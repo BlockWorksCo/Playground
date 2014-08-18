@@ -7,9 +7,9 @@
 // - Stack usage of a typical many-concurrent-state-machines type app is reduced compared to
 // having one stack per-thread & one thread per state-machine. Instead, we simply have one 
 // stack, reducing RAM usage.
-// - Simplicity. The code is very clear and deterministic.
+// - Simplicity. The code is very clear and deterministic in terms of both time and space.
 // - Can be extended to include priorities, parameters & timing to the events. Scales up nicely from
-// this minimal mechanism to a full featired scheduler.
+// this minimal mechanism to a full featured scheduler.
 // - Optional mechanism similar to EventToSequential can make a more traditional sequential
 // program-flow from individual events.
 // - Handler-execution is non-deterministic. real-time aspects are handled in the ISR which then
@@ -18,7 +18,7 @@
 // - Compared to a typical super-loop style, the EventLoop produces a more loosly-coupled 
 // architecture. Each state-machine knows nothing about the others, just the EventLoop library.
 // - Composable. Its a library, not a framework, meaning it doesn't impose any unnecessary 
-// structure on your code.
+// structure on your code. You could quite happily run multiple event loops in one App.
 // - High level, there is nothing but plain ANSI C99 here. no low-level context saving or stack
 // fiddling (as compared to an RTOS).
 // - Trivially portable to *every* architecture.
@@ -31,8 +31,8 @@
 typedef void (*EventHandler)();
 
 EventHandler    eventQ[8];
-int             eventQHead  = 0;
-int             eventQTail  = 0;
+uint8_t         eventQHead  = 0;
+uint8_t         eventQTail  = 0;
 
 void ProcessEvents()
 {
@@ -44,9 +44,10 @@ void ProcessEvents()
     }
 }
 
+
 void QueueEventHandler(EventHandler handler)
 {
-    int     nextHead    = (eventQHead + 1) % NUMBER_OF_ELEMENTS(eventQ);
+    uint8_t         nextHead    = (eventQHead + 1) % NUMBER_OF_ELEMENTS(eventQ);
 
     if( nextHead != eventQTail )
     {
@@ -55,9 +56,14 @@ void QueueEventHandler(EventHandler handler)
     }
     else
     {
+        /*
+        // Queue full situation. You haven't correctly sized the eventQ for your
+        // worst case concurrency.
+        */
         PANIC(1);
     }
 }
+
 
 void Sleep()
 {
