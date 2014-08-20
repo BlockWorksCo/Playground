@@ -66,9 +66,9 @@ template <typename First, typename... Rest> void IndexedDispatch(uint8_t index, 
 
 
 
+#if 0
 
-
-template <typename First> void EnumeratedDispatch(int enumeration, int& firstEnumeration, First& first) 
+template <typename First> void EnumeratedDispatch(const int enumeration, const int firstEnumeration, First& first) 
 {
     if(enumeration == firstEnumeration)
     {
@@ -76,7 +76,33 @@ template <typename First> void EnumeratedDispatch(int enumeration, int& firstEnu
     }
 }
 
-template <typename First, typename... Rest> void EnumeratedDispatch(int enumeration, int& firstEnumeration, First& first, Rest&... rest) 
+template <typename First, typename... Rest> void EnumeratedDispatch(const int enumeration, const int firstEnumeration, First& first, Rest&... rest) 
+{
+    if(enumeration == firstEnumeration)
+    {
+        first();
+    }
+    EnumeratedDispatch(enumeration, rest...);
+}
+
+
+#endif
+
+
+
+
+
+
+
+template <typename First, typename EnumerationType> void EnumeratedDispatch(const EnumerationType enumeration, const EnumerationType firstEnumeration, First first) 
+{
+    if(enumeration == firstEnumeration)
+    {
+        first();
+    }
+}
+
+template <typename First, typename EnumerationType, typename... Rest> void EnumeratedDispatch(const EnumerationType enumeration, const EnumerationType firstEnumeration, First& first, Rest... rest) 
 {
     if(enumeration == firstEnumeration)
     {
@@ -88,6 +114,23 @@ template <typename First, typename... Rest> void EnumeratedDispatch(int enumerat
 
 
 
+
+
+
+
+
+
+#define NUMBER_OF_ELEMENTS(a)   sizeof(a)/sizeof(a[0])
+
+
+
+typedef enum 
+{
+    eOne,
+    eTwo,
+    eThree,
+} ObjectType;
+
 int main()
 {
     One     one;
@@ -96,11 +139,16 @@ int main()
 
     //IndexedDispatch(0,  one,two,three);
 
-    int     a = 11;
-    int     b = 22;
-    int     c = 33;
-    EnumeratedDispatch(33,  a,one, b,two, c,three);
 
+    volatile ObjectType  order[]     = {eThree, eTwo, eOne};
+
+    for(int i=0; i<NUMBER_OF_ELEMENTS(order); i++)
+    {
+        EnumeratedDispatch(order[i],    eOne,   one, 
+                                        eTwo,   two, 
+                                        eThree, three);
+
+    }
     return 0;
 }
 
