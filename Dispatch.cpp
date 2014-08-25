@@ -128,10 +128,20 @@ public:
     Container(T... values)
     {
         Store(values...);
+
+        for(int i=0; i<sizeof...(T); i++)
+        {
+            printf("%d) %p\n",i,storage[i]);
+        }
     }
 
     void ShowAll()
     {
+        for(int i=0; i<sizeof...(T); i++)
+        {
+            printf("%d) %p\n",i,storage[i]);
+        }
+
         Show<T...>();
     }
 
@@ -156,17 +166,23 @@ private:
     //
     template <typename First> void Show() 
     {
-        storage[0]   = (void*)1;
+        First*  pFirst  = (First*)storage[0];
+        First   value   = *pFirst;
+        value();
     }
 
     template <typename First, typename Second, typename... Rest> void Show() 
     {
-        storage[sizeof...(Rest)]   = (void*)1;
+        First*  pFirst  = (First*)storage[sizeof...(Rest)+1];
+        First   value   = *pFirst;
+        value();
         Show<Second,Rest...>();
     }
 
 
-    void*       storage[sizeof...(T)];
+private:
+
+    const void*       storage[sizeof...(T)];
 
 };
 
@@ -186,21 +202,27 @@ typedef enum
     eTwo,
     eThree,
 } ObjectType;
+    static uint8_t     a0  = 11;
+    static uint16_t    a1  = 22;
+    static int         a2  = 33;
+    static int         a3  = 44;
+    static int         a4  = 55;
 
 int main()
 {
+#if 1
     One         one;
     Two         two;
     Three       three;
-    uint8_t     a0  = 1;
-    uint16_t    a1  = 2;
-    uint32_t    a2  = 3;
+#endif    
 
     //IndexedDispatch(0,  one,two,three);
 
-    Container<uint8_t, uint16_t, uint32_t>  container( a0,a1,a2 );
+    //Container<uint8_t, uint16_t, int,int,int>  container( a0,a1,a2,a3,a4 );
+    Container<One, Two, Three>  container( one, two, three );
+    printf("\n");
     container.ShowAll();
-
+#if 0
 
     volatile ObjectType  order[]     = {eThree, eTwo, eOne};
 
@@ -211,6 +233,7 @@ int main()
                                         eThree, three);
 
     }
+#endif    
     return 0;
 }
 
