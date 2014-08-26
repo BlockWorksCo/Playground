@@ -252,8 +252,6 @@ int main()
     One         one;
     Two         two;
     Three       three;
-    auto        t       = std::make_tuple( 1, "two", 3 );
-    pointer_to_function<bool, int ,double,foo> fooable ( t ) ;
 
     Delegate<int, One,     &One::DoAnotherThing>       oneDoAnotherThing(one);
     Delegate<int, Two,     &Two::DoAnotherThing>       twoDoAnotherThing(two);

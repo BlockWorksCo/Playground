@@ -38,7 +38,7 @@ struct Delegate
 
 
 private:
-    
+
     template<int ...S>
     ReturnType callFunc(seq<S...>)
     {
@@ -53,6 +53,75 @@ private:
 
 
 
+
+
+
+
+
+template <typename ReturnType, typename... T>
+class Container
+{
+
+public:
+
+    Container(T... values)
+    {
+        Store(values...);
+    }
+
+    template <typename... ParamTypes> ReturnType Call(uint8_t index, ParamTypes... params)
+    {
+        return Call<T...>(index);
+    }
+
+private:
+
+    //
+    //
+    //
+    template <typename First> void Store(First& first) 
+    {
+        storage[0]   = &first;
+    }
+
+    template <typename First, typename... Rest> void Store(First& first, Rest&... rest) 
+    {
+        storage[sizeof...(Rest)]   = &first;
+        Store(rest...);
+    }
+
+    //
+    //
+    //
+    template <typename First> ReturnType Call(uint8_t index) 
+    {
+        if( index == (sizeof...(T)-1) ) 
+        {
+            First*  pFirst  = (First*)storage[0];
+            First   value   = *pFirst;
+            return value(0);
+        }
+    }
+
+    template <typename First, typename Second, typename... Rest> ReturnType Call(uint8_t index) 
+    {
+        if( index == (sizeof...(T) - (sizeof...(Rest)+1)) - 1)
+        {
+            First*  pFirst  = (First*)storage[sizeof...(Rest)+1];
+            First   value   = *pFirst;
+            return value(0);
+        }
+        else
+        {            
+            return Call<Second,Rest...>(index);
+        }
+    }
+
+private:
+
+    const void*       storage[sizeof...(T)];
+
+};
 
 
 
@@ -89,12 +158,6 @@ public:
     int DoAnotherThing(int p0)
     {
         return 11;
-    }
-
-    int foo(int x, float y, double z)
-    {
-        printf("%d %f %f\n",x,y,z);
-        return x + y + z;
     }
 
 };
@@ -151,18 +214,26 @@ public:
 //
 int main(void)
 {
-    One                                     one;
-    Two                                     two;
-    Three                                   three;    
-    std::tuple<int, float, double>          params    = std::make_tuple(1, 1.2, 5);
-    //Delegate<int, One, int,float, double>   delegate  = {params, &One::foo, one};
-    Delegate<int, One, int,float, double>   delegate(one, &One::foo, params);
+    One           one;
+    Two           two;
+    Three         three;    
+    Delegate<int, One, int>       delegateOne(one, &One::DoAnotherThing, std::make_tuple(1) );
+    Delegate<int, Two, int>       delegateTwo(two, &Two::DoAnotherThing, std::make_tuple(1) );
+    Delegate<int, Three, int>     delegateThree(three, &Three::DoAnotherThing, std::make_tuple(1) );
+    Container<int, Delegate<int, One, int>, Delegate<int, Two, int>, Delegate<int, Three, int> >  anotherDelegateContainer( delegateOne, delegateTwo, delegateThree );
 
     //
     //
     //
-    delegate();
-    //printf("%f\n", delegate() );
+    printf("<%d>\n", delegateOne() );
+    printf("<%d>\n", delegateTwo() );
+    printf("<%d>\n", delegateThree() );
+
+    //
+    //
+    //
+    //printf("<%d>\n", anotherDelegateContainer.Call(2) );
+
 }
 
 
