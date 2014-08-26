@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
-
+#include <tuple>
 
 
 
@@ -21,7 +21,7 @@ public:
         printf("<One>.\n");
     }
 
-    int DoAnotherThing()
+    int DoAnotherThing(int p0)
     {
         return 11;
     }
@@ -42,7 +42,7 @@ public:
         printf("<Two>.\n");
     }
 
-    int DoAnotherThing()
+    int DoAnotherThing(int p0)
     {
         return 22;
     }
@@ -63,7 +63,7 @@ public:
         printf("<Three>.\n");
     }
 
-    int DoAnotherThing()
+    int DoAnotherThing(int p0)
     {
         return 33;
     }
@@ -190,7 +190,7 @@ private:
         {
             First*  pFirst  = (First*)storage[0];
             First   value   = *pFirst;
-            return value();
+            return value(0);
         }
     }
 
@@ -200,7 +200,7 @@ private:
         {
             First*  pFirst  = (First*)storage[sizeof...(Rest)+1];
             First   value   = *pFirst;
-            return value();
+            return value(0);
         }
         else
         {            
@@ -222,7 +222,7 @@ private:
 //
 //
 //
-template <typename ReturnType, typename TargetType, ReturnType (TargetType::*targetMethod)() >
+template <typename ReturnType, typename TargetType, ReturnType (TargetType::*targetMethod)(int) >
 struct Delegate
 {                                                              
     Delegate(TargetType& _instance) : instance(_instance) {}   
@@ -232,10 +232,10 @@ struct Delegate
 
 
 
-
-
-#define NUMBER_OF_ELEMENTS(a)   sizeof(a)/sizeof(a[0])
-
+int blaa(int p0, char* p1, int p2)
+{
+    printf("%d %s %d\n",p0, p1, p2);
+}
 
 
 typedef enum 
@@ -252,19 +252,13 @@ int main()
     One         one;
     Two         two;
     Three       three;
-    Delegate<void, One,   &One::DoSomething>      delegateOne(one);
-    Delegate<void, Two,   &Two::DoSomething>      delegateTwo(two);
-    Delegate<void, Three, &Three::DoSomething>    delegateThree(three);    
-    Container<void, Delegate<void, One, &One::DoSomething>, Delegate<void, Two, &Two::DoSomething>, Delegate<void, Three, &Three::DoSomething>>  delegateContainer( delegateOne, delegateTwo, delegateThree );
+    auto        t       = std::make_tuple( 1, "two", 3 );
+    pointer_to_function<bool, int ,double,foo> fooable ( t ) ;
 
     Delegate<int, One,     &One::DoAnotherThing>       oneDoAnotherThing(one);
     Delegate<int, Two,     &Two::DoAnotherThing>       twoDoAnotherThing(two);
     Delegate<int, Three,   &Three::DoAnotherThing>     threeDoAnotherThing(three);
     Container<int, Delegate<int, One, &One::DoAnotherThing>, Delegate<int, Two, &Two::DoAnotherThing>, Delegate<int, Three, &Three::DoAnotherThing> >  anotherDelegateContainer( oneDoAnotherThing, twoDoAnotherThing, threeDoAnotherThing );
-
-    delegateContainer.Call(0);
-    delegateContainer.Call(1);
-    delegateContainer.Call(2);
 
     printf("<%d>\n", anotherDelegateContainer.Call(0) );
     printf("<%d>\n", anotherDelegateContainer.Call(1) );
