@@ -15,6 +15,11 @@ public:
     {
         printf("One.\n");
     }
+
+    void DoSomething()
+    {
+        printf("<One>.\n");
+    }
 };
 
 
@@ -26,6 +31,11 @@ public:
     {
         printf("Two.\n");
     }
+
+    void DoSomething()
+    {
+        printf("<Two>.\n");
+    }
 };
 
 
@@ -36,6 +46,11 @@ public:
     void operator()()
     {
         printf("Three.\n");
+    }
+
+    void DoSomething()
+    {
+        printf("<Three>.\n");
     }
 };
 
@@ -128,21 +143,11 @@ public:
     Container(T... values)
     {
         Store(values...);
-
-        for(int i=0; i<sizeof...(T); i++)
-        {
-            printf("%d) %p\n",i,storage[i]);
-        }
     }
 
-    void ShowAll()
+    void Call(uint8_t index)
     {
-        for(int i=0; i<sizeof...(T); i++)
-        {
-            printf("%d) %p\n",i,storage[i]);
-        }
-
-        Show<T...>();
+        Call<T...>(index);
     }
 
 private:
@@ -164,21 +169,29 @@ private:
     //
     //
     //
-    template <typename First> void Show() 
+    template <typename First> void Call(uint8_t index) 
     {
-        First*  pFirst  = (First*)storage[0];
-        First   value   = *pFirst;
-        value();
+        if( index == (sizeof...(T)-1) ) 
+        {
+            First*  pFirst  = (First*)storage[0];
+            First   value   = *pFirst;
+            value();
+        }
     }
 
-    template <typename First, typename Second, typename... Rest> void Show() 
+    template <typename First, typename Second, typename... Rest> void Call(uint8_t index) 
     {
-        First*  pFirst  = (First*)storage[sizeof...(Rest)+1];
-        First   value   = *pFirst;
-        value();
-        Show<Second,Rest...>();
+        if( index == (sizeof...(T) - (sizeof...(Rest)+1)) - 1)
+        {
+            First*  pFirst  = (First*)storage[sizeof...(Rest)+1];
+            First   value   = *pFirst;
+            value();
+        }
+        else
+        {            
+            Call<Second,Rest...>(index);
+        }
     }
-
 
 private:
 
@@ -186,6 +199,22 @@ private:
 
 };
 
+
+
+
+
+
+
+//
+//
+//
+template <typename TargetType, void (TargetType::*targetMethod)() >
+struct Delegate
+{                                                              
+    Delegate(TargetType& _instance) : instance(_instance) {}   
+    void operator()() { (instance.*targetMethod)(); }                
+    TargetType&  instance;                                     
+};
 
 
 
@@ -202,26 +231,24 @@ typedef enum
     eTwo,
     eThree,
 } ObjectType;
-    static uint8_t     a0  = 11;
-    static uint16_t    a1  = 22;
-    static int         a2  = 33;
-    static int         a3  = 44;
-    static int         a4  = 55;
+
+
 
 int main()
 {
-#if 1
     One         one;
     Two         two;
     Three       three;
-#endif    
+    Delegate<One,   &One::DoSomething>      delegateOne(one);
+    Delegate<Two,   &Two::DoSomething>      delegateTwo(two);
+    Delegate<Three, &Three::DoSomething>    delegateThree(three);
+    Container<Delegate<One, &One::DoSomething>, Delegate<Two, &Two::DoSomething>, Delegate<Three, &Three::DoSomething>>  delegateContainer( delegateOne, delegateTwo, delegateThree );
+    
+    delegateContainer.Call(0);
+    delegateContainer.Call(1);
+    delegateContainer.Call(2);
 
     //IndexedDispatch(0,  one,two,three);
-
-    //Container<uint8_t, uint16_t, int,int,int>  container( a0,a1,a2,a3,a4 );
-    Container<One, Two, Three>  container( one, two, three );
-    printf("\n");
-    container.ShowAll();
 #if 0
 
     volatile ObjectType  order[]     = {eThree, eTwo, eOne};
