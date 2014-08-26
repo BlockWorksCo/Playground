@@ -99,7 +99,7 @@ private:
         {
             First*  pFirst  = (First*)storage[0];
             First   value   = *pFirst;
-            return value(0);
+            return value();
         }
     }
 
@@ -109,7 +109,7 @@ private:
         {
             First*  pFirst  = (First*)storage[sizeof...(Rest)+1];
             First   value   = *pFirst;
-            return value(0);
+            return value();
         }
         else
         {            
@@ -225,14 +225,16 @@ int main(void)
     //
     //
     //
-    printf("<%d>\n", delegateOne() );
-    printf("<%d>\n", delegateTwo() );
-    printf("<%d>\n", delegateThree() );
+    //printf("<%d>\n", delegateOne() );
+    //printf("<%d>\n", delegateTwo() );
+    //printf("<%d>\n", delegateThree() );
 
     //
     //
     //
-    //printf("<%d>\n", anotherDelegateContainer.Call(2) );
+    printf("<%d>\n", anotherDelegateContainer.Call(0) );
+    printf("<%d>\n", anotherDelegateContainer.Call(1) );
+    printf("<%d>\n", anotherDelegateContainer.Call(2) );
 
 }
 
