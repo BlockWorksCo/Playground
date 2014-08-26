@@ -24,12 +24,12 @@ double foo(int x, float y, double z)
 
 
 template <typename ...Args>
-struct save_it_for_later
+struct Delegate
 {
   std::tuple<Args...>   params;
   double                (*func)(Args...);
 
-  double delayed_dispatch()
+  double operator()()
   {
     return callFunc(typename gens<sizeof...(Args)>::type());
   }
@@ -45,12 +45,13 @@ struct save_it_for_later
 
 int main(void)
 {
-  gens<10>        g;
-  gens<10>::type  s;
-
-  std::tuple<int, float, double> t = std::make_tuple(1, 1.2, 5);
-  save_it_for_later<int,float, double> saved = {t, foo};
-  saved.delayed_dispatch();
+  std::tuple<int, float, double>  t         = std::make_tuple(1, 1.2, 5);
+  Delegate<int,float, double>     delegate  = {t, foo};
+  
+  //
+  //
+  //
+  delegate();
 }
 
 
