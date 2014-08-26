@@ -15,7 +15,7 @@ template<int ...S> struct gens<0, S...>{ typedef seq<S...> type; };
 
 
 
-double foo(int x, float y, double z)
+int foo(int x, float y, double z)
 {
     printf("%d %f %f\n",x,y,z);
     return x + y + z;
@@ -23,19 +23,19 @@ double foo(int x, float y, double z)
 
 
 
-template <typename ...Args>
+template < typename ReturnType, typename ...Args>
 struct Delegate
 {
     std::tuple<Args...>   params;
-    double                (*func)(Args...);
+    ReturnType            (*func)(Args...);
 
-    double operator()()
+    ReturnType operator()()
     {
         return callFunc(typename gens<sizeof...(Args)>::type());
     }
 
     template<int ...S>
-    double callFunc(seq<S...>)
+    ReturnType callFunc(seq<S...>)
     {
         return func(std::get<S>(params) ...);
     }
@@ -46,12 +46,13 @@ struct Delegate
 int main(void)
 {
     std::tuple<int, float, double>  t         = std::make_tuple(1, 1.2, 5);
-    Delegate<int,float, double>     delegate  = {t, foo};
+    Delegate<int, int,float, double>     delegate  = {t, foo};
 
     //
     //
     //
     delegate();
+    //printf("%f\n", delegate() );
 }
 
 
