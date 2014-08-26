@@ -160,7 +160,7 @@ public:
         Store(values...);
     }
 
-    ReturnType Call(uint8_t index)
+    template <typename... ParamTypes> ReturnType Call(uint8_t index, ParamTypes... params)
     {
         return Call<T...>(index);
     }
@@ -219,28 +219,14 @@ private:
 
 
 
-
-//
-//
-//
-template <typename TargetType, void (TargetType::*targetMethod)() >
-struct Delegate
-{                                                              
-    Delegate(TargetType& _instance) : instance(_instance) {}   
-    void operator()() { (instance.*targetMethod)(); }                
-    TargetType&  instance;                                     
-};
-
-
-
 //
 //
 //
 template <typename ReturnType, typename TargetType, ReturnType (TargetType::*targetMethod)() >
-struct DelegateWithReturn
+struct Delegate
 {                                                              
-    DelegateWithReturn(TargetType& _instance) : instance(_instance) {}   
-    ReturnType operator()() { return (instance.*targetMethod)(); }                
+    Delegate(TargetType& _instance) : instance(_instance) {}   
+    template <typename... T> ReturnType operator()(T... params) { return (instance.*targetMethod)(params...); }                
     TargetType&  instance;                                     
 };
 
@@ -266,15 +252,15 @@ int main()
     One         one;
     Two         two;
     Three       three;
-    Delegate<One,   &One::DoSomething>      delegateOne(one);
-    Delegate<Two,   &Two::DoSomething>      delegateTwo(two);
-    Delegate<Three, &Three::DoSomething>    delegateThree(three);    
-    Container<void, Delegate<One, &One::DoSomething>, Delegate<Two, &Two::DoSomething>, Delegate<Three, &Three::DoSomething>>  delegateContainer( delegateOne, delegateTwo, delegateThree );
+    Delegate<void, One,   &One::DoSomething>      delegateOne(one);
+    Delegate<void, Two,   &Two::DoSomething>      delegateTwo(two);
+    Delegate<void, Three, &Three::DoSomething>    delegateThree(three);    
+    Container<void, Delegate<void, One, &One::DoSomething>, Delegate<void, Two, &Two::DoSomething>, Delegate<void, Three, &Three::DoSomething>>  delegateContainer( delegateOne, delegateTwo, delegateThree );
 
-    DelegateWithReturn<int, One,     &One::DoAnotherThing>       oneDoAnotherThing(one);
-    DelegateWithReturn<int, Two,     &Two::DoAnotherThing>       twoDoAnotherThing(two);
-    DelegateWithReturn<int, Three,   &Three::DoAnotherThing>     threeDoAnotherThing(three);
-    Container<int, DelegateWithReturn<int, One,     &One::DoAnotherThing>, DelegateWithReturn<int, Two,     &Two::DoAnotherThing>, DelegateWithReturn<int, Three,   &Three::DoAnotherThing> >  anotherDelegateContainer( oneDoAnotherThing, twoDoAnotherThing, threeDoAnotherThing );
+    Delegate<int, One,     &One::DoAnotherThing>       oneDoAnotherThing(one);
+    Delegate<int, Two,     &Two::DoAnotherThing>       twoDoAnotherThing(two);
+    Delegate<int, Three,   &Three::DoAnotherThing>     threeDoAnotherThing(three);
+    Container<int, Delegate<int, One,     &One::DoAnotherThing>, Delegate<int, Two,     &Two::DoAnotherThing>, Delegate<int, Three,   &Three::DoAnotherThing> >  anotherDelegateContainer( oneDoAnotherThing, twoDoAnotherThing, threeDoAnotherThing );
 
     delegateContainer.Call(0);
     delegateContainer.Call(1);
