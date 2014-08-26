@@ -260,7 +260,7 @@ int main()
     Delegate<int, One,     &One::DoAnotherThing>       oneDoAnotherThing(one);
     Delegate<int, Two,     &Two::DoAnotherThing>       twoDoAnotherThing(two);
     Delegate<int, Three,   &Three::DoAnotherThing>     threeDoAnotherThing(three);
-    Container<int, Delegate<int, One,     &One::DoAnotherThing>, Delegate<int, Two,     &Two::DoAnotherThing>, Delegate<int, Three,   &Three::DoAnotherThing> >  anotherDelegateContainer( oneDoAnotherThing, twoDoAnotherThing, threeDoAnotherThing );
+    Container<int, Delegate<int, One, &One::DoAnotherThing>, Delegate<int, Two, &Two::DoAnotherThing>, Delegate<int, Three, &Three::DoAnotherThing> >  anotherDelegateContainer( oneDoAnotherThing, twoDoAnotherThing, threeDoAnotherThing );
 
     delegateContainer.Call(0);
     delegateContainer.Call(1);
