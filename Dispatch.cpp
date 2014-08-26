@@ -20,6 +20,11 @@ public:
     {
         printf("<One>.\n");
     }
+
+    int DoAnotherThing()
+    {
+        return 11;
+    }
 };
 
 
@@ -36,6 +41,11 @@ public:
     {
         printf("<Two>.\n");
     }
+
+    int DoAnotherThing()
+    {
+        return 22;
+    }
 };
 
 
@@ -51,6 +61,11 @@ public:
     void DoSomething()
     {
         printf("<Three>.\n");
+    }
+
+    int DoAnotherThing()
+    {
+        return 33;
     }
 };
 
@@ -134,7 +149,7 @@ template <typename First, typename EnumerationType, typename... Rest> void Enume
 
 
 
-template <typename... T>
+template <typename ReturnType, typename... T>
 class Container
 {
 
@@ -145,9 +160,9 @@ public:
         Store(values...);
     }
 
-    void Call(uint8_t index)
+    ReturnType Call(uint8_t index)
     {
-        Call<T...>(index);
+        return Call<T...>(index);
     }
 
 private:
@@ -169,27 +184,27 @@ private:
     //
     //
     //
-    template <typename First> void Call(uint8_t index) 
+    template <typename First> ReturnType Call(uint8_t index) 
     {
         if( index == (sizeof...(T)-1) ) 
         {
             First*  pFirst  = (First*)storage[0];
             First   value   = *pFirst;
-            value();
+            return value();
         }
     }
 
-    template <typename First, typename Second, typename... Rest> void Call(uint8_t index) 
+    template <typename First, typename Second, typename... Rest> ReturnType Call(uint8_t index) 
     {
         if( index == (sizeof...(T) - (sizeof...(Rest)+1)) - 1)
         {
             First*  pFirst  = (First*)storage[sizeof...(Rest)+1];
             First   value   = *pFirst;
-            value();
+            return value();
         }
         else
         {            
-            Call<Second,Rest...>(index);
+            return Call<Second,Rest...>(index);
         }
     }
 
@@ -218,6 +233,18 @@ struct Delegate
 
 
 
+//
+//
+//
+template <typename ReturnType, typename TargetType, ReturnType (TargetType::*targetMethod)() >
+struct DelegateWithReturn
+{                                                              
+    DelegateWithReturn(TargetType& _instance) : instance(_instance) {}   
+    ReturnType operator()() { return (instance.*targetMethod)(); }                
+    TargetType&  instance;                                     
+};
+
+
 
 
 
@@ -241,12 +268,21 @@ int main()
     Three       three;
     Delegate<One,   &One::DoSomething>      delegateOne(one);
     Delegate<Two,   &Two::DoSomething>      delegateTwo(two);
-    Delegate<Three, &Three::DoSomething>    delegateThree(three);
-    Container<Delegate<One, &One::DoSomething>, Delegate<Two, &Two::DoSomething>, Delegate<Three, &Three::DoSomething>>  delegateContainer( delegateOne, delegateTwo, delegateThree );
-    
+    Delegate<Three, &Three::DoSomething>    delegateThree(three);    
+    Container<void, Delegate<One, &One::DoSomething>, Delegate<Two, &Two::DoSomething>, Delegate<Three, &Three::DoSomething>>  delegateContainer( delegateOne, delegateTwo, delegateThree );
+
+    DelegateWithReturn<int, One,     &One::DoAnotherThing>       oneDoAnotherThing(one);
+    DelegateWithReturn<int, Two,     &Two::DoAnotherThing>       twoDoAnotherThing(two);
+    DelegateWithReturn<int, Three,   &Three::DoAnotherThing>     threeDoAnotherThing(three);
+    Container<int, DelegateWithReturn<int, One,     &One::DoAnotherThing>, DelegateWithReturn<int, Two,     &Two::DoAnotherThing>, DelegateWithReturn<int, Three,   &Three::DoAnotherThing> >  anotherDelegateContainer( oneDoAnotherThing, twoDoAnotherThing, threeDoAnotherThing );
+
     delegateContainer.Call(0);
     delegateContainer.Call(1);
     delegateContainer.Call(2);
+
+    printf("<%d>\n", anotherDelegateContainer.Call(0) );
+    printf("<%d>\n", anotherDelegateContainer.Call(1) );
+    printf("<%d>\n", anotherDelegateContainer.Call(2) );
 
     //IndexedDispatch(0,  one,two,three);
 #if 0
