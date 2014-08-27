@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <tuple>
-
+#include <functional>
 
 
 //
@@ -231,11 +231,34 @@ One           one;
 Two           two;
 Three         three;    
 
+
+
+
+auto func = [](int a, int b) -> int { return a+b; };
+
+auto Blaa = [](int protocolType) -> int { switch(protocolType) { case 1:return one.DoAnotherThing(protocolType);break;   case 2:return two.DoAnotherThing(protocolType);break;  case 3:return three.DoAnotherThing(protocolType);break; } };
+
+
+
+
+
+void DoIt(int type, int (*func)(int) )
+{
+    printf("%d\n", func(type) );
+}
+
 //
 //
 //
 int main(void)
 {
+    DoIt(1, Blaa);
+    DoIt(2, Blaa);
+    DoIt(3, Blaa);
+
+
+    return 0;
+#if 0
     typedef std::tuple<int>    ParamTypes;
     Delegate<int, One, int>       delegateOne(one, &One::DoAnotherThing );
     Delegate<int, Two, int>       delegateTwo(two, &Two::DoAnotherThing );
@@ -253,7 +276,8 @@ int main(void)
                                                                             simpleThree );
 
     simpleContainer.Call(0, std::make_tuple(99) );
-
+#endif    
+#if 0
     //
     //
     //
@@ -267,7 +291,7 @@ int main(void)
     printf("<%d>\n", anotherDelegateContainer.Call(0, std::make_tuple(1) ) );
     printf("<%d>\n", anotherDelegateContainer.Call(1, std::make_tuple(2) ) );
     printf("<%d>\n", anotherDelegateContainer.Call(2, std::make_tuple(3) ) );
-
+#endif
 }
 
 
