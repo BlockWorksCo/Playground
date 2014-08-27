@@ -20,38 +20,35 @@ template<int ...S> struct gens<0, S...>{ typedef seq<S...> type; };
 //
 //
 template < typename ReturnType, typename TargetType, typename ...Args>
-struct Delegate
+class Delegate
 {
-
+public:
     Delegate(TargetType& _targetInstance, ReturnType (TargetType::*_func)(Args...) ) :
         targetInstance(_targetInstance),
         func(_func)
     {
-
     }
 
-    ReturnType operator()(Args... _params)
+    ReturnType operator()(Args... params)
     {
-        return Call( std::make_tuple(_params... ) );
+        return Call( std::make_tuple(params... ) );
     }
 
-    ReturnType Call(std::tuple<Args...> _params)
+    ReturnType Call(std::tuple<Args...> params)
     {
-        params  = _params;
-        return callFunc(typename gens<sizeof...(Args)>::type());        
+        return callFunc(params, typename gens<sizeof...(Args)>::type());        
     }
 
 
 private:
 
     template<int ...S>
-    ReturnType callFunc(seq<S...>)
+    ReturnType callFunc(std::tuple<Args...> params, seq<S...>)
     {
         return (targetInstance.*func)(std::get<S>(params) ...);
     }
 
 
-    std::tuple<Args...>     params;
     ReturnType              (TargetType::*func)(Args...);
     TargetType&             targetInstance;
 };
@@ -144,7 +141,9 @@ private:
 
 
 
-
+volatile uint8_t    v0  = 0;
+volatile uint8_t    v1  = 0;
+volatile uint8_t    v2  = 0;
 
 
 class One
@@ -165,6 +164,10 @@ public:
         return p0*11;
     }
 
+    void Simple(uint8_t p0)
+    {
+        v0  = p0;
+    }
 };
 
 
@@ -185,6 +188,11 @@ public:
     int DoAnotherThing(int p0)
     {
         return p0*11;
+    }
+
+    void Simple(uint8_t p0)
+    {
+        v1  = p0;
     }
 };
 
@@ -207,40 +215,53 @@ public:
     {
         return p0*11;
     }
+
+    void Simple(uint8_t p0)
+    {
+        v2  = p0;
+    }
 };
 
 
 
 
 
+One           one;
+Two           two;
+Three         three;    
 
 //
 //
 //
 int main(void)
 {
-    One           one;
-    Two           two;
-    Three         three;    
     typedef std::tuple<int>    ParamTypes;
     Delegate<int, One, int>       delegateOne(one, &One::DoAnotherThing );
     Delegate<int, Two, int>       delegateTwo(two, &Two::DoAnotherThing );
     Delegate<int, Three, int>     delegateThree(three, &Three::DoAnotherThing );
     Container<int,ParamTypes, Delegate<int, One, int>, Delegate<int, Two, int>, Delegate<int, Three, int> >  anotherDelegateContainer( delegateOne, delegateTwo, delegateThree );
 
-    //
-    //
-    //
-    printf("<%d>\n", delegateOne(1) );
-    printf("<%d>\n", delegateTwo(2) );
-    printf("<%d>\n", delegateThree(3) );
+
+    Delegate<void, One, uint8_t>       simpleOne(one, &One::Simple );
+    Delegate<void, Two, uint8_t>       simpleTwo(two, &Two::Simple );
+    Delegate<void, Three, uint8_t>     simpleThree(three, &Three::Simple );
+    Container<void,ParamTypes, Delegate<void, One, uint8_t>, Delegate<void, Two, uint8_t>, Delegate<void, Three, uint8_t> >  simpleContainer( simpleOne, simpleTwo, simpleThree );
+
+    simpleContainer.Call(0, std::make_tuple(99) );
 
     //
     //
     //
-    printf("<%d>\n", anotherDelegateContainer.Call(0, std::make_tuple(1) ) );
-    printf("<%d>\n", anotherDelegateContainer.Call(1, std::make_tuple(2) ) );
-    printf("<%d>\n", anotherDelegateContainer.Call(2, std::make_tuple(3) ) );
+    //printf("<%d>\n", delegateOne(1) );
+    //printf("<%d>\n", delegateTwo(2) );
+    //printf("<%d>\n", delegateThree(3) );
+
+    //
+    //
+    //
+    //printf("<%d>\n", anotherDelegateContainer.Call(0, std::make_tuple(1) ) );
+    //printf("<%d>\n", anotherDelegateContainer.Call(1, std::make_tuple(2) ) );
+    //printf("<%d>\n", anotherDelegateContainer.Call(2, std::make_tuple(3) ) );
 
 }
 
