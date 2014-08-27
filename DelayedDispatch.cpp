@@ -240,33 +240,33 @@ int main(void)
     Delegate<int, One, int>       delegateOne(one, &One::DoAnotherThing );
     Delegate<int, Two, int>       delegateTwo(two, &Two::DoAnotherThing );
     Delegate<int, Three, int>     delegateThree(three, &Three::DoAnotherThing );
-    Container<int,ParamTypes, Delegate<int, One, int>, Delegate<int, Two, int>, Delegate<int, Three, int> >  anotherDelegateContainer( delegateOne, delegateTwo, delegateThree );
+    Container<int,ParamTypes, decltype(delegateOne), decltype(delegateTwo), decltype(delegateThree) >  anotherDelegateContainer( delegateOne, delegateTwo, delegateThree );
 
 
     Delegate<void, One, uint8_t>       simpleOne(one, &One::Simple );
     Delegate<void, Two, uint8_t>       simpleTwo(two, &Two::Simple );
     Delegate<void, Three, uint8_t>     simpleThree(three, &Three::Simple );
-    Container<void,ParamTypes,  Delegate<void, One, uint8_t>, 
-                                Delegate<void, Two, uint8_t>, 
-                                Delegate<void, Three, uint8_t> >  simpleContainer(  simpleOne, 
-                                                                                    simpleTwo, 
-                                                                                    simpleThree );
+    Container<void,ParamTypes,  decltype(simpleOne), 
+                                decltype(simpleTwo), 
+                                decltype(simpleThree) >  simpleContainer(   simpleOne, 
+                                                                            simpleTwo, 
+                                                                            simpleThree );
 
     simpleContainer.Call(0, std::make_tuple(99) );
 
     //
     //
     //
-    //printf("<%d>\n", delegateOne(1) );
-    //printf("<%d>\n", delegateTwo(2) );
-    //printf("<%d>\n", delegateThree(3) );
+    printf("<%d>\n", delegateOne(1) );
+    printf("<%d>\n", delegateTwo(2) );
+    printf("<%d>\n", delegateThree(3) );
 
     //
     //
     //
-    //printf("<%d>\n", anotherDelegateContainer.Call(0, std::make_tuple(1) ) );
-    //printf("<%d>\n", anotherDelegateContainer.Call(1, std::make_tuple(2) ) );
-    //printf("<%d>\n", anotherDelegateContainer.Call(2, std::make_tuple(3) ) );
+    printf("<%d>\n", anotherDelegateContainer.Call(0, std::make_tuple(1) ) );
+    printf("<%d>\n", anotherDelegateContainer.Call(1, std::make_tuple(2) ) );
+    printf("<%d>\n", anotherDelegateContainer.Call(2, std::make_tuple(3) ) );
 
 }
 
