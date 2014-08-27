@@ -7,7 +7,8 @@
 
 
 //
-//
+// Originally from:
+// http://stackoverflow.com/questions/7858817/unpacking-a-tuple-to-call-a-matching-function-pointer
 //
 template<int ...> struct seq {};
 
@@ -245,7 +246,11 @@ int main(void)
     Delegate<void, One, uint8_t>       simpleOne(one, &One::Simple );
     Delegate<void, Two, uint8_t>       simpleTwo(two, &Two::Simple );
     Delegate<void, Three, uint8_t>     simpleThree(three, &Three::Simple );
-    Container<void,ParamTypes, Delegate<void, One, uint8_t>, Delegate<void, Two, uint8_t>, Delegate<void, Three, uint8_t> >  simpleContainer( simpleOne, simpleTwo, simpleThree );
+    Container<void,ParamTypes,  Delegate<void, One, uint8_t>, 
+                                Delegate<void, Two, uint8_t>, 
+                                Delegate<void, Three, uint8_t> >  simpleContainer(  simpleOne, 
+                                                                                    simpleTwo, 
+                                                                                    simpleThree );
 
     simpleContainer.Call(0, std::make_tuple(99) );
 
