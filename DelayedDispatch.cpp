@@ -227,7 +227,7 @@ int main(void)
     Delegate<int, One, int>       delegateOne(one, &One::DoAnotherThing, std::make_tuple(1) );
     Delegate<int, Two, int>       delegateTwo(two, &Two::DoAnotherThing, std::make_tuple(1) );
     Delegate<int, Three, int>     delegateThree(three, &Three::DoAnotherThing, std::make_tuple(1) );
-    Container<ParamTypes, int, Delegate<int, One, int>, Delegate<int, Two, int>, Delegate<int, Three, int> >  anotherDelegateContainer( delegateOne, delegateTwo, delegateThree );
+    Container<int,ParamTypes, Delegate<int, One, int>, Delegate<int, Two, int>, Delegate<int, Three, int> >  anotherDelegateContainer( delegateOne, delegateTwo, delegateThree );
 
     //
     //
@@ -239,10 +239,9 @@ int main(void)
     //
     //
     //
-    //anotherDelegateContainer.Call(0, std::make_tuple(1) );
-    //printf("<%d>\n", anotherDelegateContainer.Call(0, std::make_tuple(1) );
-    //printf("<%d>\n", anotherDelegateContainer.Call(1) );
-    //printf("<%d>\n", anotherDelegateContainer.Call(2) );
+    printf("<%d>\n", anotherDelegateContainer.Call(0, std::make_tuple(1) ) );
+    printf("<%d>\n", anotherDelegateContainer.Call(1, std::make_tuple(2) ) );
+    printf("<%d>\n", anotherDelegateContainer.Call(2, std::make_tuple(3) ) );
 
 }
 
