@@ -36,7 +36,7 @@ struct Delegate
         Call<CallArgs...>( std::make_tuple(_params... ) );
     }
 
-    template<typename... CallArgs> void Call(std::tuple<CallArgs...> _params)
+    template<typename... CallArgs> ReturnType Call(std::tuple<CallArgs...> _params)
     {
         params  = _params;
         return callFunc(typename gens<sizeof...(Args)>::type());        
@@ -64,7 +64,7 @@ private:
 
 
 
-template <typename ReturnType, typename... T>
+template <typename ReturnType, typename ParamTypes ,typename... T>
 class Container
 {
 
@@ -75,9 +75,9 @@ public:
         Store(values...);
     }
 
-    template <typename ParamTypes> ReturnType Call(uint8_t index, ParamTypes _params)
+    ReturnType Call(uint8_t index, ParamTypes _params)
     {
-        return Call<ParamTypes, T...>(index, _params);
+        return Call<T...>(index, _params);
     }
 
 private:
@@ -99,7 +99,7 @@ private:
     //
     //
     //
-    template <typename ParamTypes, typename First> ReturnType Call(uint8_t index, ParamTypes params) 
+    template <typename First> ReturnType Call(uint8_t index, ParamTypes params) 
     {
         if( index == (sizeof...(T)-1) ) 
         {
@@ -109,7 +109,7 @@ private:
         }
     }
 
-    template <typename ParamTypes, typename First, typename Second, typename... Rest> ReturnType Call(uint8_t index, ParamTypes params) 
+    template <typename First, typename Second, typename... Rest> ReturnType Call(uint8_t index, ParamTypes params) 
     {
         if( index == (sizeof...(T) - (sizeof...(Rest)+1)) - 1)
         {
@@ -119,7 +119,7 @@ private:
         }
         else
         {            
-            return Call<ParamTypes, Second,Rest...>(index);
+            return Call<Second,Rest...>(index, params);
         }
     }
 
