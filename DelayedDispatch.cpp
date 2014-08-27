@@ -31,9 +31,15 @@ struct Delegate
 
     }
 
-    ReturnType operator()()
+    template<typename... CallArgs> ReturnType operator()(CallArgs... _params)
     {
-        return callFunc(typename gens<sizeof...(Args)>::type());
+        Call<CallArgs...>( std::make_tuple(_params... ) );
+    }
+
+    template<typename... CallArgs> void Call(std::tuple<CallArgs...> _params)
+    {
+        params  = _params;
+        return callFunc(typename gens<sizeof...(Args)>::type());        
     }
 
 
@@ -69,9 +75,9 @@ public:
         Store(values...);
     }
 
-    template <typename... ParamTypes> ReturnType Call(uint8_t index, ParamTypes... params)
+    template <typename ParamTypes> ReturnType Call(uint8_t index, ParamTypes _params)
     {
-        return Call<T...>(index);
+        return Call<ParamTypes, T...>(index, _params);
     }
 
 private:
@@ -93,27 +99,27 @@ private:
     //
     //
     //
-    template <typename First> ReturnType Call(uint8_t index) 
+    template <typename ParamTypes, typename First> ReturnType Call(uint8_t index, ParamTypes params) 
     {
         if( index == (sizeof...(T)-1) ) 
         {
             First*  pFirst  = (First*)storage[0];
             First   value   = *pFirst;
-            return value();
+            return value.Call(params);
         }
     }
 
-    template <typename First, typename Second, typename... Rest> ReturnType Call(uint8_t index) 
+    template <typename ParamTypes, typename First, typename Second, typename... Rest> ReturnType Call(uint8_t index, ParamTypes params) 
     {
         if( index == (sizeof...(T) - (sizeof...(Rest)+1)) - 1)
         {
             First*  pFirst  = (First*)storage[sizeof...(Rest)+1];
             First   value   = *pFirst;
-            return value();
+            return value.Call(params);
         }
         else
         {            
-            return Call<Second,Rest...>(index);
+            return Call<ParamTypes, Second,Rest...>(index);
         }
     }
 
@@ -157,7 +163,7 @@ public:
 
     int DoAnotherThing(int p0)
     {
-        return 11;
+        return p0*11;
     }
 
 };
@@ -179,7 +185,7 @@ public:
 
     int DoAnotherThing(int p0)
     {
-        return 22;
+        return p0*11;
     }
 };
 
@@ -200,7 +206,7 @@ public:
 
     int DoAnotherThing(int p0)
     {
-        return 33;
+        return p0*11;
     }
 };
 
@@ -217,24 +223,25 @@ int main(void)
     One           one;
     Two           two;
     Three         three;    
+    typedef std::tuple<int>    ParamTypes;
     Delegate<int, One, int>       delegateOne(one, &One::DoAnotherThing, std::make_tuple(1) );
     Delegate<int, Two, int>       delegateTwo(two, &Two::DoAnotherThing, std::make_tuple(1) );
     Delegate<int, Three, int>     delegateThree(three, &Three::DoAnotherThing, std::make_tuple(1) );
-    Container<int, Delegate<int, One, int>, Delegate<int, Two, int>, Delegate<int, Three, int> >  anotherDelegateContainer( delegateOne, delegateTwo, delegateThree );
+    Container<ParamTypes, int, Delegate<int, One, int>, Delegate<int, Two, int>, Delegate<int, Three, int> >  anotherDelegateContainer( delegateOne, delegateTwo, delegateThree );
 
     //
     //
     //
-    //printf("<%d>\n", delegateOne() );
-    //printf("<%d>\n", delegateTwo() );
-    //printf("<%d>\n", delegateThree() );
+    printf("<%d>\n", delegateOne(1) );
+    printf("<%d>\n", delegateTwo(2) );
+    printf("<%d>\n", delegateThree(3) );
 
     //
     //
     //
-    printf("<%d>\n", anotherDelegateContainer.Call(0) );
-    printf("<%d>\n", anotherDelegateContainer.Call(1) );
-    printf("<%d>\n", anotherDelegateContainer.Call(2) );
+    //printf("<%d>\n", anotherDelegateContainer.Call(0) );
+    //printf("<%d>\n", anotherDelegateContainer.Call(1) );
+    //printf("<%d>\n", anotherDelegateContainer.Call(2) );
 
 }
 
