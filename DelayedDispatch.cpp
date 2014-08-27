@@ -31,12 +31,12 @@ struct Delegate
 
     }
 
-    template<typename... CallArgs> ReturnType operator()(CallArgs... _params)
+    ReturnType operator()(Args... _params)
     {
-        Call<CallArgs...>( std::make_tuple(_params... ) );
+        return Call( std::make_tuple(_params... ) );
     }
 
-    template<typename... CallArgs> ReturnType Call(std::tuple<CallArgs...> _params)
+    ReturnType Call(std::tuple<Args...> _params)
     {
         params  = _params;
         return callFunc(typename gens<sizeof...(Args)>::type());        
@@ -239,7 +239,7 @@ int main(void)
     //
     //
     //
-    anotherDelegateContainer.Call(0, std::make_tuple(1) );
+    //anotherDelegateContainer.Call(0, std::make_tuple(1) );
     //printf("<%d>\n", anotherDelegateContainer.Call(0, std::make_tuple(1) );
     //printf("<%d>\n", anotherDelegateContainer.Call(1) );
     //printf("<%d>\n", anotherDelegateContainer.Call(2) );
