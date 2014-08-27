@@ -23,10 +23,9 @@ template < typename ReturnType, typename TargetType, typename ...Args>
 struct Delegate
 {
 
-    Delegate(TargetType& _targetInstance, ReturnType (TargetType::*_func)(Args...), std::tuple<Args...> _params) :
+    Delegate(TargetType& _targetInstance, ReturnType (TargetType::*_func)(Args...) ) :
         targetInstance(_targetInstance),
-        func(_func),
-        params(_params)
+        func(_func)
     {
 
     }
@@ -224,9 +223,9 @@ int main(void)
     Two           two;
     Three         three;    
     typedef std::tuple<int>    ParamTypes;
-    Delegate<int, One, int>       delegateOne(one, &One::DoAnotherThing, std::make_tuple(1) );
-    Delegate<int, Two, int>       delegateTwo(two, &Two::DoAnotherThing, std::make_tuple(1) );
-    Delegate<int, Three, int>     delegateThree(three, &Three::DoAnotherThing, std::make_tuple(1) );
+    Delegate<int, One, int>       delegateOne(one, &One::DoAnotherThing );
+    Delegate<int, Two, int>       delegateTwo(two, &Two::DoAnotherThing );
+    Delegate<int, Three, int>     delegateThree(three, &Three::DoAnotherThing );
     Container<int,ParamTypes, Delegate<int, One, int>, Delegate<int, Two, int>, Delegate<int, Three, int> >  anotherDelegateContainer( delegateOne, delegateTwo, delegateThree );
 
     //
