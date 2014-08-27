@@ -239,7 +239,8 @@ int main(void)
     //
     //
     //
-    //printf("<%d>\n", anotherDelegateContainer.Call(0) );
+    anotherDelegateContainer.Call(0, std::make_tuple(1) );
+    //printf("<%d>\n", anotherDelegateContainer.Call(0, std::make_tuple(1) );
     //printf("<%d>\n", anotherDelegateContainer.Call(1) );
     //printf("<%d>\n", anotherDelegateContainer.Call(2) );
 
