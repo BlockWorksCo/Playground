@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <tuple>
-
+#include <utility>
 
 
 
@@ -253,15 +253,15 @@ auto blaa2      = []() {printf("Two\n");};
 auto foreach    = []( std::tuple ttt , int blaa) {switch(blaa) {case 1:fn(blaa);break; case 2:fn(blaa);break; } };
 #endif
 
-template <int p, typename ...Args> void ForEach( std::tuple<Args...> ppp )
+template <typename T, typename ...Args> void ForEach( T tup, Args... args )
 {
-    std::get<0>(ppp)(p);
+    std::get<0>(tup)(args...);
 }
 
 auto protocol = std::make_tuple(
-        [](int p) {printf("[One:%d]\n",p);},
-        [](int p) {printf("[Two:%d]\n",p);},
-        [](int p) {printf("[Three:%d]\n",p);}
+        [](int p0)                  {printf("[One:%d]\n",p0);},
+        [](int p0, int p1)          {printf("[Two:%d]\n",p0);},
+        [](int p0, int p1, int p2)  {printf("[Three:%d]\n",p0);}
     );
 
 
@@ -269,7 +269,9 @@ auto protocol = std::make_tuple(
 
 int main()
 {
-    ForEach( 0, protocol );
+    //std::get<0>(protocol)(1);
+
+    ForEach( protocol, 2 );
 
 #if 0    
     One         one;
