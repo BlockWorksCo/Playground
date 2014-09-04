@@ -246,9 +246,32 @@ typedef enum
 } ObjectType;
 
 
+#if 0
+auto blaa0      = [](int p) {printf("[%d]\n",p);};
+auto blaa1      = []() {printf("Two\n");};
+auto blaa2      = []() {printf("Two\n");};
+auto foreach    = []( std::tuple ttt , int blaa) {switch(blaa) {case 1:fn(blaa);break; case 2:fn(blaa);break; } };
+#endif
+
+template <int p, typename ...Args> void ForEach( std::tuple<Args...> ppp )
+{
+    std::get<0>(ppp)(p);
+}
+
+auto protocol = std::make_tuple(
+        [](int p) {printf("[One:%d]\n",p);},
+        [](int p) {printf("[Two:%d]\n",p);},
+        [](int p) {printf("[Three:%d]\n",p);}
+    );
+
+
+
 
 int main()
 {
+    ForEach( 0, protocol );
+
+#if 0    
     One         one;
     Two         two;
     Three       three;
@@ -263,6 +286,8 @@ int main()
     printf("<%d>\n", anotherDelegateContainer.Call(2) );
 
     //IndexedDispatch(0,  one,two,three);
+
+#endif    
 #if 0
 
     volatile ObjectType  order[]     = {eThree, eTwo, eOne};

@@ -252,9 +252,10 @@ void DoIt(int type, int (*func)(int) )
 //
 int main(void)
 {
-    DoIt(1, Blaa);
-    DoIt(2, Blaa);
-    DoIt(3, Blaa);
+    volatile int    ppp = 1;
+    DoIt(ppp, Blaa);
+    //DoIt(2, Blaa);
+    //DoIt(3, Blaa);
 
 
     return 0;
