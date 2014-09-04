@@ -253,7 +253,7 @@ auto blaa2      = []() {printf("Two\n");};
 auto foreach    = []( std::tuple ttt , int blaa) {switch(blaa) {case 1:fn(blaa);break; case 2:fn(blaa);break; } };
 #endif
 
-template <typename T, typename ...Args> void ForEach( T tup, Args... args )
+template <typename T, typename ...Args> void ForEach( T tup, int index, Args... args )
 {
     std::get<0>(tup)(args...);
 }
@@ -271,7 +271,8 @@ int main()
 {
     //std::get<0>(protocol)(1);
 
-    ForEach( protocol, 2 );
+    ForEach( protocol, 0, 2 );
+    ForEach( protocol, 0, 2 );
 
 #if 0    
     One         one;
