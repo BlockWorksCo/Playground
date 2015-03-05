@@ -270,11 +270,11 @@ auto protocol = std::make_tuple(
 int main()
 {
     //std::get<0>(protocol)(1);
-
+#if 0
     ForEach( protocol, 0, 2 );
-    ForEach( protocol, 0, 2 );
-
-#if 0    
+    ForEach( protocol, 1, 3 );
+#endif
+#if 1   
     One         one;
     Two         two;
     Three       three;
