@@ -124,8 +124,6 @@ void CheckTimedEventHandlers()
                 }
             }
         }
-
-        break;
     }    
 }
 
