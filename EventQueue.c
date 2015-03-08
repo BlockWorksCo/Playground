@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #include "Utilities.h"
 #include <time.h>
+#include <string.h>
 
 typedef void (*Handler)();
 
@@ -59,13 +60,13 @@ void EventLoop()
 
     do
     {
-        handler = HandlerQueueGet( NULL );
-        if( handler != NULL )
+        handler = HandlerQueueGet( 0 );
+        if( handler != 0 )
         {
             handler();
         }
 
-    } while( handler != NULL );
+    } while( handler != 0 );
 }
 
 
@@ -75,14 +76,14 @@ void CallEvery_ms( Handler handler, uint32_t interval )
 {
     for(uint32_t i=0; i<NUMBER_OF_ELEMENTS(timedEventHandlers); i++)
     {
-        if( timedEventHandlers[i].handler == NULL )
+        if( timedEventHandlers[i].handler == 0 )
         {
             timedEventHandlers[i].handler       = handler;
             timedEventHandlers[i].interval      = interval;
             timedEventHandlers[i].firingTime    = CurrentTimestamp() + interval;
+            break;
         }
 
-        break;
     }
 }
 
@@ -90,14 +91,14 @@ void CallAfter_ms( Handler handler, uint32_t interval )
 {
     for(uint32_t i=0; i<NUMBER_OF_ELEMENTS(timedEventHandlers); i++)
     {
-        if( timedEventHandlers[i].handler == NULL )
+        if( timedEventHandlers[i].handler == 0 )
         {
             timedEventHandlers[i].handler       = handler;
             timedEventHandlers[i].interval      = 0;
             timedEventHandlers[i].firingTime    = CurrentTimestamp() + interval;
+            break;
         }
 
-        break;
     }    
 }
 
@@ -116,7 +117,7 @@ void CheckTimedEventHandlers()
 
                 if(timedEventHandlers[i].interval == 0)
                 {
-                    timedEventHandlers[i].handler   = NULL;
+                    timedEventHandlers[i].handler   = 0;
                 }
                 else
                 {
@@ -151,6 +152,8 @@ void Periodic()
 
 int main()
 {
+    memset(&timedEventHandlers[0], 0x00, sizeof(timedEventHandlers));
+
     Call( HelloWorld );
     CallAfter_ms( OneShot, 1000 );
     CallEvery_ms( Periodic, 500 );
