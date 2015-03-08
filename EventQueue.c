@@ -81,15 +81,13 @@ void EventLoop()
 #include "Utilities.h"
 
 
-typedef struct
+struct
 {
     Handler     handler;
     uint32_t    interval;
     uint32_t    firingTime;
 
-} TimedEventHandler;
-
-TimedEventHandler   timedEventHandlers[8];
+} timedEventHandlers[8] = {0};
 
 
 void CallEvery_ms( Handler handler, uint32_t interval )
@@ -164,14 +162,12 @@ void CheckTimedEventHandlers()
 
 #include "Utilities.h"
 
-typedef struct
+struct
 {
     Handler     handler;
     bool*       blockingFlag;
 
-} BlockedEventHandler;
-
-BlockedEventHandler   blockedEventHandlers[8];
+} blockedEventHandlers[8];
 
 
 void CallWhenUnblocked( Handler handler, bool* blockingFlag )
@@ -213,8 +209,6 @@ void CheckBlockedEventHandlers()
 
 #ifdef TEST
 
-#include <string.h>
-
 void HelloWorld()
 {
     printf("Hello World.\n");
@@ -225,12 +219,20 @@ void OneShot()
     printf("One shot.\n");
 }
 
-void Periodic()
+void Tock()
+{
+    printf("Tock.\n");
+}
+
+void Tick()
 {
     static uint32_t    i = 0;
-    printf("Periodic(%d).\n",i);
+    printf("Tick(%d).\n",i);
     i++;
+
+    CallAfter_ms( Tock, 250 );
 }
+
 
 bool trigger    = false;
 
@@ -247,11 +249,9 @@ void Bang()
 
 int main()
 {
-    memset(&timedEventHandlers[0], 0x00, sizeof(timedEventHandlers));
-
     Call( HelloWorld );
     CallAfter_ms( OneShot, 1000 );
-    CallEvery_ms( Periodic, 500 );
+    CallEvery_ms( Tick, 500 );
 
     CallAfter_ms( PullTheTrigger, 5000 );
     CallWhenUnblocked( Bang, &trigger );
