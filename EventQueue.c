@@ -21,7 +21,7 @@ void PANIC()
     printf("PANIC!\n");
 }
 
-uint32_t CurrentTimestamp()
+uint32_t CurrentTimestamp_ms()
 {
     clock_t     value   = clock();
     const uint32_t  clocksPerMs     = CLOCKS_PER_SEC/1000;
@@ -75,7 +75,7 @@ void EventLoop()
 
 
 
-// TimedEventQueue --------------------------------------------------------------------------------
+// TimedEvents.c --------------------------------------------------------------------------------
 
 
 #include "Utilities.h"
@@ -100,7 +100,7 @@ void CallEvery_ms( Handler handler, uint32_t interval )
         {
             timedEventHandlers[i].handler       = handler;
             timedEventHandlers[i].interval      = interval;
-            timedEventHandlers[i].firingTime    = CurrentTimestamp() + interval;
+            timedEventHandlers[i].firingTime    = CurrentTimestamp_ms() + interval;
             break;
         }
 
@@ -115,7 +115,7 @@ void CallAfter_ms( Handler handler, uint32_t interval )
         {
             timedEventHandlers[i].handler       = handler;
             timedEventHandlers[i].interval      = 0;
-            timedEventHandlers[i].firingTime    = CurrentTimestamp() + interval;
+            timedEventHandlers[i].firingTime    = CurrentTimestamp_ms() + interval;
             break;
         }
 
@@ -125,7 +125,7 @@ void CallAfter_ms( Handler handler, uint32_t interval )
 
 void CheckTimedEventHandlers()
 {
-    uint32_t    timestamp   = CurrentTimestamp();
+    uint32_t    timestamp   = CurrentTimestamp_ms();
 
     for(uint32_t i=0; i<NUMBER_OF_ELEMENTS(timedEventHandlers); i++)
     {
@@ -158,8 +158,53 @@ void CheckTimedEventHandlers()
 
 
 
+// BlockedEvents.c --------------------------------------------------------------------------------
 
 
+
+#include "Utilities.h"
+
+typedef struct
+{
+    Handler     handler;
+    bool*       blockingFlag;
+
+} BlockedEventHandler;
+
+BlockedEventHandler   blockedEventHandlers[8];
+
+
+void CallWhenUnblocked( Handler handler, bool* blockingFlag )
+{
+    for(uint32_t i=0; i<NUMBER_OF_ELEMENTS(blockedEventHandlers); i++)
+    {
+        if( blockedEventHandlers[i].handler == 0 )
+        {
+            blockedEventHandlers[i].handler         = handler;
+            blockedEventHandlers[i].blockingFlag    = blockingFlag;
+            break;
+        }
+
+    }    
+
+}
+
+
+void CheckBlockedEventHandlers()
+{
+    for(uint32_t i=0; i<NUMBER_OF_ELEMENTS(blockedEventHandlers); i++)
+    {
+        if( blockedEventHandlers[i].handler != 0 )
+        {
+            if( *blockedEventHandlers[i].blockingFlag == true )
+            {
+                Call( blockedEventHandlers[i].handler );
+
+                blockedEventHandlers[i].handler   = 0;
+            }
+        }
+    }    
+}
 
 
 
@@ -187,6 +232,19 @@ void Periodic()
     i++;
 }
 
+bool trigger    = false;
+
+void PullTheTrigger()
+{
+    trigger     = true;
+    printf("pulled the trigger...\n");
+}
+
+void Bang()
+{
+    printf("Bang!\n");
+}
+
 int main()
 {
     memset(&timedEventHandlers[0], 0x00, sizeof(timedEventHandlers));
@@ -195,9 +253,13 @@ int main()
     CallAfter_ms( OneShot, 1000 );
     CallEvery_ms( Periodic, 500 );
 
+    CallAfter_ms( PullTheTrigger, 5000 );
+    CallWhenUnblocked( Bang, &trigger );
+
     while(true)
     {
         CheckTimedEventHandlers();
+        CheckBlockedEventHandlers();
         EventLoop();
     }
 }
