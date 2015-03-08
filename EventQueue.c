@@ -7,31 +7,14 @@
 
 
 #include <stdio.h>
-#include "Queue.h"
 #include <stdint.h>
 #include <stdbool.h>
-#include "Utilities.h"
 #include <time.h>
-#include <string.h>
-
-typedef void (*Handler)();
-
-typedef struct
-{
-    Handler     handler;
-    uint32_t    interval;
-    uint32_t    firingTime;
-
-} TimedEventHandler;
 
 
 
-void PANIC();
 
-
-DECLARE_QUEUE( HandlerQueue, Handler, 16);
-TimedEventHandler   timedEventHandlers[8];
-
+// Utilities --------------------------------------------------------------------------------
 
 void PANIC()
 {
@@ -46,6 +29,22 @@ uint32_t CurrentTimestamp()
     return value/clocksPerMs;
 }
 
+
+
+
+
+
+
+
+
+// EventQueue --------------------------------------------------------------------------------
+
+#include "Queue.h"
+
+typedef void (*Handler)();
+
+
+DECLARE_QUEUE( HandlerQueue, Handler, 16);
 
 
 void Call( Handler handler )
@@ -70,6 +69,27 @@ void EventLoop()
 }
 
 
+
+
+
+
+
+
+// TimedEventQueue --------------------------------------------------------------------------------
+
+
+#include "Utilities.h"
+
+
+typedef struct
+{
+    Handler     handler;
+    uint32_t    interval;
+    uint32_t    firingTime;
+
+} TimedEventHandler;
+
+TimedEventHandler   timedEventHandlers[8];
 
 
 void CallEvery_ms( Handler handler, uint32_t interval )
@@ -131,7 +151,24 @@ void CheckTimedEventHandlers()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+// EventQueueTest.c --------------------------------------------------------------------------------
+
 #ifdef TEST
+
+#include <string.h>
 
 void HelloWorld()
 {
