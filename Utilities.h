@@ -15,6 +15,7 @@
 #define NUMBER_OF_ELEMENTS(a)   (sizeof(a)/sizeof(a[0]))
 #define TRACE                   printf("<%s:%d>\n",__FILE__,__LINE__)
 
+#define PRIVATE                 static
 
 #endif
 

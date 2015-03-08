@@ -19,6 +19,7 @@
 void PANIC()
 {
     printf("PANIC!\n");
+    while(true);
 }
 
 uint32_t CurrentTimestamp_ms()
@@ -203,7 +204,40 @@ void CheckBlockedEventHandlers()
 }
 
 
+// ResourceSharingTest.c --------------------------------------------------------------------------------
 
+
+typedef struct
+{
+    uint8_t*    dataIn;
+    uint8_t*    dataOut;
+    uint8_t     cs;
+    uint8_t     numberOfBytesToTransfer;
+    Handler     completionHandler;
+
+} TransferRequest;
+
+DECLARE_QUEUE( TransferRequestQueue, TransferRequest, 16);
+
+TransferRequest     currentRequest;
+
+void BusRelease()
+{
+    Call( currentRequest.completionHandler );
+}
+
+void BusClaim( uint8_t* dataIn, uint8_t* dataOut, uint8_t numberOfBytesToTransfer, Handler completionHandler )
+{
+    TransferRequest     request     = 
+    {
+        .dataIn                  = dataIn, 
+        .dataOut                 = dataOut, 
+        .numberOfBytesToTransfer = numberOfBytesToTransfer, 
+        .completionHandler       = completionHandler
+    };
+
+    TransferRequestQueuePut( request );
+}
 
 // EventQueueTest.c --------------------------------------------------------------------------------
 
@@ -219,9 +253,19 @@ void OneShot()
     printf("One shot.\n");
 }
 
+void TransferComplete()
+{
+    printf("TransferComplete\n");
+}
+
 void Tock()
 {
     printf("Tock.\n");
+
+    static uint8_t  in[8];
+    static uint8_t  out[8];
+
+    BusClaim( &in[0], &out[0], 8, TransferComplete );
 }
 
 void Tick()
