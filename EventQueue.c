@@ -220,13 +220,21 @@ typedef struct
 DECLARE_QUEUE( TransferRequestQueue, TransferRequest, 16);
 
 TransferRequest     currentRequest;
-
-void BusRelease()
+TransferRequest     nullRequest = 
 {
+    .dataIn                  = 0, 
+    .dataOut                 = 0, 
+    .numberOfBytesToTransfer = 0, 
+    .completionHandler       = 0
+};
+
+void TransferFinished()
+{
+    printf("<TransferFinished>\n");
     Call( currentRequest.completionHandler );
 }
 
-void BusClaim( uint8_t* dataIn, uint8_t* dataOut, uint8_t numberOfBytesToTransfer, Handler completionHandler )
+void PerformTransfer( uint8_t* dataIn, uint8_t* dataOut, uint8_t numberOfBytesToTransfer, Handler completionHandler )
 {
     TransferRequest     request     = 
     {
@@ -237,6 +245,12 @@ void BusClaim( uint8_t* dataIn, uint8_t* dataOut, uint8_t numberOfBytesToTransfe
     };
 
     TransferRequestQueuePut( request );
+
+    //
+    // Simulate a real transfer, will be called via ISR in reality.
+    //
+    currentRequest  = TransferRequestQueueGet( nullRequest );
+    CallAfter_ms( TransferFinished, 100 );
 }
 
 // EventQueueTest.c --------------------------------------------------------------------------------
@@ -265,7 +279,7 @@ void Tock()
     static uint8_t  in[8];
     static uint8_t  out[8];
 
-    BusClaim( &in[0], &out[0], 8, TransferComplete );
+    PerformTransfer( &in[0], &out[0], 8, TransferComplete );
 }
 
 void Tick()
