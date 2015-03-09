@@ -228,10 +228,26 @@ TransferRequest     nullRequest =
     .completionHandler       = 0
 };
 
+void TransferFinished();
+
+void PollRequestQueue()
+{
+    currentRequest  = TransferRequestQueueGet( nullRequest );
+    if( currentRequest.numberOfBytesToTransfer != 0 )
+    {
+        //
+        // Simulate a real transfer, will be called via ISR in reality.
+        //
+        CallAfter_ms( TransferFinished, 100 );        
+    }    
+}
+
 void TransferFinished()
 {
     printf("<TransferFinished>\n");
     Call( currentRequest.completionHandler );
+
+    PollRequestQueue();
 }
 
 void PerformTransfer( uint8_t* dataIn, uint8_t* dataOut, uint8_t numberOfBytesToTransfer, Handler completionHandler )
@@ -246,11 +262,7 @@ void PerformTransfer( uint8_t* dataIn, uint8_t* dataOut, uint8_t numberOfBytesTo
 
     TransferRequestQueuePut( request );
 
-    //
-    // Simulate a real transfer, will be called via ISR in reality.
-    //
-    currentRequest  = TransferRequestQueueGet( nullRequest );
-    CallAfter_ms( TransferFinished, 100 );
+    PollRequestQueue();
 }
 
 // EventQueueTest.c --------------------------------------------------------------------------------
