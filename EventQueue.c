@@ -341,6 +341,9 @@ void EraseFileBlock( uint8_t fileNumber, uint32_t address, uint8_t* data, uint32
 uint32_t    lastEntry   = 0xffffffff;
 
 
+//
+// FindLastEntry state machine.
+//
 uint32_t    FindLastEntryReadAddress       = 0;
 Handler     FindLastEntryCompletionEvent   = 0;
 uint8_t     FindLastEntryLogEntry          = {0};
@@ -368,12 +371,15 @@ uint32_t FindLastEntry( Handler completionHandler )
 }
 
 
-uint8_t*    WriteLogLogEntry    = 0;
+//
+// WriteLog state machine.
+//
+uint8_t*    WriteLogLogEntry            = 0;
 Handler     WriteLogCompletionHandler   = 0;
 
 void WriteLogLastEntryAvailable()
 {
-    uint32_t    address     = 0;
+    uint32_t    address     = lastEntry;
     WriteFileBlock( LOG_FILE_NUMBER, address, WriteLogLogEntry, LOG_ENTRY_SIZE, WriteLogCompletionHandler );
 }
 
@@ -385,19 +391,21 @@ void WriteLog( uint8_t* data, Handler completionHandler )
 }
 
 
-
-uint8_t*    ReadLogLogEntry     = 0;
+//
+// ReadLog state machine.
+//
+uint8_t*    ReadLogLogEntry             = 0;
 Handler     ReadLogCompletionHandler    = 0;
 
 void ReadLogLastEntryAvailable()
 {
-    uint32_t    address     = 0;
+    uint32_t    address     = lastEntry+1;
     ReadFileBlock( LOG_FILE_NUMBER, address, ReadLogLogEntry, LOG_ENTRY_SIZE, ReadLogCompletionHandler );
 }
 
 void ReadLog( uint8_t* data, Handler completionHandler )
 {
-    ReadLogLogEntry     = data;
+    ReadLogLogEntry             = data;
     ReadLogCompletionHandler    = completionHandler;
     FindLastEntry( ReadLogLastEntryAvailable );
 }
