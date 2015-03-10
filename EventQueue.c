@@ -204,6 +204,53 @@ void CheckBlockedEventHandlers()
 }
 
 
+// PredicatedEvents.c --------------------------------------------------------------------------------
+
+
+
+#include "Utilities.h"
+
+struct
+{
+    Handler     handler;
+    bool        (*predicate)();
+
+} predicatedEventHandlers[8];
+
+
+void CallWhenPredicateIsTrue( Handler handler, bool (*predicate)() )
+{
+    for(uint32_t i=0; i<NUMBER_OF_ELEMENTS(predicatedEventHandlers); i++)
+    {
+        if( predicatedEventHandlers[i].handler == 0 )
+        {
+            predicatedEventHandlers[i].handler      = handler;
+            predicatedEventHandlers[i].predicate    = predicate;
+            break;
+        }
+
+    }    
+
+}
+
+
+void CheckPredicatedEventHandlers()
+{
+    for(uint32_t i=0; i<NUMBER_OF_ELEMENTS(predicatedEventHandlers); i++)
+    {
+        if( predicatedEventHandlers[i].handler != 0 )
+        {
+            if( predicatedEventHandlers[i].predicate() == true )
+            {
+                Call( predicatedEventHandlers[i].handler );
+
+                predicatedEventHandlers[i].handler   = 0;
+            }
+        }
+    }    
+}
+
+
 // ResourceSharingTest.c --------------------------------------------------------------------------------
 
 
@@ -416,6 +463,8 @@ void ReadLog( uint8_t* data, Handler completionHandler )
 
 #ifdef TEST
 
+uint32_t    seconds     = 0;
+
 void HelloWorld()
 {
     printf("Hello World.\n");
@@ -448,6 +497,7 @@ void Tick()
     i++;
 
     CallAfter_ms( Tock, 250 );
+    seconds++;
 }
 
 
@@ -464,6 +514,25 @@ void Bang()
     printf("Bang!\n");
 }
 
+
+
+bool TenSecondsHavePassed()
+{
+    if( seconds > 10 )
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+void BigTick()
+{
+    printf("*** big tick ***\n");
+}
+
 int main()
 {
     Call( HelloWorld );
@@ -473,10 +542,13 @@ int main()
     CallAfter_ms( PullTheTrigger, 5000 );
     CallWhenUnblocked( Bang, &trigger );
 
+    CallWhenPredicateIsTrue( BigTick, TenSecondsHavePassed );
+
     while(true)
     {
         CheckTimedEventHandlers();
         CheckBlockedEventHandlers();
+        CheckPredicatedEventHandlers();
         EventLoop();
     }
 }
