@@ -265,6 +265,145 @@ void PerformTransfer( uint8_t* dataIn, uint8_t* dataOut, uint8_t numberOfBytesTo
     PollRequestQueue();
 }
 
+// PersistentStorage.c --------------------------------------------------------------------------------
+
+#include <string.h>
+
+#define BLOCK_SIZE          (1024)
+#define NUMBER_OF_BLOCKS    (128)
+
+
+uint8_t     simulatedFLASH[BLOCK_SIZE*NUMBER_OF_BLOCKS];
+
+void WriteBlock( uint32_t address, uint8_t* data, uint32_t numberOfBytes, Handler completionHandler )
+{
+    memcpy( &simulatedFLASH[address], data, numberOfBytes );
+
+    Call( completionHandler );
+}
+
+void ReadBlock( uint32_t address, uint8_t* data, uint32_t numberOfBytes, Handler completionHandler )
+{
+    memcpy( data, &simulatedFLASH[address], numberOfBytes );    
+    
+    Call( completionHandler );
+}
+
+void EraseBlock( uint32_t address, Handler completionHandler )
+{
+    uint32_t    blockNumber     = address / BLOCK_SIZE;
+    memset( &simulatedFLASH[blockNumber*BLOCK_SIZE], 0xff, BLOCK_SIZE );
+    
+    Call( completionHandler );
+}
+
+void EraseDevice( Handler completionHandler )
+{
+    memset( &simulatedFLASH[0], 0xff, sizeof(simulatedFLASH) );
+    
+    Call( completionHandler );
+}
+
+
+// FileStorage.c --------------------------------------------------------------------------------
+
+
+uint32_t fileMap[]  =
+{
+    0,
+    1,
+    10,
+    30,
+    40,
+};
+
+void WriteFileBlock( uint8_t fileNumber, uint32_t address, uint8_t* data, uint32_t numberOfBytes, Handler completionHandler )
+{
+    WriteBlock( (fileMap[fileNumber]*BLOCK_SIZE)+address, data, numberOfBytes, completionHandler );
+}
+
+void ReadFileBlock( uint8_t fileNumber, uint32_t address, uint8_t* data, uint32_t numberOfBytes, Handler completionHandler )
+{
+    ReadBlock( (fileMap[fileNumber]*BLOCK_SIZE)+address, data, numberOfBytes, completionHandler );
+}
+
+void EraseFileBlock( uint8_t fileNumber, uint32_t address, uint8_t* data, uint32_t numberOfBytes, Handler completionHandler )
+{
+    EraseBlock( (fileMap[fileNumber]*BLOCK_SIZE)+address, completionHandler );
+}
+
+
+// LogStorage.c --------------------------------------------------------------------------------
+
+#define LOG_ENTRY_SIZE      (128)
+#define LOG_FILE_NUMBER     (1)
+
+uint32_t    lastEntry   = 0xffffffff;
+
+
+uint32_t    FindLastEntryReadAddress       = 0;
+Handler     FindLastEntryCompletionEvent   = 0;
+uint8_t     FindLastEntryLogEntry          = {0};
+
+void FindLastEntryReadComplete()
+{
+    FindLastEntryReadAddress    += LOG_ENTRY_SIZE;
+    ReadFileBlock( LOG_FILE_NUMBER, FindLastEntryReadAddress, &FindLastEntryLogEntry, LOG_ENTRY_SIZE, FindLastEntryReadComplete );
+}
+
+uint32_t FindLastEntry( Handler completionHandler )
+{
+    FindLastEntryCompletionEvent    = completionHandler;
+    if(lastEntry == 0xffffffff)
+    {
+        FindLastEntryReadAddress    = 0;
+        ReadFileBlock( LOG_FILE_NUMBER, FindLastEntryReadAddress, &FindLastEntryLogEntry, LOG_ENTRY_SIZE, FindLastEntryReadComplete );
+    }
+    else
+    {
+        Call( completionHandler );
+    }
+
+    return lastEntry;
+}
+
+
+uint8_t*    WriteLogLogEntry    = 0;
+Handler     WriteLogCompletionHandler   = 0;
+
+void WriteLogLastEntryAvailable()
+{
+    uint32_t    address     = 0;
+    WriteFileBlock( LOG_FILE_NUMBER, address, WriteLogLogEntry, LOG_ENTRY_SIZE, WriteLogCompletionHandler );
+}
+
+void WriteLog( uint8_t* data, Handler completionHandler )
+{
+    WriteLogLogEntry    = data;
+    WriteLogCompletionHandler   = completionHandler;
+    FindLastEntry( WriteLogLastEntryAvailable );
+}
+
+
+
+uint8_t*    ReadLogLogEntry     = 0;
+Handler     ReadLogCompletionHandler    = 0;
+
+void ReadLogLastEntryAvailable()
+{
+    uint32_t    address     = 0;
+    ReadFileBlock( LOG_FILE_NUMBER, address, ReadLogLogEntry, LOG_ENTRY_SIZE, ReadLogCompletionHandler );
+}
+
+void ReadLog( uint8_t* data, Handler completionHandler )
+{
+    ReadLogLogEntry     = data;
+    ReadLogCompletionHandler    = completionHandler;
+    FindLastEntry( ReadLogLastEntryAvailable );
+}
+
+
+
 // EventQueueTest.c --------------------------------------------------------------------------------
 
 #ifdef TEST
