@@ -54,7 +54,7 @@ void Call( Handler handler )
 }
 
 
-void EventLoop()
+void DispatchHandlers()
 {
     Handler     handler;
 
@@ -458,6 +458,23 @@ void ReadLog( uint8_t* data, Handler completionHandler )
 }
 
 
+// KeyValueStore.c --------------------------------------------------------------------------------
+
+#define MAX_KEY_VALUE   (128)
+
+uint32_t    index[MAX_KEY_VALUE];
+uint8_t     keyValueData[1024];
+
+void SetValueForKey( uint32_t key, void* value, uint32_t numberOfBytes )
+{
+    memcpy( &keyValueData[index[key]], value, numberOfBytes );
+}
+
+void GetValueForKey( uint32_t key, void* value, uint32_t numberOfBytes )
+{
+    memcpy( value, &keyValueData[index[key]], numberOfBytes );    
+}
+
 
 // EventQueueTest.c --------------------------------------------------------------------------------
 
@@ -549,7 +566,7 @@ int main()
         CheckTimedEventHandlers();
         CheckBlockedEventHandlers();
         CheckPredicatedEventHandlers();
-        EventLoop();
+        DispatchHandlers();
     }
 }
 
