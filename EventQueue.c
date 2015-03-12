@@ -460,19 +460,44 @@ void ReadLog( uint8_t* data, Handler completionHandler )
 
 // KeyValueStore.c --------------------------------------------------------------------------------
 
+#include <stddef.h>
+
 #define MAX_KEY_VALUE   (128)
 
-uint32_t    index[MAX_KEY_VALUE];
-uint8_t     keyValueData[1024];
+#define DECLARE_KEY_VALUE_STORAGE( type, name )  type name##Storage
+#define DECLARE_KEY( name )  name = offsetof( KeyValueData, name##Storage )
+
+typedef struct
+{
+    DECLARE_KEY_VALUE_STORAGE( uint32_t, Value1 );
+    DECLARE_KEY_VALUE_STORAGE( uint32_t, Value2 );
+    DECLARE_KEY_VALUE_STORAGE( uint32_t, Value3 );
+    DECLARE_KEY_VALUE_STORAGE( uint32_t, Value4 );
+    DECLARE_KEY_VALUE_STORAGE( uint32_t, Value5 );
+
+} KeyValueData;
+
+
+typedef enum
+{
+    DECLARE_KEY( Value1 ),
+    DECLARE_KEY( Value2 ),
+    DECLARE_KEY( Value3 ),
+    DECLARE_KEY( Value4 ),
+    DECLARE_KEY( Value5 ),
+
+    MaxKeyValue = sizeof(KeyValueData)
+
+} Key;
 
 void SetValueForKey( uint32_t key, void* value, uint32_t numberOfBytes )
 {
-    memcpy( &keyValueData[index[key]], value, numberOfBytes );
+    //memcpy( &keyValueData[index[key]], value, numberOfBytes );
 }
 
 void GetValueForKey( uint32_t key, void* value, uint32_t numberOfBytes )
 {
-    memcpy( value, &keyValueData[index[key]], numberOfBytes );    
+    //memcpy( value, &keyValueData[index[key]], numberOfBytes );    
 }
 
 
