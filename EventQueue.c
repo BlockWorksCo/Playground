@@ -374,7 +374,7 @@ void ReadFileBlock( uint8_t fileNumber, uint32_t address, uint8_t* data, uint32_
     ReadBlock( (fileMap[fileNumber]*BLOCK_SIZE)+address, data, numberOfBytes, completionHandler );
 }
 
-void EraseFileBlock( uint8_t fileNumber, uint32_t address, uint8_t* data, uint32_t numberOfBytes, Handler completionHandler )
+void EraseFileBlock( uint8_t fileNumber, uint32_t address, Handler completionHandler )
 {
     EraseBlock( (fileMap[fileNumber]*BLOCK_SIZE)+address, completionHandler );
 }
@@ -492,13 +492,22 @@ typedef enum
 
 } Key;
 
+void KeyValueStoreBackedUp()
+{
+
+}
+
+void KeyValueStoreErased()
+{
+    WriteFileBlock( 1, 0, (uint8_t*)&keyValueData, sizeof(keyValueData), KeyValueStoreBackedUp );
+}
 
 void KeyValueStoreWritten( uint32_t key )
 {
     //
     // Write to persistent storage.
     //
-    //memcpy( value, &keyValueData[index[key]], numberOfBytes );    
+    EraseFileBlock( 1, 0, KeyValueStoreErased );
 }
 
 
