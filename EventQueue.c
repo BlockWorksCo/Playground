@@ -466,6 +466,8 @@ void ReadLog( uint8_t* data, Handler completionHandler )
 
 #define DECLARE_KEY_VALUE_STORAGE( type, name )  type name##Storage
 #define DECLARE_KEY( name )  name = offsetof( KeyValueData, name##Storage )
+#define SET_KEY_VALUE( key, value )    keyValueData.key##Storage = value;KeyValueStoreWritten(key)
+#define GET_KEY_VALUE( key )    keyValueData.key##Storage 
 
 typedef struct
 {
@@ -476,7 +478,7 @@ typedef struct
     DECLARE_KEY_VALUE_STORAGE( uint32_t, Value5 );
 
 } KeyValueData;
-
+KeyValueData keyValueData;
 
 typedef enum
 {
@@ -490,13 +492,12 @@ typedef enum
 
 } Key;
 
-void SetValueForKey( uint32_t key, void* value, uint32_t numberOfBytes )
-{
-    //memcpy( &keyValueData[index[key]], value, numberOfBytes );
-}
 
-void GetValueForKey( uint32_t key, void* value, uint32_t numberOfBytes )
+void KeyValueStoreWritten( uint32_t key )
 {
+    //
+    // Write to persistent storage.
+    //
     //memcpy( value, &keyValueData[index[key]], numberOfBytes );    
 }
 
@@ -585,6 +586,9 @@ int main()
     CallWhenUnblocked( Bang, &trigger );
 
     CallWhenPredicateIsTrue( BigTick, TenSecondsHavePassed );
+
+    SET_KEY_VALUE( Value1, 123 );
+    uint32_t temp = GET_KEY_VALUE( Value1 );
 
     while(true)
     {
