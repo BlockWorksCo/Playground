@@ -462,14 +462,13 @@ void ReadLog( uint8_t* data, Handler completionHandler )
 
 #include <stddef.h>
 
-#define MAX_KEY_VALUE   (128)
 
-#define DECLARE_KEY_VALUE_STORAGE( type, name )  type name##Storage
-#define DECLARE_KEY( name )  name = offsetof( KeyValueData, name##Storage )
-#define SET_KEY_VALUE( key, value )    keyValueData.key##Storage = value;KeyValueStoreWritten(key)
-#define GET_KEY_VALUE( key )    keyValueData.key##Storage 
+#define DECLARE_KEY_VALUE_STORAGE( type, name )     type name##Storage
+#define DECLARE_KEY( name )                         name = offsetof( KeyValueData, name##Storage )
+#define SET_KEY_VALUE( key, value )                 keyValueData.key##Storage = value;KeyValueStoreWritten(key)
+#define GET_KEY_VALUE( key )                        keyValueData.key##Storage 
 
-typedef struct
+struct
 {
     DECLARE_KEY_VALUE_STORAGE( uint32_t, Value1 );
     DECLARE_KEY_VALUE_STORAGE( uint32_t, Value2 );
@@ -494,7 +493,6 @@ typedef enum
 
 void KeyValueStoreBackedUp()
 {
-
 }
 
 void KeyValueStoreErased()
@@ -506,6 +504,7 @@ void KeyValueStoreWritten( uint32_t key )
 {
     //
     // Write to persistent storage.
+    // alteratively, can just write the individual value...
     //
     EraseFileBlock( 1, 0, KeyValueStoreErased );
 }
