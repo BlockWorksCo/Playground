@@ -25,7 +25,7 @@ modelWorkingMemory  = []
 
 
 
-def LinkSymbolToSymbol( links, symbolA, symbolB ):
+def StrengthenLink( links, symbolA, symbolB ):
     """
     """
     symbols.add( symbolA )
@@ -41,12 +41,40 @@ def LinkSymbolToSymbol( links, symbolA, symbolB ):
 
 
 
+def DecayLink( links, symbolA, symbolB ):
+    """
+    """
+    symbols.add( symbolA )
+    symbols.add( symbolB )
+
+    if symbolA in links:
+        if symbolB in links[symbolA]:
+            links[symbolA][symbolB]     = links[symbolA][symbolB]-1
+        else:
+            links[symbolA][symbolB]     = 1
+    else:
+        links[symbolA] = {symbolB:1}
+
+
+
+
 def Cycle( memory, model ):
     """
     """
-    newSymbols  = FindNewSymbols( symbols )
-    for symbol in newSymbols:
-        InsertSymbol( symbols, symbol )
+
+    #
+    # Strengthen the links between symbols in working memory.
+    #
+    for symbolFrom in memory:
+        for symbolTo in memory:
+            StrengthenLink( symbolFrom, symbolTo )
+
+    #
+    # Decay links between all symbols
+    #
+    for symbolFrom in symbols:
+        for symbolTo in symbols:
+            DecayLinks( symbolFrom, symbolTo )
 
 
 
@@ -55,19 +83,20 @@ def Cycle( memory, model ):
 
 
 
-LinkSymbolToSymbol( links, 0, 1 )
-LinkSymbolToSymbol( links, 0, 2 )
-LinkSymbolToSymbol( links, 0, 3 )
-LinkSymbolToSymbol( links, 1, 2 )
-LinkSymbolToSymbol( links, 1, 3 )
-LinkSymbolToSymbol( links, 2, 1 )
-LinkSymbolToSymbol( links, 2, 0 )
+
+StrengthenLink( links, 0, 1 )
+StrengthenLink( links, 0, 2 )
+StrengthenLink( links, 0, 3 )
+StrengthenLink( links, 1, 2 )
+StrengthenLink( links, 1, 3 )
+StrengthenLink( links, 2, 1 )
+StrengthenLink( links, 2, 0 )
 
 print(symbols)
 print(links)
 
-LinkSymbolToSymbol( links, 0, 1 )
-LinkSymbolToSymbol( links, 2, 0 )
+StrengthenLink( links, 0, 1 )
+StrengthenLink( links, 2, 0 )
 
 print(symbols)
 print(links)
