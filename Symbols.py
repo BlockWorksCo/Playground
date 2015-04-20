@@ -10,15 +10,19 @@ class Generation:
     """
 
     links               = {}
+    inputSymbols        = []
 
     liveWorkingMemory   = []
     modelWorkingMemory  = []
 
+    youngerGeneration   = None
 
-    def __init__(self):
+
+    def __init__(self, youngerGeneration=None ):
         """
         """
-        pass
+        self.youngerGeneration  = youngerGeneration
+
 
 
     def StrengthenLink( self, links, symbolA, symbolB ):
@@ -31,6 +35,7 @@ class Generation:
                 links[symbolA][symbolB]     = 1
         else:
             links[symbolA] = {symbolB:1}
+
 
 
 
@@ -48,48 +53,43 @@ class Generation:
 
 
 
-    def Cycle( self, memory, model ):
+    def PushInto( self, links, symbol ):
         """
         """
+        self.inputSymbols.append( symbol )
 
         #
         # Strengthen the links between symbols in working memory.
         #
-        for symbolFrom in memory:
-            for symbolTo in memory:
-                StrengthenLink( symbolFrom, symbolTo )
-
-        #
-        # Decay links between all symbols
-        #
-        for symbolFrom in symbols:
-            for symbolTo in symbols:
-                DecayLinks( symbolFrom, symbolTo )
+        for symbolFrom in self.inputSymbols:
+            for symbolTo in self.inputSymbols:
+                if symbolTo != symbolFrom:
+                    self.StrengthenLink( links, symbolFrom, symbolTo )
 
 
 
 
+    def Cycle( self, links ):
+        """
+        """
+        for symbolFrom in links[0]:
+            pass
 
 
 
 
+links           = {}
 generation0     = Generation()
+generation1     = Generation( generation0 )
 
+generation0.PushInto( links, 0 )
+generation0.PushInto( links, 1 )
+generation0.PushInto( links, 2 )
+generation0.PushInto( links, 3 )
 
-generation0.StrengthenLink( generation0.links, 0, 1 )
-generation0.StrengthenLink( generation0.links, 0, 2 )
-generation0.StrengthenLink( generation0.links, 0, 3 )
-generation0.StrengthenLink( generation0.links, 1, 2 )
-generation0.StrengthenLink( generation0.links, 1, 3 )
-generation0.StrengthenLink( generation0.links, 2, 1 )
-generation0.StrengthenLink( generation0.links, 2, 0 )
+generation1.Cycle( links )
 
-print(generation0.links)
-
-generation0.StrengthenLink( generation0.links, 0, 1 )
-generation0.StrengthenLink( generation0.links, 2, 0 )
-
-print(generation0.links)
+print( links )
 
 
 
