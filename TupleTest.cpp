@@ -10,16 +10,33 @@
 //
 //
 //
-template<std::size_t I = 0, typename... Tp>
+template< uint32_t I = 0, typename... Tp>
 typename std::enable_if<I == sizeof...(Tp), void>::type CallEach(std::tuple<Tp...>& t)
 { 
 }
 
-template<std::size_t I = 0, typename... Tp>
+template< uint32_t I = 0, typename... Tp>
 typename std::enable_if<I < sizeof...(Tp), void>::type CallEach(std::tuple<Tp...>& t)
 {
     std::get<I>(t)();
     CallEach<I + 1, Tp...>(t);
+}
+
+
+
+//
+//
+//
+template< uint32_t I = 0, typename... Tp>
+typename std::enable_if<I == sizeof...(Tp), void>::type CallIndexed(std::tuple<Tp...>& t)
+{ 
+}
+
+template< uint32_t I = 0, typename... Tp>
+typename std::enable_if<I < sizeof...(Tp), void>::type CallIndexed(std::tuple<Tp...>& t)
+{
+    std::get<I>(t)();
+    CallIndexed<I + 1, Tp...>(t);
 }
 
 
@@ -37,7 +54,9 @@ int main()
         );
  
 
-    CallEach( container );
+    //CallEach( container );
+
+    CallIndexed( container );
 }
 
 
