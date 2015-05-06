@@ -45,6 +45,27 @@ typename std::enable_if<I < sizeof...(Tp), void>::type CallIndexed(std::tuple<Tp
 
 
 
+//
+//
+//
+template< uint32_t N, uint32_t I = 0, typename... Tp>
+typename std::enable_if<I == sizeof...(Tp), void>::type CallEnumerated(std::tuple<Tp...>& t, uint32_t id)
+{ 
+}
+
+template< uint32_t N, uint32_t I = 0, typename... Tp>
+typename std::enable_if<I < sizeof...(Tp), void>::type CallEnumerated(std::tuple<Tp...>& t, uint32_t id)
+{
+    if(std::get<I>(t).id == id)
+    {
+        std::get<I>(t).fn();
+    }
+    CallEnumerated<N,I + 1, Tp...>(t, id);        
+}
+
+
+
+
 
 
 
@@ -60,6 +81,20 @@ auto container = std::make_tuple(
     );
 
 
+typedef struct
+{
+    uint32_t id;
+    void     (*fn)();
+
+} Pair;
+
+auto container2 = std::make_tuple(
+        Pair{ .id=11,  .fn=[]()  {printf("[One:]\n");}   },
+        Pair{ .id=12,  .fn=[]()  {printf("[Two:]\n");}   },
+        Pair{ .id=103, .fn=[]()  {printf("[Three:]\n");} }
+    );
+
+
 //
 //
 //
@@ -69,7 +104,8 @@ int main()
 
     //CallEach( container );
 
-    CallIndexed<2>( container );
+    //CallIndexed<2>( container );
+    CallEnumerated<2>( container2, 103 );
 }
 
 
