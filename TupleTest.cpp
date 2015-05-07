@@ -44,18 +44,28 @@ typename std::enable_if<I < sizeof...(Tp), void>::type CallIndexed(std::tuple<Tp
 
 
 
+
+
+
+
+
+
+//
+//
+//
+auto container = std::make_tuple(
+        []()  {printf("[One:]\n");},
+        []()  {printf("[Two:]\n");},
+        []()  {printf("[Three:]\n");}
+    );
+
+
 //
 //
 //
 int main()
 {
 
-    auto container = std::make_tuple(
-            []()  {printf("[One:]\n");},
-            []()  {printf("[Two:]\n");},
-            []()  {printf("[Three:]\n");}
-        );
- 
 
     //CallEach( container );
 
