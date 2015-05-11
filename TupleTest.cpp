@@ -124,7 +124,10 @@ typename std::enable_if<I != 0, void>::type CallEnumeratedTwo(uint32_t id)
     {
         fnArray[I]();
     }
-    CallEnumeratedTwo<I-1,idArray,fnArray>(id);        
+    else
+    {
+        CallEnumeratedTwo<I-1,idArray,fnArray>(id);        
+    }
 }
 
 
