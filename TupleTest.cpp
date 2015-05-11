@@ -7,6 +7,9 @@
 #include <utility>
 
 
+#define NUMBER_OF_ELEMENTS(a)   (sizeof(a)/sizeof(a[0]))
+
+
 //
 //
 //
@@ -158,7 +161,7 @@ int main()
     //CallEach( container );
     //CallIndexed<2>( container );
     //CallEnumerated<2>( container2, 12 );
-    CallEnumeratedTwo<3, idArray, fnArray>( 103 );
+    CallEnumeratedTwo<NUMBER_OF_ELEMENTS(idArray), idArray, fnArray>( 103 );
 }
 
 
