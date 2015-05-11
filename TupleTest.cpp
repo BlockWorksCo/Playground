@@ -48,13 +48,28 @@ typename std::enable_if<I < sizeof...(Tp), void>::type CallIndexed(std::tuple<Tp
 //
 //
 //
+auto container = std::make_tuple(
+        []()  {printf("[One:]\n");},
+        []()  {printf("[Two:]\n");},
+        []()  {printf("[Three:]\n");}
+    );
+
+
+
+
+
+
+
+//
+//
+//
 template< uint32_t N, uint32_t I = 0, typename... Tp>
-typename std::enable_if<I == sizeof...(Tp), void>::type CallEnumerated(std::tuple<Tp...>& t, uint32_t id)
+typename std::enable_if<I == sizeof...(Tp), void>::type CallEnumerated(const std::tuple<Tp...>& t, uint32_t id)
 { 
 }
 
 template< uint32_t N, uint32_t I = 0, typename... Tp>
-typename std::enable_if<I < sizeof...(Tp), void>::type CallEnumerated(std::tuple<Tp...>& t, uint32_t id)
+typename std::enable_if<I < sizeof...(Tp), void>::type CallEnumerated(const std::tuple<Tp...>& t, uint32_t id)
 {
     if(std::get<I>(t).id == id)
     {
@@ -64,35 +79,72 @@ typename std::enable_if<I < sizeof...(Tp), void>::type CallEnumerated(std::tuple
 }
 
 
-
-
-
-
-
-
-
-//
-//
-//
-auto container = std::make_tuple(
-        []()  {printf("[One:]\n");},
-        []()  {printf("[Two:]\n");},
-        []()  {printf("[Three:]\n");}
-    );
-
-
 typedef struct
 {
-    uint32_t id;
-    void     (*fn)();
+    uint32_t  id;
+    void      (*fn)();
 
 } Pair;
 
-auto container2 = std::make_tuple(
+const auto container2 = std::make_tuple(
         Pair{ .id=11,  .fn=[]()  {printf("[One:]\n");}   },
         Pair{ .id=12,  .fn=[]()  {printf("[Two:]\n");}   },
         Pair{ .id=103, .fn=[]()  {printf("[Three:]\n");} }
     );
+
+
+
+
+
+
+
+
+
+
+
+typedef void (*fn)();
+
+//
+//
+//
+
+template<uint32_t I, uint32_t idArray[], fn fnArray[] >
+typename std::enable_if<I == 0, void>::type CallEnumeratedTwo(uint32_t id)
+{
+    if(idArray[I] == id)
+    {
+        fnArray[I]();
+    }
+}
+
+template<uint32_t I, uint32_t idArray[], fn fnArray[] >
+typename std::enable_if<I != 0, void>::type CallEnumeratedTwo(uint32_t id)
+{
+    if(idArray[I] == id)
+    {
+        fnArray[I]();
+    }
+    CallEnumeratedTwo<I-1,idArray,fnArray>(id);        
+}
+
+
+fn fnArray[] = 
+{
+    [](){printf("[One:]\n");},
+    [](){printf("[Two:]\n");},
+    [](){printf("[Three:]\n");},
+};
+
+uint32_t idArray[] = 
+{
+    11,
+    12,
+    103,
+};
+
+
+
+
 
 
 //
@@ -100,12 +152,10 @@ auto container2 = std::make_tuple(
 //
 int main()
 {
-
-
     //CallEach( container );
-
     //CallIndexed<2>( container );
-    CallEnumerated<2>( container2, 103 );
+    //CallEnumerated<2>( container2, 12 );
+    CallEnumeratedTwo<3, idArray, fnArray>( 103 );
 }
 
 
