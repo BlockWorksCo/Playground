@@ -152,6 +152,18 @@ uint32_t idArray[] =
 
 
 
+void SwitchTest(uint32_t id)
+{
+    switch(id)
+    {
+        case 11: [](){printf("[One:]\n");}();break;
+        case 12: [](){printf("[Two:]\n");}();break;
+        case 103: [](){printf("[Three:]\n");}();break;
+    }
+}
+
+
+
 
 //
 //
@@ -161,7 +173,8 @@ int main()
     //CallEach( container );
     //CallIndexed<2>( container );
     //CallEnumerated<2>( container2, 12 );
-    CallEnumeratedTwo<NUMBER_OF_ELEMENTS(idArray), idArray, fnArray>( 103 );
+    //CallEnumeratedTwo<NUMBER_OF_ELEMENTS(idArray), idArray, fnArray>( 103 );
+    SwitchTest(12);
 }
 
 
