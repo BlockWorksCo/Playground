@@ -152,7 +152,7 @@ uint32_t idArray[] =
 
 
 
-void SwitchTest(uint32_t id)
+auto Switcher = [](uint32_t id)
 {
     switch(id)
     {
@@ -160,7 +160,7 @@ void SwitchTest(uint32_t id)
         case 12: [](){printf("[Two:]\n");}();break;
         case 103: [](){printf("[Three:]\n");}();break;
     }
-}
+};
 
 
 
@@ -174,7 +174,7 @@ int main()
     //CallIndexed<2>( container );
     //CallEnumerated<2>( container2, 12 );
     //CallEnumeratedTwo<NUMBER_OF_ELEMENTS(idArray), idArray, fnArray>( 103 );
-    SwitchTest(12);
+    Switcher(103);
 }
 
 
