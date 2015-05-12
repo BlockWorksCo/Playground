@@ -151,14 +151,49 @@ uint32_t idArray[] =
 
 
 
+class One
+{
+public:
+    void Demo(uint32_t id)
+    {
+        printf("One %d\n",id);
+    }    
+};
+
+class Two
+{
+public:
+    void Demo(uint32_t id)
+    {
+        printf("Two %d\n",id);
+    }    
+};
+
+class Three
+{
+public:
+    void Demo(uint32_t id)
+    {
+        printf("Three %d\n",id);
+    }    
+};
+
+One     one;
+Two     two;
+Three   three;
+
+
+#define ON_ID_CALL(id,obj,...)      case id:obj.CALL(__VA_ARGS__);break
+
 
 auto Switcher = [](uint32_t id)
 {
+    #define CALL    Demo
     switch(id)
     {
-        case 11: [](){printf("[One:]\n");}();break;
-        case 12: [](){printf("[Two:]\n");}();break;
-        case 103: [](){printf("[Three:]\n");}();break;
+        ON_ID_CALL(11,one, 999);
+        ON_ID_CALL(12,two, 999);
+        ON_ID_CALL(103,three, 999);
     }
 };
 
