@@ -183,17 +183,17 @@ Two     two;
 Three   three;
 
 
-#define ON_ID_CALL(id,obj,...)      case id:obj.CALL(__VA_ARGS__);break
+#define ON_ID_CALL_METHOD(id,obj,...)      case id:obj.METHOD(__VA_ARGS__);break
 
 
 auto Switcher = [](uint32_t id)
 {
-    #define CALL    Demo
+    #define METHOD    Demo
     switch(id)
     {
-        ON_ID_CALL(11,one, 999);
-        ON_ID_CALL(12,two, 999);
-        ON_ID_CALL(103,three, 999);
+        ON_ID_CALL_METHOD(11,  one,    id);
+        ON_ID_CALL_METHOD(12,  two,    id);
+        ON_ID_CALL_METHOD(103, three,  id);
     }
 };
 
