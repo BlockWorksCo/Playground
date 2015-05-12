@@ -178,6 +178,22 @@ public:
     }    
 };
 
+
+
+
+
+
+void DoSomething( void (*fn)(uint32_t) )
+{
+    fn( 11 );
+    fn( 12 );
+    fn( 103 );
+}
+
+
+
+
+
 One     one;
 Two     two;
 Three   three;
@@ -209,7 +225,8 @@ int main()
     //CallIndexed<2>( container );
     //CallEnumerated<2>( container2, 12 );
     //CallEnumeratedTwo<NUMBER_OF_ELEMENTS(idArray), idArray, fnArray>( 103 );
-    Switcher(103);
+    //Switcher(103);
+    DoSomething( Switcher );
 }
 
 
