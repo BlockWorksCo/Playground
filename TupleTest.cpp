@@ -320,6 +320,10 @@ public:
         void*       ptr  = (void*)addx;
         //fnType      fn2     = (memberFnPtr)ptr;
         (instance.*fn)();
+
+
+        auto wrapper = [&]() {instance.DoThat();};
+        wrapper();
     }
 
 };
