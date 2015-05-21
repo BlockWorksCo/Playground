@@ -313,9 +313,10 @@ public:
     {
         typedef void (InstanceType::*memberFnPtr)();
         fnType      fn  = &InstanceType::DoThat;
-        uint32_t    addx = (uint64_t)(void*&)fn;
-        //memberFnPtr     fn  = (memberFnPtr)123;
-        //(instance.*fn)();
+        uint64_t    addx = (uint64_t)(void*&)fn;
+        void*       ptr  = (void*)addx;
+        //fnType      fn2     = (memberFnPtr)(void*&)ptr;
+        (instance.*fn)();
     }
 
 };
