@@ -297,11 +297,28 @@ private:
 
 
 
+void fn()
+{
+
+}
 
 
 
+template <typename InstanceType, typename fnType>
+class ccc
+{
+public:
 
+    void Call(InstanceType& instance)
+    {
+        typedef void (InstanceType::*memberFnPtr)();
+        fnType      fn  = &InstanceType::DoThat;
+        uint32_t    addx = (uint64_t)(void*&)fn;
+        //memberFnPtr     fn  = (memberFnPtr)123;
+        //(instance.*fn)();
+    }
 
+};
 
 
 //
@@ -318,21 +335,29 @@ constexpr int blaa(size_t i, size_t n)
 
 
 
-
-
-template< uint32_t I = 0, typename... Tp>
-typename std::enable_if<I == sizeof...(Tp), void>::type blaaa(std::tuple<Tp...>& t)
-{ 
-}
-
-template< uint32_t I = 0, typename... Tp>
-typename std::enable_if<I < sizeof...(Tp), void>::type blaaa(std::tuple<Tp...>& t)
+class BlaaaClass
 {
-    std::get<I>(t).DoThat();    
-    if( I<sizeof...(Tp) ) blaaa<I + 1, Tp...>(t);
-}
+public:
+
+    BlaaaClass()
+    {
+
+    }
+
+    template< uint32_t I = 0, typename... Tp>
+    typename std::enable_if<I == sizeof...(Tp), void>::type blaaa(std::tuple<Tp...>& t)
+    { 
+    }
+
+    template< uint32_t I = 0, typename... Tp>
+    typename std::enable_if<I < sizeof...(Tp), void>::type blaaa(std::tuple<Tp...>& t)
+    {
+        std::get<I>(t).DoThat();    
+        if( I<sizeof...(Tp) ) blaaa<I + 1, Tp...>(t);
+    }
 
 
+};
 
 //
 //
@@ -350,8 +375,12 @@ int main()
     //proxy.DoThis(11);
     //proxy.DoThat(12);
 
-    
-    blaaa(instanceContainer);
+
+    ccc<One, void (One::*)() >     c1;
+    c1.Call(one);
+
+    //BlaaaClass  blaaInstance;
+    //blaaInstance.blaaa(instanceContainer);
 }
 
 
