@@ -299,7 +299,7 @@ private:
 
 void fn()
 {
-
+    printf("fn()\n");
 }
 
 
@@ -367,6 +367,20 @@ public:
 
 };
 
+
+
+
+
+
+template <typename T, void (T::*fnParam)()>
+void fnTest(T& t)
+{
+    (t.*fnParam)();
+}
+
+
+
+
 //
 //
 //
@@ -384,11 +398,13 @@ int main()
     //proxy.DoThat(12);
 
 
-    ccc<One, void (One::*)() >     c1;
-    c1.Call(one);
+    //ccc<One, void (One::*)() >     c1;
+    //c1.Call(one);
 
     //BlaaaClass  blaaInstance;
     //blaaInstance.blaaa(instanceContainer);
+
+    fnTest<One, &One::DoThat>(one);
 }
 
 
