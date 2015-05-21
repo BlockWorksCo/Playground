@@ -303,7 +303,10 @@ void fn()
 }
 
 
-
+//
+// http://stackoverflow.com/questions/1307278/casting-between-void-and-a-pointer-to-member-function
+// http://stackoverflow.com/questions/1207106/calling-base-class-definition-of-virtual-member-function-with-function-pointer/1207396#1207396
+//
 template <typename InstanceType, typename fnType>
 class ccc
 {
@@ -315,7 +318,7 @@ public:
         fnType      fn  = &InstanceType::DoThat;
         uint64_t    addx = (uint64_t)(void*&)fn;
         void*       ptr  = (void*)addx;
-        //fnType      fn2     = (memberFnPtr)(void*&)ptr;
+        //fnType      fn2     = (memberFnPtr)ptr;
         (instance.*fn)();
     }
 
