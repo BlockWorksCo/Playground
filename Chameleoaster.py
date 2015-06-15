@@ -14,12 +14,13 @@ class Chameleoaster:
     initialization and creating of the Game.
     """
     
-    def __init__(self, width=32*16,height=32*12):
+    def __init__(self, blockSize):
         """
         """
         pygame.init()
-        self.width = width
-        self.height = height
+        self.width      = blockSize * 16
+        self.height     = blockSize * 12
+        self.blockSize  = blockSize
         self.screen = pygame.display.set_mode((self.width, self.height))
 
         self.frame  =  [[0 for i in xrange(16)] for i in xrange(12)]
@@ -43,37 +44,57 @@ class Chameleoaster:
         return position
 
 
+    def DrawFrame(self):
+        """
+        """
+        for x in range(16):
+            for y in range(12):
+                r   = random.randint(0,255)
+                g   = random.randint(0,255)
+                b   = random.randint(0,255)
+                c   = pygame.Color(r,g,b)
+                self.SetPixelColour(x,y, c )
+
+
     def MainLoop(self):
         """
         This is the Main Loop of the Game
         """        
         while 1:
 
-            for x in range(16):
-                for y in range(12):
-                    r   = random.randint(0,255)
-                    g   = random.randint(0,255)
-                    b   = random.randint(0,255)
-                    c   = pygame.Color(r,g,b)
-                    self.SetPixelColour(x,y, c )
+            #
+            # Draw something interesting in  the frame.
+            #
+            self.DrawFrame()
 
-
+            #
+            # Handle touches
+            #
             touchPosition   = self.GetTouches()
             if touchPosition != None:
                 print(touchPosition)
 
 
+            #
+            # Handle window events
+            #
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: 
                     sys.exit()
 
+            #
+            # Copy the frame to the physical display.
+            #
             for x in range(16):
                 for y in range(12):
                     pixelColour     = self.frame[y][x]
-                    pygame.draw.rect(self.screen, pixelColour, pygame.Rect([x*32,y*32],[32,32]), 0)
+                    pygame.draw.rect(self.screen, pixelColour, pygame.Rect([x*self.blockSize,y*self.blockSize],[self.blockSize,self.blockSize]), 0)
 
             pygame.display.update()
 
+            #
+            # Wait a bit.
+            #
             time.sleep(0.05)
 
 
@@ -81,7 +102,7 @@ class Chameleoaster:
 
 
 if __name__ == "__main__":
-    MainWindow = Chameleoaster()
+    MainWindow = Chameleoaster(48)
     MainWindow.MainLoop()
 
 
