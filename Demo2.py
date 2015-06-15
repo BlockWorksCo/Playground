@@ -82,7 +82,13 @@ class Demo2(Coaster.CoasterWindow):
         g   = random.randint(0,255)
         b   = random.randint(0,255)
 
-        self.SetPixelColour( self.frame, x/self.blockSize,y/self.blockSize, r,g,b )
+        px  = x/self.blockSize
+        py  = y/self.blockSize
+        self.SetPixelColour( self.frame, px+0,py+0, r,g,b )
+        self.SetPixelColour( self.frame, px+0,py-1, r,g,b )
+        self.SetPixelColour( self.frame, px+0,py+1, r,g,b )
+        self.SetPixelColour( self.frame, px-1,py+0, r,g,b )
+        self.SetPixelColour( self.frame, px+1,py+0, r,g,b )
 
 
 
