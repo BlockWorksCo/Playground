@@ -69,7 +69,6 @@ class Demo2(Coaster.CoasterWindow):
                 self.SetPixelColour( newFrame, x,y, r,g,b )
 
         self.frame = newFrame
-        #self.CopyFrameToWindow( newFrame )
 
 
 
