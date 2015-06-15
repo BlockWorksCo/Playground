@@ -30,7 +30,7 @@ class Demo1(Coaster.CoasterWindow):
         """
         for x in range(16):
             for y in range(12):
-                currentR,currentG,currentB,a  = self.GetPixelColour(x,y)
+                currentR,currentG,currentB  = self.GetPixelColour(x,y)
                 r   = int(currentR * 0.9)
                 g   = int(currentG * 0.9)
                 b   = int(currentB * 0.9)
