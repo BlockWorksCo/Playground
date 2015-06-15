@@ -372,7 +372,7 @@ public:
 
 
 
-template <typename T, void (T::*fnParam)()>
+template <typename T, void (T::*fnParam)(), typename... Rest>
 void fnTest(T& t)
 {
     (t.*fnParam)();
@@ -404,7 +404,7 @@ int main()
     //BlaaaClass  blaaInstance;
     //blaaInstance.blaaa(instanceContainer);
 
-    fnTest<One, &One::DoThat>(one);
+    fnTest< One,&One::DoThat, Two,&Two::DoThat >(one);
 }
 
 
