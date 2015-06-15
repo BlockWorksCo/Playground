@@ -34,10 +34,13 @@ class CoasterWindow:
                 b   = random.randint(0,255)
                 self.SetPixelColour(x,y, r,g,b )
 
+
     def GetPixelColour(self, x,y):
         """
         """
-        return self.frame[y][x]
+        #print('%d,%d'%(x,y))
+        r,g,b,a = self.frame[y][x]
+        return r,g,b
 
 
     def SetPixelColour(self, x,y, r,g,b):
@@ -57,6 +60,36 @@ class CoasterWindow:
             position = None
 
         return position
+
+
+
+    def WrappedCoordinate(self,x,y):
+        """
+        """
+        while x < 0:
+            x = x + 16
+
+        while y < 0:
+            y = y + 12
+
+        while x >= 16:
+            x = x - 16
+
+        while y >= 12:
+            y = y - 12
+
+        #print('-- %d %d --'%(x,y))
+
+        return x,y
+
+
+    def GetWrappedPixelColour( self, position ):
+        """
+        """
+        x,y = position
+        wrappedX,wrappedY = self.WrappedCoordinate( x,y )
+        return self.GetPixelColour( wrappedX,wrappedY )
+
 
 
     def DrawFrame(self):
