@@ -1,14 +1,16 @@
-import os, sys
+"""
+"""
+
+
+import os
+import sys
 import pygame
-from pygame.locals import *
 import time
-
-if not pygame.font: print 'Warning, fonts disabled'
-if not pygame.mixer: print 'Warning, sound disabled'
-
 import random
 
-class Chameleoaster:
+
+
+class ChameleoasterWindow:
     """
     The Chameleoaster Class - This class handles the main 
     initialization and creating of the Game.
@@ -36,6 +38,7 @@ class Chameleoaster:
         """
         """
         button1,button2,button3     = pygame.mouse.get_pressed()
+
         if button1 == True or button2 == True or button3 == True:
             position = pygame.mouse.get_pos()
         else:
@@ -69,6 +72,12 @@ class Chameleoaster:
 
 
 
+    def HandleTouch(self, touchPosition):
+        """
+        """
+        print(touchPosition)
+
+
 
     def MainLoop(self):
         """
@@ -86,7 +95,7 @@ class Chameleoaster:
             #
             touchPosition   = self.GetTouches()
             if touchPosition != None:
-                print(touchPosition)
+                self.HandleTouch(touchPosition)
 
 
             #
@@ -111,7 +120,7 @@ class Chameleoaster:
 
 
 if __name__ == "__main__":
-    MainWindow = Chameleoaster(48)
+    MainWindow = ChameleoasterWindow(48)
     MainWindow.MainLoop()
 
 
