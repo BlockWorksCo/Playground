@@ -31,6 +31,18 @@ class Chameleoaster:
         self.frame[y][x]    = colour
 
 
+    def GetTouches(self):
+        """
+        """
+        button1,button2,button3     = pygame.mouse.get_pressed()
+        if button1 == True or button2 == True or button3 == True:
+            position = pygame.mouse.get_pos()
+        else:
+            position = None
+
+        return position
+
+
     def MainLoop(self):
         """
         This is the Main Loop of the Game
@@ -44,6 +56,11 @@ class Chameleoaster:
                     b   = random.randint(0,255)
                     c   = pygame.Color(r,g,b)
                     self.SetPixelColour(x,y, c )
+
+
+            touchPosition   = self.GetTouches()
+            if touchPosition != None:
+                print(touchPosition)
 
 
             for event in pygame.event.get():
