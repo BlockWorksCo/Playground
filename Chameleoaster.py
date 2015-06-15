@@ -131,7 +131,7 @@ class ChameleoasterWindow:
             #
             # Wait a bit.
             #
-            time.sleep(0.05)
+            time.sleep(0.1)
 
 
 
