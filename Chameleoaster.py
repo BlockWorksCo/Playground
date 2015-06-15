@@ -56,11 +56,25 @@ class Chameleoaster:
                 self.SetPixelColour(x,y, c )
 
 
+
+    def CopyFrameToWindow(self):
+        """
+        """
+        for x in range(16):
+            for y in range(12):
+                pixelColour     = self.frame[y][x]
+                pygame.draw.rect(self.screen, pixelColour, pygame.Rect([x*self.blockSize,y*self.blockSize],[self.blockSize,self.blockSize]), 0)
+
+        pygame.display.update()
+
+
+
+
     def MainLoop(self):
         """
         This is the Main Loop of the Game
         """        
-        while 1:
+        while True:
 
             #
             # Draw something interesting in  the frame.
@@ -85,12 +99,7 @@ class Chameleoaster:
             #
             # Copy the frame to the physical display.
             #
-            for x in range(16):
-                for y in range(12):
-                    pixelColour     = self.frame[y][x]
-                    pygame.draw.rect(self.screen, pixelColour, pygame.Rect([x*self.blockSize,y*self.blockSize],[self.blockSize,self.blockSize]), 0)
-
-            pygame.display.update()
+            self.CopyFrameToWindow()
 
             #
             # Wait a bit.
