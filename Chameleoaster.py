@@ -27,6 +27,14 @@ class ChameleoasterWindow:
 
         self.frame  =  [[0 for i in xrange(16)] for i in xrange(12)]
 
+        for x in range(16):
+            for y in range(12):
+                r   = random.randint(0,255)
+                g   = random.randint(0,255)
+                b   = random.randint(0,255)
+                c   = pygame.Color(r,g,b)
+                self.SetPixelColour(x,y, c )
+
 
     def SetPixelColour(self, x,y, colour):
         """
@@ -52,9 +60,10 @@ class ChameleoasterWindow:
         """
         for x in range(16):
             for y in range(12):
-                r   = random.randint(0,255)
-                g   = random.randint(0,255)
-                b   = random.randint(0,255)
+                currentR,currentG,currentB,a  = self.frame[y][x]
+                r   = int(currentR * 0.9)
+                g   = int(currentG * 0.9)
+                b   = int(currentB * 0.9)
                 c   = pygame.Color(r,g,b)
                 self.SetPixelColour(x,y, c )
 
@@ -75,7 +84,16 @@ class ChameleoasterWindow:
     def HandleTouch(self, touchPosition):
         """
         """
+        x,y = touchPosition
         print(touchPosition)
+
+        r   = random.randint(0,255)
+        g   = random.randint(0,255)
+        b   = random.randint(0,255)
+        c   = pygame.Color(r,g,b)
+
+        self.SetPixelColour(x/self.blockSize,y/self.blockSize, c )
+
 
 
 
