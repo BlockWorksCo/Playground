@@ -22,7 +22,7 @@ class Demo1(Coaster.CoasterWindow):
                 r   = random.randint(0,255)
                 g   = random.randint(0,255)
                 b   = random.randint(0,255)
-                self.SetPixelColour(x,y, r,g,b )
+                self.SetPixelColour( self.frame, x,y, r,g,b )
 
 
     def DrawFrame(self):
@@ -30,11 +30,11 @@ class Demo1(Coaster.CoasterWindow):
         """
         for x in range(16):
             for y in range(12):
-                currentR,currentG,currentB  = self.GetPixelColour(x,y)
+                currentR,currentG,currentB  = self.GetPixelColour( self.frame, x,y)
                 r   = int(currentR * 0.9)
                 g   = int(currentG * 0.9)
                 b   = int(currentB * 0.9)
-                self.SetPixelColour(x,y, r,g,b )
+                self.SetPixelColour( self.frame, x,y, r,g,b )
 
 
 
@@ -48,7 +48,7 @@ class Demo1(Coaster.CoasterWindow):
         g   = random.randint(0,255)
         b   = random.randint(0,255)
 
-        self.SetPixelColour(x/self.blockSize,y/self.blockSize, r,g,b )
+        self.SetPixelColour( self.frame, x/self.blockSize,y/self.blockSize, r,g,b )
 
 
 

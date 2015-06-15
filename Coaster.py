@@ -32,21 +32,21 @@ class CoasterWindow:
                 r   = random.randint(0,255)
                 g   = random.randint(0,255)
                 b   = random.randint(0,255)
-                self.SetPixelColour(x,y, r,g,b )
+                self.SetPixelColour( self.frame, x,y, r,g,b )
 
 
-    def GetPixelColour(self, x,y):
+    def GetPixelColour(self, frame, x,y):
         """
         """
         #print('%d,%d'%(x,y))
-        r,g,b,a = self.frame[y][x]
+        r,g,b,a = frame[y][x]
         return r,g,b
 
 
-    def SetPixelColour(self, x,y, r,g,b):
+    def SetPixelColour(self, frame, x,y, r,g,b):
         """
         """
-        self.frame[y][x]    = pygame.Color(r,g,b)        
+        frame[y][x]    = pygame.Color(r,g,b)        
 
 
     def GetTouches(self):
@@ -83,12 +83,12 @@ class CoasterWindow:
         return x,y
 
 
-    def GetWrappedPixelColour( self, position ):
+    def GetWrappedPixelColour( self, frame, position ):
         """
         """
         x,y = position
         wrappedX,wrappedY = self.WrappedCoordinate( x,y )
-        return self.GetPixelColour( wrappedX,wrappedY )
+        return self.GetPixelColour( frame, wrappedX,wrappedY )
 
 
 
@@ -98,12 +98,12 @@ class CoasterWindow:
         pass
 
 
-    def CopyFrameToWindow(self):
+    def CopyFrameToWindow(self, frame ):
         """
         """
         for x in range(16):
             for y in range(12):
-                pixelColour     = self.frame[y][x]
+                pixelColour     = frame[y][x]
                 pygame.draw.rect(self.screen, pixelColour, pygame.Rect([x*self.blockSize,y*self.blockSize],[self.blockSize,self.blockSize]), 0)
 
         pygame.display.update()
@@ -148,7 +148,7 @@ class CoasterWindow:
             #
             # Copy the frame to the physical display.
             #
-            self.CopyFrameToWindow()
+            self.CopyFrameToWindow( self.frame )
 
             #
             # Wait a bit.

@@ -22,7 +22,7 @@ class Demo2(Coaster.CoasterWindow):
                 r   = random.randint(0,255)
                 g   = random.randint(0,255)
                 b   = random.randint(0,255)
-                self.SetPixelColour(x,y, r,g,b )
+                self.SetPixelColour( self.frame, x,y, r,g,b )
 
 
     def AverageColourOf( self, pixelValues ):
@@ -46,21 +46,30 @@ class Demo2(Coaster.CoasterWindow):
     def DrawFrame(self):
         """
         """
+        oldFrame    = self.frame
+        newFrame    =  [[0 for i in xrange(16)] for i in xrange(12)]
         for x in range(16):
             for y in range(12):
 
                 pixelValues     = []
-                pixelValues     = pixelValues + [self.GetWrappedPixelColour( (x+0, y-1) )]
-                pixelValues     = pixelValues + [self.GetWrappedPixelColour( (x+0, y+1) )]
-                pixelValues     = pixelValues + [self.GetWrappedPixelColour( (x-1, y+0) )]
-                pixelValues     = pixelValues + [self.GetWrappedPixelColour( (x+1, y+0) )]
+                
+                pixelValues     = pixelValues + [self.GetWrappedPixelColour( oldFrame, (x+0, y-1) )]
+                pixelValues     = pixelValues + [self.GetWrappedPixelColour( oldFrame, (x+0, y+1) )]
+                pixelValues     = pixelValues + [self.GetWrappedPixelColour( oldFrame, (x-1, y+0) )]
+                pixelValues     = pixelValues + [self.GetWrappedPixelColour( oldFrame, (x+1, y+0) )]
+                pixelValues     = pixelValues + [self.GetWrappedPixelColour( oldFrame, (x-1, y-1) )]
+                pixelValues     = pixelValues + [self.GetWrappedPixelColour( oldFrame, (x+1, y-1) )]
+                pixelValues     = pixelValues + [self.GetWrappedPixelColour( oldFrame, (x-1, y+1) )]
+                pixelValues     = pixelValues + [self.GetWrappedPixelColour( oldFrame, (x+1, y+1) )]
 
                 r,g,b = self.AverageColourOf( pixelValues )
-                #currentR,currentG,currentB  = self.GetPixelColour(x,y)
-                #r   = int(currentR * 0.9)
-                #g   = int(currentG * 0.9)
-                #b   = int(currentB * 0.9)
-                self.SetPixelColour(x,y, r,g,b )
+                r   = int(r * 0.95)
+                g   = int(g * 0.95)
+                b   = int(b * 0.95)
+                self.SetPixelColour( newFrame, x,y, r,g,b )
+
+        self.frame = newFrame
+        #self.CopyFrameToWindow( newFrame )
 
 
 
@@ -74,7 +83,7 @@ class Demo2(Coaster.CoasterWindow):
         g   = random.randint(0,255)
         b   = random.randint(0,255)
 
-        self.SetPixelColour(x/self.blockSize,y/self.blockSize, r,g,b )
+        self.SetPixelColour( self.frame, x/self.blockSize,y/self.blockSize, r,g,b )
 
 
 
