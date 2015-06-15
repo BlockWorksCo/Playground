@@ -34,6 +34,11 @@ class CoasterWindow:
                 b   = random.randint(0,255)
                 self.SetPixelColour(x,y, r,g,b )
 
+    def GetPixelColour(self, x,y):
+        """
+        """
+        return self.frame[y][x]
+
 
     def SetPixelColour(self, x,y, r,g,b):
         """
