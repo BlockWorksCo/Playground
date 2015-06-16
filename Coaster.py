@@ -46,10 +46,6 @@ class CoasterWindow:
     def SetPixelColour(self, frame, x,y, r,g,b):
         """
         """
-        r = r%255
-        g = g%255
-        b = b%255
-
         x = x%16
         y = y%12
         frame[y][x]    = pygame.Color(r,g,b)        
