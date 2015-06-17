@@ -105,14 +105,14 @@ class Demo3(Coaster.CoasterWindow):
                 pixelValues     = pixelValues + [self.GetWrappedPixelColour( oldFrame, (x+1, y+1) )]
 
                 r,g,b = self.AverageColourOf( pixelValues )
-                r   = int(r * 0.9)
-                g   = int(g * 0.9)
-                b   = int(b * 0.9)
+                r   = int(r * 0.8)
+                g   = int(g * 0.8)
+                b   = int(b * 0.8)
                 self.SetPixelColour( newFrame, x,y, r,g,b )
 
 
         if self.rippleRadius < 15:
-            self.DrawCircle(  newFrame, self.rippleX,self.rippleY, self.rippleRadius+0, 0,255,0)
+            #self.DrawCircle(  newFrame, self.rippleX,self.rippleY, self.rippleRadius+0, 0,255,0)
             self.DrawCircle(  newFrame, self.rippleX,self.rippleY, self.rippleRadius+1, 0,255,0)
             self.rippleRadius = self.rippleRadius + 1
 
