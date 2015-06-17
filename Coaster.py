@@ -46,9 +46,36 @@ class CoasterWindow:
     def SetPixelColour(self, frame, x,y, r,g,b):
         """
         """
-        x = x%16
-        y = y%12
-        frame[y][x]    = pygame.Color(r,g,b)        
+        #x = x%16
+        #y = y%12
+        if x >= 0 and x < 16 and y >= 0 and y < 12:
+            frame[y][x]    = pygame.Color(r,g,b)        
+
+
+
+
+    def DrawCircle( self, frame, x0, y0, radius, r,g,b ):
+        """
+        """
+        x               = radius;
+        y               = 0;
+        decisionOver2   = 1 - x         # Decision criterion divided by 2 evaluated at x=r, y=0
+
+        while x >= y:
+            self.SetPixelColour( frame,  x + x0,  y + y0,  r,g,b )
+            self.SetPixelColour( frame,  y + x0,  x + y0,  r,g,b )
+            self.SetPixelColour( frame, -x + x0,  y + y0,  r,g,b )
+            self.SetPixelColour( frame, -y + x0,  x + y0,  r,g,b )
+            self.SetPixelColour( frame, -x + x0, -y + y0,  r,g,b )
+            self.SetPixelColour( frame, -y + x0, -x + y0,  r,g,b )
+            self.SetPixelColour( frame,  x + x0, -y + y0,  r,g,b )
+            self.SetPixelColour( frame,  y + x0, -x + y0,  r,g,b )
+            y = y + 1
+            if decisionOver2 <= 0:            
+                decisionOver2 = decisionOver2 +  (2 * y + 1)   # Change in decision criterion for y -> y+1            
+            else:
+                x = x - 1
+                decisionOver2 = decisionOver2 + (2 * (y - x) + 1)   # Change for y -> y+1, x -> x-1
 
 
     def GetTouches(self):

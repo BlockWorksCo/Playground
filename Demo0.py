@@ -31,6 +31,8 @@ class Demo0(Coaster.CoasterWindow):
 
         self.frameCount = self.frameCount + 1
 
+        self.DrawCircle(  self.frame, 8,6, 8, 0,255,0)
+
         if (self.frameCount%10) == 0:
             self.SetPixelColour( self.frame, 7,5, 255,0,0 )
             print('On')
