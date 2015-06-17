@@ -56,6 +56,8 @@ class CoasterWindow:
 
     def DrawCircle( self, frame, x0, y0, radius, r,g,b ):
         """
+        An implementation of Breshenhams circle algorithm, see:
+        https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
         """
         x               = radius;
         y               = 0;
