@@ -126,11 +126,11 @@ int main()
         CircularBufferPut( &context, "Ten        ");
         CircularBufferPut( &context, "Eleven     ");
         CircularBufferPut( &context, "Twelve     ");
-        */
 
         uint8_t     temp[16];
         CircularBufferGet( &context, &temp[0] );
         printf("(%s)\n", temp);
+        */
     }
 }
 

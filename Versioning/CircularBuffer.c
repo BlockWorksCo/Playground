@@ -129,6 +129,7 @@ void CircularBufferGet(CircularBufferContext* context,  void* element)
     SequenceNumber  sequenceNumber  = 0xffffffff;
 
     printf("oldestIndex = %d\n", oldestIndex);
+    printf("oldestOffset = %ld\n", context->offset+(context->elementSize*oldestIndex)+sizeof(SequenceNumber) );
 
     BlockDeviceRead(    context->offset+(context->elementSize*oldestIndex)+sizeof(SequenceNumber),   
                         context->elementSize-sizeof(SequenceNumber), 
