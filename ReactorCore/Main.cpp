@@ -2,63 +2,52 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-
-
-uint8_t     inputs  = 0x00;
+#include "GPIO.h"
 
 
 
-void Pin0()
+template <uint32_t base, uint32_t pinNumber>
+class PinController
 {
-    return true;
-}
 
-void Pin1()
-{
-    return true;
-}
+public:
 
-void Pin2()
-{
-    return true;
-}
+    void Process()
+    {
 
-void Pin3()
-{
-    return true;
-}
+    }
 
-void Pin4()
-{
-    return true;
-}
+private:
 
-void Pin5()
-{
-    return true;
-}
 
-void Pin6()
-{
-    return true;
-}
+};
 
-void Pin7()
-{
-    return true;    
-}
+
+
+
+
+PinController<0x10001000, 0>    pin0;
+PinController<0x10001000, 1>    pin1;
+PinController<0x10001000, 2>    pin2;
+PinController<0x10001000, 3>    pin3;
+PinController<0x10001000, 4>    pin4;
+PinController<0x10001000, 5>    pin5;
+PinController<0x10001000, 6>    pin6;
+PinController<0x10001000, 7>    pin7;
+
+
 
 
 void RunSchedule()
 {
-    outputs     = Pin0();
-    outputs     |= Pin1() << 1;
-    outputs     |= Pin2() << 2;
-    outputs     |= Pin3() << 3;
-    outputs     |= Pin4() << 4;
-    outputs     |= Pin5() << 5;
-    outputs     |= Pin6() << 6;
-    outputs     |= Pin7() << 7;
+    pin0.Process();
+    pin1.Process();
+    pin2.Process();
+    pin3.Process();
+    pin4.Process();
+    pin5.Process();
+    pin6.Process();
+    pin7.Process();
 }
 
 
@@ -73,14 +62,9 @@ int main()
     while(true)
     {
         //
-        // Get the inputs.
-        //
-        inputs  = 0xab;
-
-        //
         // Calculate the new outputs.
         //
-        outputs     = RunSchedule();
+        RunSchedule();
 
         //
         // Output the new values.
@@ -90,3 +74,8 @@ int main()
     return 0;
 }
 
+
+void start()
+{
+    main();
+}
