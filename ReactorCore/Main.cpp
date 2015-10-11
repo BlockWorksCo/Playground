@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "GPIO.h"
+#include "CycleCounterTiming.h"
 
 
 
@@ -19,6 +20,11 @@ typedef STM32Output<GPIOD_BASE, 4>            Pin4Type;
 typedef STM32Output<GPIOD_BASE, 5>            Pin5Type;
 typedef STM32Output<GPIOD_BASE, 6>            Pin6Type;
 typedef STM32Output<GPIOD_BASE, 7>            Pin7Type;
+
+//
+//
+//
+Timing<uint32_t, 200000>                    timing;
 
 
 //
@@ -59,7 +65,9 @@ void RunSchedule()
 
 
 
-
+//
+//
+//
 int main()
 {
     //
@@ -67,14 +75,18 @@ int main()
     //
     while(true)
     {
+        uint32_t    previousTimestamp       = 0;
+        uint32_t    nanosecondTimestamp     = timing.GetNanosecondTick();
+
         //
         // Calculate the new outputs.
         //
         RunSchedule();
 
         //
-        // Output the new values.
         //
+        //
+        previousTimestamp   = nanosecondTimestamp;
     }
 
     return 0;
