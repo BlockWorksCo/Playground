@@ -4,15 +4,18 @@
 #ifndef __TOGGLE_H__
 #define __TOGGLE_H__
 
-template <typename pinType>
+template <  typename pinType, 
+            typename timingType, 
+            uint32_t ticksPerSecond>
 class ToggleController
 {
 
 public:
 
 
-    ToggleController( pinType& _pin ) :
+    ToggleController( pinType& _pin, timingType& _timing ) :
             pin(_pin),
+            timing(_timing),
             state(false)
     {
         pin.Set();
@@ -35,6 +38,7 @@ public:
 private:
 
     pinType&    pin;
+    timingType& timing;
     bool        state;
 
 };

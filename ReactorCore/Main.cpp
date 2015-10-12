@@ -10,7 +10,16 @@
 
 
 //
+// Timing related definitions.
 //
+const uint32_t  CLOCK_RATE              = 200000000;
+typedef Timing<uint32_t, CLOCK_RATE>        TimingType;
+TimingType                                  timing;
+
+
+
+//
+// Raw pin definitions.
 //
 typedef STM32Output<GPIOD_BASE, 0>            Pin0Type;
 typedef STM32Output<GPIOD_BASE, 1>            Pin1Type;
@@ -21,15 +30,6 @@ typedef STM32Output<GPIOD_BASE, 5>            Pin5Type;
 typedef STM32Output<GPIOD_BASE, 6>            Pin6Type;
 typedef STM32Output<GPIOD_BASE, 7>            Pin7Type;
 
-//
-//
-//
-Timing<uint32_t, 200000>                    timing;
-
-
-//
-//
-//
 Pin0Type                    pin0;
 Pin1Type                    pin1;
 Pin2Type                    pin2;
@@ -40,7 +40,7 @@ Pin6Type                    pin6;
 Pin7Type                    pin7;
 
 //
-//
+// User configuration.
 //
 #include "Configuration.h"
 
@@ -81,7 +81,10 @@ int main()
         //
         // Calculate the new outputs.
         //
-        RunSchedule();
+        if(nanosecondTimestamp !=  previousTimestamp)
+        {
+            RunSchedule();            
+        }
 
         //
         //
