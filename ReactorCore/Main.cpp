@@ -63,6 +63,14 @@ void RunSchedule()
 }
 
 
+//
+// Rx and Tx data from/to the SPI port.
+//
+void TransferUserData()
+{
+
+}
+
 
 
 //
@@ -85,6 +93,11 @@ int main()
         {
             RunSchedule();            
         }
+
+        //
+        // Data transfer.
+        //
+        TransferUserData();
 
         //
         //
