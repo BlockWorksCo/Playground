@@ -24,15 +24,17 @@ public:
 
     void Process()
     {
-        if(state == true)
+        if( (timing.GetTick()%ticksPerSecond) <= 100)
         {
-            pin.Set();            
+            if(state == true)
+            {
+                pin.Set();            
+            }
+            else
+            {
+                pin.Clear();            
+            }            
         }
-        else
-        {
-            pin.Clear();            
-        }
-
     }
 
 private:
