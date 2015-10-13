@@ -9,7 +9,7 @@ template <  typename pinType,
             uint32_t ticksPerSecond,
             uint32_t bitsPerSecond,
             uint32_t bitsPerByte,
-            uint32_t bitTolerance,
+            uint32_t sampleTolerance,
             uint32_t samplesPerBit>
 class UARTReceive
 {
@@ -23,149 +23,88 @@ public:
             ticksPerBit( ticksPerSecond/bitsPerSecond ),
             bitNumber(0),
             currentByte(0xab),
-            previousBitTick(0),
-            ticksPerSample( ticksPerBit / samplesPerBit )
+            previousSampleTick(0),
+            ticksPerSample( ticksPerBit / samplesPerBit ),
+            sampleNumber(0)
     {
-        pin.Set();
     }
 
 
     void Process()
     {
-        uint32_t    deltaTick   = timing.GetTick()-previousBitTick;
+        uint32_t    currentTick = timing.GetTick();
+        uint32_t    deltaTick   = currentTick-previousSampleTick;
 
-        if( (deltaTick >= ticksPerSample) && (deltaTick < (ticksPerSample+bitTolerance)) )
+        if( (deltaTick >= ticksPerSample) && (deltaTick < (ticksPerSample+sampleTolerance)) )
         {
-            bool        state   = true;
 
             //
             // Sample the input line.
             //
+            bool        sample      = pin.Get();
 
             //
+            // Reset the counts on sample 0.
             //
-            //
-            switch(bitNumber)
+            if(sampleNumber == 0)
             {
-                case 0:
-                {
-                    state   = false;    // Start bit.
-                    break;
-                }
-
-                case 1:
-                {
-                    if( (currentByte&0x01) == 0)
-                    {
-                        state   = false;
-                    }
-                    break;
-                }
-
-                case 2:
-                {
-                    if( (currentByte&0x02) == 0)
-                    {
-                        state   = false;
-                    }
-                    break;
-                }
-
-                case 3:
-                {
-                    if( (currentByte&0x04) == 0)
-                    {
-                        state   = false;
-                    }
-                    break;
-                }
-
-                case 4:
-                {
-                    if( (currentByte&0x08) == 0)
-                    {
-                        state   = false;
-                    }
-                    break;
-                }
-
-                case 5:
-                {
-                    if( (currentByte&0x10) == 0)
-                    {
-                        state   = false;
-                    }
-                    break;
-                }
-
-                case 6:
-                {
-                    if( (currentByte&0x20) == 0)
-                    {
-                        state   = false;
-                    }
-                    break;
-                }
-
-                case 7:
-                {
-                    if( (currentByte&0x40) == 0)
-                    {
-                        state   = false;
-                    }
-                    break;
-                }
-
-                case 8:
-                {
-                    if( (currentByte&0x80) == 0)
-                    {
-                        state   = false;
-                    }
-                    break;
-                }
-
-                case 9:
-                {
-                    state   = true;     // Stop bit.
-                    break;
-                }
-
-                default:
-                {
-                    state   = true;
-                    break;
-                }
+                highSampleCount     = 0;
+                lowSampleCount      = 0;
             }
 
             //
-            // Set the output state.
+            // Update the counts.
             //
-            if(state == true)
+            if(sample == true)
             {
-                pin.Set();            
+                highSampleCount++;
             }
             else
             {
-                pin.Clear();            
+                lowSampleCount++;
+            }
+
+            //
+            // Last sample in this bit, so lets process the bit.
+            //
+            if(sampleNumber == (samplesPerBit-1) )
+            {
+                bool    bitState    = false;
+                if(highSampleCount > lowSampleCount)
+                {
+                    bitState    = true;
+                }
+
+                ProcessBit( bitState );
             }
 
             //
             // move along the bitNumber for next time.
             //            
-            bitNumber   = (bitNumber + 1) % bitsPerByte;
+            sampleNumber        = (sampleNumber + 1) % samplesPerBit;
+            previousSampleTick  = currentTick;
         }
     }
 
 private:
+
+
+    void ProcessBit( bool bit )
+    {
+
+    }
+
 
     pinType&    pin;
     timingType& timing;
     uint32_t    ticksPerBit;
     uint8_t     bitNumber;
     uint8_t     currentByte;
-    uint32_t    previousBitTick;
-    uint32_t    ticksPerSample;
+    uint32_t    previousSampleTick;
+    uint8_t     ticksPerSample;
+    uint8_t     sampleNumber;
+    uint8_t     highSampleCount;
+    uint8_t     lowSampleCount;
 };
 
 

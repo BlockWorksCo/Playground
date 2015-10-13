@@ -30,6 +30,7 @@ public:
 
     void Process()
     {
+        uint32_t    currentTick = timing.GetTick();
         uint32_t    deltaTick   = timing.GetTick()-previousBitTick;
 
         if( (deltaTick >= ticksPerBit) && (deltaTick < (ticksPerBit+bitTolerance)) )
@@ -147,7 +148,8 @@ public:
             //
             // move along the bitNumber for next time.
             //            
-            bitNumber   = (bitNumber + 1) % bitsPerByte;
+            bitNumber       = (bitNumber + 1) % bitsPerByte;
+            previousBitTick = currentTick;
         }
     }
 
