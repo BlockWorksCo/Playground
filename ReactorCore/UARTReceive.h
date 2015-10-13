@@ -91,7 +91,47 @@ private:
 
     void ProcessBit( bool bit )
     {
+        //
+        // Is it the start bit.
+        //
+        if(bitNumber == 0)
+        {
+            currentStartBit     = bit;
+        }
 
+        //
+        // Data bit?
+        //
+        if( (bitNumber >= 1) && (bitNumber < 9) )
+        {
+            if(bit == true)
+            {
+                currentByte     |= (0x01 << (bitNumber-1));                
+            }
+            else
+            {
+                currentByte     &= ~(0x01 << (bitNumber-1));                                
+            }
+        }
+
+        //
+        // Is it the stop bit.
+        //
+        if( bitNumber == bitsPerByte-1 )
+        {
+            currentStopBit      = bit;
+
+            if( (currentStartBit == false) && (currentStopBit == true) )
+            {
+                //
+                // ...byte received.
+                //
+                //printf("byte received %02x\n", currentByte);
+            }
+        }
+
+
+        bitNumber   = (bitNumber + 1) % bitsPerByte;
     }
 
 
@@ -105,6 +145,8 @@ private:
     uint8_t     sampleNumber;
     uint8_t     highSampleCount;
     uint8_t     lowSampleCount;
+    bool        currentStartBit;
+    bool        currentStopBit;
 };
 
 
