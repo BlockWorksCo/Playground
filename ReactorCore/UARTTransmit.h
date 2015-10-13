@@ -32,12 +32,12 @@ public:
     {
         uint32_t    deltaTick   = timing.GetTick()-previousBitTick;
 
-        if( (deltaTick >= ticksPerBit) && (deltaTick < ticksPerBit+bitTolerance) )
+        if( (deltaTick >= ticksPerBit) && (deltaTick < (ticksPerBit+bitTolerance)) )
         {
             bool        state   = true;
 
             //
-            //
+            // Set the output state according to the UART protocol.
             //
             switch(bitNumber)
             {
