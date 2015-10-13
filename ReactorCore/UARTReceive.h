@@ -9,7 +9,8 @@ template <  typename pinType,
             uint32_t ticksPerSecond,
             uint32_t bitsPerSecond,
             uint32_t bitsPerByte,
-            uint32_t bitTolerance>
+            uint32_t bitTolerance,
+            uint32_t samplesPerBit>
 class UARTReceive
 {
 
@@ -22,7 +23,8 @@ public:
             ticksPerBit( ticksPerSecond/bitsPerSecond ),
             bitNumber(0),
             currentByte(0xab),
-            previousBitTick(0)
+            previousBitTick(0),
+            ticksPerSample( ticksPerBit / samplesPerBit )
     {
         pin.Set();
     }
@@ -32,12 +34,16 @@ public:
     {
         uint32_t    deltaTick   = timing.GetTick()-previousBitTick;
 
-        if( (deltaTick >= ticksPerBit) && (deltaTick < (ticksPerBit+bitTolerance)) )
+        if( (deltaTick >= ticksPerSample) && (deltaTick < (ticksPerSample+bitTolerance)) )
         {
             bool        state   = true;
 
             //
-            // Set the output state according to the UART protocol.
+            // Sample the input line.
+            //
+
+            //
+            //
             //
             switch(bitNumber)
             {
@@ -159,6 +165,7 @@ private:
     uint8_t     bitNumber;
     uint8_t     currentByte;
     uint32_t    previousBitTick;
+    uint32_t    ticksPerSample;
 };
 
 
