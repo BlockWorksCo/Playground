@@ -55,12 +55,56 @@ void TransferUserData()
 }
 
 
+#include "stm32f4xx_rcc.h"
+#include "stm32f4xx_gpio.h"
 
 //
 //
 //
 int main()
 {
+    //
+    //  Initialise the peripheral clock.
+    //
+    RCC->AHB1ENR |= RCC_AHB1Periph_GPIOD;
+    //
+    //  Initilaise the GPIO port.
+    //
+    GPIOD->MODER |= GPIO_Mode_OUT;
+    GPIOD->OSPEEDR |= GPIO_Speed_25MHz;
+    GPIOD->OTYPER |= GPIO_OType_PP;
+    GPIOD->PUPDR |= GPIO_PuPd_NOPULL;
+    //
+    //  Toggle Port D, pin 0 indefinitely.
+    //
+    while (true)
+    {
+        GPIOD->BSRRL = GPIO_Pin_0;
+        GPIOD->BSRRH = GPIO_Pin_0;
+    }
+
+
+    while(true)
+    {
+        pin0.Set();
+        pin1.Set();
+        //pin2.Set();
+        pin3.Set();
+        pin4.Set();
+        pin5.Set();
+        pin6.Set();
+        pin7.Set();
+
+        pin0.Clear();
+        pin1.Clear();
+        //pin2.Clear();
+        pin3.Clear();
+        pin4.Clear();
+        pin5.Clear();
+        pin6.Clear();
+        pin7.Clear();
+    }
+
     //
     // Forever
     //
@@ -93,3 +137,7 @@ int main()
 
 
 
+extern "C" void WWDG_IRQHandler(void)
+{
+    while(true);
+}
