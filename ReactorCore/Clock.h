@@ -7,7 +7,8 @@
 template <  typename pinType, 
             typename timingType, 
             uint32_t ticksPerSecond,
-            uint32_t clocksPerSecond>
+            uint32_t clocksPerSecond,
+            uint32_t tolerance>
 class Clock
 {
 
@@ -17,7 +18,9 @@ public:
     Clock( pinType& _pin, timingType& _timing ) :
             pin(_pin),
             timing(_timing),
-            state(false)
+            state(false),
+            ticksPerClock( ticksPerSecond / ticksPerClock ),
+            ticksAtLastClock(0)
     {
         pin.Set();
     }
@@ -25,7 +28,10 @@ public:
 
     void Process()
     {
-        if( (timing.GetTick()%ticksPerSecond) <= 100)
+        uint32_t    currentTicks    = timing.GetTick();
+        uint32_t    deltaTicks      = currentTicks - ticksAtLastClock;
+
+        if( ((currentTicks%ticksPerClock) <= tolerance) && (deltaTicks >= clocksPerSecond))
         {
             if(state == true)
             {
@@ -35,6 +41,8 @@ public:
             {
                 pin.Clear();            
             }            
+
+            ticksAtLastClock    = currentTicks;
         }
     }
 
@@ -43,6 +51,8 @@ private:
     pinType&    pin;
     timingType& timing;
     bool        state;
+    uint32_t    ticksPerClock;
+    uint32_t    ticksAtLastClock;
 
 };
 
