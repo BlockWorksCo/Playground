@@ -6,14 +6,15 @@
 
 template <  typename pinType, 
             typename timingType, 
-            uint32_t ticksPerSecond>
+            uint32_t ticksPerSecond,
+            uint32_t clocksPerSecond>
 class Clock
 {
 
 public:
 
 
-    ToggleController( pinType& _pin, timingType& _timing ) :
+    Clock( pinType& _pin, timingType& _timing ) :
             pin(_pin),
             timing(_timing),
             state(false)
