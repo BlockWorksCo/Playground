@@ -10,7 +10,7 @@
 
 
 
-TransferChannelType                             transferChannel;
+TransferChannelType                             transferController;
 
 
 TimingType                                  timing;
@@ -91,7 +91,6 @@ int main()
 
     while(true)
     {
-        uint32_t    previousTimestamp       = 0;
         volatile uint32_t    nanosecondTimestamp     = timing.GetNanosecondTick();
 
         if( (nanosecondTimestamp%168) < 10)
@@ -107,26 +106,16 @@ int main()
     //
     while(true)
     {
-        uint32_t    previousTimestamp       = 0;
-        uint32_t    nanosecondTimestamp     = timing.GetNanosecondTick();
-
         //
         // Calculate the new outputs.
+        // Note: The PinControllers are idempotent, so can be applied repeatedly.
         //
-        if(nanosecondTimestamp !=  previousTimestamp)
-        {
-            RunSchedule();            
-        }
+        RunSchedule();            
 
         //
         // Data transfer.
         //
-        transferChannel.Go();
-
-        //
-        //
-        //
-        previousTimestamp   = nanosecondTimestamp;
+        transferController.Go();
     }
 
     return 0;
