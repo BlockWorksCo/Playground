@@ -59,8 +59,8 @@ UARTReceive<Pin2Type, TimingType, CLOCK_RATE, 9600,8,10,8, TransferChannelType> 
 UARTTransmit<Pin3Type, TimingType, CLOCK_RATE, 9600,8,100, TransferChannelType>      pin3Controller(pin3, timing, transferChannel);
 ToggleController<Pin4Type, TimingType, CLOCK_RATE, TransferChannelType>              pin4Controller(pin4, timing, transferChannel);
 ToggleController<Pin5Type, TimingType, CLOCK_RATE, TransferChannelType>              pin5Controller(pin5, timing, transferChannel);
-Clock<Pin6Type, TimingType, CLOCK_RATE, 2000, 100>              pin6Controller(pin6, timing);
-Clock<Pin7Type, TimingType, CLOCK_RATE, 1000, 100>              pin7Controller(pin7, timing);
+Clock<Pin7Type, TimingType, CLOCK_RATE, 1000, 100, TransferChannelType>              pin7Controller(pin7, timing, transferChannel);
+Clock<Pin6Type, TimingType, CLOCK_RATE, 2000, 100, TransferChannelType>              pin6Controller(pin6, timing, transferChannel);
 
 
 
