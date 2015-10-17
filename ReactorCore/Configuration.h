@@ -12,6 +12,15 @@
 #include "UARTTransmit.h"
 #include "UARTReceive.h"
 #include "Clock.h"
+#include "SPIChannel.h"
+
+
+//
+//
+//
+typedef SPIChannel<0x1, 1024, 1024>         TransferChannelType;
+extern TransferChannelType                      transferChannel;
+
 
 
 //
@@ -44,12 +53,12 @@ extern Pin7Type                    pin7;
 
 
 
-ToggleController<Pin0Type, TimingType, CLOCK_RATE>              pin0Controller(pin0, timing);
-ToggleController<Pin1Type, TimingType, CLOCK_RATE>              pin1Controller(pin1, timing);
+ToggleController<Pin0Type, TimingType, CLOCK_RATE, TransferChannelType>              pin0Controller(pin0, timing, transferChannel);
+ToggleController<Pin1Type, TimingType, CLOCK_RATE, TransferChannelType>              pin1Controller(pin1, timing, transferChannel);
 UARTReceive<Pin2Type, TimingType, CLOCK_RATE, 9600,8,10,8>      pin2Controller(pin2, timing);
 UARTTransmit<Pin3Type, TimingType, CLOCK_RATE, 9600,8,100>      pin3Controller(pin3, timing);
-ToggleController<Pin4Type, TimingType, CLOCK_RATE>              pin4Controller(pin4, timing);
-ToggleController<Pin5Type, TimingType, CLOCK_RATE>              pin5Controller(pin5, timing);
+ToggleController<Pin4Type, TimingType, CLOCK_RATE, TransferChannelType>              pin4Controller(pin4, timing, transferChannel);
+ToggleController<Pin5Type, TimingType, CLOCK_RATE, TransferChannelType>              pin5Controller(pin5, timing, transferChannel);
 Clock<Pin6Type, TimingType, CLOCK_RATE, 2000, 100>              pin6Controller(pin6, timing);
 Clock<Pin7Type, TimingType, CLOCK_RATE, 1000, 100>              pin7Controller(pin7, timing);
 

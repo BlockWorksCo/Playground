@@ -6,17 +6,19 @@
 
 template <  typename pinType, 
             typename timingType, 
-            uint32_t ticksPerSecond>
+            uint32_t ticksPerSecond,
+            typename transferType>
 class ToggleController
 {
 
 public:
 
 
-    ToggleController( pinType& _pin, timingType& _timing ) :
+    ToggleController( pinType& _pin, timingType& _timing, transferType& _transferController ) :
             pin(_pin),
             timing(_timing),
-            state(false)
+            state(false),
+            transferController(_transferController)
     {
         pin.Set();
     }
@@ -39,9 +41,10 @@ public:
 
 private:
 
-    pinType&    pin;
-    timingType& timing;
-    bool        state;
+    pinType&        pin;
+    timingType&     timing;
+    bool            state;
+    transferType&   transferController;
 
 };
 
