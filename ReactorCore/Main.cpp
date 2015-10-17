@@ -50,50 +50,65 @@ void RunSchedule()
 }
 
 
-//
-// Rx and Tx data from/to the SPI port.
-//
-void TransferUserData()
-{
 
+
+extern unsigned long __preinit_array_start;
+extern unsigned long __preinit_array_end;
+extern unsigned long __init_array_start;
+extern unsigned long __init_array_end;
+extern unsigned long _ctor_start;
+extern unsigned long _ctor_end;
+static void call_constructors(unsigned long *start, unsigned long *end) __attribute__((noinline));
+static void call_constructors(unsigned long *start, unsigned long *end)
+{
+  unsigned long *i;
+  void (*funcptr)();
+  for ( i = start; i < end; i++)
+  {
+    funcptr=(void (*)())(*i);
+    funcptr();
+  }
 }
 
 
-#include "stm32f4xx_rcc.h"
-#include "stm32f4xx_gpio.h"
 
-#include "stm32f4xx.h"
-#include "core_cm4.h"
-#include "stm32f4xx_gpio.h"
-#include "stm32f4xx_usart.h"
+
+extern "C" void __cxa_pure_virtual() 
+{ 
+    while (1); 
+}
+
+
+
+extern "C" void abort(void)
+{
+    while(true);
+}
 
 //
 //
 //
 int main()
 {
-    //
-    //  Initialise the peripheral clock.
-    //
-    RCC->AHB1ENR |= RCC_AHB1Periph_GPIOD;
-    //
-    //  Initilaise the GPIO port.
-    //
-    GPIOD->MODER |= GPIO_Mode_OUT;
-    GPIOD->OSPEEDR |= GPIO_Speed_25MHz;
-    GPIOD->OTYPER |= GPIO_OType_PP;
-    GPIOD->PUPDR |= GPIO_PuPd_NOPULL;
+    SystemInit();
 
-    ((CoreDebug_Type*)CoreDebug_BASE)->DEMCR |= 0x01000000;
-    ((DWT_Type*)DWT_BASE)->CYCCNT      = 0;            // reset the counter
-    ((DWT_Type*)DWT_BASE)->CTRL        |= 0x00000001;  // enable the counter
+    //
+    //Call C++ global constructors
+    //
+    call_constructors(&__preinit_array_start, &__preinit_array_end);
+    call_constructors(&__init_array_start, &__init_array_end);
 
+
+    volatile uint32_t    timestamp1  = timing.GetTick();
+    volatile uint32_t    timestamp2  = timing.GetTick();
+    volatile uint32_t    timestamp3  = timing.GetTick();
 
     while(true)
     {
-        volatile uint32_t    nanosecondTimestamp     = timing.GetNanosecondTick();
+        volatile uint32_t    timestamp     = timing.GetTick();
+        volatile uint32_t    t   = timestamp % 168;
 
-        if( (nanosecondTimestamp%168) < 10)
+        if( t < 40)
         {
             GPIOD->ODR  = ~GPIOD->ODR;
         }
