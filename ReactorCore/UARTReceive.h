@@ -10,14 +10,15 @@ template <  typename pinType,
             uint32_t bitsPerSecond,
             uint32_t bitsPerByte,
             uint32_t sampleTolerance,
-            uint32_t samplesPerBit>
+            uint32_t samplesPerBit,
+            typename transferType >
 class UARTReceive
 {
 
 public:
 
 
-    UARTReceive( pinType& _pin, timingType& _timing ) :
+    UARTReceive( pinType& _pin, timingType& _timing, transferType& _transferController ) :
             pin(_pin),
             timing(_timing),
             ticksPerBit( ticksPerSecond/bitsPerSecond ),
@@ -25,7 +26,8 @@ public:
             currentByte(0xab),
             previousSampleTick(0),
             ticksPerSample( ticksPerBit / samplesPerBit ),
-            sampleNumber(0)
+            sampleNumber(0),
+            transferController(_transferController)
     {
     }
 
@@ -135,18 +137,20 @@ private:
     }
 
 
-    pinType&    pin;
-    timingType& timing;
-    uint32_t    ticksPerBit;
-    uint8_t     bitNumber;
-    uint8_t     currentByte;
-    uint32_t    previousSampleTick;
-    uint8_t     ticksPerSample;
-    uint8_t     sampleNumber;
-    uint8_t     highSampleCount;
-    uint8_t     lowSampleCount;
-    bool        currentStartBit;
-    bool        currentStopBit;
+    pinType&        pin;
+    timingType&     timing;
+    uint32_t        ticksPerBit;
+    uint8_t         bitNumber;
+    uint8_t         currentByte;
+    uint32_t        previousSampleTick;
+    uint8_t         ticksPerSample;
+    uint8_t         sampleNumber;
+    uint8_t         highSampleCount;
+    uint8_t         lowSampleCount;
+    bool            currentStartBit;
+    bool            currentStopBit;
+    transferType&   transferController;
+
 };
 
 

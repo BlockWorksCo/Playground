@@ -9,20 +9,22 @@ template <  typename pinType,
             uint32_t ticksPerSecond,
             uint32_t bitsPerSecond,
             uint32_t bitsPerByte,
-            uint32_t bitTolerance>
+            uint32_t bitTolerance,
+            typename transferType >
 class UARTTransmit
 {
 
 public:
 
 
-    UARTTransmit( pinType& _pin, timingType& _timing ) :
+    UARTTransmit( pinType& _pin, timingType& _timing, transferType& _transferController ) :
             pin(_pin),
             timing(_timing),
             ticksPerBit( ticksPerSecond/bitsPerSecond ),
             bitNumber(0),
             currentByte(0xab),
-            previousBitTick(0)
+            previousBitTick(0),
+            transferController(_transferController)
     {
         pin.Set();
     }
@@ -155,12 +157,13 @@ public:
 
 private:
 
-    pinType&    pin;
-    timingType& timing;
-    uint32_t    ticksPerBit;
-    uint8_t     bitNumber;
-    uint8_t     currentByte;
-    uint32_t    previousBitTick;
+    pinType&        pin;
+    timingType&     timing;
+    uint32_t        ticksPerBit;
+    uint8_t         bitNumber;
+    uint8_t         currentByte;
+    uint32_t        previousBitTick;
+    transferType&   transferController;
 };
 
 
