@@ -99,21 +99,18 @@ int main()
     call_constructors(&__init_array_start, &__init_array_end);
 
 
-    volatile uint32_t    timestamp1  = timing.GetTick();
-    volatile uint32_t    timestamp2  = timing.GetTick();
-    volatile uint32_t    timestamp3  = timing.GetTick();
-
     while(true)
     {
-        volatile uint32_t    timestamp     = timing.GetTick();
-        volatile uint32_t    t   = timestamp % 168;
+        uint32_t    timestamp           = timing.GetTick();
+        static uint32_t    previousTimestamp   = 0;
 
-        if( t < 40)
+        if( (timestamp-previousTimestamp) >= 168 )
         {
-            GPIOD->ODR  = ~GPIOD->ODR;
+            previousTimestamp   = timestamp;
+            //pin0.Toggle();
+            pin4.Toggle();
+            //pin6.Toggle();
         }
-        //pin0.Set();
-        //pin0.Clear();
     }
 
     //
