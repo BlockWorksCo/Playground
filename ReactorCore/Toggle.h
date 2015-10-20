@@ -17,7 +17,6 @@ public:
     ToggleController( pinType& _pin, timingType& _timing, transferType& _transferController ) :
             pin(_pin),
             timing(_timing),
-            state(false),
             transferController(_transferController)
     {
         pin.Set();
@@ -26,24 +25,13 @@ public:
 
     void Process()
     {
-        if( (timing.GetTick()%ticksPerSecond) <= 100)
-        {
-            if(state == true)
-            {
-                pin.Set();            
-            }
-            else
-            {
-                pin.Clear();            
-            }            
-        }
+        pin.Toggle();
     }
 
 private:
 
     pinType&        pin;
     timingType&     timing;
-    bool            state;
     transferType&   transferController;
 
 };

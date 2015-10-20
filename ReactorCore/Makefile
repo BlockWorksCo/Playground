@@ -40,7 +40,7 @@ ECHO_GREEN		= echo -e "\033[0;32m"
 
 ######################################################################################################
 
-CFLAGS	+= -g -Ofast -ftree-loop-optimize -funroll-loops -Wall -T$(BLOCKWORKS_PLATFORM_BASE)/$(PLATFORM)/stm32_ram.ld -mlittle-endian -mthumb -mthumb-interwork -mcpu=cortex-m4 -fsingle-precision-constant -Wdouble-promotion -mfpu=fpv4-sp-d16 -mfloat-abi=hard -nostdlib -DSTM32F40XX -DUSE_STDPERIPH_DRIVER
+CFLAGS	+= -g -O3 -ftree-loop-optimize -funroll-loops -Wall -T$(BLOCKWORKS_PLATFORM_BASE)/$(PLATFORM)/stm32_flash.ld -mlittle-endian -mthumb -mthumb-interwork -mcpu=cortex-m4 -fsingle-precision-constant -Wdouble-promotion -mfpu=fpv4-sp-d16 -mfloat-abi=hard -nostdlib -DSTM32F40XX -DUSE_STDPERIPH_DRIVER
 
 
 ######################################################################################################
@@ -89,6 +89,7 @@ OBJS		+=	system_stm32f4xx.o \
 clean:
 	-@ $(RM) -f Main.elf
 	-@ $(RM) -f *.o
+	-@ $(RM) -f *.d
 
 
 #

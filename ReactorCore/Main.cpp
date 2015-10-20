@@ -39,14 +39,16 @@ Pin7Type                    pin7;
 //
 void RunSchedule()
 {
-    pin0Controller.Process();
-    pin1Controller.Process();
-    pin2Controller.Process();
-    pin3Controller.Process();
-    pin4Controller.Process();
-    pin5Controller.Process();
-    pin6Controller.Process();
-    pin7Controller.Process();
+    pin0Controller.Process();       // 60ns
+    pin1Controller.Process();       // 60ns
+    pin2Controller.Process();       // 130ns
+pin6.Set();
+    pin3Controller.Process();       // 160ns
+pin6.Clear();
+    pin4Controller.Process();       // 130ns
+    pin5Controller.Process();       // 60ns
+    //pin6Controller.Process();     // 130ns
+    pin7Controller.Process();       // 130ns
 }
 
 
@@ -97,21 +99,6 @@ int main()
     //
     call_constructors(&__preinit_array_start, &__preinit_array_end);
     call_constructors(&__init_array_start, &__init_array_end);
-
-
-    while(true)
-    {
-        uint32_t    timestamp           = timing.GetTick();
-        static uint32_t    previousTimestamp   = 0;
-
-        if( (timestamp-previousTimestamp) >= 168 )
-        {
-            previousTimestamp   = timestamp;
-            //pin0.Toggle();
-            pin4.Toggle();
-            //pin6.Toggle();
-        }
-    }
 
     //
     // Forever

@@ -33,8 +33,10 @@ public:
         uint32_t    currentTicks    = timing.GetTick();
         uint32_t    deltaTicks      = currentTicks - ticksAtLastClock;
 
-        if( ((currentTicks%ticksPerClock) <= tolerance) && (deltaTicks >= clocksPerSecond))
+        if( deltaTicks >= clocksPerSecond )
         {
+            pin.Toggle();
+#if 0            
             if(state == true)
             {
                 pin.Set();            
@@ -43,7 +45,7 @@ public:
             {
                 pin.Clear();            
             }            
-
+#endif
             ticksAtLastClock    = currentTicks;
         }
     }
