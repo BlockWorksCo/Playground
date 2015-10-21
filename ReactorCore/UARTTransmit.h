@@ -22,7 +22,7 @@ public:
             timing(_timing),
             ticksPerBit( ticksPerSecond/bitsPerSecond ),
             bitNumber(0),
-            currentByte(0xab),
+            currentByte(0xff),
             previousBitTick(0),
             transferController(_transferController)
     {
@@ -33,9 +33,9 @@ public:
     void Process()
     {
         uint32_t    currentTick = timing.GetTick();
-        uint32_t    deltaTick   = timing.GetTick()-previousBitTick;
+        uint32_t    deltaTick   = currentTick-previousBitTick;
 
-        if( (deltaTick >= ticksPerBit) && (deltaTick < (ticksPerBit+bitTolerance)) )
+        if( deltaTick >= ticksPerBit )
         {
             bool        state   = true;
 
@@ -50,7 +50,7 @@ public:
                     break;
                 }
 
-                case 1:
+                case 1:                 // D0
                 {
                     if( (currentByte&0x01) == 0)
                     {
@@ -59,7 +59,7 @@ public:
                     break;
                 }
 
-                case 2:
+                case 2:                 // D1
                 {
                     if( (currentByte&0x02) == 0)
                     {
@@ -68,7 +68,7 @@ public:
                     break;
                 }
 
-                case 3:
+                case 3:                 // D2
                 {
                     if( (currentByte&0x04) == 0)
                     {
@@ -77,7 +77,7 @@ public:
                     break;
                 }
 
-                case 4:
+                case 4:                 // D3
                 {
                     if( (currentByte&0x08) == 0)
                     {
@@ -86,7 +86,7 @@ public:
                     break;
                 }
 
-                case 5:
+                case 5:                 // D4
                 {
                     if( (currentByte&0x10) == 0)
                     {
@@ -95,7 +95,7 @@ public:
                     break;
                 }
 
-                case 6:
+                case 6:                 // D5
                 {
                     if( (currentByte&0x20) == 0)
                     {
@@ -104,7 +104,7 @@ public:
                     break;
                 }
 
-                case 7:
+                case 7:                 // D6
                 {
                     if( (currentByte&0x40) == 0)
                     {
@@ -113,7 +113,7 @@ public:
                     break;
                 }
 
-                case 8:
+                case 8:                 // D7
                 {
                     if( (currentByte&0x80) == 0)
                     {
@@ -122,9 +122,9 @@ public:
                     break;
                 }
 
-                case 9:
+                case 9:                 // Stop bit.
                 {
-                    state   = true;     // Stop bit.
+                    state   = true;
                     break;
                 }
 

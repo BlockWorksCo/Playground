@@ -20,7 +20,7 @@ public:
             pin(_pin),
             timing(_timing),
             state(false),
-            ticksPerClock( ticksPerSecond / ticksPerClock ),
+            ticksPerClock( ticksPerSecond / clocksPerSecond ),
             ticksAtLastClock(0),
             transferController(_transferController)
     {
@@ -33,19 +33,10 @@ public:
         uint32_t    currentTicks    = timing.GetTick();
         uint32_t    deltaTicks      = currentTicks - ticksAtLastClock;
 
-        if( deltaTicks >= clocksPerSecond )
+        if( deltaTicks >= ticksPerClock )
         {
             pin.Toggle();
-#if 0            
-            if(state == true)
-            {
-                pin.Set();            
-            }
-            else
-            {
-                pin.Clear();            
-            }            
-#endif
+
             ticksAtLastClock    = currentTicks;
         }
     }

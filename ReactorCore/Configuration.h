@@ -15,6 +15,10 @@
 #include "SPIChannel.h"
 
 
+
+const uint32_t  TICKS_PER_SECOND        = (168*1000*1000)+1;
+
+
 //
 //
 //
@@ -55,15 +59,14 @@ extern STM32Output<GPIOE_BASE, 0>  debugPin;
 
 
 
-ToggleController<Pin0Type, TimingType, CLOCK_RATE, TransferChannelType>             pin0Controller(pin0, timing, transferController);
-ToggleController<Pin1Type, TimingType, CLOCK_RATE, TransferChannelType>             pin1Controller(pin1, timing, transferController);
-UARTReceive<Pin2Type, TimingType, CLOCK_RATE, 9600,8,10,8, TransferChannelType>     pin2Controller(pin2, timing, transferController);
-UARTTransmit<Pin3Type, TimingType, CLOCK_RATE, 9600,8,100, TransferChannelType>     pin3Controller(pin3, timing, transferController);
-//ToggleController<Pin4Type, TimingType, 168, TransferChannelType>                       pin4Controller(pin4, timing, transferController);
-Clock<Pin4Type, TimingType, 1, 168/4, 100, TransferChannelType>                       pin4Controller(pin4, timing, transferController);
-ToggleController<Pin5Type, TimingType, CLOCK_RATE, TransferChannelType>             pin5Controller(pin5, timing, transferController);
-Clock<Pin7Type, TimingType, CLOCK_RATE, 1000, 100, TransferChannelType>             pin7Controller(pin7, timing, transferController);
-Clock<Pin6Type, TimingType, CLOCK_RATE, 2000, 100, TransferChannelType>             pin6Controller(pin6, timing, transferController);
+ToggleController<Pin0Type, TimingType, TICKS_PER_SECOND, TransferChannelType>           pin0Controller(pin0, timing, transferController);
+ToggleController<Pin1Type, TimingType, TICKS_PER_SECOND, TransferChannelType>           pin1Controller(pin1, timing, transferController);
+UARTReceive<Pin2Type, TimingType, TICKS_PER_SECOND, 115200,8,10,8, TransferChannelType>   pin2Controller(pin2, timing, transferController);
+ToggleController<Pin3Type, TimingType, TICKS_PER_SECOND, TransferChannelType>           pin3Controller(pin3, timing, transferController);
+Clock<Pin4Type, TimingType, TICKS_PER_SECOND, 1000, 1, TransferChannelType>             pin4Controller(pin4, timing, transferController);
+Clock<Pin5Type, TimingType, TICKS_PER_SECOND, 2000, 100, TransferChannelType>           pin5Controller(pin5, timing, transferController);
+UARTTransmit<Pin6Type, TimingType, TICKS_PER_SECOND, 115200,8,100, TransferChannelType>   pin6Controller(pin6, timing, transferController);
+Clock<Pin7Type, TimingType, TICKS_PER_SECOND, 1000, 100, TransferChannelType>           pin7Controller(pin7, timing, transferController);
 
 
 

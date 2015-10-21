@@ -171,6 +171,23 @@ void rcc_set_frequency(enum sysclk_freq freq)
 }
 
 
+void TimingCalibration()
+{
+
+    while(true)
+    {
+        uint32_t            currentTicks        = timing.GetTick();
+        static uint32_t     ticksAtLastClock    = 0;
+        uint32_t            deltaTicks          = currentTicks - ticksAtLastClock;
+
+        if( deltaTicks >= TICKS_PER_SECOND )
+        {
+           debugPin.Toggle();
+           ticksAtLastClock     = currentTicks;
+        }        
+    }
+
+}
 
 
 
@@ -189,6 +206,11 @@ int main()
     //
     call_constructors(&__preinit_array_start, &__preinit_array_end);
     call_constructors(&__init_array_start, &__init_array_end);
+
+    //
+    //
+    //
+    //TimingCalibration();
 
     //
     // Forever
