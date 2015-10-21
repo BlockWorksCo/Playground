@@ -31,6 +31,7 @@ Pin5Type                    pin5;
 Pin6Type                    pin6;
 Pin7Type                    pin7;
 
+STM32Output<GPIOE_BASE, 0>  debugPin;
 
 
 
@@ -42,12 +43,12 @@ void RunSchedule()
     pin0Controller.Process();       // 60ns
     pin1Controller.Process();       // 60ns
     pin2Controller.Process();       // 130ns
-pin6.Set();
+debugPin.Set();
     pin3Controller.Process();       // 160ns
-pin6.Clear();
+debugPin.Clear();
     pin4Controller.Process();       // 130ns
     pin5Controller.Process();       // 60ns
-    //pin6Controller.Process();     // 130ns
+    pin6Controller.Process();     // 130ns
     pin7Controller.Process();       // 130ns
 }
 

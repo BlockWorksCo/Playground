@@ -51,6 +51,8 @@ extern Pin5Type                    pin5;
 extern Pin6Type                    pin6;
 extern Pin7Type                    pin7;
 
+extern STM32Output<GPIOE_BASE, 0>  debugPin;
+
 
 
 ToggleController<Pin0Type, TimingType, CLOCK_RATE, TransferChannelType>             pin0Controller(pin0, timing, transferController);
