@@ -4,6 +4,8 @@
 #ifndef __CLOCK_H__
 #define __CLOCK_H__
 
+#include <memory.h>
+
 template <  typename pinType, 
             typename timingType, 
             uint32_t ticksPerSecond,

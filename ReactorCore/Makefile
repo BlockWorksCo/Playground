@@ -23,11 +23,11 @@ SHELL		= sh
 #
 # Tools
 #
-CPPC      		= arm-none-eabi-g++
-CC        	    = arm-none-eabi-gcc
-LD        		= arm-none-eabi-gcc
-AS        		= arm-none-eabi-as
-OBJCOPY   		= arm-none-eabi-objcopy
+CPPC      		= arm-linux-gnueabi-g++
+CC        	    = arm-linux-gnueabi-gcc
+LD        		= arm-linux-gnueabi-gcc
+AS        		= arm-linux-gnueabi-as
+OBJCOPY   		= arm-linux-gnueabi-objcopy
 RM        		= rm
 MKDIR     		= mkdir
 SIZE      		= size
@@ -40,7 +40,7 @@ ECHO_GREEN		= echo -e "\033[0;32m"
 
 ######################################################################################################
 
-CFLAGS	+= -g -O3 -ftree-loop-optimize -funroll-loops -Wall -T$(BLOCKWORKS_PLATFORM_BASE)/$(PLATFORM)/stm32_flash.ld -mlittle-endian -mthumb -mthumb-interwork -mcpu=cortex-m4 -fsingle-precision-constant -Wdouble-promotion -mfpu=fpv4-sp-d16 -mfloat-abi=hard -nostdlib -DSTM32F40XX -DUSE_STDPERIPH_DRIVER
+CFLAGS	+= -g -Ofast
 
 
 ######################################################################################################
@@ -56,17 +56,7 @@ INCLUDES	+=	-I$(BLOCKWORKS_BASE)/Platform/$(PLATFORM) \
 VPATH		+=	$(BLOCKWORKS_PLATFORM_BASE)/$(PLATFORM) \
      		  	$(BLOCKWORKS_PLATFORM_BASE)/$(PLATFORM)/CMSIS/STM32F4xx_DSP_StdPeriph_Lib_V1.1.0/Libraries/STM32F4xx_StdPeriph_Driver/src
 
-OBJS		+=	system_stm32f4xx.o \
-    		  	startup_stm32f4xx.o \
-    		  	syscalls.o \
-    		  	Support.o \
-    		  	stm32f4xx_usart.o \
-    		  	stm32f4xx_rcc.o \
-    		  	stm32f4xx_gpio.o \
-    		  	stm32f4xx_dac.o \
-    		  	stm32f4xx_tim.o \
-    		  	misc.o \
-    		  	Main.o
+OBJS		+=	Main.o
 
 
 

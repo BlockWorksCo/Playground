@@ -34,14 +34,14 @@ const uint32_t  CLOCK_RATE              = 200000000;
 typedef Timing<uint32_t, CLOCK_RATE>        TimingType;
 
 
-typedef STM32Output<GPIOD_BASE, 0>            Pin0Type;
-typedef STM32Output<GPIOD_BASE, 1>            Pin1Type;
-typedef STM32Input<GPIOD_BASE, 2>             Pin2Type;
-typedef STM32Output<GPIOD_BASE, 3>            Pin3Type;
-typedef STM32Output<GPIOD_BASE, 4>            Pin4Type;
-typedef STM32Output<GPIOD_BASE, 5>            Pin5Type;
-typedef STM32Output<GPIOD_BASE, 6>            Pin6Type;
-typedef STM32Output<GPIOD_BASE, 7>            Pin7Type;
+typedef RPIOutput<1, 0>            Pin0Type;
+typedef RPIOutput<1, 1>            Pin1Type;
+typedef RPIInput<1, 2>             Pin2Type;
+typedef RPIOutput<1, 3>            Pin3Type;
+typedef RPIOutput<1, 4>            Pin4Type;
+typedef RPIOutput<1, 5>            Pin5Type;
+typedef RPIOutput<1, 6>            Pin6Type;
+typedef RPIOutput<1, 7>            Pin7Type;
 
 
 
@@ -55,7 +55,7 @@ extern Pin5Type                    pin5;
 extern Pin6Type                    pin6;
 extern Pin7Type                    pin7;
 
-extern STM32Output<GPIOE_BASE, 0>  debugPin;
+extern RPIOutput<1, 0>  debugPin;
 
 
 
