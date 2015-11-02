@@ -34,14 +34,14 @@ const uint32_t  CLOCK_RATE              = 200000000;
 typedef Timing<uint32_t, CLOCK_RATE>        TimingType;
 
 
-typedef RPIOutput<1, 0>            Pin0Type;
-typedef RPIOutput<1, 1>            Pin1Type;
-typedef RPIInput<1, 2>             Pin2Type;
-typedef RPIOutput<1, 3>            Pin3Type;
-typedef RPIOutput<1, 4>            Pin4Type;
-typedef RPIOutput<1, 5>            Pin5Type;
-typedef RPIOutput<1, 6>            Pin6Type;
-typedef RPIOutput<1, 7>            Pin7Type;
+typedef RPIOutput<0>            Pin0Type;
+typedef RPIOutput<1>            Pin1Type;
+typedef RPIInput<2>             Pin2Type;
+typedef RPIOutput<3>            Pin3Type;
+typedef RPIOutput<4>            Pin4Type;
+typedef RPIOutput<5>            Pin5Type;
+typedef RPIOutput<6>            Pin6Type;
+typedef RPIOutput<7>            Pin7Type;
 
 
 
@@ -55,9 +55,9 @@ extern Pin5Type                    pin5;
 extern Pin6Type                    pin6;
 extern Pin7Type                    pin7;
 
-extern RPIOutput<1, 0>  debugPin;
+extern RPIOutput<4>  debugPin;
 
-
+/*
 
 ToggleController<Pin0Type, TimingType, TICKS_PER_SECOND, TransferChannelType>           pin0Controller(pin0, timing, transferController);
 ToggleController<Pin1Type, TimingType, TICKS_PER_SECOND, TransferChannelType>           pin1Controller(pin1, timing, transferController);
@@ -68,7 +68,7 @@ Clock<Pin5Type, TimingType, TICKS_PER_SECOND, 2000, 100, TransferChannelType>   
 UARTTransmit<Pin6Type, TimingType, TICKS_PER_SECOND, 115200,8,100, TransferChannelType>   pin6Controller(pin6, timing, transferController);
 Clock<Pin7Type, TimingType, TICKS_PER_SECOND, 1000, 100, TransferChannelType>           pin7Controller(pin7, timing, transferController);
 
-
+*/
 
 #endif
 

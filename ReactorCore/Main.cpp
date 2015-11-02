@@ -21,7 +21,7 @@ TimingType                                  timing;
 // Raw pin definitions.
 //
 
-
+/*
 Pin0Type                    pin0;
 Pin1Type                    pin1;
 Pin2Type                    pin2;
@@ -30,10 +30,12 @@ Pin4Type                    pin4;
 Pin5Type                    pin5;
 Pin6Type                    pin6;
 Pin7Type                    pin7;
+*/
+RPIOutput<4>  debugPin;
 
-RPIOutput<1, 0>  debugPin;
 
-
+template<uint8_t bitNumber> volatile uint32_t* RPIOutput<bitNumber>::gpio    = 0;
+/*
 
 //
 //
@@ -53,7 +55,7 @@ debugPin.Clear();
 }
 
 
-
+*/
 
 
 
@@ -63,14 +65,16 @@ void TimingCalibration()
 
     while(true)
     {
-        uint32_t            currentTicks        = timing.GetTick();
-        static uint32_t     ticksAtLastClock    = 0;
-        uint32_t            deltaTicks          = currentTicks - ticksAtLastClock;
+        //uint32_t            currentTicks        = timing.GetTick();
+        //static uint32_t     ticksAtLastClock    = 0;
+        //uint32_t            deltaTicks          = currentTicks - ticksAtLastClock;
 
-        if( deltaTicks >= TICKS_PER_SECOND )
+        //if( deltaTicks >= TICKS_PER_SECOND )
         {
-           debugPin.Toggle();
-           ticksAtLastClock     = currentTicks;
+           //debugPin.Toggle();
+            debugPin.Set();
+            debugPin.Clear();
+            //ticksAtLastClock     = currentTicks;
         }        
     }
 
@@ -84,6 +88,12 @@ void TimingCalibration()
 //
 int main()
 {
+    while(true)
+    {
+        debugPin.Set();
+        debugPin.Clear();        
+    }
+
     //
     // Forever
     //
@@ -93,7 +103,7 @@ int main()
         // Calculate the new outputs.
         // Note: The PinControllers are idempotent, so can be applied repeatedly.
         //
-        RunSchedule();            
+        //RunSchedule();            
 
         //
         // Data transfer.
