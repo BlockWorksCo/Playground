@@ -28,6 +28,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+extern volatile uint32_t*  gpio; 
+
 
 //
 //
@@ -45,10 +47,18 @@ public:
         //
         if(gpio == 0)
         {
-            gpio = mapRegAddr(GPIO_BASE);
-            setRegister     = gpio+GPFSET0;
-            clearRegister   = gpio+GPFCLR0;
+            perror("<NO GPIO mapping!>\n");
         }
+        else
+        {
+            printf("GPIO mapping ok.\n");
+        }
+
+        //
+        //
+        //
+        setRegister     = gpio+GPFSET0;
+        clearRegister   = gpio+GPFCLR0;
 
         //
         //
@@ -103,61 +113,6 @@ public:
         *clearRegister = mask;
     }
 
-private:
-
-    /********************************************************************
-     *  volatile unsigned *mapRegAddr(unsigned long baseAddr)
-     * This function maps a block of physical memory into the memory of 
-     * the calling process. It enables a user space process to access 
-     * registers in physical memory directly without having to interact 
-     * with in kernel side code i.e. device drivers
-     *
-     * Parameter - baseAddr (unsigned long) - this is the base address of
-     * a block of physical memory that will be mapped into the userspace 
-     * process memory. 
-     *******************************************************************/ 
-    uint32_t* mapRegAddr(unsigned long baseAddr)
-    {
-      int mem_fd = 0;
-      void *regAddrMap = MAP_FAILED;
-
-      /* open /dev/mem.....need to run program as root i.e. use sudo or su */
-      if (!mem_fd) 
-      {
-        if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) 
-        {
-         perror("can't open /dev/mem");
-          exit (1);
-        }
-      }
-      
-       /* mmap IO */
-      regAddrMap = mmap(
-          NULL,             //Any adddress in our space will do
-          GPIO_LEN,       //Map length
-          PROT_READ|PROT_WRITE|PROT_EXEC,// Enable reading & writting to mapped memory
-          MAP_SHARED|MAP_LOCKED,       //Shared with other processes
-          mem_fd,           //File to map
-          baseAddr         //Offset to base address
-      );
-        
-      if (regAddrMap == MAP_FAILED) 
-      {
-          perror("mmap error");
-          close(mem_fd);
-          exit (1);
-      }
-      
-      if(close(mem_fd) < 0)
-      { //No need to keep mem_fd open after mmap
-                             //i.e. we can close /dev/mem
-        perror("couldn't close /dev/mem file descriptor");
-        exit(1);
-        }   
-
-      printf("GPIO mapped to %08x\n",(uint32_t)regAddrMap);
-      return (uint32_t*)regAddrMap;
-    }
 
 
 private:
@@ -169,11 +124,6 @@ private:
     static const unsigned int GPFSEL0 = 0;
     static const unsigned int GPFSEL1 = 1;
     static const unsigned int GPFSEL2 = 2;
-
-    static const unsigned int GPIO_BASE = 0x3f200000;// gpio registers base address
-    static const unsigned int GPIO_LEN =   0xB4;// need only map B4 registers
-
-    static volatile uint32_t*  gpio; 
 
     volatile uint32_t*  setRegister;
     volatile uint32_t*  clearRegister;
@@ -229,10 +179,6 @@ private:
     static const unsigned int GPFSEL0 = 0;
     static const unsigned int GPFSEL1 = 1;
     static const unsigned int GPFSEL2 = 2;
-
-    static const unsigned int GPIO_BASE = 0x3f200000;// gpio registers base address
-    static const unsigned int GPIO_LEN =   0xB4;// need only map B4 registers
-
 };
 
 

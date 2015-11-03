@@ -19,7 +19,7 @@ public:
             timing(_timing),
             transferController(_transferController)
     {
-        pin.Set();
+        //pin.Set();
     }
 
 

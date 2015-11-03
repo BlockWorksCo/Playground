@@ -16,7 +16,7 @@
 
 
 
-const uint32_t  TICKS_PER_SECOND        = (168*1000*1000)+1;
+const uint32_t  TICKS_PER_SECOND        = (1*1000*1000)+1;
 
 
 //
@@ -57,8 +57,6 @@ extern Pin7Type                    pin7;
 
 extern RPIOutput<4>  debugPin;
 
-/*
-
 ToggleController<Pin0Type, TimingType, TICKS_PER_SECOND, TransferChannelType>           pin0Controller(pin0, timing, transferController);
 ToggleController<Pin1Type, TimingType, TICKS_PER_SECOND, TransferChannelType>           pin1Controller(pin1, timing, transferController);
 UARTReceive<Pin2Type, TimingType, TICKS_PER_SECOND, 115200,8,10,8, TransferChannelType>   pin2Controller(pin2, timing, transferController);
@@ -67,8 +65,6 @@ Clock<Pin4Type, TimingType, TICKS_PER_SECOND, 1000, 1, TransferChannelType>     
 Clock<Pin5Type, TimingType, TICKS_PER_SECOND, 2000, 100, TransferChannelType>           pin5Controller(pin5, timing, transferController);
 UARTTransmit<Pin6Type, TimingType, TICKS_PER_SECOND, 115200,8,100, TransferChannelType>   pin6Controller(pin6, timing, transferController);
 Clock<Pin7Type, TimingType, TICKS_PER_SECOND, 1000, 100, TransferChannelType>           pin7Controller(pin7, timing, transferController);
-
-*/
 
 #endif
 

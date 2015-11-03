@@ -26,7 +26,7 @@ public:
             ticksAtLastClock(0),
             transferController(_transferController)
     {
-        pin.Set();
+        //pin.Set();
     }
 
 
