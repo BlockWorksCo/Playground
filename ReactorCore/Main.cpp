@@ -141,12 +141,11 @@ void TimingCalibration()
         static uint32_t     ticksAtLastClock    = 0;
         uint32_t            deltaTicks          = currentTicks - ticksAtLastClock;
 
-        if( deltaTicks >= TICKS_PER_SECOND )
+        if( deltaTicks >= (TICKS_PER_SECOND/10000000) )
         {
-           //debugPin.Toggle();
-            debugPin.Set();
-            debugPin.Clear();
-            //ticksAtLastClock     = currentTicks;
+            //printf("tick...\n");
+            debugPin.Toggle();
+            ticksAtLastClock     = currentTicks;
         }        
     }
 
@@ -162,7 +161,7 @@ int main()
 {
     printf("ReactorCore 0.1\n");
 
-    //TimingCalibration();
+    TimingCalibration();
 
     //
     //

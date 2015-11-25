@@ -16,7 +16,7 @@
 
 
 
-const uint32_t  TICKS_PER_SECOND        = (1*1000*1000)+1;
+const uint32_t  TICKS_PER_SECOND        = (1*1000*1000*900);
 
 
 //

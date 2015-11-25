@@ -89,6 +89,16 @@ public:
     
     void Toggle()
     {
+        uint32_t    currentState    = *(gpio + GPFLEV0);
+
+        if( (currentState & mask) == 0)
+        {
+            Set();
+        }
+        else
+        {
+            Clear();
+        }
     }
     
     void Set()
