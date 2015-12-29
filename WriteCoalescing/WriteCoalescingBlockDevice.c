@@ -119,6 +119,9 @@ void WriteCoalescingBlockDeviceInitialise()
 //
 void WriteCoalescingBlockDeviceRead(uint32_t offset, uint32_t numberOfBytes, uint8_t* data)
 {
+    //
+    // TODO: Check whether this read can be satisfied from the written data first.
+    //
     BlockDeviceRead( offset, numberOfBytes, data );
 }
 

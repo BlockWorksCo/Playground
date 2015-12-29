@@ -1,0 +1,10 @@
+#!/bin/sh
+
+rm Main.bin
+rm Main.elf
+rm Main.o
+rm Main.map
+arm-linux-gnueabi-gcc -mthumb -march=armv7-a -mlittle-endian -mtune=cortex-a7  -c Main.c
+arm-linux-gnueabi-gcc -r -mthumb -Wl,--build-id=none -Wl,-eEntryPoint -nostdlib -T Main.ld -Xlinker -Map=Main.map -o Main.elf Main.o 
+arm-linux-gnueabi-objcopy --image-base 0x70000000 -O binary Main.elf Main.bin
+
