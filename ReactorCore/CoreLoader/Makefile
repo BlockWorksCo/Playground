@@ -1,7 +1,12 @@
+#
+#
+#
+
+
 SRC=main.c loader.c
 ASRC=
 
-TARGET=elfloader
+TARGET=CoreLoader
 
 CROSS=arm-linux-gnueabi-
 CC=$(CROSS)gcc
@@ -43,24 +48,3 @@ app:
 clean:
 	@echo " CLEAN"
 	@rm -fR $(OBJS) $(DEPS) $(TARGET)
-
-debug: $(TARGET) app
-	@echo " Debuggin..."
-	@$(CROSS)gdb $(TARGET) \
-		-ex 'target remote :3333' \
-		-ex 'monitor reset halt' \
-		-ex 'load' \
-		-ex 'monitor arm semihosting enable'
-
-run: $(TARGET) app
-	@echo " Debuggin..."
-	@$(CROSS)gdb $(TARGET) \
-		-ex 'target remote :3333' \
-		-ex 'monitor reset halt' \
-		-ex 'load' \
-		-ex 'monitor arm semihosting enable' \
-		-ex 'continue'
-
-openocd: app
-	@echo " Launch OpenOCD for stm32f4discovery"
-	@cd app && openocd -f board/stm32f4discovery.cfg -l oocd.log
