@@ -50,7 +50,7 @@ typedef struct {
  * @retval -1 On fail
  * @todo Error information
  */
-extern int exec_elf(const char *path, const ELFEnv_t *env);
+extern void exec_elf(const char *path, const ELFEnv_t *env);
 
 /** @} */
 
