@@ -5,10 +5,25 @@
 
 #include "loader.h"
 #include "elf.h"
-#include "loader_config.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdint.h>
+#include <stdbool.h>
+
+#define DBG(...) printf("ELF: " __VA_ARGS__)
+#define ERR(msg) do { perror("ELF: " msg); exit(-1); } while(0)
+#define MSG(msg) puts("ELF: " msg)
 
 #define IS_FLAGS_SET(v, m) ((v&m) == m)
 #define SECTION_OFFSET(e, n) (e->sectionTable + n * sizeof(Elf32_Shdr))
+
+#define swab16(x) ( (((x) << 8) & 0xFF00) | (((x) >> 8) & 0x00FF) )
+
 
 
 //
@@ -76,11 +91,20 @@ typedef enum
 
 
 
+//
+//
+//
+void *do_alloc(size_t size, size_t align, ELFSecPerm_t perm, uint32_t* physicalAddress );
+void arch_jumpTo(entry_t entry);
+
+
+
+
 
 //
 //
 //
-static int readSectionName(ELFExec_t* e, off_t off, char* buf, size_t max)
+static int ReadSectionName(ELFExec_t* e, off_t off, char* buf, size_t max)
 {
     int ret = -1;
     off_t offset = e->sectionTableStrings + off;
@@ -139,7 +163,7 @@ static uint32_t swabo(uint32_t hl)
 //
 //
 //
-static void loadSecData(ELFExec_t* e, ELFSection_t* s, Elf32_Shdr* h)
+static void LoadSectionData(ELFExec_t* e, ELFSection_t* s, Elf32_Shdr* h)
 {
     if (h->sh_size == 0)
     {
@@ -154,7 +178,7 @@ static void loadSecData(ELFExec_t* e, ELFSection_t* s, Elf32_Shdr* h)
         // This section has data, so attempt to load it.
         //
         uint32_t    physicalAddress;
-        s->data = LOADER_ALIGN_ALLOC(h->sh_size, h->sh_addralign, h->sh_flags, &s->physicalAddress);
+        s->data = do_alloc(h->sh_size, h->sh_addralign, h->sh_flags, &s->physicalAddress);
 
         if (s->data == NULL)
         {
@@ -177,7 +201,7 @@ static void loadSecData(ELFExec_t* e, ELFSection_t* s, Elf32_Shdr* h)
 //
 //
 //
-static void readSecHeader(ELFExec_t* e, int n, Elf32_Shdr* h)
+static void ReadSectionHeader(ELFExec_t* e, int n, Elf32_Shdr* h)
 {
     off_t offset = SECTION_OFFSET(e, n);
 
@@ -192,25 +216,31 @@ static void readSecHeader(ELFExec_t* e, int n, Elf32_Shdr* h)
     }
 }
 
-static int readSection(ELFExec_t* e, int n, Elf32_Shdr* h, char* name,
-                       size_t nlen)
+
+//
+//
+//
+static int ReadSection(ELFExec_t* e, int n, Elf32_Shdr* h, char* name, size_t nlen)
 {
-    readSecHeader(e, n, h);
+    ReadSectionHeader(e, n, h);
 
     if (h->sh_name)
     {
-        return readSectionName(e, h->sh_name, name, nlen);
+        return ReadSectionName(e, h->sh_name, name, nlen);
     }
 
     return 0;
 }
 
-static int readSymbol(ELFExec_t* e, int n, Elf32_Sym* sym, char* name,
-                      size_t nlen)
+
+//
+//
+//
+static int readSymbol(ELFExec_t* e, int n, Elf32_Sym* sym, char* name, size_t nlen)
 {
-    int ret = -1;
-    off_t old = lseek(e->fd, 0, SEEK_CUR);
-    off_t pos = e->symbolTable + n * sizeof(Elf32_Sym);
+    int     ret     = -1;
+    off_t   old     = lseek(e->fd, 0, SEEK_CUR);
+    off_t   pos     = e->symbolTable + n * sizeof(Elf32_Sym);
 
     if (lseek(e->fd, pos, SEEK_SET) != -1)
     {
@@ -220,12 +250,15 @@ static int readSymbol(ELFExec_t* e, int n, Elf32_Sym* sym, char* name,
             {
                 ret = readSymbolName(e, sym->st_name, name, nlen);
             }
-
             else
             {
                 Elf32_Shdr shdr;
-                ret = readSection(e, sym->st_shndx, &shdr, name, nlen);
+                ret = ReadSection(e, sym->st_shndx, &shdr, name, nlen);
             }
+        }
+        else
+        {
+            ERR("Can't read symbol.");
         }
     }
 
@@ -233,25 +266,7 @@ static int readSymbol(ELFExec_t* e, int n, Elf32_Sym* sym, char* name,
     return ret;
 }
 
-static const char* typeStr(int symt)
-{
-#define STRCASE(name) case name: return #name;
 
-    switch (symt)
-    {
-        STRCASE(R_ARM_NONE)
-        STRCASE(R_ARM_ABS32)
-        STRCASE(R_ARM_THM_PC22)
-        STRCASE(R_ARM_THM_JUMP24)
-        STRCASE(R_ARM_THM_MOVW_ABS_NC)
-        STRCASE(R_ARM_THM_MOVT_ABS)
-
-    default:
-        return "R_<unknow>";
-    }
-
-#undef STRCASE
-}
 
 
 
@@ -283,8 +298,6 @@ static void relJmpCall(Elf32_Addr relAddr, int type, Elf32_Addr symAddr)
                   | ((offset >> 1) & 0x07ff));
     ((uint16_t*) relAddr)[1] = lower_insn;
 }
-
-#define swab16(x) ( (((x) << 8) & 0xFF00) | (((x) >> 8) & 0x00FF) )
 
 
 //
@@ -378,7 +391,7 @@ static void relocateSymbol(Elf32_Addr relAddr, int type, Elf32_Addr symAddr)
 //
 // Return the section with the matching index value.
 //
-static ELFSection_t* sectionOf(ELFExec_t* e, int index)
+static ELFSection_t* SectionFromIndex(ELFExec_t* e, int index)
 {
     ELFSection_t*   section     = NULL;
 
@@ -439,7 +452,7 @@ static Elf32_Addr addressOf(ELFExec_t* e, Elf32_Sym* sym, const char* sName)
         //
         // Defined symbol so get the section that contains it and work out the address.
         //
-        ELFSection_t* symSec = sectionOf(e, sym->st_shndx);
+        ELFSection_t* symSec = SectionFromIndex(e, sym->st_shndx);
         //address = ((Elf32_Addr) symSec->data) + sym->st_value;
         address     = ((Elf32_Addr) symSec->physicalAddress) + sym->st_value;
     }
@@ -483,7 +496,7 @@ static void relocate(ELFExec_t* e, Elf32_Shdr* h, ELFSection_t* s, const char* n
                 Elf32_Addr  relAddr     = ((Elf32_Addr) s->data) + rel.r_offset;
 
                 readSymbol(e, symEntry, &sym, name, sizeof(name));
-                DBG(" %08X %08X %-16s %s\n", (unsigned int) rel.r_offset, (unsigned int) rel.r_info, typeStr(relType), name);
+                DBG(" %08X %08X %d %s\n", (unsigned int) rel.r_offset, (unsigned int) rel.r_info, relType, name);
 
                 //
                 // Get the address to relocate to.
@@ -508,7 +521,7 @@ static void relocate(ELFExec_t* e, Elf32_Shdr* h, ELFSection_t* s, const char* n
 //
 //
 //
-int placeInfo(ELFExec_t* e, Elf32_Shdr* sh, const char* name, int n)
+int ParseSectionHeader(ELFExec_t* e, Elf32_Shdr* sh, const char* name, int n)
 {
     int type    = 0;
 
@@ -525,25 +538,25 @@ int placeInfo(ELFExec_t* e, Elf32_Shdr* sh, const char* name, int n)
     }
     else if (strcmp(name, ".text") == 0)
     {
-        loadSecData(e, &e->text, sh);
+        LoadSectionData(e, &e->text, sh);
         e->text.secIdx = n;
         type = FoundText;
     }
     else if (strcmp(name, ".rodata") == 0)
     {
-        loadSecData(e, &e->rodata, sh);
+        LoadSectionData(e, &e->rodata, sh);
         e->rodata.secIdx = n;
         type = FoundRodata;
     }
     else if (strcmp(name, ".data") == 0)
     {
-        loadSecData(e, &e->data, sh);
+        LoadSectionData(e, &e->data, sh);
         e->data.secIdx = n;
         type = FoundData;
     }
     else if (strcmp(name, ".bss") == 0)
     {
-        loadSecData(e, &e->bss, sh);
+        LoadSectionData(e, &e->bss, sh);
         e->bss.secIdx = n;
         type = FoundBss;
     }
@@ -570,10 +583,10 @@ int placeInfo(ELFExec_t* e, Elf32_Shdr* sh, const char* name, int n)
 //
 //
 //
-static int loadSymbols(ELFExec_t* e)
+static bool loadSymbols(ELFExec_t* e)
 {
     int n;
-    int founded = 0;
+    int founded = false;
 
     MSG("Scan ELF indexs...");
 
@@ -588,19 +601,23 @@ static int loadSymbols(ELFExec_t* e)
         //
         // Read the section header.
         //
-        readSecHeader(e, n, &sectHdr);
+        ReadSectionHeader(e, n, &sectHdr);
 
         if (sectHdr.sh_name)
         {
-            readSectionName(e, sectHdr.sh_name, name, sizeof(name));
+            ReadSectionName(e, sectHdr.sh_name, name, sizeof(name));
         }
 
         DBG("Examining section %d %s\n", n, name);
-        founded |= placeInfo(e, &sectHdr, name, n);
+        founded |= ParseSectionHeader(e, &sectHdr, name, n);
 
         if (IS_FLAGS_SET(founded, FoundAll))
         {
-            return FoundAll;
+            //
+            // We have all the requried sections, so break out of the loop.
+            //
+            founded     = true;
+            break;
         }
     }
 
@@ -617,12 +634,12 @@ static void initElf(ELFExec_t* e, int f)
     Elf32_Ehdr h;
     Elf32_Shdr sH;
 
-    if (!LOADER_FD_VALID(f))
+    if (f == -1)
     {
         ERR("Invalid file handle.");
     }
 
-    LOADER_CLEAR(e, sizeof(ELFExec_t));
+    memset(e, 0, sizeof(ELFExec_t));
 
     if (read(f, &h, sizeof(h)) != sizeof(h))
     {
@@ -659,7 +676,7 @@ static void relocateSection(ELFExec_t* e, ELFSection_t* s, const char* name)
     {
         Elf32_Shdr sectHdr;
 
-        readSecHeader(e, s->relSecIdx, &sectHdr);
+        ReadSectionHeader(e, s->relSecIdx, &sectHdr);
         relocate(e, &sectHdr, s, name);
     }
     else
@@ -683,8 +700,8 @@ static int jumpTo(ELFExec_t* e)
 {
     if (e->entry)
     {
-        entry_t* entry = (entry_t*)(e->text.data + e->entry);
-        LOADER_JUMP_TO(entry);
+        entry_t* entry = (entry_t*)(e->text.physicalAddress + e->entry);
+        arch_jumpTo(entry);
         return 0;
     }
 
@@ -717,8 +734,8 @@ void exec_elf(const char* path, const ELFEnv_t* env)
     //
     // If we have all the required sections,then relocate the sections.
     //
-    int     r   = loadSymbols(&exec);
-    if (IS_FLAGS_SET(r, FoundValid))
+    bool     r   = loadSymbols(&exec);
+    if (r == true)
     {
         //
         // Relocate all the sections.

@@ -9,6 +9,7 @@
 #include <malloc.h>
 #include <sys/mman.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "loader.h"
 
 
@@ -110,7 +111,19 @@ void* do_alloc(size_t size, size_t align, ELFSecPerm_t perm, uint32_t* physicalA
 void arch_jumpTo(entry_t entry)
 {
     printf("EntryPoint @ %08x \n", (uint32_t)entry );
-    entry();
+
+    //
+    // Trigger the core to execute this code.
+    //
+    //entry();
+
+    //
+    // Wait for completion.
+    //
+    while(true)
+    {
+        sleep(1);
+    }
 }
 
 
