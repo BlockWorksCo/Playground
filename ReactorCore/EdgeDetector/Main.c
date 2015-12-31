@@ -18,7 +18,7 @@ void CoreMain()
     }    
 }
 
-uint8_t      stack[1024*1];
+//uint8_t      stack[1024*1];
 
 void EntryPoint()
 {

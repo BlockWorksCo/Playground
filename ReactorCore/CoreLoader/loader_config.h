@@ -56,7 +56,7 @@ extern void arch_jumpTo(entry_t entry);
 #endif
 
 #define DBG(...) printf("ELF: " __VA_ARGS__)
-#define ERR(msg) do { perror("ELF: " msg); __asm__ volatile ("bkpt"); } while(0)
+#define ERR(msg) do { perror("ELF: " msg); exit(-1); } while(0)
 #define MSG(msg) puts("ELF: " msg)
 
 #else

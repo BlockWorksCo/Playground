@@ -1,3 +1,8 @@
+//
+// Originally from https://github.com/embedded2014/elf-loader.git
+//
+
+
 #include "loader.h"
 #include "elf.h"
 #include "loader_config.h"
@@ -389,7 +394,6 @@ static Elf32_Addr addressOf(ELFExec_t* e, Elf32_Sym* sym, const char* sName)
                 return (Elf32_Addr)(e->env->exported[i].ptr);
             }
     }
-
     else
     {
         ELFSection_t* symSec = sectionOf(e, sym->st_shndx);

@@ -8,14 +8,24 @@ ASRC=
 
 TARGET=CoreLoader
 
-CROSS=arm-linux-gnueabi-
+ifeq ($(PLATFORM),RPI)
+ CROSS	= arm-linux-gnueabi-
+ CFLAGS = -O0 -ggdb3 -mcpu=cortex-a7 -mthumb \
+	-ffunction-sections -fdata-sections \
+	-Iarm/CMSIS/include -I.
+endif
+
+ifeq ($(PLATFORM),PC)
+ CROSS	= 
+ CFLAGS = -O0 -ggdb3 \
+	-ffunction-sections -fdata-sections \
+	-I.
+endif
+
 CC=$(CROSS)gcc
 AS=$(CROSS)gcc
 LD=$(CROSS)gcc
 
-CFLAGS=-O0 -ggdb3 -mcpu=cortex-a7 -mthumb \
-	-ffunction-sections -fdata-sections \
-	-Iarm/CMSIS/include -I.
 
 LDFLAGS=\
   -Wl,--start-group -lgcc -lc -lc -lm -Wl,--end-group \
