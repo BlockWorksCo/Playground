@@ -10,8 +10,10 @@
 #define IS_FLAGS_SET(v, m) ((v&m) == m)
 #define SECTION_OFFSET(e, n) (e->sectionTable + n * sizeof(Elf32_Shdr))
 
-#ifndef DOX
 
+//
+//
+//
 typedef struct
 {
     void*       data;
@@ -21,9 +23,13 @@ typedef struct
 
 } ELFSection_t;
 
+
+//
+//
+//
 typedef struct
 {
-    LOADER_FD_T fd;
+    int fd;
 
     size_t sections;
     off_t sectionTable;
@@ -44,8 +50,11 @@ typedef struct
     const ELFEnv_t* env;
 } ELFExec_t;
 
-#endif
 
+
+//
+//
+//
 typedef enum
 {
     FoundERROR = 0,
@@ -65,46 +74,57 @@ typedef enum
                | FoundBss | FoundRelText | FoundRelRodata | FoundRelData | FoundRelBss
 } FindFlags_t;
 
+
+
+
+//
+//
+//
 static int readSectionName(ELFExec_t* e, off_t off, char* buf, size_t max)
 {
     int ret = -1;
     off_t offset = e->sectionTableStrings + off;
     off_t old = LOADER_TELL(e->fd);
 
-    if (LOADER_SEEK_FROM_START(e->fd, offset) == 0)
-        if (LOADER_READ(e->fd, buf, max) == 0)
+    if (lseek(e->fd, offset, SEEK_SET) != -1)
+    {
+        if (read(e->fd, buf, max) == 0)
         {
             ret = 0;
         }
+    }
 
-    (void) LOADER_SEEK_FROM_START(e->fd, old);
+    (void) lseek(e->fd, old, SEEK_SET);
     return ret;
 }
 
+
+//
+//
+//
 static int readSymbolName(ELFExec_t* e, off_t off, char* buf, size_t max)
 {
     int ret = -1;
     off_t offset = e->symbolTableStrings + off;
     off_t old = LOADER_TELL(e->fd);
 
-    if (LOADER_SEEK_FROM_START(e->fd, offset) == 0)
-        if (LOADER_READ(e->fd, buf, max) == 0)
+    if (lseek(e->fd, offset, SEEK_SET) != -1)
+    {
+        if (read(e->fd, buf, max) == 0)
         {
             ret = 0;
         }
+    }
 
-    (void) LOADER_SEEK_FROM_START(e->fd, old);
+    (void) lseek(e->fd, old, SEEK_SET);
+
     return ret;
 }
 
-static void freeSection(ELFSection_t* s)
-{
-    if (s->data)
-    {
-        LOADER_FREE(s->data);
-    }
-}
 
+//
+//
+//
 static uint32_t swabo(uint32_t hl)
 {
     return ((((hl) >> 24)) | /* */
@@ -141,13 +161,12 @@ static void loadSecData(ELFExec_t* e, ELFSection_t* s, Elf32_Shdr* h)
             ERR("memory allocation failure.");
         }
 
-        if (LOADER_SEEK_FROM_START(e->fd, h->sh_offset) != 0)
+        if (lseek(e->fd, h->sh_offset, SEEK_SET) == -1)
         {
             ERR("    seek fail");
-            freeSection(s);
         }
 
-        if (LOADER_READ(e->fd, s->data, h->sh_size) != h->sh_size)
+        if (read(e->fd, s->data, h->sh_size) != h->sh_size)
         {
             ERR("     read data fail");
         }        
@@ -162,12 +181,12 @@ static void readSecHeader(ELFExec_t* e, int n, Elf32_Shdr* h)
 {
     off_t offset = SECTION_OFFSET(e, n);
 
-    if (LOADER_SEEK_FROM_START(e->fd, offset) != 0)
+    if (lseek(e->fd, offset, SEEK_SET) == -1)
     {
         ERR("Can't seek to section start.");
     }
 
-    if (LOADER_READ(e->fd, h, sizeof(Elf32_Shdr)) != sizeof(Elf32_Shdr))
+    if (read(e->fd, h, sizeof(Elf32_Shdr)) != sizeof(Elf32_Shdr))
     {
         ERR("Can't read section header.");
     }
@@ -193,8 +212,9 @@ static int readSymbol(ELFExec_t* e, int n, Elf32_Sym* sym, char* name,
     off_t old = LOADER_TELL(e->fd);
     off_t pos = e->symbolTable + n * sizeof(Elf32_Sym);
 
-    if (LOADER_SEEK_FROM_START(e->fd, pos) == 0)
-        if (LOADER_READ(e->fd, sym, sizeof(Elf32_Sym)) == sizeof(Elf32_Sym))
+    if (lseek(e->fd, pos, SEEK_SET) != -1)
+    {
+        if (read(e->fd, sym, sizeof(Elf32_Sym)) == sizeof(Elf32_Sym))
         {
             if (sym->st_name)
             {
@@ -207,8 +227,9 @@ static int readSymbol(ELFExec_t* e, int n, Elf32_Sym* sym, char* name,
                 ret = readSection(e, sym->st_shndx, &shdr, name, nlen);
             }
         }
+    }
 
-    (void) LOADER_SEEK_FROM_START(e->fd, old);
+    (void) lseek(e->fd, old, SEEK_SET);
     return ret;
 }
 
@@ -443,7 +464,7 @@ static void relocate(ELFExec_t* e, Elf32_Shdr* h, ELFSection_t* s, const char* n
         size_t      relEntries = h->sh_size / sizeof(rel);
         size_t      relCount;
 
-        (void) LOADER_SEEK_FROM_START(e->fd, h->sh_offset);
+        (void) lseek(e->fd, h->sh_offset, SEEK_SET);
 
         //
         // For every relocation entry...
@@ -452,7 +473,7 @@ static void relocate(ELFExec_t* e, Elf32_Shdr* h, ELFSection_t* s, const char* n
 
         for (relCount = 0; relCount < relEntries; relCount++)
         {
-            if (LOADER_READ(e->fd, &rel, sizeof(rel)) == sizeof(rel))
+            if (read(e->fd, &rel, sizeof(rel)) == sizeof(rel))
             {
                 Elf32_Sym   sym;
                 Elf32_Addr  symAddr;
@@ -591,7 +612,7 @@ static int loadSymbols(ELFExec_t* e)
 //
 //
 //
-static void initElf(ELFExec_t* e, LOADER_FD_T f)
+static void initElf(ELFExec_t* e, int f)
 {
     Elf32_Ehdr h;
     Elf32_Shdr sH;
@@ -603,19 +624,19 @@ static void initElf(ELFExec_t* e, LOADER_FD_T f)
 
     LOADER_CLEAR(e, sizeof(ELFExec_t));
 
-    if (LOADER_READ(f, &h, sizeof(h)) != sizeof(h))
+    if (read(f, &h, sizeof(h)) != sizeof(h))
     {
         ERR("Can't read the file header.");
     }
 
     e->fd = f;
 
-    if (LOADER_SEEK_FROM_START(e->fd, h.e_shoff + h.e_shstrndx * sizeof(sH)) != 0)
+    if (lseek(e->fd, h.e_shoff + h.e_shstrndx * sizeof(sH), SEEK_SET) == -1)
     {
         ERR("Cant seek to section start.");
     }
 
-    if (LOADER_READ(e->fd, &sH, sizeof(Elf32_Shdr)) != sizeof(Elf32_Shdr))
+    if (read(e->fd, &sH, sizeof(Elf32_Shdr)) != sizeof(Elf32_Shdr))
     {
         ERR("Can't read section header.");
     }
@@ -686,7 +707,7 @@ void exec_elf(const char* path, const ELFEnv_t* env)
     //
     // Setup file handle and read file header and initial section header.
     //
-    initElf(&exec, LOADER_OPEN_FOR_RD(path));
+    initElf(&exec, open(path, O_RDONLY) );
 
     //
     // Store the environment symbols.
