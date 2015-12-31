@@ -113,59 +113,45 @@ static uint32_t swabo(uint32_t hl)
             (((hl) << 24))); /* */
 }
 
-static void dumpData(uint8_t* data, size_t size)
-{
-#if 0
-    int i = 0;
 
-    while (i < size)
+
+
+//
+//
+//
+static void loadSecData(ELFExec_t* e, ELFSection_t* s, Elf32_Shdr* h)
+{
+    if (h->sh_size == 0)
     {
-        if ((i & 0xf) == 0)
+        //
+        // NO data for section.
+        //
+        MSG(" No data for section");
+    }
+    else
+    {
+        //
+        // This section has data, so attempt to load it.
+        //
+        uint32_t    physicalAddress;
+        s->data = LOADER_ALIGN_ALLOC(h->sh_size, h->sh_addralign, h->sh_flags, &s->physicalAddress);
+
+        if (s->data == NULL)
         {
-            DBG("\n  %04X: ", i);
+            ERR("memory allocation failure.");
         }
 
-        DBG("%08x ", swabo(*((uint32_t*)(data + i))));
-        i += sizeof(uint32_t);
+        if (LOADER_SEEK_FROM_START(e->fd, h->sh_offset) != 0)
+        {
+            ERR("    seek fail");
+            freeSection(s);
+        }
+
+        if (LOADER_READ(e->fd, s->data, h->sh_size) != h->sh_size)
+        {
+            ERR("     read data fail");
+        }        
     }
-
-    DBG("\n");
-#endif
-}
-
-static int loadSecData(ELFExec_t* e, ELFSection_t* s, Elf32_Shdr* h)
-{
-    if (!h->sh_size)
-    {
-        MSG(" No data for section");
-        return 0;
-    }
-
-    uint32_t    physicalAddress;
-    s->data = LOADER_ALIGN_ALLOC(h->sh_size, h->sh_addralign, h->sh_flags, &s->physicalAddress);
-
-    if (!s->data)
-    {
-        ERR("    GET MEMORY fail");
-        return -1;
-    }
-
-    if (LOADER_SEEK_FROM_START(e->fd, h->sh_offset) != 0)
-    {
-        ERR("    seek fail");
-        freeSection(s);
-        return -1;
-    }
-
-    if (LOADER_READ(e->fd, s->data, h->sh_size) != h->sh_size)
-    {
-        ERR("     read data fail");
-        return -1;
-    }
-
-    /* DBG("DATA: "); */
-    dumpData(s->data, h->sh_size);
-    return 0;
 }
 
 
@@ -518,41 +504,25 @@ int placeInfo(ELFExec_t* e, Elf32_Shdr* sh, const char* name, int n)
     }
     else if (strcmp(name, ".text") == 0)
     {
-        if (loadSecData(e, &e->text, sh) == -1)
-        {
-            return FoundERROR;
-        }
-
+        loadSecData(e, &e->text, sh);
         e->text.secIdx = n;
         type = FoundText;
     }
     else if (strcmp(name, ".rodata") == 0)
     {
-        if (loadSecData(e, &e->rodata, sh) == -1)
-        {
-            return FoundERROR;
-        }
-
+        loadSecData(e, &e->rodata, sh);
         e->rodata.secIdx = n;
         type = FoundRodata;
     }
     else if (strcmp(name, ".data") == 0)
     {
-        if (loadSecData(e, &e->data, sh) == -1)
-        {
-            return FoundERROR;
-        }
-
+        loadSecData(e, &e->data, sh);
         e->data.secIdx = n;
         type = FoundData;
     }
     else if (strcmp(name, ".bss") == 0)
     {
-        if (loadSecData(e, &e->bss, sh) == -1)
-        {
-            return FoundERROR;
-        }
-
+        loadSecData(e, &e->bss, sh);
         e->bss.secIdx = n;
         type = FoundBss;
     }
