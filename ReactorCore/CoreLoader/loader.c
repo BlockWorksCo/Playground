@@ -14,9 +14,11 @@
 
 typedef struct
 {
-    void* data;
-    int secIdx;
-    off_t relSecIdx;
+    void*       data;
+    uint32_t    physicalAddress;
+    int         secIdx;
+    off_t       relSecIdx;
+
 } ELFSection_t;
 
 typedef struct
@@ -140,7 +142,7 @@ static int loadSecData(ELFExec_t* e, ELFSection_t* s, Elf32_Shdr* h)
     }
 
     uint32_t    physicalAddress;
-    s->data = LOADER_ALIGN_ALLOC(h->sh_size, h->sh_addralign, h->sh_flags, &physicalAddress);
+    s->data = LOADER_ALIGN_ALLOC(h->sh_size, h->sh_addralign, h->sh_flags, &s->physicalAddress);
 
     if (!s->data)
     {
@@ -332,80 +334,110 @@ static void relR_ARM_THM_MOVT_ABS(Elf32_Addr relAddr, int type, Elf32_Addr symAd
 
 
 
-
-static int relocateSymbol(Elf32_Addr relAddr, int type, Elf32_Addr symAddr)
+//
+// Modify the value to be relocated according to the relocation-type.
+//
+static void relocateSymbol(Elf32_Addr relAddr, int type, Elf32_Addr symAddr)
 {
     switch (type)
     {
-    case R_ARM_ABS32:
-        *((uint32_t*) relAddr) += symAddr;
-        DBG("  R_ARM_ABS32 relocated is 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
-        break;
+        case R_ARM_ABS32:
+            *((uint32_t*) relAddr) += symAddr;
+            DBG("  R_ARM_ABS32 relocated is 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
+            break;
 
-    case R_ARM_THM_PC22:
-    case R_ARM_THM_JUMP24:
-        relJmpCall(relAddr, type, symAddr);
-        DBG("  R_ARM_THM_CALL/JMP relocated is 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
-        break;
+        case R_ARM_THM_PC22:
+        case R_ARM_THM_JUMP24:
+            relJmpCall(relAddr, type, symAddr);
+            DBG("  R_ARM_THM_CALL/JMP relocated is 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
+            break;
 
-    case R_ARM_THM_MOVW_ABS_NC:
-        relR_ARM_THM_MOVW_ABS_NC(relAddr, type, symAddr);
-        DBG("  R_ARM_THM_MOVW_ABS_NC relocated is 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
-        break;
+        case R_ARM_THM_MOVW_ABS_NC:
+            relR_ARM_THM_MOVW_ABS_NC(relAddr, type, symAddr);
+            DBG("  R_ARM_THM_MOVW_ABS_NC relocated is 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
+            break;
 
-    case R_ARM_THM_MOVT_ABS:
-        relR_ARM_THM_MOVT_ABS(relAddr, type, symAddr);
-        DBG("  R_ARM_THM_MOVT_ABS relocated is 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
-        break;
+        case R_ARM_THM_MOVT_ABS:
+            relR_ARM_THM_MOVT_ABS(relAddr, type, symAddr);
+            DBG("  R_ARM_THM_MOVT_ABS relocated is 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
+            break;
 
-    default:
-        DBG("  Undefined relocation %d\n", type);
-        return -1;
+        default:
+            ERR("  Undefined relocation type.");
     }
-
-    return 0;
 }
 
 
+//
+// Return the section with the matching index value.
+//
 static ELFSection_t* sectionOf(ELFExec_t* e, int index)
 {
-#define IFSECTION(sec, i) \
-    do { \
-        if ((sec).secIdx == i) \
-            return &(sec); \
-    } while(0)
-    IFSECTION(e->text, index);
-    IFSECTION(e->rodata, index);
-    IFSECTION(e->data, index);
-    IFSECTION(e->bss, index);
-#undef IFSECTION
-    return NULL;
+    ELFSection_t*   section     = NULL;
+
+    if(e->text.secIdx == index)
+    {
+        section     = &e->text;
+    }
+
+    if(e->rodata.secIdx == index)
+    {
+        section     = &e->rodata;
+    }
+
+    if(e->data.secIdx == index)
+    {
+        section     = &e->data;
+    }
+
+    if(e->bss.secIdx == index)
+    {
+        section     = &e->bss;
+    }
+
+    return section;
 }
 
+
+//
+// Determine the address of the given symbol within the sections or the 
+// enviromment if undefined.
+//
 static Elf32_Addr addressOf(ELFExec_t* e, Elf32_Sym* sym, const char* sName)
 {
+    uint32_t    address     = 0xffffffff;
+
     if (sym->st_shndx == SHN_UNDEF)
     {
-        int i;
+        printf("<undefined symbol %s>\n", sName);
 
-        for (i = 0; i < e->env->exported_size; i++)
+        //
+        // Undefined symbol, look it up from the environment for linking.
+        //
+        for (uint32_t i = 0; i < e->env->exported_size; i++)
+        {
             if (LOADER_STREQ(e->env->exported[i].name, sName))
             {
-                return (Elf32_Addr)(e->env->exported[i].ptr);
-            }
+                address     = (Elf32_Addr)(e->env->exported[i].ptr);
+            }            
+        }
     }
     else
     {
+        //
+        // Defined symbol so get the section that contains it and work out the address.
+        //
         ELFSection_t* symSec = sectionOf(e, sym->st_shndx);
 
         if (symSec)
         {
-            return ((Elf32_Addr) symSec->data) + sym->st_value;
+            //address = ((Elf32_Addr) symSec->data) + sym->st_value;
+            address     = ((Elf32_Addr) symSec->physicalAddress) + sym->st_value;
         }
     }
 
     DBG("  Can not find address for symbol %s\n", sName);
-    return 0xffffffff;
+    return address;
 }
 
 static int relocate(ELFExec_t* e, Elf32_Shdr* h, ELFSection_t* s,
@@ -447,10 +479,7 @@ static int relocate(ELFExec_t* e, Elf32_Shdr* h, ELFSection_t* s,
                 {
                     DBG("  symAddr=%08X relAddr=%08X\n", (unsigned int) symAddr, (unsigned int) relAddr);
 
-                    if (relocateSymbol(relAddr, relType, symAddr) == -1)
-                    {
-                        return -1;
-                    }
+                    relocateSymbol(relAddr, relType, symAddr);
                 }
 
                 else
