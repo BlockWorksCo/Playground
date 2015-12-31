@@ -61,7 +61,7 @@ uint32_t get_page_frame_number_of_address(void* addr)
 //
 //
 //
-void* do_alloc(size_t size, size_t align, ELFSecPerm_t perm)
+void* do_alloc(size_t size, size_t align, ELFSecPerm_t perm, uint32_t* physicalAddress)
 {
     (void) perm;
     //
@@ -94,9 +94,9 @@ void* do_alloc(size_t size, size_t align, ELFSecPerm_t perm)
     // Get the physical address of this virtual block address.
     //
     uint32_t    pageFrameNumber     = get_page_frame_number_of_address( block );
-    uint32_t    physicalAddress     = (pageFrameNumber << PAGE_SHIFT) + 0;
+    *physicalAddress     = (pageFrameNumber << PAGE_SHIFT) + 0;
 
-    printf("physical address = %08x virtual address = %08x\n", physicalAddress, (uint32_t)block );
+    printf("physical address = %08x virtual address = %08x\n", *physicalAddress, (uint32_t)block );
 
     return block;
 }
