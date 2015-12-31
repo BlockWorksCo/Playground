@@ -84,7 +84,7 @@ static int readSectionName(ELFExec_t* e, off_t off, char* buf, size_t max)
 {
     int ret = -1;
     off_t offset = e->sectionTableStrings + off;
-    off_t old = LOADER_TELL(e->fd);
+    off_t old = lseek(e->fd, 0, SEEK_CUR);
 
     if (lseek(e->fd, offset, SEEK_SET) != -1)
     {
@@ -106,7 +106,7 @@ static int readSymbolName(ELFExec_t* e, off_t off, char* buf, size_t max)
 {
     int ret = -1;
     off_t offset = e->symbolTableStrings + off;
-    off_t old = LOADER_TELL(e->fd);
+    off_t old = lseek(e->fd, 0, SEEK_CUR);
 
     if (lseek(e->fd, offset, SEEK_SET) != -1)
     {
@@ -209,7 +209,7 @@ static int readSymbol(ELFExec_t* e, int n, Elf32_Sym* sym, char* name,
                       size_t nlen)
 {
     int ret = -1;
-    off_t old = LOADER_TELL(e->fd);
+    off_t old = lseek(e->fd, 0, SEEK_CUR);
     off_t pos = e->symbolTable + n * sizeof(Elf32_Sym);
 
     if (lseek(e->fd, pos, SEEK_SET) != -1)
@@ -428,7 +428,7 @@ static Elf32_Addr addressOf(ELFExec_t* e, Elf32_Sym* sym, const char* sName)
         //
         for (uint32_t i = 0; i < e->env->exported_size; i++)
         {
-            if (LOADER_STREQ(e->env->exported[i].name, sName))
+            if (strcmp(e->env->exported[i].name, sName) == 0)
             {
                 address     = (Elf32_Addr)(e->env->exported[i].ptr);
             }            
