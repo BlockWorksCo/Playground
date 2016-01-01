@@ -270,7 +270,7 @@ static int readSymbol(ELFExec_t* e, int n, Elf32_Sym* sym, char* name, size_t nl
 
 
 
-static void relJmpCall(Elf32_Addr relAddr, int type, Elf32_Addr symAddr)
+static void relJmpCall(Elf32_Addr relAddr, int type, Elf32_Addr symAddr, Elf32_Addr relPhysAddr)
 {
     uint16_t upper_insn = ((uint16_t*) relAddr)[0];
     uint16_t lower_insn = ((uint16_t*) relAddr)[1];
@@ -300,10 +300,75 @@ static void relJmpCall(Elf32_Addr relAddr, int type, Elf32_Addr symAddr)
 }
 
 
+
+
+
+
+
+
+
+static void relR_ARM_THM_JUMP24(Elf32_Addr relAddr, int type, Elf32_Addr symAddr, Elf32_Addr relPhysAddr)
+{
+    uint32_t upper = ((uint16_t*) relAddr)[0];
+    uint32_t lower = ((uint16_t*) relAddr)[1];
+    
+    /*
+    * 25 bit signed address range (Thumb-2 BL and B.W
+    * instructions):
+    *   S:I1:I2:imm10:imm11:0
+    * where:
+    *   S     = upper[10]   = offset[24]
+    *   I1    = ~(J1 ^ S)   = offset[23]
+    *   I2    = ~(J2 ^ S)   = offset[22]
+    *   imm10 = upper[9:0]  = offset[21:12]
+    *   imm11 = lower[10:0] = offset[11:1]
+    *   J1    = lower[13]
+    *   J2    = lower[11]
+    */
+    uint32_t sign = (upper >> 10) & 1;
+    uint32_t j1 = (lower >> 13) & 1;
+    uint32_t j2 = (lower >> 11) & 1;
+    int32_t offset = (sign << 24) | ((~(j1 ^ sign) & 1) << 23) |
+             ((~(j2 ^ sign) & 1) << 22) |
+             ((upper & 0x03ff) << 12) |
+             ((lower & 0x07ff) << 1);
+
+    if (offset & 0x01000000)
+    {
+        offset -= 0x02000000;
+    }
+
+    printf("offset before = %08x, symAddr = %08x, relPhysAddr = %08x\n", offset, symAddr, relPhysAddr);
+    offset += symAddr - relPhysAddr;
+    printf("offset after = %08x\n", offset);
+
+    if (    offset <= (int32_t)0xff000000 ||
+            offset >= (int32_t)0x01000000)
+    {
+        printf("offset = %08x\n",offset);
+        ERR("relocation out of range.");
+    }
+
+    sign = (offset >> 24) & 1;
+    j1 = sign ^ (~(offset >> 23) & 1);
+    j2 = sign ^ (~(offset >> 22) & 1);
+    upper = (uint16_t)((upper & 0xf800) | (sign << 10) |
+                  ((offset >> 12) & 0x03ff));
+    lower = (uint16_t)((lower & 0xd000) |
+                  (j1 << 13) | (j2 << 11) |
+                  ((offset >> 1) & 0x07ff));
+
+    ((uint16_t*) relAddr)[0] = upper;
+    ((uint16_t*) relAddr)[1] = lower;
+}
+
+
+
+
 //
 //
 //
-static void relR_ARM_THM_MOVW_ABS_NC(Elf32_Addr relAddr, int type, Elf32_Addr symAddr)
+static void relR_ARM_THM_MOVW_ABS_NC(Elf32_Addr relAddr, int type, Elf32_Addr symAddr, Elf32_Addr relPhysAddr)
 {
     uint32_t    upper_insn = ( ((uint16_t*) relAddr)[0] );
     uint32_t    lower_insn = ( ((uint16_t*) relAddr)[1] );
@@ -329,7 +394,7 @@ static void relR_ARM_THM_MOVW_ABS_NC(Elf32_Addr relAddr, int type, Elf32_Addr sy
 //
 //
 //
-static void relR_ARM_THM_MOVT_ABS(Elf32_Addr relAddr, int type, Elf32_Addr symAddr)
+static void relR_ARM_THM_MOVT_ABS(Elf32_Addr relAddr, int type, Elf32_Addr symAddr, Elf32_Addr relPhysAddr)
 {
     uint32_t    upper_insn = ( ((uint16_t*) relAddr)[0] );
     uint32_t    lower_insn = ( ((uint16_t*) relAddr)[1] );
@@ -356,8 +421,10 @@ static void relR_ARM_THM_MOVT_ABS(Elf32_Addr relAddr, int type, Elf32_Addr symAd
 //
 // Modify the value to be relocated according to the relocation-type.
 //
-static void relocateSymbol(Elf32_Addr relAddr, int type, Elf32_Addr symAddr)
+static void relocateSymbol(Elf32_Addr relAddr, int type, Elf32_Addr symAddr, Elf32_Addr relPhysAddr)
 {
+    printf("Symbol relocation type %d\n", type);
+
     switch (type)
     {
         case R_ARM_ABS32:
@@ -367,17 +434,17 @@ static void relocateSymbol(Elf32_Addr relAddr, int type, Elf32_Addr symAddr)
 
         case R_ARM_THM_PC22:
         case R_ARM_THM_JUMP24:
-            relJmpCall(relAddr, type, symAddr);
+            relR_ARM_THM_JUMP24(relAddr, type, symAddr, relPhysAddr);
             DBG("  R_ARM_THM_CALL/JMP relocated is 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
             break;
 
         case R_ARM_THM_MOVW_ABS_NC:
-            relR_ARM_THM_MOVW_ABS_NC(relAddr, type, symAddr);
+            relR_ARM_THM_MOVW_ABS_NC(relAddr, type, symAddr, relPhysAddr);
             DBG("  R_ARM_THM_MOVW_ABS_NC relocated is 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
             break;
 
         case R_ARM_THM_MOVT_ABS:
-            relR_ARM_THM_MOVT_ABS(relAddr, type, symAddr);
+            relR_ARM_THM_MOVT_ABS(relAddr, type, symAddr, relPhysAddr);
             DBG("  R_ARM_THM_MOVT_ABS relocated is 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
             break;
 
@@ -494,6 +561,7 @@ static void relocate(ELFExec_t* e, Elf32_Shdr* h, ELFSection_t* s, const char* n
                 int         symEntry    = ELF32_R_SYM(rel.r_info);
                 int         relType     = ELF32_R_TYPE(rel.r_info);
                 Elf32_Addr  relAddr     = ((Elf32_Addr) s->data) + rel.r_offset;
+                Elf32_Addr  relPhysAddr = ((Elf32_Addr) s->physicalAddress) + rel.r_offset;
 
                 readSymbol(e, symEntry, &sym, name, sizeof(name));
                 DBG(" %08X %08X %d %s\n", (unsigned int) rel.r_offset, (unsigned int) rel.r_info, relType, name);
@@ -507,7 +575,7 @@ static void relocate(ELFExec_t* e, Elf32_Shdr* h, ELFSection_t* s, const char* n
                 // Do the relocation.
                 //
                 DBG("  symAddr=%08X relAddr=%08X\n", (unsigned int) symAddr, (unsigned int) relAddr);
-                relocateSymbol(relAddr, relType, symAddr);
+                relocateSymbol(relAddr, relType, symAddr, relPhysAddr);
             }
         }
     }
