@@ -63,7 +63,7 @@
 /* 
  * The name of the device file 
  */
-#define DEVICE_FILE_NAME "ReactorCoreServices"
+#define DEVICE_FILE_NAME "/dev/ReactorCoreServices"
 
 #endif
 
