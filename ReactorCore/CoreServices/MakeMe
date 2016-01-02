@@ -1,0 +1,8 @@
+#!/bin/sh
+
+
+make ARCH=arm KDIR=~/KernelHeaders/linux CROSS_COMPILE=/usr/bin/arm-linux-gnueabi- 
+
+
+
+

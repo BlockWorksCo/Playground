@@ -10,6 +10,13 @@
 #include <sys/mman.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "loader.h"
 
 
@@ -17,6 +24,11 @@
 #define PAGEMAP_LENGTH  8
 #define PAGE_SHIFT      12
 
+
+
+#define DBG(...) printf("ELF: " __VA_ARGS__)
+#define ERR(msg) do { perror("ELF: " msg); exit(-1); } while(0)
+#define MSG(msg) puts("ELF: " msg)
 
 
 ELFSymbol_t     exports[]   = {0};
@@ -104,6 +116,16 @@ void* do_alloc(size_t size, size_t align, ELFSecPerm_t perm, uint32_t* physicalA
     return block;
 }
 
+static inline void dcache_clean(void)
+ {
+     const int zero = 0;
+     /* clean entire D cache -> push to external memory. */
+     __asm volatile ("1: mrc p15, 0, r15, c7, c10, 3\n"
+                     " bne 1b\n" ::: "cc");
+     /* drain the write buffer */
+    __asm volatile ("mcr 15, 0, %0, c7, c10, 4"::"r" (zero));
+ }
+
 
 //
 //
@@ -115,7 +137,51 @@ void arch_jumpTo(entry_t entry)
     //
     // Trigger the core to execute this code.
     //
-    //entry();
+    //0x400000CC+(cpuNumber<<4)
+    int     fd  = open("/dev/mem", O_RDWR|O_SYNC);
+    if(fd != -1)
+    {
+        uint32_t    cpuNumber   = 3;
+        uint32_t    offset      = 0xCC+(cpuNumber<<4);
+
+        uint32_t*   map = (uint32_t*)mmap( NULL,
+                            4096,
+                            PROT_READ | PROT_WRITE,
+                            MAP_SHARED,
+                            fd,             // File descriptor to physical memory virtual file '/dev/mem'
+                            0x40000000      // Address in physical map that we want this memory block to expose
+                            );
+
+        if (map == MAP_FAILED) 
+        {
+            ERR("mmap failed.");
+        }
+
+        printf("Writing %08x to address %08x\n",(uint32_t)entry, offset);
+        map[0xfc/4] = (uint32_t)entry;
+        msync( map , 4096 , MS_SYNC);
+
+        sleep(1);
+        for(uint32_t i=0; i<128; i++)
+        {
+            printf("%04x) %08x\n", i*4, map[i]);
+        }
+
+
+
+#if 0
+        uint32_t pos = lseek(fd, offset, SEEK_SET);
+        write(fd, &entry, sizeof(uint32_t));
+        pos = lseek(fd, offset, SEEK_SET);
+        read(fd, &entry, sizeof(uint32_t));
+        printf("read %08x from address %08x\n",(uint32_t)entry, offset);
+#endif        
+        close(fd);
+    }
+    else
+    {
+        ERR("Cant open /dev/mem.");
+    }
 
     //
     // Wait for completion.
