@@ -14,6 +14,7 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "CoreServices.h"
 
 #define DBG(...) printf("ELF: " __VA_ARGS__)
 #define ERR(msg) do { perror("ELF: " msg); exit(-1); } while(0)
@@ -495,6 +496,11 @@ static ELFSection_t* SectionFromIndex(ELFExec_t* e, int index)
 }
 
 
+volatile CoreServicesBridge     bridge    = {0};
+
+uint32_t PhysicalAddressOf(uint32_t virtualAddress);
+int GetBridgePhysicalAddress();
+
 //
 // Determine the address of the given symbol within the sections or the 
 // enviromment if undefined.
@@ -508,15 +514,18 @@ static Elf32_Addr addressOf(ELFExec_t* e, Elf32_Sym* sym, const char* sName)
         printf("<undefined symbol %s>\n", sName);
 
         //
-        // Undefined symbol, look it up from the environment for linking.
+        // Predefined environment.
         //
-        for (uint32_t i = 0; i < e->env->exported_size; i++)
+        if(strcmp(sName, "bridge") == 0)
         {
-            if (strcmp(e->env->exported[i].name, sName) == 0)
-            {
-                address     = (Elf32_Addr)(e->env->exported[i].ptr);
-            }            
+            address     = GetBridgePhysicalAddress();
+            printf("Physical bridge address = %08x\n", address );
         }
+
+        //
+        // Convert to physical address.
+        //
+        //address     = PhysicalAddressOf( address );
     }
     else
     {

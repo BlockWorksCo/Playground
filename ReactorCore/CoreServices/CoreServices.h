@@ -54,6 +54,11 @@
  * Get the n'th byte of the message 
  */
 #define IOCTL_GET_NTH_BYTE _IOWR(MAJOR_NUM, 2, int)
+
+#define IOCTL_GET_BRIDGE_ADDRESS _IOWR(MAJOR_NUM, 3, int)
+
+
+
 /* 
  * The IOCTL is used for both input and output. It 
  * receives from the user a number, n, and returns 
@@ -64,6 +69,16 @@
  * The name of the device file 
  */
 #define DEVICE_FILE_NAME "/dev/ReactorCoreServices"
+
+
+
+typedef struct
+{
+    volatile uint32_t    heartBeats[4];
+
+} CoreServicesBridge;
+
+
 
 #endif
 

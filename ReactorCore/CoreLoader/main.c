@@ -83,6 +83,21 @@ uint32_t get_page_frame_number_of_address(void* addr)
 //
 //
 //
+uint32_t PhysicalAddressOf(uint32_t virtualAddress)
+{
+    uint32_t pageFrameNumber        = get_page_frame_number_of_address( (void*)virtualAddress );
+    const uint32_t  pageSize        = 1 << PAGE_SHIFT;
+    uint32_t offsetIntoPage         = virtualAddress % pageSize;
+    uint32_t physicalAddressOfPage  = pageFrameNumber << PAGE_SHIFT;
+    uint32_t physicalAddress        = physicalAddressOfPage + offsetIntoPage;
+
+    return physicalAddressOfPage;
+}
+
+
+//
+//
+//
 void* do_alloc(size_t size, size_t align, ELFSecPerm_t perm, uint32_t* physicalAddress)
 {
     (void) perm;
@@ -139,6 +154,61 @@ static inline void dcache_clean(void)
 
 
 
+
+//
+// Cause the specified core to start execution at the specified point in physical memory.
+//
+void GetBridgeData( CoreServicesBridge* bridge )
+{
+    int     file_desc;
+
+    file_desc = open("/dev/ReactorCoreServices", 0);
+
+    if (file_desc < 0)
+    {
+        ERR("Can't open /dev/ReactorCoreServices");
+    }
+
+    int ret_val = ioctl(file_desc, IOCTL_GET_MSG, bridge );
+
+    if (ret_val < 0)
+    {
+        printf("ioctl failed:%d\n", ret_val);
+        exit(-1);
+    }
+    
+    close(file_desc);
+}
+
+
+//
+// Cause the specified core to start execution at the specified point in physical memory.
+//
+int GetBridgePhysicalAddress()
+{
+    int     file_desc;
+
+    file_desc = open("/dev/ReactorCoreServices", 0);
+
+    if (file_desc < 0)
+    {
+        ERR("Can't open /dev/ReactorCoreServices");
+    }
+
+    uint32_t physicalAddress    = 0;
+    int ret_val = ioctl(file_desc, IOCTL_GET_BRIDGE_ADDRESS, &physicalAddress );
+
+    if (ret_val < 0)
+    {
+        printf("ioctl failed:%d\n", ret_val);
+        exit(-1);
+    }
+    
+    close(file_desc);
+
+    return physicalAddress;
+}
+
 //
 // Cause the specified core to start execution at the specified point in physical memory.
 //
@@ -165,7 +235,7 @@ int TriggerCoreExecution(uint32_t coreNumber, uint32_t physicalAddress)
 }
 
 
-
+extern volatile CoreServicesBridge     bridge;
 
 //
 //
@@ -184,6 +254,12 @@ void arch_jumpTo(entry_t entry)
     //
     while(true)
     {
+        CoreServicesBridge  b;
+        GetBridgeData( &b );
+
+        uint32_t    temp    = PhysicalAddressOf( (uint32_t)&bridge );
+        printf("<%08x> %08x %08x %08x %08x\n", temp, b.heartBeats[0], b.heartBeats[1], b.heartBeats[2], b.heartBeats[3] );
+
         sleep(1);
     }
 }

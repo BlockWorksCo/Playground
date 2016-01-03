@@ -2,27 +2,34 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "CoreServices.h"
+
+
+#define PANIC()             {while(true);}
 
 
 //
 //
 //
-uint32_t    Blaa[10]        = {0};
-uint8_t     stack[1024];
+extern volatile CoreServicesBridge      bridge;
 
+//
+//
+//
 void CoreMain()
 {
-    static volatile uint32_t     counter     = 0;
     while(true)    
     {
-        Blaa[0]++;
-        counter++;
+        bridge.heartBeats[3]++;
     }    
 }
 
-//uint8_t      stack[1024*1];
 
-void EntryPoint()
+
+
+uint8_t     stack[1024];
+
+void __attribute__ ( ( naked ) ) EntryPoint()
 {
     //
     // Setup the stack.
@@ -34,6 +41,11 @@ void EntryPoint()
     // Call the CoreMain.
     //
     CoreMain();
+
+    //
+    // SHould never get here.
+    //
+    PANIC();
 }
 
 
