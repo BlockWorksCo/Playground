@@ -198,6 +198,46 @@ static void LoadSectionData(ELFExec_t* e, ELFSection_t* s, Elf32_Shdr* h)
 }
 
 
+
+//
+//
+//
+static void LoadBSSSectionData(ELFExec_t* e, ELFSection_t* s, Elf32_Shdr* h)
+{
+    if (h->sh_size == 0)
+    {
+        //
+        // NO data for section.
+        //
+        MSG(" No data for section");
+    }
+    else
+    {
+        //
+        // This section has data, so attempt to load it.
+        //
+        uint32_t    physicalAddress;
+        s->data = do_alloc(h->sh_size, h->sh_addralign, h->sh_flags, &s->physicalAddress);
+
+        if (s->data == NULL)
+        {
+            ERR("memory allocation failure.");
+        }
+
+        if (lseek(e->fd, h->sh_offset, SEEK_SET) == -1)
+        {
+            ERR("    seek fail");
+        }
+
+        //
+        // Zero the BSS data.
+        //
+        memset(s->data, 0x00, h->sh_size);
+        printf("Zeroed %d bytes of .bss data.\n", h->sh_size);
+    }
+}
+
+
 //
 //
 //
@@ -264,39 +304,6 @@ static int readSymbol(ELFExec_t* e, int n, Elf32_Sym* sym, char* name, size_t nl
 
     (void) lseek(e->fd, old, SEEK_SET);
     return ret;
-}
-
-
-
-
-
-static void relJmpCall(Elf32_Addr relAddr, int type, Elf32_Addr symAddr, Elf32_Addr relPhysAddr)
-{
-    uint16_t upper_insn = ((uint16_t*) relAddr)[0];
-    uint16_t lower_insn = ((uint16_t*) relAddr)[1];
-    uint32_t S = (upper_insn >> 10) & 1;
-    uint32_t J1 = (lower_insn >> 13) & 1;
-    uint32_t J2 = (lower_insn >> 11) & 1;
-    int32_t offset = (S << 24) | /* S     -> offset[24] */
-                     ((~(J1 ^ S) & 1) << 23) | /* J1    -> offset[23] */
-                     ((~(J2 ^ S) & 1) << 22) | /* J2    -> offset[22] */
-                     ((upper_insn & 0x03ff) << 12) | /* imm10 -> offset[12:21] */
-                     ((lower_insn & 0x07ff) << 1); /* imm11 -> offset[1:11] */
-
-    if (offset & 0x01000000)
-    {
-        offset -= 0x02000000;
-    }
-
-    offset += symAddr - relAddr;
-    S = (offset >> 24) & 1;
-    J1 = S ^ (~(offset >> 23) & 1);
-    J2 = S ^ (~(offset >> 22) & 1);
-    upper_insn = ((upper_insn & 0xf800) | (S << 10) | ((offset >> 12) & 0x03ff));
-    ((uint16_t*) relAddr)[0] = upper_insn;
-    lower_insn = ((lower_insn & 0xd000) | (J1 << 13) | (J2 << 11)
-                  | ((offset >> 1) & 0x07ff));
-    ((uint16_t*) relAddr)[1] = lower_insn;
 }
 
 
@@ -621,7 +628,7 @@ int ParseSectionHeader(ELFExec_t* e, Elf32_Shdr* sh, const char* name, int n)
     }
     else if (strcmp(name, ".bss") == 0)
     {
-        LoadSectionData(e, &e->bss, sh);
+        LoadBSSSectionData(e, &e->bss, sh);
         e->bss.secIdx = n;
         type = FoundBss;
     }
