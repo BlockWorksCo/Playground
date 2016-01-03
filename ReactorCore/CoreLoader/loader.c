@@ -304,9 +304,6 @@ static void relJmpCall(Elf32_Addr relAddr, int type, Elf32_Addr symAddr, Elf32_A
 
 
 
-
-
-
 static void relR_ARM_THM_JUMP24(Elf32_Addr relAddr, int type, Elf32_Addr symAddr, Elf32_Addr relPhysAddr)
 {
     uint32_t upper = ((uint16_t*) relAddr)[0];

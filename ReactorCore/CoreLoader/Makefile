@@ -27,6 +27,8 @@ AS=$(CROSS)gcc
 LD=$(CROSS)gcc
 
 
+INCLUDES	= -I../CoreServices
+
 LDFLAGS=\
   -Wl,--start-group -lgcc -lc -lc -lm -Wl,--end-group \
   -Wl,--gc-sections
@@ -40,7 +42,7 @@ all: $(TARGET)
 
 %.o: %.c
 	@echo " CC $<"
-	@$(CC) -MMD $(CFLAGS) -o $@ -c $<
+	@$(CC) -MMD $(CFLAGS)  $(INCLUDES) -o $@ -c $<
 
 %.o: %.S
 	@echo " AS $<"
