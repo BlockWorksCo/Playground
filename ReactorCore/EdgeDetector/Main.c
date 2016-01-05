@@ -18,6 +18,15 @@ extern volatile CoreServicesBridge      bridge;
 //
 void CoreMain()
 {
+    //
+    // Cause a reset request.
+    //
+    uint32_t    cwrr    = 0x00000002;
+    __asm__ volatile("mcr p14, 0, %0, c1, c4, 4\n\t" : : "r"(cwrr));
+
+    //
+    //
+    //
     while(true)    
     {
         bridge.heartBeats[3]++;
