@@ -13,23 +13,53 @@
 //
 extern volatile CoreServicesBridge      bridge;
 
+
 //
+// Get the Multiprocessor affinity register (core id).
 //
+uint32_t MPIDR()
+{
+    register uint32_t    mpidr;
+
+    __asm__ volatile("mrc p15, 0, %0, c0, c0, 5\n\t" : : "r"(mpidr));    
+
+    uint32_t coreID     = mpidr & 0x03;
+    return coreID;
+}
+
+
+
 //
-void CoreMain()
+// Cause a reset request.
+//
+void CWRR()
 {
     //
     // Cause a reset request.
     //
     uint32_t    cwrr    = 0x00000002;
     __asm__ volatile("mcr p14, 0, %0, c1, c4, 4\n\t" : : "r"(cwrr));
+}
+
+
+
+//
+//
+//
+void CoreMain()
+{
 
     //
     //
     //
     while(true)    
     {
-        bridge.heartBeats[3]++;
+        uint32_t coreID  = MPIDR();
+        //register uint32_t    coreID;
+        //__asm__ volatile("mrc p15, 0, %0, c0, c0, 5\n\t" : : "r"(coreID));    
+        //coreID  = coreID & 0x03;
+
+        bridge.heartBeats[coreID]++;
     }    
 }
 
