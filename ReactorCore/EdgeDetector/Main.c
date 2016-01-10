@@ -69,18 +69,27 @@ void SendDoorBellToCore(uint32_t coreNumber, uint32_t mailboxNumber)
 //
 void CoreMain()
 {
+    uint32_t coreID  = MPIDR();
+    bridge.heartBeats[coreID]   = 0;
 
     //
     //
     //
     while(true)    
     {
-        uint32_t coreID  = MPIDR();
         //register uint32_t    coreID;
         //__asm__ volatile("mrc p15, 0, %0, c0, c0, 5\n\t" : : "r"(coreID));    
         //coreID  = coreID & 0x03;
 
         bridge.heartBeats[coreID]++;
+
+        if( (bridge.heartBeats[coreID] % 0x4ffff) == 0 )
+        {
+            //
+            // Notify ControllerCore that we've started up.
+            //
+            SendDoorBellToCore(0, 2);            
+        }
     }    
 }
 
