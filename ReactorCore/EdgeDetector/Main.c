@@ -46,6 +46,27 @@ void CWRR()
 //
 //
 //
+void SendDoorBellToCore(uint32_t coreNumber, uint32_t mailboxNumber)
+{
+    //
+    // Ensure that stores to Normal memory are visible to the
+    // other CPUs before issuing the IPI.
+    //
+    //dsb();
+
+    //
+    // Cause the doorbell interrupt on the remote core.
+    //
+    uint32_t    thisCore    = MPIDR();
+    uint32_t    address     = 0x40000080 + (0x10 * coreNumber) + (mailboxNumber*4);
+    *((uint32_t*)address)   = 1 << thisCore;
+}
+
+
+
+//
+//
+//
 void CoreMain()
 {
 
@@ -72,9 +93,15 @@ void __attribute__ ( ( naked ) ) EntryPoint()
 {
     //
     // Setup the stack.
+    // TODO: Make this a different stack for each core (based on MPIDR).
     //
     uint32_t            stackPointer    = ((uint32_t)&stack[0]) + sizeof(stack);
     __asm__ volatile("MOV sp, %0\n\t" : : "r"(stackPointer));
+
+    //
+    // Notify ControllerCore that we've started up.
+    //
+    //SendDoorBellToCore(0, 2);
 
     //
     // Call the CoreMain.
@@ -82,7 +109,7 @@ void __attribute__ ( ( naked ) ) EntryPoint()
     CoreMain();
 
     //
-    // SHould never get here.
+    // Should never get here.
     //
     PANIC();
 }
