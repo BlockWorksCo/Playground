@@ -235,6 +235,32 @@ int TriggerCoreExecution(uint32_t coreNumber, uint32_t physicalAddress)
 }
 
 
+//
+// Cause the specified core to start execution at the specified point in physical memory.
+//
+int SendMail(uint32_t coreNumber)
+{
+    int     file_desc;
+
+    file_desc = open("/dev/ReactorCoreServices", 0);
+
+    if (file_desc < 0)
+    {
+        ERR("Can't open /dev/ReactorCoreServices");
+    }
+
+    int ret_val = ioctl(file_desc, IOCTL_SEND_MAIL, coreNumber );
+
+    if (ret_val < 0)
+    {
+        printf("ioctl failed:%d\n", ret_val);
+        exit(-1);
+    }
+    
+    close(file_desc);
+}
+
+
 extern volatile CoreServicesBridge     bridge;
 
 //
@@ -257,8 +283,9 @@ void arch_jumpTo(entry_t entry)
         CoreServicesBridge  b;
         GetBridgeData( &b );
 
-        uint32_t    temp    = PhysicalAddressOf( (uint32_t)&bridge );
-        printf("<%08x> %08x %08x %08x %08x\n", temp, b.heartBeats[0], b.heartBeats[1], b.heartBeats[2], b.heartBeats[3] );
+        printf("%08x %08x %08x %08x\n", b.heartBeats[0], b.heartBeats[1], b.heartBeats[2], b.heartBeats[3] );
+
+        //SendMail(2);
 
         sleep(1);
     }

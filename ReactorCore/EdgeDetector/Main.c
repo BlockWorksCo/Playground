@@ -102,7 +102,7 @@ void CWRR()
     //
     // Cause a reset request.
     //
-    uint32_t    cwrr    = 0x00000002;
+    register uint32_t    cwrr    = 0x00000002;
     __asm__ volatile("mcr p14, 0, %0, c1, c4, 4\n\t" : : "r"(cwrr));
 }
 
@@ -117,7 +117,7 @@ void SendDoorBellToCore(uint32_t coreNumber, uint32_t mailboxNumber)
     // Ensure that stores to Normal memory are visible to the
     // other CPUs before issuing the IPI.
     //
-    //dsb();
+    dsb();
 
     //
     // Cause the doorbell interrupt on the remote core.
@@ -154,15 +154,17 @@ void CoreMain()
             //
             // Notify ControllerCore that we've started up.
             //
-            SendDoorBellToCore(0, 2);            
+            SendDoorBellToCore(0, coreID);            
         }
     }    
 }
 
 
+#define STACK_SIZE              (1024)
+#define NUMBER_OF_ALLOY_CORES   (3)
 
 
-uint8_t     stack[1024*3];
+uint8_t     stack[NUMBER_OF_ALLOY_CORES*STACK_SIZE];
 
 void __attribute__ ( ( naked ) ) EntryPoint()
 {
@@ -175,19 +177,14 @@ void __attribute__ ( ( naked ) ) EntryPoint()
     __asm__ volatile("mrc p15, 0, %0, c0, c0, 5\n\t" : : "r"(mpidr));    
 
     uint32_t coreID     = mpidr & 0x03;
-    uint32_t            stackPointer    = ((uint32_t)&stack[coreID*1024]) + sizeof(stack);
+    register uint32_t            stackPointer    = ((uint32_t)&stack[coreID*STACK_SIZE]) + STACK_SIZE;
     __asm__ volatile("MOV sp, %0\n\t" : : "r"(stackPointer));
-
-    //
-    // Notify ControllerCore that we've started up.
-    //
-    //SendDoorBellToCore(0, 2);
 
     //
     //
     //
     //EnableMMU();
-    //EnableCache();
+    EnableCache();
 
     //
     // Call the CoreMain.

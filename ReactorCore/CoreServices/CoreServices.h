@@ -57,6 +57,8 @@
 
 #define IOCTL_GET_BRIDGE_ADDRESS _IOWR(MAJOR_NUM, 3, int)
 
+#define IOCTL_SEND_MAIL _IOWR(MAJOR_NUM, 4, int)
+
 
 
 /* 
