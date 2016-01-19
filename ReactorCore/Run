@@ -1,0 +1,11 @@
+#!/bin/sh
+
+
+
+./JtagEnabler 
+insmod CoreServices.ko 
+mknod /dev/ReactorCoreServices c 100 0
+
+./CoreLoader Main.elf
+
+

@@ -9,7 +9,9 @@
 
 
 
-#define dsb(option) __asm__ __volatile__ ("dsb " #option : : : "memory")
+#define dsb(option) asm volatile ("dsb " #option : : : "memory")
+#define EI()        asm volatile ("cpsie i")
+#define DI()        asm volatile ("cpsid i")
 
 //
 //
@@ -129,13 +131,85 @@ void SendDoorBellToCore(uint32_t coreNumber, uint32_t mailboxNumber)
 
 
 
+
+#define STACK_SIZE              (1024)
+#define NUMBER_OF_ALLOY_CORES   (4)
+#define NUMBER_OF_VECTORS       (256)
+uint32_t    vectorTables[NUMBER_OF_VECTORS*NUMBER_OF_ALLOY_CORES];
+
+//
+//
+//
+uint32_t* VectorTableForCore(uint32_t coreID)
+{
+    uint32_t*   vectorTable = (uint32_t*)&vectorTables[ coreID * (NUMBER_OF_VECTORS*sizeof(uint32_t)) ];
+
+    return vectorTable;
+}
+
+
+//
+//
+//
+void SetVectorTableAddress(uint32_t address)
+{
+    register uint32_t   temp    = address;
+    asm volatile ("mcr p15, 0, %0, c12, c0,  0" : "=r" (temp));
+}
+
+
+//
+//
+//
+void InstallISR( uint32_t* vectorTable, uint32_t vectorNumber, void (*ISR)() )
+{
+    uint32_t    isrAddress  = (uint32_t)ISR;
+
+    vectorTable[vectorNumber]   = isrAddress;
+}
+
+
+//
+//
+//
+void Handler()
+{
+    asm volatile ("bx pc\n");
+    PANIC();
+}
+
+
+
 //
 //
 //
 void CoreMain()
 {
     uint32_t coreID  = MPIDR();
+
+    //
+    //
+    //
     bridge.heartBeats[coreID]   = 0;
+
+    //
+    //
+    //
+    uint32_t*   vectorTable     = VectorTableForCore(coreID);
+    SetVectorTableAddress( (uint32_t)vectorTable );
+
+    //
+    //
+    //
+    for(uint32_t i=0; i<NUMBER_OF_VECTORS; i++)
+    {
+        InstallISR( vectorTable, i, (void(*)())0x47784778 );
+    }
+
+    //
+    //
+    //
+    EI();
 
     //
     //
@@ -160,12 +234,15 @@ void CoreMain()
 }
 
 
-#define STACK_SIZE              (1024)
-#define NUMBER_OF_ALLOY_CORES   (3)
-
 
 uint8_t     stack[NUMBER_OF_ALLOY_CORES*STACK_SIZE];
 
+
+
+
+//
+//
+//
 void __attribute__ ( ( naked ) ) EntryPoint()
 {
     //
@@ -184,7 +261,7 @@ void __attribute__ ( ( naked ) ) EntryPoint()
     //
     //
     //EnableMMU();
-    EnableCache();
+    //EnableCache();
 
     //
     // Call the CoreMain.
