@@ -18,7 +18,7 @@
 //
 extern volatile CoreServicesBridge      bridge;
 
-
+#if 0
 void EnableCache()
 {
 #define ARM_AUX_CONTROL_SMP   (1 << 6)
@@ -80,6 +80,10 @@ void EnableMMU (void)     // not fully optimized
     mode |= 0x1805;
     asm volatile ("mcr p15, 0, %0, c1, c0, 0" :: "r" (mode) : "memory");
 }
+#endif
+
+
+
 
 //
 // Get the Multiprocessor affinity register (core id).
@@ -142,7 +146,7 @@ uint32_t    vectorTables[NUMBER_OF_VECTORS*NUMBER_OF_ALLOY_CORES];
 //
 uint32_t* VectorTableForCore(uint32_t coreID)
 {
-    uint32_t*   vectorTable = (uint32_t*)&vectorTables[ coreID * (NUMBER_OF_VECTORS*sizeof(uint32_t)) ];
+    uint32_t*   vectorTable = &vectorTables[ coreID*NUMBER_OF_VECTORS ];
 
     return vectorTable;
 }
@@ -209,7 +213,7 @@ void CoreMain()
     //
     //
     //
-    EI();
+    //EI();
 
     //
     //
@@ -254,7 +258,7 @@ void __attribute__ ( ( naked ) ) EntryPoint()
     __asm__ volatile("mrc p15, 0, %0, c0, c0, 5\n\t" : : "r"(mpidr));    
 
     uint32_t coreID     = mpidr & 0x03;
-    register uint32_t            stackPointer    = ((uint32_t)&stack[coreID*STACK_SIZE]) + STACK_SIZE;
+    register uint32_t            stackPointer    = ((uint32_t)&stack[coreID*STACK_SIZE]) + STACK_SIZE - 16;
     __asm__ volatile("MOV sp, %0\n\t" : : "r"(stackPointer));
 
     //

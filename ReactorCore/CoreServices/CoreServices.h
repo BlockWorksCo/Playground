@@ -59,6 +59,10 @@
 
 #define IOCTL_SEND_MAIL _IOWR(MAJOR_NUM, 4, int)
 
+#define IOCTL_ALLOCATE_BLOCK _IOWR(MAJOR_NUM, 5, int)
+
+#define IOCTL_FLUSH_AND_INVALIDATE _IOWR(MAJOR_NUM, 6, int)
+
 
 
 /* 
@@ -80,6 +84,26 @@ typedef struct
 
 } CoreServicesBridge;
 
+
+//
+//
+//
+typedef struct
+{
+    uint32_t    size;
+    uint32_t    virtualAddress;
+    uint32_t    physicalAddress;  
+
+} AllocateRequest;
+
+
+
+
+
+
+
+#define ALLOY_DEDICATED_RAM_SIZE        (1024*1024*706)
+#define ALLOY_RAM_BASE                  (256*1024*1024)
 
 
 #endif

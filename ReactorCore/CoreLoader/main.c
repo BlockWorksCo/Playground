@@ -133,7 +133,7 @@ void* do_alloc(size_t size, size_t align, ELFSecPerm_t perm, uint32_t* physicalA
     uint32_t    pageFrameNumber     = get_page_frame_number_of_address( block );
     *physicalAddress     = (pageFrameNumber << PAGE_SHIFT) + 0;
 
-    printf("physical address = %08x virtual address = %08x\n", *physicalAddress, (uint32_t)block );
+    printf("physical address = %08x virtual address = %08x size=%d\n", *physicalAddress, (uint32_t)block, size );
 
     return block;
 }
@@ -178,6 +178,40 @@ void GetBridgeData( CoreServicesBridge* bridge )
     }
     
     close(file_desc);
+}
+
+
+
+//
+// Cause the specified core to start execution at the specified point in physical memory.
+//
+void Allocate( uint32_t numberOfBytes )
+{
+    int     file_desc;
+
+    file_desc = open("/dev/ReactorCoreServices", 0);
+
+    if (file_desc < 0)
+    {
+        ERR("Can't open /dev/ReactorCoreServices");
+    }
+
+    AllocateRequest     request;
+    request.size            = numberOfBytes;
+    request.virtualAddress  = 0;
+    request.physicalAddress = 0;
+    int ret_val = ioctl(file_desc, IOCTL_ALLOCATE_BLOCK, &request );
+
+    if (ret_val < 0)
+    {
+        printf("ioctl failed:%d\n", ret_val);
+        exit(-1);
+    }
+    
+    close(file_desc);
+
+    printf("virtualAddress = %08x\n", request.virtualAddress);
+    printf("physicalAddress = %08x\n", request.physicalAddress);
 }
 
 
@@ -295,12 +329,123 @@ void arch_jumpTo(entry_t entry)
 
 
 
+#define PAGE_SIZE 4096
+
+void Test()
+{
+    int configfd;
+    configfd = open("/dev/ReactorCoreServices", O_RDWR);
+    if(configfd < 0) 
+    {
+        perror("open");
+        return -1;
+    }
+
+    char* address = NULL;
+    address = mmap(NULL, PAGE_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, configfd, 0);
+    if (address == MAP_FAILED) 
+    {
+        perror("mmap");
+        return -1;
+    }
+
+    printf("initial message: %s\n", address);
+    memcpy(address + 11 , "*user*", 6);
+    printf("changed message: %s\n", address);
+    close(configfd);    
+    
+    return 0;
+}
+
+
+
+
+#define dsb(option) asm volatile ("dsb " #option : : : "memory")
+
+//
+// examine /proc/maps
+//
+void Test2()
+{
+    int fd;
+    fd = open("/dev/mem", O_RDWR);
+    if(fd < 0) 
+    {
+        perror("open");
+        return -1;
+    }
+
+    uint8_t*    ptr = mmap(ALLOY_RAM_BASE, getpagesize(), PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED , fd, ALLOY_RAM_BASE );
+    printf("base = %08x\n", ptr);
+
+    for(uint32_t i=0; i<16; i++)
+    {
+        ptr[i] = i;
+        printf("%02x ", ptr[i]);
+    }
+
+    for(uint32_t i=0; i<64; i++)
+    {
+        printf("%02x ", ptr[i]);
+    }
+
+    printf("\n");
+
+    dsb(sy);
+}
+
+
+
+
+
+//
+// examine /proc/maps
+//
+void Test1()
+{
+    int fd;
+    fd = open("/dev/ReactorCoreServices", O_RDWR);
+    if(fd < 0) 
+    {
+        perror("open");
+        return -1;
+    }
+
+    uint8_t*    ptr = mmap(ALLOY_RAM_BASE, getpagesize(), PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED , fd, ALLOY_RAM_BASE );
+    printf("base = %08x\n", ptr);
+
+    for(uint32_t i=0; i<16; i++)
+    {
+        ptr[i] = i;
+        printf("%02x ", ptr[i]);
+    }
+
+    for(uint32_t i=0; i<64; i++)
+    {
+        printf("%02x ", ptr[i]);
+    }
+
+    printf("\n");
+
+    dsb(sy);
+}
+
+
 
 //
 //
 //
 int main(int argc, char* argv[])
 {
+    Test1();
+    exit(0);
+
+    //Test2();
+    //exit(0);
+
+    Allocate(1024*1024);
+    exit(-1);
+
     exec_elf(argv[1], &env);
     puts("Done");
     return 0;
