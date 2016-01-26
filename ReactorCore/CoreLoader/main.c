@@ -396,7 +396,7 @@ void Test2()
 
 
 
-
+char temp[]     = "Hello World.";
 
 //
 // examine /proc/maps
@@ -411,16 +411,17 @@ void Test1()
         return -1;
     }
 
-    uint8_t*    ptr = mmap(ALLOY_RAM_BASE, getpagesize(), PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED , fd, ALLOY_RAM_BASE );
-    printf("base = %08x\n", ptr);
-
+    //uint8_t*    ptr = mmap(NULL, getpagesize(), PROT_READ|PROT_WRITE, MAP_PRIVATE , fd, ALLOY_RAM_BASE );
+    uint8_t*    ptr = mmap(NULL, getpagesize(), PROT_READ|PROT_WRITE, MAP_NORESERVE|MAP_PRIVATE , fd, 0 );
+    printf("base = %08x physical = %08x\n", ptr, PhysicalAddressOf((uint32_t)&temp[0]));
+#if 1
     for(uint32_t i=0; i<16; i++)
     {
         ptr[i] = i;
         printf("%02x ", ptr[i]);
     }
-
-    for(uint32_t i=0; i<64; i++)
+#endif
+    for(uint32_t i=0; i<256; i++)
     {
         printf("%02x ", ptr[i]);
     }
