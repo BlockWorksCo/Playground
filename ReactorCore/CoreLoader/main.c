@@ -368,28 +368,32 @@ void Test()
 void Test2()
 {
     int fd;
-    fd = open("/dev/mem", O_RDWR);
+    fd = open("/dev/mem", O_RDWR|O_SYNC);
     if(fd < 0) 
     {
         perror("open");
         return -1;
     }
 
-    uint8_t*    ptr = mmap(ALLOY_RAM_BASE, getpagesize(), PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED , fd, ALLOY_RAM_BASE );
+    //uint8_t*    ptr = mmap(ALLOY_RAM_BASE, getpagesize(), PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED , fd, ALLOY_RAM_BASE );
+    uint8_t*    ptr = mmap(ALLOY_RAM_BASE, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED , fd, ALLOY_RAM_BASE );
     printf("base = %08x\n", ptr);
-
-    for(uint32_t i=0; i<16; i++)
+    ptr[0]++;
+#if 0
+    for(uint32_t i=0; i<128; i++)
     {
-        ptr[i] = i;
+        ptr[i]++;
         printf("%02x ", ptr[i]);
     }
-
-    for(uint32_t i=0; i<64; i++)
+#endif
+    for(uint32_t i=0; i<128; i++)
     {
         printf("%02x ", ptr[i]);
     }
 
     printf("\n");
+    msync(ptr, 4096, MS_SYNC);
+    close(fd);
 
     dsb(sy);
 }
@@ -404,7 +408,7 @@ char temp[]     = "Hello World.";
 void Test1()
 {
     int fd;
-    fd = open("/dev/ReactorCoreServices", O_RDWR);
+    fd = open("/dev/ReactorCoreServices", O_RDWR|O_SYNC);
     if(fd < 0) 
     {
         perror("open");
@@ -414,7 +418,8 @@ void Test1()
     //uint8_t*    ptr = mmap(NULL, getpagesize(), PROT_READ|PROT_WRITE, MAP_PRIVATE , fd, ALLOY_RAM_BASE );
     uint8_t*    ptr = mmap(NULL, getpagesize(), PROT_READ|PROT_WRITE, MAP_NORESERVE|MAP_PRIVATE , fd, 0 );
     printf("base = %08x physical = %08x\n", ptr, PhysicalAddressOf((uint32_t)&temp[0]));
-#if 1
+    ptr[0]++;
+#if 0
     for(uint32_t i=0; i<16; i++)
     {
         ptr[i] = i;
@@ -438,7 +443,7 @@ void Test1()
 //
 int main(int argc, char* argv[])
 {
-    Test1();
+    Test2();
     exit(0);
 
     //Test2();
