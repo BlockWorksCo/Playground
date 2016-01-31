@@ -47,6 +47,9 @@ int             memFD       = -1;
 uint8_t*        alloyRAM    = 0;
 uint8_t*        topOfHeap   = 0;
 
+
+#if 0
+
 //
 //
 //
@@ -84,7 +87,6 @@ uint32_t get_page_frame_number_of_address(void* addr)
     return returnValue;
 }
 
-
 //
 //
 //
@@ -98,7 +100,7 @@ uint32_t PhysicalAddressOf(uint32_t virtualAddress)
 
     return physicalAddressOfPage;
 }
-
+#endif
 
 //
 //
@@ -151,13 +153,16 @@ void* do_alloc(size_t size, size_t align, ELFSecPerm_t perm, uint32_t* physicalA
     uint32_t    blockSize   = ((size+(align/2))/align)*align;
 
     topOfHeap           += blockSize;
-    *physicalAddress    = (uint32_t)block - (uint32_t)alloyRAM;
+    *physicalAddress    = ((uint32_t)block - (uint32_t)alloyRAM) + ALLOY_RAM_BASE;
+
+    printf("topOfHeap = %08x, block = %08x  physicalAddress=%08x alloyRAM=%08x\n", (uint32_t)topOfHeap, (uint32_t)block, (uint32_t)*physicalAddress, (uint32_t)alloyRAM );
+    memset(block, 0, size);
 
     return block;
 
 #endif    
 }
-
+#if 0
 
 //
 //
@@ -172,9 +177,10 @@ static inline void dcache_clean(void)
     __asm volatile ("mcr 15, 0, %0, c7, c10, 4"::"r" (zero));
  }
 
+#endif
 
 
-
+#if 0
 //
 // Cause the specified core to start execution at the specified point in physical memory.
 //
@@ -208,8 +214,9 @@ void GetBridgeData( CoreServicesBridge* bridge )
 
 #endif    
 }
+#endif
 
-
+#if 0
 
 //
 // Cause the specified core to start execution at the specified point in physical memory.
@@ -242,6 +249,8 @@ void Allocate( uint32_t numberOfBytes )
     printf("virtualAddress = %08x\n", request.virtualAddress);
     printf("physicalAddress = %08x\n", request.physicalAddress);
 }
+
+#endif
 
 
 //
@@ -347,11 +356,10 @@ void arch_jumpTo(entry_t entry)
     //
     while(true)
     {
-        CoreServicesBridge  b;
-        GetBridgeData( &b );
+        CoreServicesBridge*  b  = (CoreServicesBridge*)ALLOY_RAM_BASE;
 
         //uint32_t    temp    = PhysicalAddressOf( (uint32_t)&bridge );
-        printf("%08x %08x %08x %08x\n", b.heartBeats[0], b.heartBeats[1], b.heartBeats[2], b.heartBeats[3] );
+        printf("%08x %08x %08x %08x\n", b->heartBeats[0], b->heartBeats[1], b->heartBeats[2], b->heartBeats[3] );
 
         //SendMail(2);
 
@@ -488,8 +496,9 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    alloyRAM = mmap( (void*)ALLOY_RAM_BASE, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED , memFD, ALLOY_RAM_BASE );
+    alloyRAM = mmap( (void*)ALLOY_RAM_BASE, 1024*1024*8, PROT_READ|PROT_WRITE, MAP_SHARED , memFD, ALLOY_RAM_BASE );
     printf("Alloy RAM base = %08x\n", (uint32_t)alloyRAM);
+    memset(alloyRAM, 0, 4096);
     topOfHeap   = alloyRAM;
 
 #endif

@@ -226,14 +226,15 @@ void CoreMain()
 
         bridge.heartBeats[coreID]++;
         dsb();
-
+/*
         if( (bridge.heartBeats[coreID] % 0x4ffff) == 0 )
         {
             //
             // Notify ControllerCore that we've started up.
             //
-            SendDoorBellToCore(0, coreID);            
+            //SendDoorBellToCore(0, coreID);            
         }
+*/        
     }    
 }
 
