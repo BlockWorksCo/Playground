@@ -187,9 +187,9 @@ void Handler()
 //
 //
 //
-void CoreMain()
+void CoreMain(uint32_t coreID)
 {
-    uint32_t coreID  = MPIDR();
+    //uint32_t coreID  = MPIDR();
 
     //
     //
@@ -243,8 +243,6 @@ void CoreMain()
 uint8_t     stack[NUMBER_OF_ALLOY_CORES*STACK_SIZE];
 
 
-
-
 //
 //
 //
@@ -254,11 +252,14 @@ void __attribute__ ( ( naked ) ) EntryPoint()
     // Setup the stack.
     // TODO: Make this a different stack for each core (based on MPIDR).
     //
+#if 0    
     register uint32_t   mpidr;
 
     __asm__ volatile("mrc p15, 0, %0, c0, c0, 5\n\t" : : "r"(mpidr));    
-
-    uint32_t coreID     = mpidr & 0x03;
+#else
+    uint32_t coreID   = *((uint32_t*)0x10000000);
+    *((uint32_t*)0x10000000)    = 0xffffffff;
+#endif
     register uint32_t            stackPointer    = ((uint32_t)&stack[coreID*STACK_SIZE]) + STACK_SIZE - 16;
     __asm__ volatile("MOV sp, %0\n\t" : : "r"(stackPointer));
 
@@ -271,7 +272,7 @@ void __attribute__ ( ( naked ) ) EntryPoint()
     //
     // Call the CoreMain.
     //
-    CoreMain();
+    CoreMain(coreID);
 
     //
     // Should never get here.
