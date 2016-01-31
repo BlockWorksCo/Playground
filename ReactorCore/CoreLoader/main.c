@@ -32,6 +32,8 @@
 #define PAGE_SHIFT      12
 
 
+#define dsb(option) asm volatile ("dsb " #option : : : "memory")
+
 
 #define DBG(...) printf("ELF: " __VA_ARGS__)
 #define ERR(msg) do { perror("ELF: " msg); exit(-1); } while(0)
@@ -41,6 +43,9 @@
 ELFSymbol_t     exports[]   = {0};
 ELFEnv_t        env         = { exports, 0 };
 
+int             memFD       = -1;
+uint8_t*        alloyRAM    = 0;
+uint8_t*        topOfHeap   = 0;
 
 //
 //
@@ -100,6 +105,7 @@ uint32_t PhysicalAddressOf(uint32_t virtualAddress)
 //
 void* do_alloc(size_t size, size_t align, ELFSecPerm_t perm, uint32_t* physicalAddress)
 {
+#if 0    
     (void) perm;
     //
     // Allocate the block, aligned on page size..
@@ -136,6 +142,20 @@ void* do_alloc(size_t size, size_t align, ELFSecPerm_t perm, uint32_t* physicalA
     printf("physical address = %08x virtual address = %08x size=%d\n", *physicalAddress, (uint32_t)block, size );
 
     return block;
+#else
+
+    //
+    //
+    //
+    void*       block       = topOfHeap;
+    uint32_t    blockSize   = ((size+(align/2))/align)*align;
+
+    topOfHeap           += blockSize;
+    *physicalAddress    = (uint32_t)block - (uint32_t)alloyRAM;
+
+    return block;
+
+#endif    
 }
 
 
@@ -160,6 +180,7 @@ static inline void dcache_clean(void)
 //
 void GetBridgeData( CoreServicesBridge* bridge )
 {
+#if 0
     int     file_desc;
 
     file_desc = open("/dev/ReactorCoreServices", 0);
@@ -178,6 +199,14 @@ void GetBridgeData( CoreServicesBridge* bridge )
     }
     
     close(file_desc);
+#else
+    
+    //
+    //
+    //
+    memcpy(bridge, (uint8_t*)ALLOY_RAM_BASE, sizeof(*bridge) );
+
+#endif    
 }
 
 
@@ -220,6 +249,7 @@ void Allocate( uint32_t numberOfBytes )
 //
 int GetBridgePhysicalAddress()
 {
+#if 0
     int     file_desc;
 
     file_desc = open("/dev/ReactorCoreServices", 0);
@@ -241,6 +271,9 @@ int GetBridgePhysicalAddress()
     close(file_desc);
 
     return physicalAddress;
+#else
+    return ALLOY_RAM_BASE;    
+#endif    
 }
 
 //
@@ -317,8 +350,8 @@ void arch_jumpTo(entry_t entry)
         CoreServicesBridge  b;
         GetBridgeData( &b );
 
-        uint32_t    temp    = PhysicalAddressOf( (uint32_t)&bridge );
-        printf("<%08x> %08x %08x %08x %08x\n", temp, b.heartBeats[0], b.heartBeats[1], b.heartBeats[2], b.heartBeats[3] );
+        //uint32_t    temp    = PhysicalAddressOf( (uint32_t)&bridge );
+        printf("%08x %08x %08x %08x\n", b.heartBeats[0], b.heartBeats[1], b.heartBeats[2], b.heartBeats[3] );
 
         //SendMail(2);
 
@@ -326,7 +359,7 @@ void arch_jumpTo(entry_t entry)
     }
 }
 
-
+#if 0
 
 
 #define PAGE_SIZE 4096
@@ -338,7 +371,7 @@ void Test()
     if(configfd < 0) 
     {
         perror("open");
-        return -1;
+        return;
     }
 
     char* address = NULL;
@@ -346,21 +379,17 @@ void Test()
     if (address == MAP_FAILED) 
     {
         perror("mmap");
-        return -1;
+        return;
     }
 
     printf("initial message: %s\n", address);
     memcpy(address + 11 , "*user*", 6);
     printf("changed message: %s\n", address);
     close(configfd);    
-    
-    return 0;
 }
 
 
 
-
-#define dsb(option) asm volatile ("dsb " #option : : : "memory")
 
 //
 // examine /proc/maps
@@ -372,12 +401,12 @@ void Test2()
     if(fd < 0) 
     {
         perror("open");
-        return -1;
+        return;
     }
 
     //uint8_t*    ptr = mmap(ALLOY_RAM_BASE, getpagesize(), PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED , fd, ALLOY_RAM_BASE );
-    uint8_t*    ptr = mmap(ALLOY_RAM_BASE, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED , fd, ALLOY_RAM_BASE );
-    printf("base = %08x\n", ptr);
+    uint8_t*    ptr = mmap( (void*)ALLOY_RAM_BASE, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED , fd, ALLOY_RAM_BASE );
+    printf("base = %08x\n", (uint32_t)ptr);
     ptr[0]++;
 #if 0
     for(uint32_t i=0; i<128; i++)
@@ -436,24 +465,38 @@ void Test1()
     dsb(sy);
 }
 
-
+#endif
 
 //
 //
 //
 int main(int argc, char* argv[])
 {
+#if 0    
     Test2();
     exit(0);
 
     //Test2();
     //exit(0);
-
     Allocate(1024*1024);
     exit(-1);
+#else
+    memFD = open("/dev/mem", O_RDWR|O_SYNC);
+    if(memFD < 0) 
+    {
+        perror("open");
+        return -1;
+    }
+
+    alloyRAM = mmap( (void*)ALLOY_RAM_BASE, getpagesize(), PROT_READ|PROT_WRITE, MAP_SHARED , memFD, ALLOY_RAM_BASE );
+    printf("Alloy RAM base = %08x\n", (uint32_t)alloyRAM);
+    topOfHeap   = alloyRAM;
+
+#endif
 
     exec_elf(argv[1], &env);
     puts("Done");
+
     return 0;
 }
 
