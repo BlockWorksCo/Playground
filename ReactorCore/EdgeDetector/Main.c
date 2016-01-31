@@ -199,15 +199,15 @@ void CoreMain()
     //
     //
     //
-    uint32_t*   vectorTable     = VectorTableForCore(coreID);
-    SetVectorTableAddress( (uint32_t)vectorTable );
+    //uint32_t*   vectorTable     = VectorTableForCore(coreID);
+    //SetVectorTableAddress( (uint32_t)vectorTable );
 
     //
     //
     //
     for(uint32_t i=0; i<NUMBER_OF_VECTORS; i++)
     {
-        InstallISR( vectorTable, i, (void(*)())0x47784778 );
+        //InstallISR( vectorTable, i, (void(*)())0x47784778 );
     }
 
     //
