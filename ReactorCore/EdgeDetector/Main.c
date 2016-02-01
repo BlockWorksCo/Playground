@@ -90,7 +90,7 @@ void EnableMMU (void)     // not fully optimized
 //
 uint32_t MPIDR()
 {
-    register uint32_t    mpidr;
+    uint32_t    mpidr;
 
     __asm__ volatile("mrc p15, 0, %0, c0, c0, 5\n\t" : "=r"(mpidr));    
 
@@ -128,9 +128,9 @@ void SendDoorBellToCore(uint32_t coreNumber, uint32_t mailboxNumber)
     //
     // Cause the doorbell interrupt on the remote core.
     //
-    uint32_t    thisCore    = MPIDR();
+    //uint32_t    thisCore    = MPIDR();
     uint32_t    address     = 0x40000080 + (0x10 * coreNumber) + (mailboxNumber*4);
-    *((uint32_t*)address)   = 1 << thisCore;
+    *((uint32_t*)address)   = 1 << mailboxNumber;
 }
 
 
@@ -226,15 +226,13 @@ void CoreMain(uint32_t coreID)
 
         bridge.heartBeats[coreID]++;
         dsb();
-/*
         if( (bridge.heartBeats[coreID] % 0x4ffff) == 0 )
         {
             //
             // Notify ControllerCore that we've started up.
             //
-            //SendDoorBellToCore(0, coreID);            
+            SendDoorBellToCore(0, coreID);            
         }
-*/        
     }    
 }
 
