@@ -92,7 +92,7 @@ uint32_t MPIDR()
 {
     register uint32_t    mpidr;
 
-    __asm__ volatile("mrc p15, 0, %0, c0, c0, 5\n\t" : : "r"(mpidr));    
+    __asm__ volatile("mrc p15, 0, %0, c0, c0, 5\n\t" : "=r"(mpidr));    
 
     uint32_t coreID     = mpidr & 0x03;
     return coreID;
@@ -252,10 +252,12 @@ void __attribute__ ( ( naked ) ) EntryPoint()
     // Setup the stack.
     // TODO: Make this a different stack for each core (based on MPIDR).
     //
-#if 0    
-    register uint32_t   mpidr;
+#if 1
+    uint32_t   mpidr;
 
-    __asm__ volatile("mrc p15, 0, %0, c0, c0, 5\n\t" : : "r"(mpidr));    
+    __asm__ volatile("mrc p15, 0, %0, c0, c0, 5\n\t" : "=r"(mpidr) ); 
+    uint32_t    coreID  = mpidr&0x3;   
+    //*((uint32_t*)0x10000000)    = 0xffffffff;
 #else
     uint32_t coreID   = *((uint32_t*)0x10000000);
     *((uint32_t*)0x10000000)    = 0xffffffff;
