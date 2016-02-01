@@ -211,9 +211,14 @@ void CoreMain(uint32_t coreID)
     }
 
     //
+    // Enable the malbox interrupt.
     //
-    //
-    //EI();
+    uint32_t    mailboxInterruptControlAddress  = 0x40000050+(coreID*4);
+    uint32_t currentSettings     = *(uint32_t*)mailboxInterruptControlAddress;
+    currentSettings |= 0x0000000f;
+    *(uint32_t*)mailboxInterruptControlAddress   = currentSettings;
+
+    EI();
 
     //
     //
@@ -250,16 +255,11 @@ void __attribute__ ( ( naked ) ) EntryPoint()
     // Setup the stack.
     // TODO: Make this a different stack for each core (based on MPIDR).
     //
-#if 1
     uint32_t   mpidr;
 
     __asm__ volatile("mrc p15, 0, %0, c0, c0, 5\n\t" : "=r"(mpidr) ); 
     uint32_t    coreID  = mpidr&0x3;   
-    //*((uint32_t*)0x10000000)    = 0xffffffff;
-#else
-    uint32_t coreID   = *((uint32_t*)0x10000000);
-    *((uint32_t*)0x10000000)    = 0xffffffff;
-#endif
+
     register uint32_t            stackPointer    = ((uint32_t)&stack[coreID*STACK_SIZE]) + STACK_SIZE - 16;
     __asm__ volatile("MOV sp, %0\n\t" : : "r"(stackPointer));
 

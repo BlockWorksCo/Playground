@@ -361,7 +361,7 @@ void arch_jumpTo(entry_t entry)
         //uint32_t    temp    = PhysicalAddressOf( (uint32_t)&bridge );
         printf("%08x %08x %08x %08x\n", b->heartBeats[0], b->heartBeats[1], b->heartBeats[2], b->heartBeats[3] );
 
-        //SendMail(2);
+        SendMail(2);
 
         sleep(1);
     }
