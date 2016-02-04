@@ -424,6 +424,67 @@ static void relR_ARM_THM_MOVT_ABS(Elf32_Addr relAddr, int type, Elf32_Addr symAd
 
 
 //
+//
+//
+static void relR_ARM_MOVW_ABS_NC(Elf32_Addr relAddr, int type, Elf32_Addr symAddr, Elf32_Addr relPhysAddr)
+{
+    int32_t     offset;
+    uint32_t    tmp;
+
+    printf("<%08x>\n", symAddr - relPhysAddr);
+
+    tmp = *(uint32_t*)relAddr;
+    offset = tmp;
+
+    offset = ((offset & 0xf0000) >> 4) | (offset & 0xfff);
+    offset = (offset ^ 0x8000) - 0x8000;
+
+    offset += symAddr;
+    if (type == R_ARM_MOVT_ABS)
+        offset >>= 16;
+
+    tmp &= 0xfff0f000;
+    tmp |= ((offset & 0xf000) << 4) | (offset & 0x0fff);
+
+    *(uint32_t*)relAddr = tmp;
+}
+
+
+
+
+//
+//
+//
+static void relR_ARM_CALL(Elf32_Addr relAddr, int type, Elf32_Addr symAddr, Elf32_Addr relPhysAddr)
+{
+    uint32_t    insn = ( ((uint32_t*) relAddr)[0] );
+    int32_t     offset;
+    uint32_t    tmp;
+
+    if (symAddr & 3) {
+        return;
+    }
+
+    offset = ( ((uint32_t*) relAddr)[0] );
+    offset = (offset & 0x00ffffff) << 2;
+    if (offset & 0x02000000)
+        offset -= 0x04000000;
+
+    offset += symAddr - relPhysAddr;
+    if (offset <= (int32_t)0xfe000000 ||
+        offset >= (int32_t)0x02000000) {
+        return;
+    }
+
+    offset >>= 2;
+    offset &= 0x00ffffff;
+
+    *(uint32_t *)relAddr &= (0xff000000);
+    *(uint32_t *)relAddr |= (offset);
+}
+
+
+//
 // Modify the value to be relocated according to the relocation-type.
 //
 static void relocateSymbol(Elf32_Addr relAddr, int type, Elf32_Addr symAddr, Elf32_Addr relPhysAddr)
@@ -451,6 +512,17 @@ static void relocateSymbol(Elf32_Addr relAddr, int type, Elf32_Addr symAddr, Elf
         case R_ARM_THM_MOVT_ABS:
             relR_ARM_THM_MOVT_ABS(relAddr, type, symAddr, relPhysAddr);
             DBG("  R_ARM_THM_MOVT_ABS relocated is 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
+            break;
+
+        case R_ARM_MOVT_ABS:
+        case R_ARM_MOVW_ABS_NC:
+            relR_ARM_MOVW_ABS_NC(relAddr, type, symAddr, relPhysAddr);
+            DBG("  R_ARM_MOVW_ABS_NC relocated is 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
+            break;
+
+        case R_ARM_CALL:
+            relR_ARM_CALL(relAddr, type, symAddr, relPhysAddr);
+            DBG("  R_ARM_CALL relocated is 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
             break;
 
         default:
@@ -576,6 +648,7 @@ static void relocate(ELFExec_t* e, Elf32_Shdr* h, ELFSection_t* s, const char* n
                 Elf32_Addr  relAddr     = ((Elf32_Addr) s->data) + rel.r_offset;
                 Elf32_Addr  relPhysAddr = ((Elf32_Addr) s->physicalAddress) + rel.r_offset;
 
+                printf("\n");
                 readSymbol(e, symEntry, &sym, name, sizeof(name));
                 DBG(" %08X %08X %d %s\n", (unsigned int) rel.r_offset, (unsigned int) rel.r_info, relType, name);
 
@@ -587,7 +660,7 @@ static void relocate(ELFExec_t* e, Elf32_Shdr* h, ELFSection_t* s, const char* n
                 //
                 // Do the relocation.
                 //
-                DBG("  symAddr=%08X relAddr=%08X\n", (unsigned int) symAddr, (unsigned int) relAddr);
+                DBG("  symAddr=%08X relAddr=%08X relPhysAddr=%08x\n", (unsigned int) symAddr, (unsigned int) relAddr, relPhysAddr);
                 relocateSymbol(relAddr, relType, symAddr, relPhysAddr);
             }
         }

@@ -139,17 +139,7 @@ void SendDoorBellToCore(uint32_t coreNumber, uint32_t mailboxNumber)
 #define STACK_SIZE              (1024)
 #define NUMBER_OF_ALLOY_CORES   (4)
 #define NUMBER_OF_VECTORS       (256)
-uint32_t    vectorTables[NUMBER_OF_VECTORS*NUMBER_OF_ALLOY_CORES];
 
-//
-//
-//
-uint32_t* VectorTableForCore(uint32_t coreID)
-{
-    uint32_t*   vectorTable = &vectorTables[ coreID*NUMBER_OF_VECTORS ];
-
-    return vectorTable;
-}
 
 
 //
@@ -162,25 +152,151 @@ void SetVectorTableAddress(uint32_t address)
 }
 
 
+
+
+
+
 //
 //
 //
-void InstallISR( uint32_t* vectorTable, uint32_t vectorNumber, void (*ISR)() )
+void __attribute__ ( (naked) ) HardFault()
 {
-    uint32_t    isrAddress  = (uint32_t)ISR;
-
-    vectorTable[vectorNumber]   = isrAddress;
-}
-
-
-//
-//
-//
-void Handler()
-{
-    asm volatile ("bx pc\n");
     PANIC();
 }
+
+
+//
+//
+//
+void __attribute__ ( (naked) ) Handler()
+{
+    //PANIC();
+
+    uint32_t    mailboxClearAddress;
+
+    mailboxClearAddress     = 0x400000c0 + (16*2) + (4*0);
+    *(uint32_t*)mailboxClearAddress     = 0xffffffff;
+
+    mailboxClearAddress     = 0x400000c0 + (16*2) + (4*1);
+    *(uint32_t*)mailboxClearAddress     = 0xffffffff;
+
+    mailboxClearAddress     = 0x400000c0 + (16*2) + (4*2);
+    *(uint32_t*)mailboxClearAddress     = 0xffffffff;
+
+    mailboxClearAddress     = 0x400000c0 + (16*2) + (4*3);
+    *(uint32_t*)mailboxClearAddress     = 0xffffffff;
+
+    //dsb();
+
+    asm volatile ("bx lr" );
+}
+
+#if 1
+
+//
+//
+//
+void __attribute__ ( (naked, aligned(128) ) ) VectorTable()
+{
+    asm volatile (".arm");
+    asm volatile ("ldr pc, %0" : : "i" (&CWRR) );
+    asm volatile ("ldr pc, %0" : : "i" (&HardFault) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+}
+
+
+#else
+
+#define ARM4_XRQ_RESET   0x00
+#define ARM4_XRQ_UNDEF   0x01
+#define ARM4_XRQ_SWINT   0x02
+#define ARM4_XRQ_ABRTP   0x03
+#define ARM4_XRQ_ABRTD   0x04
+#define ARM4_XRQ_RESV1   0x05
+#define ARM4_XRQ_IRQ     0x06
+#define ARM4_XRQ_FIQ     0x07
+
+
+
+uint32_t    vectorTable[128] __attribute__ ( (aligned(128) ) ) ;
+
+
+
+/*
+    Will install a branch instruction for the 
+    interrupt vector for the ARM platform.
+*/
+void InstallHandler(uint32_t ndx, uint32_t addr)
+{
+    vectorTable[ndx] = 0xEA000000 | ((addr - 8 - (4 * ndx)) >> 2);
+}
+
+#endif
+
 
 
 
@@ -189,8 +305,6 @@ void Handler()
 //
 void CoreMain(uint32_t coreID)
 {
-    //uint32_t coreID  = MPIDR();
-
     //
     //
     //
@@ -199,16 +313,16 @@ void CoreMain(uint32_t coreID)
     //
     //
     //
-    //uint32_t*   vectorTable     = VectorTableForCore(coreID);
-    //SetVectorTableAddress( (uint32_t)vectorTable );
-
-    //
-    //
-    //
-    for(uint32_t i=0; i<NUMBER_OF_VECTORS; i++)
+#if 1    
+    SetVectorTableAddress( (uint32_t)&VectorTable );
+#else    
+    for(uint32_t i=0; i<128; i++)
     {
-        //InstallISR( vectorTable, i, (void(*)())0x47784778 );
+        InstallHandler( i, (uint32_t)&Handler );
     }
+    InstallHandler( 0, (uint32_t)&CWRR );
+    SetVectorTableAddress( (uint32_t)&vectorTable );
+#endif
 
     //
     // Enable the malbox interrupt.
@@ -218,7 +332,7 @@ void CoreMain(uint32_t coreID)
     currentSettings |= 0x0000000f;
     *(uint32_t*)mailboxInterruptControlAddress   = currentSettings;
 
-    EI();
+    //EI();
 
     //
     //
@@ -260,7 +374,7 @@ void __attribute__ ( ( naked ) ) EntryPoint()
     __asm__ volatile("mrc p15, 0, %0, c0, c0, 5\n\t" : "=r"(mpidr) ); 
     uint32_t    coreID  = mpidr&0x3;   
 
-    register uint32_t            stackPointer    = ((uint32_t)&stack[coreID*STACK_SIZE]) + STACK_SIZE - 16;
+    uint32_t            stackPointer    = ((uint32_t)&stack[coreID*STACK_SIZE]) + STACK_SIZE - 16;
     __asm__ volatile("MOV sp, %0\n\t" : : "r"(stackPointer));
 
     //
