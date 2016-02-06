@@ -165,10 +165,19 @@ void __attribute__ ( (naked) ) HardFault()
 }
 
 
+
 //
 //
 //
-void __attribute__ ( (naked) ) Handler()
+void  __attribute__ ((interrupt ("IRQ"))) Handler()
+{
+    PANIC();
+}
+
+//
+//
+//
+void  __attribute__ ((interrupt ("IRQ"))) Mailbox()
 {
     //PANIC();
 
@@ -193,79 +202,48 @@ void __attribute__ ( (naked) ) Handler()
 
 #if 1
 
+uint32_t     vectors[] =
+{
+    (uint32_t)&Handler,
+    (uint32_t)&Handler,
+    (uint32_t)&Handler,
+    (uint32_t)&Handler,
+    (uint32_t)&Handler,
+    (uint32_t)&Handler,
+    (uint32_t)&Handler,
+    (uint32_t)&Handler,
+    (uint32_t)&Handler,
+    (uint32_t)&Handler,
+    (uint32_t)&Handler,
+    (uint32_t)&Handler,
+    (uint32_t)&Handler,
+    (uint32_t)&Handler,
+};
+
 //
 //
 //
 void __attribute__ ( (naked, aligned(128) ) ) VectorTable()
 {
-    asm volatile (".arm");
-    asm volatile ("ldr pc, %0" : : "i" (&CWRR) );
-    asm volatile ("ldr pc, %0" : : "i" (&HardFault) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
-    asm volatile ("ldr pc, %0" : : "i" (&Handler) );
+//    asm volatile ("ldr pc, [pc, %0 ]" : : "i" (-16) );
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Mailbox");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
 }
 
 
@@ -332,7 +310,7 @@ void CoreMain(uint32_t coreID)
     currentSettings |= 0x0000000f;
     *(uint32_t*)mailboxInterruptControlAddress   = currentSettings;
 
-    //EI();
+    EI();
 
     //
     //
@@ -357,7 +335,8 @@ void CoreMain(uint32_t coreID)
 
 
 
-uint8_t     stack[NUMBER_OF_ALLOY_CORES*STACK_SIZE];
+uint8_t     usrStack[NUMBER_OF_ALLOY_CORES*STACK_SIZE];
+uint8_t     irqStack[NUMBER_OF_ALLOY_CORES*STACK_SIZE];
 
 
 //
@@ -374,8 +353,13 @@ void __attribute__ ( ( naked ) ) EntryPoint()
     __asm__ volatile("mrc p15, 0, %0, c0, c0, 5\n\t" : "=r"(mpidr) ); 
     uint32_t    coreID  = mpidr&0x3;   
 
-    uint32_t            stackPointer    = ((uint32_t)&stack[coreID*STACK_SIZE]) + STACK_SIZE - 16;
-    __asm__ volatile("MOV sp, %0\n\t" : : "r"(stackPointer));
+    uint32_t            usrStackPointer    = ((uint32_t)&usrStack[coreID*STACK_SIZE]) + STACK_SIZE - 16;
+    __asm__ volatile("MOV sp, %0\n\t" : : "r"(usrStackPointer));
+
+    uint32_t            irqStackPointer    = ((uint32_t)&irqStack[coreID*STACK_SIZE]) + STACK_SIZE - 16;
+    __asm__ volatile("MSR     CPSR_c, 0xd2");
+    __asm__ volatile("MOV sp, %0\n\t" : : "r"(irqStackPointer));
+    __asm__ volatile("MSR     CPSR_c, 0xd3");
 
     //
     //
