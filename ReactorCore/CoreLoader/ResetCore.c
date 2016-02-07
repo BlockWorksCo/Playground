@@ -92,6 +92,7 @@ int main(int argc, char* argv[])
     printf("Alloy RAM base = %08x\n", (uint32_t)alloyRAM);
     bridge   = (CoreServicesBridge*)alloyRAM;
 
+    ResetCore( atoi(argv[1]) );
 
     return 0;
 }

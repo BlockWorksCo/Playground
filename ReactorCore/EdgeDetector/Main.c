@@ -172,6 +172,23 @@ void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
 
     if(bridge.coreMessages[coreID][0].type == CORE_MESSAGE_RESET)
     {
+        uint32_t    mailboxClearAddress;
+
+        bridge.coreMessages[coreID][0].type     = CORE_MESSAGE_NONE;
+        bridge.messageCounts[coreID]++;
+
+        mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*0);
+        *(uint32_t*)mailboxClearAddress     = 0xffffffff;
+
+        mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*1);
+        *(uint32_t*)mailboxClearAddress     = 0xffffffff;
+
+        mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*2);
+        *(uint32_t*)mailboxClearAddress     = 0xffffffff;
+
+        mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*3);
+        *(uint32_t*)mailboxClearAddress     = 0xffffffff;
+
         CWRR();
     }
 
@@ -179,16 +196,16 @@ void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
     {
         uint32_t    mailboxClearAddress;
 
-        mailboxClearAddress     = 0x400000c0 + (16*2) + (4*0);
+        mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*0);
         *(uint32_t*)mailboxClearAddress     = 0xffffffff;
 
-        mailboxClearAddress     = 0x400000c0 + (16*2) + (4*1);
+        mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*1);
         *(uint32_t*)mailboxClearAddress     = 0xffffffff;
 
-        mailboxClearAddress     = 0x400000c0 + (16*2) + (4*2);
+        mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*2);
         *(uint32_t*)mailboxClearAddress     = 0xffffffff;
 
-        mailboxClearAddress     = 0x400000c0 + (16*2) + (4*3);
+        mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*3);
         *(uint32_t*)mailboxClearAddress     = 0xffffffff;
 
     }
