@@ -168,14 +168,14 @@ void  __attribute__ ((interrupt ("IRQ"))) Handler()
 //
 void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
 {
-    uint32_t    coreID  = 2;
+    uint32_t    coreID  = MPIDR();
 
-    //if(bridge.coreMessages[coreID][0].type == CORE_MESSAGE_RESET)
+    if(bridge.coreMessages[coreID][0].type == CORE_MESSAGE_RESET)
     {
-    //    CWRR();
+        CWRR();
     }
 
-    //if(bridge.coreMessages[coreID][0].type == CORE_MESSAGE_TEST)
+    if(bridge.coreMessages[coreID][0].type == CORE_MESSAGE_TEST)
     {
         uint32_t    mailboxClearAddress;
 

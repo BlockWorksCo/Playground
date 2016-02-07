@@ -1,0 +1,6 @@
+
+
+
+make clean all PLATFORM=RPI
+
+arm-linux-gnueabi-gcc  -O0 -ggdb3 -mcpu=cortex-a7 -o ResetCore ResetCore.c  -I../CoreServices
