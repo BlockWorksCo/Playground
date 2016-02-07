@@ -77,10 +77,30 @@
 #define DEVICE_FILE_NAME "/dev/ReactorCoreServices"
 
 
+#define NUMBER_OF_CORES         (4)
 
+#define CORE_MESSAGE_NONE       ((uint32_t)-1)
+#define CORE_MESSAGE_RESET      (0)
+#define CORE_MESSAGE_TEST       (1)
+
+//
+//
+//
 typedef struct
 {
-    volatile uint32_t    heartBeats[4];
+    uint32_t    type;
+    uint32_t    payload;
+
+} CoreMessage;
+
+//
+//
+//
+typedef struct
+{
+    volatile CoreMessage    coreMessages[NUMBER_OF_CORES][NUMBER_OF_CORES];
+    volatile uint32_t       heartBeats[NUMBER_OF_CORES];
+    volatile uint32_t       messageCounts[NUMBER_OF_CORES];
 
 } CoreServicesBridge;
 

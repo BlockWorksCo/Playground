@@ -123,7 +123,7 @@ void SendDoorBellToCore(uint32_t coreNumber, uint32_t mailboxNumber)
     // Ensure that stores to Normal memory are visible to the
     // other CPUs before issuing the IPI.
     //
-    dsb();
+    //dsb();
 
     //
     // Cause the doorbell interrupt on the remote core.
@@ -155,17 +155,6 @@ void SetVectorTableAddress(uint32_t address)
 
 
 
-
-//
-//
-//
-void __attribute__ ( (naked) ) HardFault()
-{
-    PANIC();
-}
-
-
-
 //
 //
 //
@@ -177,76 +166,48 @@ void  __attribute__ ((interrupt ("IRQ"))) Handler()
 //
 //
 //
-void  __attribute__ ((interrupt ("IRQ"))) Mailbox()
+void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
 {
-    //PANIC();
+    uint32_t    coreID  = 2;
 
-    uint32_t    mailboxClearAddress;
+    //if(bridge.coreMessages[coreID][0].type == CORE_MESSAGE_RESET)
+    {
+    //    CWRR();
+    }
 
-    mailboxClearAddress     = 0x400000c0 + (16*2) + (4*0);
-    *(uint32_t*)mailboxClearAddress     = 0xffffffff;
+    //if(bridge.coreMessages[coreID][0].type == CORE_MESSAGE_TEST)
+    {
+        uint32_t    mailboxClearAddress;
 
-    mailboxClearAddress     = 0x400000c0 + (16*2) + (4*1);
-    *(uint32_t*)mailboxClearAddress     = 0xffffffff;
+        mailboxClearAddress     = 0x400000c0 + (16*2) + (4*0);
+        *(uint32_t*)mailboxClearAddress     = 0xffffffff;
 
-    mailboxClearAddress     = 0x400000c0 + (16*2) + (4*2);
-    *(uint32_t*)mailboxClearAddress     = 0xffffffff;
+        mailboxClearAddress     = 0x400000c0 + (16*2) + (4*1);
+        *(uint32_t*)mailboxClearAddress     = 0xffffffff;
 
-    mailboxClearAddress     = 0x400000c0 + (16*2) + (4*3);
-    *(uint32_t*)mailboxClearAddress     = 0xffffffff;
+        mailboxClearAddress     = 0x400000c0 + (16*2) + (4*2);
+        *(uint32_t*)mailboxClearAddress     = 0xffffffff;
+
+        mailboxClearAddress     = 0x400000c0 + (16*2) + (4*3);
+        *(uint32_t*)mailboxClearAddress     = 0xffffffff;
+
+    }
+
+    //
+    //
+    //
+    bridge.coreMessages[coreID][0].type     = CORE_MESSAGE_NONE;
+    bridge.messageCounts[coreID]++;
 
     //dsb();
 }
 
-#if 1
-
-uint32_t     vectors[] =
-{
-    (uint32_t)&Handler,
-    (uint32_t)&Handler,
-    (uint32_t)&Handler,
-    (uint32_t)&Handler,
-    (uint32_t)&Handler,
-    (uint32_t)&Handler,
-    (uint32_t)&Handler,
-    (uint32_t)&Handler,
-    (uint32_t)&Handler,
-    (uint32_t)&Handler,
-    (uint32_t)&Handler,
-    (uint32_t)&Handler,
-    (uint32_t)&Handler,
-    (uint32_t)&Handler,
-};
 
 //
 //
 //
 void __attribute__ ( (naked, aligned(128) ) ) VectorTable()
 {
-//    asm volatile ("ldr pc, [pc, %0 ]" : : "i" (-16) );
-    asm volatile ("ldr pc, =Handler");
-    asm volatile ("ldr pc, =Handler");
-    asm volatile ("ldr pc, =Handler");
-    asm volatile ("ldr pc, =Handler");
-    asm volatile ("ldr pc, =Handler");
-    asm volatile ("ldr pc, =Handler");
-    asm volatile ("ldr pc, =Mailbox");
-    asm volatile ("ldr pc, =Handler");
-    asm volatile ("ldr pc, =Handler");
-    asm volatile ("ldr pc, =Handler");
-    asm volatile ("ldr pc, =Handler");
-    asm volatile ("ldr pc, =Handler");
-    asm volatile ("ldr pc, =Handler");
-    asm volatile ("ldr pc, =Handler");
-    asm volatile ("ldr pc, =Handler");
-    asm volatile ("ldr pc, =Handler");
-    asm volatile ("ldr pc, =Handler");
-    asm volatile ("ldr pc, =Handler");
-}
-
-
-#else
-
 #define ARM4_XRQ_RESET   0x00
 #define ARM4_XRQ_UNDEF   0x01
 #define ARM4_XRQ_SWINT   0x02
@@ -256,22 +217,27 @@ void __attribute__ ( (naked, aligned(128) ) ) VectorTable()
 #define ARM4_XRQ_IRQ     0x06
 #define ARM4_XRQ_FIQ     0x07
 
-
-
-uint32_t    vectorTable[128] __attribute__ ( (aligned(128) ) ) ;
-
-
-
-/*
-    Will install a branch instruction for the 
-    interrupt vector for the ARM platform.
-*/
-void InstallHandler(uint32_t ndx, uint32_t addr)
-{
-    vectorTable[ndx] = 0xEA000000 | ((addr - 8 - (4 * ndx)) >> 2);
+//    asm volatile ("ldr pc, [pc, %0 ]" : : "i" (-16) );
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =IRQHandler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
+    asm volatile ("ldr pc, =Handler");
 }
 
-#endif
 
 
 
@@ -289,16 +255,7 @@ void CoreMain(uint32_t coreID)
     //
     //
     //
-#if 1    
     SetVectorTableAddress( (uint32_t)&VectorTable );
-#else    
-    for(uint32_t i=0; i<128; i++)
-    {
-        InstallHandler( i, (uint32_t)&Handler );
-    }
-    InstallHandler( 0, (uint32_t)&CWRR );
-    SetVectorTableAddress( (uint32_t)&vectorTable );
-#endif
 
     //
     // Enable the malbox interrupt.
@@ -315,10 +272,6 @@ void CoreMain(uint32_t coreID)
     //
     while(true)    
     {
-        //register uint32_t    coreID;
-        //__asm__ volatile("mrc p15, 0, %0, c0, c0, 5\n\t" : : "r"(coreID));    
-        //coreID  = coreID & 0x03;
-
         bridge.heartBeats[coreID]++;
         dsb();
         if( (bridge.heartBeats[coreID] % 0x4ffff) == 0 )

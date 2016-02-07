@@ -358,9 +358,10 @@ void arch_jumpTo(entry_t entry)
     {
         CoreServicesBridge*  b  = (CoreServicesBridge*)ALLOY_RAM_BASE;
 
-        //uint32_t    temp    = PhysicalAddressOf( (uint32_t)&bridge );
-        printf("%08x %08x %08x %08x\n", b->heartBeats[0], b->heartBeats[1], b->heartBeats[2], b->heartBeats[3] );
+        printf("[%08x %08x %08x %08x] ", b->heartBeats[0], b->heartBeats[1], b->heartBeats[2], b->heartBeats[3] );
+        printf("[%08x %08x %08x %08x] \n", b->messageCounts[0], b->messageCounts[1], b->messageCounts[2], b->messageCounts[3] );
 
+        b->coreMessages[2][0].type = CORE_MESSAGE_TEST;
         SendMail(2);
 
         sleep(1);
@@ -499,7 +500,7 @@ int main(int argc, char* argv[])
     alloyRAM = mmap( (void*)ALLOY_RAM_BASE, 1024*1024*8, PROT_READ|PROT_WRITE, MAP_SHARED , memFD, ALLOY_RAM_BASE );
     printf("Alloy RAM base = %08x\n", (uint32_t)alloyRAM);
     memset(alloyRAM, 0, 4096);
-    topOfHeap   = alloyRAM;
+    topOfHeap   = alloyRAM + 4096;
 
 #endif
 
