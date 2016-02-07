@@ -196,8 +196,6 @@ void  __attribute__ ((interrupt ("IRQ"))) Mailbox()
     *(uint32_t*)mailboxClearAddress     = 0xffffffff;
 
     //dsb();
-
-    asm volatile ("bx lr" );
 }
 
 #if 1
