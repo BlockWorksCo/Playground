@@ -163,60 +163,61 @@ void  __attribute__ ((interrupt ("IRQ"))) Handler()
     PANIC();
 }
 
+
+//
+//
+//
+void ClearMailboxFromCore(uint32_t fromID)
+{
+    uint32_t    mailboxClearAddress;
+    uint32_t    coreID  = MPIDR();
+
+    mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*fromID);
+    *(uint32_t*)mailboxClearAddress     = 0xffffffff;
+}
+
+
+//
+//
+//
+void ProcessMailFromCore(uint32_t fromID)
+{
+    uint32_t    coreID  = MPIDR();
+
+    if(bridge.coreMessages[coreID][fromID].type == CORE_MESSAGE_RESET)
+    {
+        uint32_t    mailboxClearAddress;
+
+        bridge.coreMessages[coreID][fromID].type     = CORE_MESSAGE_NONE;
+        bridge.messageCounts[coreID]++;
+
+        ClearMailboxFromCore( fromID );
+
+        CWRR();
+    }
+
+    if(bridge.coreMessages[coreID][fromID].type == CORE_MESSAGE_TEST)
+    {
+        ClearMailboxFromCore( fromID );
+    }
+
+    //
+    //
+    //
+    bridge.coreMessages[coreID][fromID].type     = CORE_MESSAGE_NONE;
+    bridge.messageCounts[coreID]++;
+}
+
+
 //
 //
 //
 void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
 {
-    uint32_t    coreID  = MPIDR();
-
-    if(bridge.coreMessages[coreID][0].type == CORE_MESSAGE_RESET)
-    {
-        uint32_t    mailboxClearAddress;
-
-        bridge.coreMessages[coreID][0].type     = CORE_MESSAGE_NONE;
-        bridge.messageCounts[coreID]++;
-
-        mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*0);
-        *(uint32_t*)mailboxClearAddress     = 0xffffffff;
-
-        mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*1);
-        *(uint32_t*)mailboxClearAddress     = 0xffffffff;
-
-        mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*2);
-        *(uint32_t*)mailboxClearAddress     = 0xffffffff;
-
-        mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*3);
-        *(uint32_t*)mailboxClearAddress     = 0xffffffff;
-
-        CWRR();
-    }
-
-    if(bridge.coreMessages[coreID][0].type == CORE_MESSAGE_TEST)
-    {
-        uint32_t    mailboxClearAddress;
-
-        mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*0);
-        *(uint32_t*)mailboxClearAddress     = 0xffffffff;
-
-        mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*1);
-        *(uint32_t*)mailboxClearAddress     = 0xffffffff;
-
-        mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*2);
-        *(uint32_t*)mailboxClearAddress     = 0xffffffff;
-
-        mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*3);
-        *(uint32_t*)mailboxClearAddress     = 0xffffffff;
-
-    }
-
-    //
-    //
-    //
-    bridge.coreMessages[coreID][0].type     = CORE_MESSAGE_NONE;
-    bridge.messageCounts[coreID]++;
-
-    //dsb();
+    ProcessMailFromCore( 0 );
+    //ProcessMailFromCore( 1 );
+    //ProcessMailFromCore( 2 );
+    //ProcessMailFromCore( 3 );
 }
 
 
