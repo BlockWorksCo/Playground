@@ -172,8 +172,8 @@ void ClearMailboxFromCore(uint32_t fromID)
     uint32_t    mailboxClearAddress;
     uint32_t    coreID  = MPIDR();
 
-    mailboxClearAddress     = 0x400000c0 + (16*coreID) + (4*fromID);
-    *(uint32_t*)mailboxClearAddress     = 0xffffffff;
+    mailboxClearAddress     = 0x400000c0 + (0x10*coreID);
+    *(uint32_t*)mailboxClearAddress     = 1<<fromID;
 }
 
 //
@@ -184,7 +184,7 @@ void EnableMailboxFromCore(uint32_t fromID)
     uint32_t    coreID  = MPIDR();
     uint32_t    mailboxInterruptControlAddress  = 0x40000050+(coreID*4);
     uint32_t    currentSettings     = *(uint32_t*)mailboxInterruptControlAddress;
-    
+
     currentSettings |= 0x0000000f;
     *(uint32_t*)mailboxInterruptControlAddress   = currentSettings;
 }
