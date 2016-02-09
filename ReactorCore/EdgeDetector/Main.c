@@ -167,6 +167,18 @@ void  __attribute__ ((interrupt ("IRQ"))) Handler()
 //
 //
 //
+void SendMailboxFromCore(uint32_t toID)
+{
+    uint32_t    mailboxSetAddress;
+    uint32_t    coreID  = MPIDR();
+
+    mailboxSetAddress     = 0x40000080 + (0x10*toID);
+    *(uint32_t*)mailboxSetAddress     = 1<<coreID;
+}
+
+//
+//
+//
 void ClearMailboxFromCore(uint32_t fromID)
 {
     uint32_t    mailboxClearAddress;
@@ -179,7 +191,7 @@ void ClearMailboxFromCore(uint32_t fromID)
 //
 //
 //
-void EnableMailboxFromCore(uint32_t fromID)
+void EnableMailboxFromCore()
 {
     uint32_t    coreID  = MPIDR();
     uint32_t    mailboxInterruptControlAddress  = 0x40000050+(coreID*4);
@@ -204,16 +216,21 @@ void ProcessMailFromCore(uint32_t fromID)
         bridge.coreMessages[coreID][fromID].type     = CORE_MESSAGE_NONE;
         bridge.messageCounts[coreID]++;
 
-        ClearMailboxFromCore( fromID );
-
-        CWRR();
+        //CWRR();
     }
 
     if(bridge.coreMessages[coreID][fromID].type == CORE_MESSAGE_TEST)
     {
-        ClearMailboxFromCore( fromID );
     }
 
+    if(coreID == 2)
+    {
+        SendMailboxFromCore( 3 );        
+    }
+    if(coreID == 3)
+    {
+        SendMailboxFromCore( 1 );        
+    }
     //
     //
     //
@@ -228,9 +245,11 @@ void ProcessMailFromCore(uint32_t fromID)
 void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
 {
     ProcessMailFromCore( 0 );
-    //ProcessMailFromCore( 1 );
-    //ProcessMailFromCore( 2 );
-    //ProcessMailFromCore( 3 );
+
+    ClearMailboxFromCore( 0 );
+    ClearMailboxFromCore( 1 );
+    ClearMailboxFromCore( 2 );
+    ClearMailboxFromCore( 3 );
 }
 
 
@@ -291,7 +310,7 @@ void CoreMain(uint32_t coreID)
     //
     // Enable the malbox interrupt.
     //
-    EnableMailboxFromCore(0);
+    EnableMailboxFromCore();
 
     EI();
 
