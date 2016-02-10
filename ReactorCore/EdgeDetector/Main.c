@@ -89,28 +89,6 @@ void WaitForMessage()
 
 
 
-//
-//
-//
-void SendDoorBellToCore(uint32_t coreNumber, uint32_t mailboxNumber)
-{
-    //
-    // Ensure that stores to Normal memory are visible to the
-    // other CPUs before issuing the IPI.
-    //
-    //dsb();
-
-    //
-    // Cause the doorbell interrupt on the remote core.
-    //
-    //uint32_t    thisCore    = MPIDR();
-    uint32_t    address     = 0x40000080 + (0x10 * coreNumber) + (mailboxNumber*4);
-    *((uint32_t*)address)   = 1 << mailboxNumber;
-}
-
-
-
-
 #define STACK_SIZE              (1024)
 #define NUMBER_OF_ALLOY_CORES   (4)
 #define NUMBER_OF_VECTORS       (256)
@@ -142,7 +120,7 @@ void  __attribute__ ((interrupt ("IRQ"))) Handler()
 //
 //
 //
-void SendMailboxFromCore(uint32_t toID)
+void TriggerMailboxInterrupt(uint32_t toID)
 {
     uint32_t    mailboxSetAddress;
     uint32_t    coreID  = MPIDR();
@@ -244,11 +222,11 @@ void ProcessMessage(CoreMessage* msg)
 
     if(coreID == 2)
     {
-        SendMailboxFromCore( 3 );        
+        TriggerMailboxInterrupt( 3 );        
     }
     if(coreID == 3)
     {
-        SendMailboxFromCore( 1 );        
+        TriggerMailboxInterrupt( 1 );        
     }
 }
 
@@ -269,9 +247,6 @@ void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
         Globals()->message.payload = bridge->coreMessages[coreID][0].payload;
         Globals()->numberOfMessagesAvailable++;
 
-        //ProcessMessage(&message);
-        //ReleaseMessage(&message);
-        
         ClearMailboxFromCore( 0 );
     }
 
@@ -280,9 +255,6 @@ void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
         Globals()->message.type    = bridge->coreMessages[coreID][1].type;
         Globals()->message.payload = bridge->coreMessages[coreID][1].payload;
         Globals()->numberOfMessagesAvailable++;
-        
-        //ProcessMessage(&message);
-        //ReleaseMessage(&message);
         
         ClearMailboxFromCore( 1 );
     }
@@ -293,9 +265,6 @@ void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
         Globals()->message.payload = bridge->coreMessages[coreID][2].payload;
         Globals()->numberOfMessagesAvailable++;
         
-        //ProcessMessage(&message);
-        //ReleaseMessage(&message);
-        
         ClearMailboxFromCore( 2 );
     }
 
@@ -305,9 +274,6 @@ void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
         Globals()->message.payload = bridge->coreMessages[coreID][3].payload;
         Globals()->numberOfMessagesAvailable++;
         
-        //ProcessMessage(&message);
-        //ReleaseMessage(&message);
-
         ClearMailboxFromCore( 3 );
     }
 
@@ -377,7 +343,7 @@ void CoreMain(uint32_t coreID)
             //
             // Notify ControllerCore that we've started up.
             //
-            SendDoorBellToCore(0, coreID);            
+            TriggerMailboxInterrupt(0);            
         }
 
         //
