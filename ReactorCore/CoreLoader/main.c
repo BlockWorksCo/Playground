@@ -79,11 +79,11 @@ int TriggerCoreExecution(uint32_t coreID, uint32_t physicalAddress)
 {
     int     file_desc;
 
-    file_desc = open("/dev/ReactorCoreServices", 0);
+    file_desc = open(DEVICE_FILE_NAME, 0);
 
     if (file_desc < 0)
     {
-        ERR("Can't open /dev/ReactorCoreServices");
+        ERR("Can't open " DEVICE_FILE_NAME);
     }
 
     CoreStartData   coreStartData   = 
@@ -110,14 +110,14 @@ int SendMail(uint32_t coreNumber)
 {
     int     file_desc;
 
-    file_desc = open("/dev/ReactorCoreServices", 0);
+    file_desc = open(DEVICE_FILE_NAME, 0);
 
     if (file_desc < 0)
     {
-        ERR("Can't open /dev/ReactorCoreServices");
+        ERR("Can't open " DEVICE_FILE_NAME);
     }
 
-    int ret_val = ioctl(file_desc, IOCTL_SEND_MAIL, coreNumber );
+    int ret_val = ioctl(file_desc, IOCTL_TRIGGER_DOORBELL, coreNumber );
 
     if (ret_val < 0)
     {
@@ -138,7 +138,7 @@ void arch_jumpTo(entry_t entry)
     printf("EntryPoint @ %08x \n", (uint32_t)entry );
 
     //
-    // Start the core executing.
+    // Start the core(s) executing.
     //
     TriggerCoreExecution( 1, (uint32_t)entry );
     TriggerCoreExecution( 2, (uint32_t)entry );

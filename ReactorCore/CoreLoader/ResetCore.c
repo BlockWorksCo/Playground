@@ -36,6 +36,9 @@ uint8_t*        alloyRAM    = 0;
 
 
 
+CoreServicesBridge*     bridge  = NULL;
+
+
 //
 // Cause the specified core to start execution at the specified point in physical memory.
 //
@@ -43,14 +46,14 @@ int SendMail(uint32_t coreNumber)
 {
     int     file_desc;
 
-    file_desc = open("/dev/ReactorCoreServices", 0);
+    file_desc = open(DEVICE_FILE_NAME, 0);
 
     if (file_desc < 0)
     {
-        printf("Can't open /dev/ReactorCoreServices");
+        printf("Can't open " DEVICE_FILE_NAME);
     }
 
-    int ret_val = ioctl(file_desc, IOCTL_SEND_MAIL, coreNumber );
+    int ret_val = ioctl(file_desc, IOCTL_TRIGGER_DOORBELL, coreNumber );
 
     if (ret_val < 0)
     {
@@ -60,9 +63,6 @@ int SendMail(uint32_t coreNumber)
     
     close(file_desc);
 }
-
-
-CoreServicesBridge*     bridge  = NULL;
 
 //
 //

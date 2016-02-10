@@ -305,7 +305,7 @@ long device_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
         }
 
 
-        case IOCTL_SEND_MAIL:
+        case IOCTL_TRIGGER_DOORBELL:
         {
             SendDoorBellToCore( arg );
             printk(KERN_INFO "Sending doorbell to core %d\n", (int)arg);
@@ -369,8 +369,6 @@ static int __init CoreServicesInit(void)
         printk("request_mem_region ok.\n");
     }
 
-    flush_cache_all();
-
     /*
      * Register the character device (atleast try)
      */
@@ -381,8 +379,7 @@ static int __init CoreServicesInit(void)
      */
     if (ret_val < 0)
     {
-        printk(KERN_ALERT "%s failed with %d\n",
-               "Sorry, registering the character device ", ret_val);
+        printk(KERN_ALERT "%s failed with %d\n", "Sorry, registering the character device ", ret_val);
         return ret_val;
     }
 
@@ -478,5 +475,5 @@ module_init(CoreServicesInit);
 module_exit(CoreServicesExit);
 
 MODULE_AUTHOR("Steve Tickle");
-MODULE_DESCRIPTION("Reactor Core Services module.");
+MODULE_DESCRIPTION("Alloy Core Services module.");
 MODULE_LICENSE("GPL");
