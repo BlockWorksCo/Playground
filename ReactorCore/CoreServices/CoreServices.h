@@ -89,7 +89,7 @@ typedef struct
 {
     uint32_t    coreID;
     uint32_t    startPoint;
-    
+
 } CoreStartData;
 
 
@@ -97,7 +97,7 @@ typedef struct
 #define UNCACHED_AREA                   (0x00000000)
 #define ALLOY_DEDICATED_RAM_SIZE        (1024*1024*706)
 #define ALLOY_RAM_BASE                  (UNCACHED_AREA+(256*1024*1024))
-
+#define BRIDGE_BASE                     (0x10000000)
 
 #endif
 

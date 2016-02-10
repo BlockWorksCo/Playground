@@ -16,7 +16,7 @@
 //
 //
 //
-extern volatile CoreServicesBridge      bridge;
+CoreServicesBridge*      bridge     = (CoreServicesBridge*)BRIDGE_BASE;
 
 #if 0
 void EnableCache()
@@ -209,17 +209,17 @@ void ProcessMailFromCore(uint32_t fromID)
 {
     uint32_t    coreID  = MPIDR();
 
-    if(bridge.coreMessages[coreID][fromID].type == CORE_MESSAGE_RESET)
+    if(bridge->coreMessages[coreID][fromID].type == CORE_MESSAGE_RESET)
     {
         uint32_t    mailboxClearAddress;
 
-        bridge.coreMessages[coreID][fromID].type     = CORE_MESSAGE_NONE;
-        bridge.messageCounts[coreID]++;
+        bridge->coreMessages[coreID][fromID].type     = CORE_MESSAGE_NONE;
+        bridge->messageCounts[coreID]++;
 
         //CWRR();
     }
 
-    if(bridge.coreMessages[coreID][fromID].type == CORE_MESSAGE_TEST)
+    if(bridge->coreMessages[coreID][fromID].type == CORE_MESSAGE_TEST)
     {
     }
 
@@ -234,8 +234,8 @@ void ProcessMailFromCore(uint32_t fromID)
     //
     //
     //
-    bridge.coreMessages[coreID][fromID].type     = CORE_MESSAGE_NONE;
-    bridge.messageCounts[coreID]++;
+    bridge->coreMessages[coreID][fromID].type     = CORE_MESSAGE_NONE;
+    bridge->messageCounts[coreID]++;
 }
 
 
@@ -300,7 +300,7 @@ void CoreMain(uint32_t coreID)
     //
     //
     //
-    bridge.heartBeats[coreID]   = 0;
+    bridge->heartBeats[coreID]   = 0;
 
     //
     //
@@ -319,9 +319,9 @@ void CoreMain(uint32_t coreID)
     //
     while(true)    
     {
-        bridge.heartBeats[coreID]++;
+        bridge->heartBeats[coreID]++;
         dsb();
-        if( (bridge.heartBeats[coreID] % 0x4ffff) == 0 )
+        if( (bridge->heartBeats[coreID] % 0x4ffff) == 0 )
         {
             //
             // Notify ControllerCore that we've started up.

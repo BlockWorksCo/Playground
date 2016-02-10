@@ -568,10 +568,6 @@ static ELFSection_t* SectionFromIndex(ELFExec_t* e, int index)
 }
 
 
-volatile CoreServicesBridge     bridge    = {0};
-
-uint32_t PhysicalAddressOf(uint32_t virtualAddress);
-int GetBridgePhysicalAddress();
 
 //
 // Determine the address of the given symbol within the sections or the 
@@ -584,20 +580,6 @@ static Elf32_Addr addressOf(ELFExec_t* e, Elf32_Sym* sym, const char* sName)
     if (sym->st_shndx == SHN_UNDEF)
     {
         printf("<undefined symbol %s>\n", sName);
-
-        //
-        // Predefined environment.
-        //
-        if(strcmp(sName, "bridge") == 0)
-        {
-            address     = GetBridgePhysicalAddress();
-            printf("Physical bridge address = %08x\n", address );
-        }
-
-        //
-        // Convert to physical address.
-        //
-        //address     = PhysicalAddressOf( address );
     }
     else
     {

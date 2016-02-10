@@ -48,9 +48,6 @@ int             memFD       = -1;
 uint8_t*        alloyRAM    = 0;
 uint8_t*        topOfHeap   = 0;
 
-int             peripheralsFD   = -1;
-uint8_t*        peripherals     = 0;
-
 
 //
 //
@@ -78,23 +75,8 @@ void* do_alloc(size_t size, size_t align, ELFSecPerm_t perm, uint32_t* physicalA
 //
 // Cause the specified core to start execution at the specified point in physical memory.
 //
-int GetBridgePhysicalAddress()
-{
-    return ALLOY_RAM_BASE;    
-}
-
-//
-// Cause the specified core to start execution at the specified point in physical memory.
-//
 int TriggerCoreExecution(uint32_t coreID, uint32_t physicalAddress)
 {
-#if 0
-    uint32_t*   startTrigger    = (uint32_t*)(peripherals + 0x8c + (0x10*coreID));
-
-    printf("TriggerCoreExecution @ %08x core %d %p\n", (uint32_t)startTrigger, coreID, startTrigger );
-    *startTrigger    = physicalAddress;
-    dsb();
-#else
     int     file_desc;
 
     file_desc = open("/dev/ReactorCoreServices", 0);
@@ -118,7 +100,6 @@ int TriggerCoreExecution(uint32_t coreID, uint32_t physicalAddress)
     }
     
     close(file_desc);
-#endif    
 }
 
 
@@ -148,7 +129,6 @@ int SendMail(uint32_t coreNumber)
 }
 
 
-extern volatile CoreServicesBridge     bridge;
 
 //
 //
@@ -163,22 +143,6 @@ void arch_jumpTo(entry_t entry)
     TriggerCoreExecution( 1, (uint32_t)entry );
     TriggerCoreExecution( 2, (uint32_t)entry );
     TriggerCoreExecution( 3, (uint32_t)entry );
-
-    //
-    // Wait for completion.
-    //
-    while(true)
-    {
-        CoreServicesBridge*  b  = (CoreServicesBridge*)alloyRAM;
-
-        printf("[%08x %08x %08x %08x] ", b->heartBeats[0], b->heartBeats[1], b->heartBeats[2], b->heartBeats[3] );
-        printf("[%08x %08x %08x %08x] \n", b->messageCounts[0], b->messageCounts[1], b->messageCounts[2], b->messageCounts[3] );
-
-        b->coreMessages[2][0].type = CORE_MESSAGE_TEST;
-        SendMail(2);
-
-        sleep(1);
-    }
 }
 
 //
@@ -204,21 +168,23 @@ int main(int argc, char* argv[])
     //
     //
     //
-    peripheralsFD = open("/dev/mem", O_RDWR|O_SYNC);
-    if(peripheralsFD < 0) 
-    {
-        perror("open");
-        return -1;
-    }
-
-    peripherals = mmap( (void*)PERIPHERALS_RAM_BASE, 4096*4, PROT_READ|PROT_WRITE, MAP_SHARED , peripheralsFD, 0 );
-    printf("peripherals RAM base = %08x\n", (uint32_t)peripherals);
-
-    //
-    //
-    //
     exec_elf(argv[1], &env);
-    puts("Done");
+
+    //
+    // Wait for completion.
+    //
+    while(true)
+    {
+        CoreServicesBridge*  b  = (CoreServicesBridge*)alloyRAM;
+
+        printf("[%08x %08x %08x %08x] ", b->heartBeats[0], b->heartBeats[1], b->heartBeats[2], b->heartBeats[3] );
+        printf("[%08x %08x %08x %08x] \n", b->messageCounts[0], b->messageCounts[1], b->messageCounts[2], b->messageCounts[3] );
+
+        b->coreMessages[2][0].type = CORE_MESSAGE_TEST;
+        SendMail(2);
+
+        sleep(1);
+    }
 
     return 0;
 }
