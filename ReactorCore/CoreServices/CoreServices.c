@@ -46,39 +46,13 @@
 
 
 
-//
-//
-//
-CoreServicesBridge*     bridge  = 0;
-
-/*
- * Is the device open right now? Used to prevent
- * concurent access into the same device
- */
-static int Device_Open = 0;
-
-/*
- * The message the device will give when asked
- */
-static char Message[BUF_LEN];
-
-/*
- * How far did the process reading the message get?
- * Useful if the message is larger than the size of the
- * buffer we get to fill in device_read.
- */
-static char* Message_Ptr;
-
-
-
-
 /*
  * This is called whenever a process attempts to open the device file
  */
 static int device_open(struct inode* inode, struct file* file)
 {
     printk(KERN_INFO "device_open(%p)\n", file);
-
+#if 0
     /*
      * We don't want to talk to two processes at the same time
      */
@@ -93,6 +67,7 @@ static int device_open(struct inode* inode, struct file* file)
      */
     Message_Ptr = Message;
     try_module_get(THIS_MODULE);
+#endif    
     return SUCCESS;
 }
 
@@ -106,7 +81,7 @@ static int device_release(struct inode* inode, struct file* file)
     /*
      * We're now ready for our next caller
      */
-    Device_Open--;
+    //Device_Open--;
     module_put(THIS_MODULE);
     return SUCCESS;
 }
@@ -122,6 +97,7 @@ static ssize_t device_read(struct file* file,   /* see include/linux/fs.h   */
                            size_t length,   /* length of the buffer     */
                            loff_t* offset)
 {
+#if 0
     /*
      * Number of bytes actually written to the buffer
      */
@@ -158,6 +134,8 @@ static ssize_t device_read(struct file* file,   /* see include/linux/fs.h   */
      * of bytes actually inserted into the buffer
      */
     return bytes_read;
+#endif
+    return 0;
 }
 
 
@@ -169,6 +147,7 @@ static ssize_t device_read(struct file* file,   /* see include/linux/fs.h   */
  */
 static ssize_t device_write(struct file* file, const char __user* buffer, size_t length, loff_t* offset)
 {
+#if 0
     int i;
 
     printk(KERN_INFO "device_write(%p,%s,%d)", file, buffer, length);
@@ -183,6 +162,8 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
      * Again, return the number of input characters used
      */
     return i;
+#endif    
+    return 0;
 }
 
 
@@ -310,59 +291,6 @@ long device_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
      */
     switch (cmd)
     {
-        case IOCTL_FLUSH_AND_INVALIDATE:
-        {
-            struct vm_area_struct*  next_vma;
-            struct mm_struct*       mm;           
-
-            printk(KERN_DEBUG "process %i (%s) going to sleep\n",current->pid, current->comm);
-
-            mm = current->mm;
-
-            next_vma = find_vma(mm, ALLOY_RAM_BASE);
-            
-            //flush_cache_range(next_vma, ALLOY_RAM_BASE, ALLOY_RAM_BASE+(ALLOY_DEDICATED_RAM_SIZE));
-
-            break;
-        }
-
-        case IOCTL_ALLOCATE_BLOCK:
-        {
-            AllocateRequest     request;
-            void*               block           = NULL;
-            dma_addr_t          handle          = 0;
-            uint32_t            result;
-
-            //
-            //
-            //
-            result  = copy_from_user(&request, (void *)arg, sizeof(request));
-
-            printk("Request to allocate %d bytes\n", request.size);
-
-            //
-            // Allocate an uncached area to be shared among cores.
-            //
-            block  = dma_alloc_coherent(NULL, request.size, &handle, GFP_KERNEL);
-            if(block != NULL)
-            {
-                printk( KERN_INFO "allocation ok (%08x).\n", virt_to_phys(bridge) );
-            }
-            else
-            {
-                printk( KERN_INFO "allocation failed.\n");
-            }
-
-            request.virtualAddress     = (uint32_t)block;
-            request.physicalAddress    = virt_to_phys(block);
-
-            //
-            //
-            //
-            result  = copy_to_user( (void *)arg, &request, sizeof(request));
-
-            break;
-        }
 
         case IOCTL_SET_MSG:
         {
@@ -376,22 +304,6 @@ long device_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
             
         }
 
-        case IOCTL_GET_BRIDGE_ADDRESS:
-        {
-            if(arg != 0)
-            {
-                uint32_t    physicalAddressOfBridge    = virt_to_phys( bridge );
-
-                uint8_t*    ptr     = (uint8_t*)&physicalAddressOfBridge;
-                uint32_t    i       = 0;
-                
-                for(i=0; i<sizeof(physicalAddressOfBridge); i++)
-                {
-                    put_user( ptr[i], ((uint8_t*)arg)+i );
-                }
-            }
-            break;
-        }
 
         case IOCTL_SEND_MAIL:
         {
@@ -400,25 +312,6 @@ long device_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
             break;
         }
 
-        case IOCTL_GET_MSG:
-        {
-            uint8_t*    ptr     = (uint8_t*)bridge;
-            uint32_t    i       = 0;
-            
-            for(i=0; i<sizeof(CoreServicesBridge); i++)
-            {
-                put_user( ptr[i], ((uint8_t*)arg)+i );
-            }
-            break;
-        }
-
-        case IOCTL_GET_NTH_BYTE:
-            /*
-             * This ioctl is both input (arg) and
-             * output (the return value of this function)
-             */
-            return Message[arg];
-            break;
     }
 
     return SUCCESS;
@@ -426,24 +319,6 @@ long device_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 
 
-
-
-
-
-
-
-void mmap_open(struct vm_area_struct *vma)
-{
-    printk("mmap_open \n");
-}
-
-void mmap_close(struct vm_area_struct *vma)
-{
-    printk("mmap_close \n");
-}
-
-
-uint8_t*    baseAddress;
 
 
 
@@ -493,11 +368,6 @@ static int __init CoreServicesInit(void)
     {
         printk("request_mem_region ok.\n");
     }
-
-    //
-    // Allocate an uncached area to be shared among cores.
-    //
-    printk( KERN_INFO "Bridge allocation ok (%08x).\n", virt_to_phys(bridge) );
 
     flush_cache_all();
 
@@ -595,12 +465,6 @@ static int __init CoreServicesInit(void)
 //
 static void __exit CoreServicesExit(void)
 {
-    if(bridge != NULL)
-    {
-        kfree( bridge );
-        bridge  = NULL;        
-    }
-
     /*
      * Unregister the device
      */
