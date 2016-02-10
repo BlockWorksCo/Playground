@@ -16,73 +16,9 @@
 //
 //
 //
-CoreServicesBridge*      bridge     = (CoreServicesBridge*)BRIDGE_BASE;
-
-#if 0
-void EnableCache()
-{
-#define ARM_AUX_CONTROL_SMP   (1 << 6)
-#define ARM_CONTROL_BRANCH_PREDICTION      (1 << 11)
-#define ARM_CONTROL_L1_INSTRUCTION_CACHE   (1 << 12)
-
-   register uint32_t nAuxControl;
-   asm volatile ("mrc p15, 0, %0, c1, c0,  1" : "=r" (nAuxControl));
-   nAuxControl |= ARM_AUX_CONTROL_SMP;
-   asm volatile ("mcr p15, 0, %0, c1, c0,  1" : : "r" (nAuxControl));   // SMP bit must be set according to ARM TRM
-
-   register uint32_t nControl;
-   asm volatile ("mrc p15, 0, %0, c1, c0,  0" : "=r" (nControl));
-   nControl |= ARM_CONTROL_BRANCH_PREDICTION | ARM_CONTROL_L1_INSTRUCTION_CACHE;
-   asm volatile ("mcr p15, 0, %0, c1, c0,  0" : : "r" (nControl) : "memory");    
-}
-
-
-void EnableMMU (void)     // not fully optimized
-{
-    static volatile __attribute__ ((aligned (0x4000))) uint32_t PageTable[4096];
-
-    uint32_t base;
-    for (base = 0; base < 1024-16; base++)
-    {
-        // section descriptor (1 MB)
-        // outer and inner write back, write allocate, not shareable (fast but unsafe)
-        //PageTable[base] = base << 20 | 0x0140E;
-        // outer and inner write through, no write allocate, shareable (safe but slower)
-        PageTable[base] = base << 20 | 0x1040A;
-    }
-
-    for (; base < 4096; base++)
-    {
-        // shared device, never execute
-        PageTable[base] = base << 20 | 0x10416;
-    }
-
-    // set SMP bit in ACTLR
-    uint32_t auxctrl;
-    asm volatile ("mrc p15, 0, %0, c1, c0,  1" : "=r" (auxctrl));
-    auxctrl |= 1 << 6;
-    asm volatile ("mcr p15, 0, %0, c1, c0,  1" :: "r" (auxctrl));
-
-    // set domain 0 to client
-    asm volatile ("mcr p15, 0, %0, c3, c0, 0" :: "r" (1));
-
-    // always use TTBR0
-    asm volatile ("mcr p15, 0, %0, c2, c0, 2" :: "r" (0));
-
-    // set TTBR0 (page table walk inner and outer non-cacheable, non-shareable memory)
-    asm volatile ("mcr p15, 0, %0, c2, c0, 0" :: "r" (0 | (unsigned) &PageTable));
-
-    asm volatile ("isb" ::: "memory");
-
-    // enable MMU, caches and branch prediction in SCTLR
-    register uint32_t mode;
-    asm volatile ("mrc p15, 0, %0, c1, c0, 0" : "=r" (mode));
-    mode |= 0x1805;
-    asm volatile ("mcr p15, 0, %0, c1, c0, 0" :: "r" (mode) : "memory");
-}
-#endif
-
-
+CoreServicesBridge*     bridge     = (CoreServicesBridge*)BRIDGE_BASE;
+CoreMessage             message    = {0};
+uint32_t                numberOfMessagesAvailable   = 0;
 
 
 //
@@ -110,6 +46,19 @@ void CWRR()
     //
     register uint32_t    cwrr    = 0x00000002;
     __asm__ volatile("mcr p14, 0, %0, c1, c4, 4\n\t" : : "r"(cwrr));
+}
+
+
+
+//
+//
+//
+void WaitForMessage()
+{
+    while(true)
+    {
+
+    }
 }
 
 
@@ -174,6 +123,26 @@ void SendMailboxFromCore(uint32_t toID)
 
     mailboxSetAddress     = 0x40000080 + (0x10*toID);
     *(uint32_t*)mailboxSetAddress     = 1<<coreID;
+}
+
+//
+//
+//
+bool IsThereMailFromCore(uint32_t fromID)
+{
+    uint32_t    coreID              = MPIDR();
+    uint32_t    mailboxAddress      = 0x400000c0 + (0x10*coreID);;
+    uint32_t    mailboxSource       = *(uint32_t*)mailboxAddress;
+
+    if( (mailboxSource&(1<<fromID)) != 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+
 }
 
 //
@@ -244,12 +213,39 @@ void ProcessMailFromCore(uint32_t fromID)
 //
 void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
 {
+    uint32_t    coreID  = MPIDR();
+
+    //
+    //
+    //
+    message.type    = bridge->coreMessages[coreID][0].type;
+    message.payload = bridge->coreMessages[coreID][0].payload;
+    numberOfMessagesAvailable++;
+
     ProcessMailFromCore( 0 );
 
-    ClearMailboxFromCore( 0 );
-    ClearMailboxFromCore( 1 );
-    ClearMailboxFromCore( 2 );
-    ClearMailboxFromCore( 3 );
+    //
+    //
+    //
+    if(IsThereMailFromCore(0) == true)
+    {
+        ClearMailboxFromCore( 0 );
+    }
+
+    if(IsThereMailFromCore(1) == true)
+    {
+        ClearMailboxFromCore( 1 );
+    }
+
+    if(IsThereMailFromCore(2) == true)
+    {
+        ClearMailboxFromCore( 2 );
+    }
+
+    if(IsThereMailFromCore(3) == true)
+    {
+        ClearMailboxFromCore( 3 );
+    }
 }
 
 
