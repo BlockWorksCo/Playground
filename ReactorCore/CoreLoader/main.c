@@ -104,7 +104,12 @@ int TriggerCoreExecution(uint32_t coreID, uint32_t physicalAddress)
         ERR("Can't open /dev/ReactorCoreServices");
     }
 
-    int ret_val = ioctl(file_desc, IOCTL_SET_MSG, physicalAddress );
+    CoreStartData   coreStartData   = 
+    {
+        .coreID         = coreID,
+        .startPoint     = physicalAddress,
+    };
+    int ret_val = ioctl(file_desc, IOCTL_START_CORE, &coreStartData );
 
     if (ret_val < 0)
     {
@@ -156,8 +161,8 @@ void arch_jumpTo(entry_t entry)
     // Start the core executing.
     //
     TriggerCoreExecution( 1, (uint32_t)entry );
-    //TriggerCoreExecution( 2, (uint32_t)entry );
-    //TriggerCoreExecution( 3, (uint32_t)entry );
+    TriggerCoreExecution( 2, (uint32_t)entry );
+    TriggerCoreExecution( 3, (uint32_t)entry );
 
     //
     // Wait for completion.

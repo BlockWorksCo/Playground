@@ -292,13 +292,13 @@ long device_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
     switch (cmd)
     {
 
-        case IOCTL_SET_MSG:
+        case IOCTL_START_CORE:
         {
-            StartCore(3, arg );
+            CoreStartData   coreStartData;
 
-            StartCore(2, arg );
+            unsigned long r =  __copy_from_user( &coreStartData, (void*)arg, sizeof(coreStartData) );
 
-            StartCore(1, arg );
+            StartCore( coreStartData.coreID, coreStartData.startPoint );
 
             break;
             
