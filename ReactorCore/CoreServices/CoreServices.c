@@ -366,20 +366,11 @@ long device_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
         case IOCTL_SET_MSG:
         {
-            *((uint32_t*)0x10000000)    = 3;
             StartCore(3, arg );
-            //msleep(100);
-            //while( *((uint32_t*)0x10000000) != 0xffffffff);
 
-            *((uint32_t*)0x10000000)    = 2;
             StartCore(2, arg );
-            //msleep(100);
-            //while( *((uint32_t*)0x10000000) != 0xffffffff);
 
-            *((uint32_t*)0x10000000)    = 1;
             StartCore(1, arg );
-            //msleep(100);
-            //while( *((uint32_t*)0x10000000) != 0xffffffff);
 
             break;
             
@@ -451,246 +442,11 @@ void mmap_close(struct vm_area_struct *vma)
     printk("mmap_close \n");
 }
 
-#if 0
-int mmap_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
-{
-    struct page*        page;
-    //uint8_t*            baseAddress;
-
-    //baseAddress     = ioremap_nocache( ALLOY_RAM_BASE, ALLOY_DEDICATED_RAM_SIZE );
-    //page = virt_to_page(ALLOY_RAM_BASE);
-    page    = ALLOY_RAM_BASE >> PAGE_SHIFT;
-
-    //vm_insert_page(vma, vmf->virtual_address , page);
-
-    printk("page = %08x %08x\n",(uint32_t)page, (uint32_t)vmf->pgoff );
-    
-    /* increment the reference count of this page */
-    get_page(page);
-    vmf->page = page;
-
-    remap_pfn_range(vma, (uint32_t)vmf->virtual_address, ALLOY_RAM_BASE>>PAGE_SHIFT, ALLOY_DEDICATED_RAM_SIZE, vma->vm_page_prot);
-
-    return 0;
-}
-#endif
-
-
 
 uint8_t*    baseAddress;
 
 
 
-//
-//
-//
-struct vm_operations_struct mmap_vm_ops = 
-{
-    .open =     mmap_open,
-    .close =    mmap_close,
-    //.fault =    mmap_fault,
-};
-
-
-
-uint8_t     blaa[8192]  =
-{
-    0,1,2,3,4,5,6,7,8,9
-};
-
-
-#if 0
-#include <soc/bcm2835/raspberrypi-firmware.h>
-#include <mach/vc_support.h>
-
-/****** VC MAILBOX FUNCTIONALITY ******/
-unsigned int AllocateVcMemory(unsigned int *pHandle, unsigned int size, unsigned int alignment, unsigned int flags)
-{
-    struct vc_msg
-    {
-        unsigned int m_msgSize;
-        unsigned int m_response;
-
-        struct vc_tag
-        {
-            unsigned int m_tagId;
-            unsigned int m_sendBufferSize;
-            union {
-                unsigned int m_sendDataSize;
-                unsigned int m_recvDataSize;
-            };
-
-            struct args
-            {
-                union {
-                    unsigned int m_size;
-                    unsigned int m_handle;
-                };
-                unsigned int m_alignment;
-                unsigned int m_flags;
-            } m_args;
-        } m_tag;
-
-        unsigned int m_endTag;
-    } msg;
-    int s;
-
-    msg.m_msgSize = sizeof(msg);
-    msg.m_response = 0;
-    msg.m_endTag = 0;
-
-    //fill in the tag for the allocation command
-    msg.m_tag.m_tagId = 0x3000c;
-    msg.m_tag.m_sendBufferSize = 12;
-    msg.m_tag.m_sendDataSize = 12;
-
-    //fill in our args
-    msg.m_tag.m_args.m_size = size;
-    msg.m_tag.m_args.m_alignment = alignment;
-    msg.m_tag.m_args.m_flags = flags;
-
-    //run the command
-    //s = bcm_mailbox_property(&msg, sizeof(msg));
-
-    if (s == 0 && msg.m_response == 0x80000000 && msg.m_tag.m_recvDataSize == 0x80000004)
-    {
-        *pHandle = msg.m_tag.m_args.m_handle;
-        return 0;
-    }
-    else
-    {
-        printk(KERN_ERR "failed to allocate vc memory: s=%d response=%08x recv data size=%08x\n",
-                s, msg.m_response, msg.m_tag.m_recvDataSize);
-        return 1;
-    }
-}
-
-
-
-unsigned int LockVcMemory(unsigned int *pBusAddress, unsigned int handle)
-{
-    struct vc_msg
-    {
-        unsigned int m_msgSize;
-        unsigned int m_response;
-
-        struct vc_tag
-        {
-            unsigned int m_tagId;
-            unsigned int m_sendBufferSize;
-            union {
-                unsigned int m_sendDataSize;
-                unsigned int m_recvDataSize;
-            };
-
-            struct args
-            {
-                union {
-                    unsigned int m_handle;
-                    unsigned int m_busAddress;
-                };
-            } m_args;
-        } m_tag;
-
-        unsigned int m_endTag;
-    } msg;
-    int s;
-
-    msg.m_msgSize = sizeof(msg);
-    msg.m_response = 0;
-    msg.m_endTag = 0;
-
-    //fill in the tag for the lock command
-    msg.m_tag.m_tagId = 0x3000d;
-    msg.m_tag.m_sendBufferSize = 4;
-    msg.m_tag.m_sendDataSize = 4;
-
-    //pass across the handle
-    msg.m_tag.m_args.m_handle = handle;
-
-    //s = bcm_mailbox_property(&msg, sizeof(msg));
-    {
-        struct rpi_firmware *fw = rpi_firmware_get(NULL);
-        int rr= rpi_firmware_property_list(&fw, &msg, sizeof(msg) );        
-    }
-
-    if (s == 0 && msg.m_response == 0x80000000 && msg.m_tag.m_recvDataSize == 0x80000004)
-    {
-        //pick out the bus address
-        *pBusAddress = msg.m_tag.m_args.m_busAddress;
-        return 0;
-    }
-    else
-    {
-        printk(KERN_ERR "failed to lock vc memory: s=%d response=%08x recv data size=%08x\n",
-                s, msg.m_response, msg.m_tag.m_recvDataSize);
-        return 1;
-    }
-}
-
-#endif
-
-
-#if 0
-//
-//
-//
-int device_mmap(struct file *filp, struct vm_area_struct *vma)
-{
-    uint32_t    address;
-
-    printk("mmap call.\n");
-
-    //vma->vm_ops = &mmap_vm_ops;
-    vma->vm_flags |= VM_IO;
-
-#if 0
-    {
-        uint32_t    handle  = 0;
-        uint32_t    busAddress  = 0;
-        uint32_t    r0      = AllocateVcMemory( &handle, 4096, 4096, MEM_FLAG_L1_NONALLOCATING );
-        uint32_t    r1      = LockVcMemory( &busAddress, handle );
-        printk("VC: %d %d %08x\n", r0, r1, busAddress);
-    }
-#endif
-
-    /* assign the file private data to the vm private data */
-    //vma->vm_private_data = filp->private_data;
-    //mmap_open(vma);
-    baseAddress     = ioremap_wc( ALLOY_RAM_BASE, ALLOY_DEDICATED_RAM_SIZE );
-    //address         = virt_to_phys( (uint32_t)baseAddress );
-    address         = ALLOY_RAM_BASE;
-    printk("address = %08x\n",address);
-    vma->vm_page_prot   = 0;        // uncached.
-    remap_pfn_range(vma, vma->vm_start, address>>PAGE_SHIFT, 4096, vma->vm_page_prot);
-
-    {
-        uint32_t    i = 0;
-
-        memset_io(baseAddress, 0x76, 4096);
-
-        for(i=0; i<16; i++)
-        {
-            baseAddress[i]  = i*2;
-            writeb( i*2, baseAddress+i );
-            wmb();
-        }
-    }
-
-    dsb(sy);
-    wmb();
-    //__cpuc_flush_dcache_area( baseAddress, 4096 );
-
-    baseAddress[128]    = 0xff;
-    baseAddress[256]    = 0xff;
-
-    //baseAddress = phys_to_virt(ALLOY_RAM_BASE);
-    //memset((uint8_t*)baseAddress, 0xba, 4096 );
-
-    return 0;
-}
-
-#endif
 /*
  * This structure will hold the functions to be called
  * when a process does something to the device we
@@ -705,7 +461,6 @@ struct file_operations Fops =
     .unlocked_ioctl = device_ioctl,
     .open           = device_open,
     .release        = device_release,  /* a.k.a. close */
-    //.mmap           = device_mmap,
 };
 
 
@@ -742,138 +497,93 @@ static int __init CoreServicesInit(void)
     //
     // Allocate an uncached area to be shared among cores.
     //
-    //bridge  = dma_alloc_coherent(NULL, ALLOY_DEDICATED_RAM_SIZE, &handle, GFP_KERNEL);
-    bridge  = kmalloc(1024*1024*1, GFP_USER );
-    if(bridge != NULL)
+    printk( KERN_INFO "Bridge allocation ok (%08x).\n", virt_to_phys(bridge) );
+
+    flush_cache_all();
+
+    /*
+     * Register the character device (atleast try)
+     */
+    ret_val = register_chrdev(MAJOR_NUM, DEVICE_NAME, &Fops);
+
+    /*
+     * Negative values signify an error
+     */
+    if (ret_val < 0)
     {
-        printk( KERN_INFO "Bridge allocation ok (%08x).\n", virt_to_phys(bridge) );
-    /*
-        result  = cacheflush(bridge, ALLOY_DEDICATED_RAM_SIZE, DCACHE);
-        if(r == 0)
-        {
-            printk("cacheflush ok.\n");
-        }
-        else
-        {
-            printk("cacheflush failed.\n");
-        }
-    */
-        flush_cache_all();
+        printk(KERN_ALERT "%s failed with %d\n",
+               "Sorry, registering the character device ", ret_val);
+        return ret_val;
+    }
+
+    set_irq_flags(IRQ_ARM_LOCAL_MAILBOX2, IRQF_VALID);
+    irq_clear_status_flags(IRQ_ARM_LOCAL_MAILBOX2, IRQ_PER_CPU);
+    irq_clear_status_flags(IRQ_ARM_LOCAL_MAILBOX2, IRQ_LEVEL);
 
 
-#if 0
-        //
-        //
-        //
-        //uint8_t*    baseAddress     = phys_to_virt( (uint8_t*)ALLOY_RAM_BASE );
-        baseAddress     = ioremap_nocache( ALLOY_RAM_BASE, ALLOY_DEDICATED_RAM_SIZE );
-        printk("baseAddress = %08x\n", (uint32_t)baseAddress);
-        memset(baseAddress, 0xa5, ALLOY_DEDICATED_RAM_SIZE);
-        printk("All cleared...\n");
-#endif
+    irq_modify_status(IRQ_ARM_LOCAL_MAILBOX0,0xffffffff,0x00000000);
+    irq_modify_status(IRQ_ARM_LOCAL_MAILBOX1,0xffffffff,0x00000000);
+    irq_modify_status(IRQ_ARM_LOCAL_MAILBOX2,0xffffffff,0x00000000);
+    irq_modify_status(IRQ_ARM_LOCAL_MAILBOX3,0xffffffff,0x00000000);
 
-        //flush_cache_range(page_anon_vma(), ALLOY_RAM_BASE, ALLOY_RAM_BASE+(ALLOY_DEDICATED_RAM_SIZE));
+    //
+    // Register the interrupt handler for mailbox IRQs.
+    // 
+    set_irq_flags(IRQ_ARM_LOCAL_MAILBOX2, IRQF_VALID);
+    result = request_threaded_irq(   IRQ_ARM_LOCAL_MAILBOX0,                 // The interrupt number requested 
+                            (irq_handler_t) MailboxIRQHandler0,      // The pointer to the handler function (above)
+                            NULL,
+                            IRQF_SHARED,           // Interrupt is on rising edge (button press in Fig.1)
+                            "MailboxIRQHandler",                    // Used in /proc/interrupts to identify the owner
+                            DEVICE_NAME);                                  // The *dev_id for shared interrupt lines, NULL here
 
-        /*
-         * Register the character device (atleast try)
-         */
-        ret_val = register_chrdev(MAJOR_NUM, DEVICE_NAME, &Fops);
+    result = request_threaded_irq(   IRQ_ARM_LOCAL_MAILBOX1,                 // The interrupt number requested 
+                            (irq_handler_t) MailboxIRQHandler1,      // The pointer to the handler function (above)
+                            NULL,
+                            IRQF_SHARED,           // Interrupt is on rising edge (button press in Fig.1)
+                            "MailboxIRQHandler",                    // Used in /proc/interrupts to identify the owner
+                            DEVICE_NAME);                                  // The *dev_id for shared interrupt lines, NULL here
 
-        /*
-         * Negative values signify an error
-         */
-        if (ret_val < 0)
-        {
-            printk(KERN_ALERT "%s failed with %d\n",
-                   "Sorry, registering the character device ", ret_val);
-            return ret_val;
-        }
+    result = request_threaded_irq(   IRQ_ARM_LOCAL_MAILBOX2,                 // The interrupt number requested 
+                            (irq_handler_t) MailboxIRQHandler2,      // The pointer to the handler function (above)
+                            NULL,
+                            IRQF_SHARED,           // Interrupt is on rising edge (button press in Fig.1)
+                            "MailboxIRQHandler",                    // Used in /proc/interrupts to identify the owner
+                            DEVICE_NAME);                                  // The *dev_id for shared interrupt lines, NULL here
 
-        set_irq_flags(IRQ_ARM_LOCAL_MAILBOX2, IRQF_VALID);
-        irq_clear_status_flags(IRQ_ARM_LOCAL_MAILBOX2, IRQ_PER_CPU);
-        irq_clear_status_flags(IRQ_ARM_LOCAL_MAILBOX2, IRQ_LEVEL);
-
-
-        irq_modify_status(IRQ_ARM_LOCAL_MAILBOX0,0xffffffff,0x00000000);
-        irq_modify_status(IRQ_ARM_LOCAL_MAILBOX1,0xffffffff,0x00000000);
-        irq_modify_status(IRQ_ARM_LOCAL_MAILBOX2,0xffffffff,0x00000000);
-        irq_modify_status(IRQ_ARM_LOCAL_MAILBOX3,0xffffffff,0x00000000);
-
-    /*
-        {
-            int i;
-            struct irq_desc *desc;
-
-            for_each_irq_desc(i, desc) {
-             if (!desc)
-               continue;
-             printk(KERN_INFO "%d: status_use_accessors=%08x, name=%08x, handle_irq=%08x\n", i, (u32) desc->status_use_accessors, (u32) desc->name, (u32) desc->handle_irq );
-             }
-         }
-    */
-        //
-        // Register the interrupt handler for mailbox IRQs.
-        // 
-        set_irq_flags(IRQ_ARM_LOCAL_MAILBOX2, IRQF_VALID);
-        result = request_threaded_irq(   IRQ_ARM_LOCAL_MAILBOX0,                 // The interrupt number requested 
-                                (irq_handler_t) MailboxIRQHandler0,      // The pointer to the handler function (above)
-                                NULL,
-                                IRQF_SHARED,           // Interrupt is on rising edge (button press in Fig.1)
-                                "MailboxIRQHandler",                    // Used in /proc/interrupts to identify the owner
-                                DEVICE_NAME);                                  // The *dev_id for shared interrupt lines, NULL here
-
-        result = request_threaded_irq(   IRQ_ARM_LOCAL_MAILBOX1,                 // The interrupt number requested 
-                                (irq_handler_t) MailboxIRQHandler1,      // The pointer to the handler function (above)
-                                NULL,
-                                IRQF_SHARED,           // Interrupt is on rising edge (button press in Fig.1)
-                                "MailboxIRQHandler",                    // Used in /proc/interrupts to identify the owner
-                                DEVICE_NAME);                                  // The *dev_id for shared interrupt lines, NULL here
-
-        result = request_threaded_irq(   IRQ_ARM_LOCAL_MAILBOX2,                 // The interrupt number requested 
-                                (irq_handler_t) MailboxIRQHandler2,      // The pointer to the handler function (above)
-                                NULL,
-                                IRQF_SHARED,           // Interrupt is on rising edge (button press in Fig.1)
-                                "MailboxIRQHandler",                    // Used in /proc/interrupts to identify the owner
-                                DEVICE_NAME);                                  // The *dev_id for shared interrupt lines, NULL here
-
-        result = request_threaded_irq(   IRQ_ARM_LOCAL_MAILBOX3,                 // The interrupt number requested 
-                                (irq_handler_t) MailboxIRQHandler3,      // The pointer to the handler function (above)
-                                NULL,
-                                IRQF_SHARED,           // Interrupt is on rising edge (button press in Fig.1)
-                                "MailboxIRQHandler",                    // Used in /proc/interrupts to identify the owner
-                                DEVICE_NAME);                                  // The *dev_id for shared interrupt lines, NULL here
-        if(result == 0)
-        {
-            printk(KERN_INFO "Mailbox ISR registered ok.\n");
-        }
-        else
-        {
-            printk(KERN_INFO "Mailbox ISR registration failed (%d).\n", result);        
-        }
-
-        //
-        // Enable the interupt.
-        // We're on Core0 and we want to enable the Mailbox 1 interrupt.
-        //
-        currentSettings     = readl( __io_address(ARM_LOCAL_MAILBOX_INT_CONTROL0) );
-        currentSettings |= 0x0000000f;
-        writel( currentSettings, __io_address(ARM_LOCAL_MAILBOX_INT_CONTROL0) );
-
-
-
-        printk(KERN_INFO "%s The major device number is %d.\n", "Registeration is a success", MAJOR_NUM);
-        printk(KERN_INFO "If you want to talk to the device driver,\n");
-        printk(KERN_INFO "you'll have to create a device file. \n");
-        printk(KERN_INFO "We suggest you use:\n");
-        printk(KERN_INFO "mknod %s c %d 0\n", DEVICE_FILE_NAME, MAJOR_NUM);
-        printk(KERN_INFO "The device file name is important, because\n");
-        printk(KERN_INFO "the ioctl program assumes that's the\n");
-        printk(KERN_INFO "file you'll use.\n");
+    result = request_threaded_irq(   IRQ_ARM_LOCAL_MAILBOX3,                 // The interrupt number requested 
+                            (irq_handler_t) MailboxIRQHandler3,      // The pointer to the handler function (above)
+                            NULL,
+                            IRQF_SHARED,           // Interrupt is on rising edge (button press in Fig.1)
+                            "MailboxIRQHandler",                    // Used in /proc/interrupts to identify the owner
+                            DEVICE_NAME);                                  // The *dev_id for shared interrupt lines, NULL here
+    if(result == 0)
+    {
+        printk(KERN_INFO "Mailbox ISR registered ok.\n");
     }
     else
     {
-        printk( KERN_INFO "Bridge allocation failed.\n");
+        printk(KERN_INFO "Mailbox ISR registration failed (%d).\n", result);        
     }
+
+    //
+    // Enable the interupt.
+    // We're on Core0 and we want to enable the Mailbox 1 interrupt.
+    //
+    currentSettings     = readl( __io_address(ARM_LOCAL_MAILBOX_INT_CONTROL0) );
+    currentSettings |= 0x0000000f;
+    writel( currentSettings, __io_address(ARM_LOCAL_MAILBOX_INT_CONTROL0) );
+
+
+
+    printk(KERN_INFO "%s The major device number is %d.\n", "Registeration is a success", MAJOR_NUM);
+    printk(KERN_INFO "If you want to talk to the device driver,\n");
+    printk(KERN_INFO "you'll have to create a device file. \n");
+    printk(KERN_INFO "We suggest you use:\n");
+    printk(KERN_INFO "mknod %s c %d 0\n", DEVICE_FILE_NAME, MAJOR_NUM);
+    printk(KERN_INFO "The device file name is important, because\n");
+    printk(KERN_INFO "the ioctl program assumes that's the\n");
+    printk(KERN_INFO "file you'll use.\n");
 
     return 0;
 }

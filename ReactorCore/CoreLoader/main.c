@@ -31,7 +31,7 @@
 #define PAGEMAP_LENGTH  8
 #define PAGE_SHIFT      12
 
-#define PERIPHERALS_RAM_BASE    (0x4000008c)
+#define PERIPHERALS_RAM_BASE    (0x40000000)
 
 #define dsb(option) asm volatile ("dsb " #option : : : "memory")
 
@@ -89,8 +89,9 @@ int GetBridgePhysicalAddress()
 int TriggerCoreExecution(uint32_t coreID, uint32_t physicalAddress)
 {
 #if 0
-    uint32_t*   startTrigger    = (uint32_t*)(peripherals + 0x8c + (coreID<<4));
+    uint32_t*   startTrigger    = (uint32_t*)(peripherals + 0x8c + (0x10*coreID));
 
+    printf("TriggerCoreExecution @ %08x core %d %p\n", (uint32_t)startTrigger, coreID, startTrigger );
     *startTrigger    = physicalAddress;
     dsb();
 #else
@@ -154,14 +155,16 @@ void arch_jumpTo(entry_t entry)
     //
     // Start the core executing.
     //
-    TriggerCoreExecution( 3, (uint32_t)entry );
+    TriggerCoreExecution( 1, (uint32_t)entry );
+    //TriggerCoreExecution( 2, (uint32_t)entry );
+    //TriggerCoreExecution( 3, (uint32_t)entry );
 
     //
     // Wait for completion.
     //
     while(true)
     {
-        CoreServicesBridge*  b  = (CoreServicesBridge*)ALLOY_RAM_BASE;
+        CoreServicesBridge*  b  = (CoreServicesBridge*)alloyRAM;
 
         printf("[%08x %08x %08x %08x] ", b->heartBeats[0], b->heartBeats[1], b->heartBeats[2], b->heartBeats[3] );
         printf("[%08x %08x %08x %08x] \n", b->messageCounts[0], b->messageCounts[1], b->messageCounts[2], b->messageCounts[3] );
@@ -203,7 +206,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    peripherals = mmap( (void*)PERIPHERALS_RAM_BASE, 4096, PROT_READ|PROT_WRITE, MAP_SHARED , peripheralsFD, 0 );
+    peripherals = mmap( (void*)PERIPHERALS_RAM_BASE, 4096*4, PROT_READ|PROT_WRITE, MAP_SHARED , peripheralsFD, 0 );
     printf("peripherals RAM base = %08x\n", (uint32_t)peripherals);
 
     //
