@@ -145,6 +145,31 @@ bool IsThereMailFromCore(uint32_t fromID)
 
 }
 
+
+//
+//
+//
+CoreMessage* NextMessage()
+{
+    if(numberOfMessagesAvailable > 0)
+    {
+        return &message;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+//
+//
+//
+void ReleaseMessge(CoreMessage* msg)
+{
+    numberOfMessagesAvailable--;
+}
+
+
 //
 //
 //
@@ -174,21 +199,20 @@ void EnableMailboxFromCore()
 //
 //
 //
-void ProcessMailFromCore(uint32_t fromID)
+void ProcessMessage(CoreMessage* msg)
 {
     uint32_t    coreID  = MPIDR();
+    bridge->messageCounts[coreID]++;
 
-    if(bridge->coreMessages[coreID][fromID].type == CORE_MESSAGE_RESET)
+    //
+    //
+    //
+    if(msg->type == CORE_MESSAGE_RESET)
     {
-        uint32_t    mailboxClearAddress;
-
-        bridge->coreMessages[coreID][fromID].type     = CORE_MESSAGE_NONE;
-        bridge->messageCounts[coreID]++;
-
         //CWRR();
     }
 
-    if(bridge->coreMessages[coreID][fromID].type == CORE_MESSAGE_TEST)
+    if(msg->type == CORE_MESSAGE_TEST)
     {
     }
 
@@ -200,11 +224,6 @@ void ProcessMailFromCore(uint32_t fromID)
     {
         SendMailboxFromCore( 1 );        
     }
-    //
-    //
-    //
-    bridge->coreMessages[coreID][fromID].type     = CORE_MESSAGE_NONE;
-    bridge->messageCounts[coreID]++;
 }
 
 
@@ -218,34 +237,54 @@ void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
     //
     //
     //
-    message.type    = bridge->coreMessages[coreID][0].type;
-    message.payload = bridge->coreMessages[coreID][0].payload;
-    numberOfMessagesAvailable++;
-
-    ProcessMailFromCore( 0 );
-
-    //
-    //
-    //
     if(IsThereMailFromCore(0) == true)
     {
+        message.type    = bridge->coreMessages[coreID][0].type;
+        message.payload = bridge->coreMessages[coreID][0].payload;
+        numberOfMessagesAvailable++;
+
+        ProcessMessage(&message);
+        ReleaseMessge(&message);
+        
         ClearMailboxFromCore( 0 );
     }
 
     if(IsThereMailFromCore(1) == true)
     {
+        message.type    = bridge->coreMessages[coreID][1].type;
+        message.payload = bridge->coreMessages[coreID][1].payload;
+        numberOfMessagesAvailable++;
+        
+        ProcessMessage(&message);
+        ReleaseMessge(&message);
+        
         ClearMailboxFromCore( 1 );
     }
 
     if(IsThereMailFromCore(2) == true)
     {
+        message.type    = bridge->coreMessages[coreID][2].type;
+        message.payload = bridge->coreMessages[coreID][2].payload;
+        numberOfMessagesAvailable++;
+        
+        ProcessMessage(&message);
+        ReleaseMessge(&message);
+        
         ClearMailboxFromCore( 2 );
     }
 
     if(IsThereMailFromCore(3) == true)
     {
+        message.type    = bridge->coreMessages[coreID][3].type;
+        message.payload = bridge->coreMessages[coreID][3].payload;
+        numberOfMessagesAvailable++;
+        
+        ProcessMessage(&message);
+        ReleaseMessge(&message);
+        
         ClearMailboxFromCore( 3 );
     }
+
 }
 
 
@@ -254,16 +293,6 @@ void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
 //
 void __attribute__ ( (naked, aligned(128) ) ) VectorTable()
 {
-#define ARM4_XRQ_RESET   0x00
-#define ARM4_XRQ_UNDEF   0x01
-#define ARM4_XRQ_SWINT   0x02
-#define ARM4_XRQ_ABRTP   0x03
-#define ARM4_XRQ_ABRTD   0x04
-#define ARM4_XRQ_RESV1   0x05
-#define ARM4_XRQ_IRQ     0x06
-#define ARM4_XRQ_FIQ     0x07
-
-//    asm volatile ("ldr pc, [pc, %0 ]" : : "i" (-16) );
     asm volatile ("ldr pc, =Handler");
     asm volatile ("ldr pc, =Handler");
     asm volatile ("ldr pc, =Handler");
@@ -323,6 +352,17 @@ void CoreMain(uint32_t coreID)
             // Notify ControllerCore that we've started up.
             //
             SendDoorBellToCore(0, coreID);            
+        }
+
+        //
+        //
+        //
+        CoreMessage*    msg     = NextMessage();
+        if(msg != 0)
+        {
+            //ProcessMessage( msg );
+
+            //ReleaseMessge( msg );
         }
     }    
 }
