@@ -66,8 +66,8 @@ static int device_open(struct inode* inode, struct file* file)
      * Initialize the message
      */
     Message_Ptr = Message;
-    try_module_get(THIS_MODULE);
 #endif    
+    try_module_get(THIS_MODULE);
     return SUCCESS;
 }
 

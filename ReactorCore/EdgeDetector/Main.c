@@ -1,11 +1,11 @@
-
+//
+//
+//
 
 #include <stdint.h>
 #include <stdbool.h>
 #include "CoreServices.h"
 
-
-#define PANIC()             {while(true);}
 
 
 
@@ -16,9 +16,19 @@
 //
 //
 //
-CoreServicesBridge*     bridge     = (CoreServicesBridge*)BRIDGE_BASE;
-CoreMessage             message    = {0};
-uint32_t                numberOfMessagesAvailable   = 0;
+CoreServicesBridge*     bridge                      = (CoreServicesBridge*)BRIDGE_BASE;
+volatile CoreMessage             message                     = {0};
+volatile uint32_t                numberOfMessagesAvailable   = 0;
+
+
+//
+//
+//
+void PANIC()
+{
+    while(true);
+}
+
 
 
 //
@@ -55,9 +65,9 @@ void CWRR()
 //
 void WaitForMessage()
 {
-    while(true)
+    while(numberOfMessagesAvailable == 0)
     {
-
+        //WFI();
     }
 }
 
@@ -164,7 +174,7 @@ CoreMessage* NextMessage()
 //
 //
 //
-void ReleaseMessge(CoreMessage* msg)
+void ReleaseMessage(CoreMessage* msg)
 {
     numberOfMessagesAvailable--;
 }
@@ -243,8 +253,8 @@ void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
         message.payload = bridge->coreMessages[coreID][0].payload;
         numberOfMessagesAvailable++;
 
-        ProcessMessage(&message);
-        ReleaseMessge(&message);
+        //ProcessMessage(&message);
+        //ReleaseMessage(&message);
         
         ClearMailboxFromCore( 0 );
     }
@@ -255,8 +265,8 @@ void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
         message.payload = bridge->coreMessages[coreID][1].payload;
         numberOfMessagesAvailable++;
         
-        ProcessMessage(&message);
-        ReleaseMessge(&message);
+        //ProcessMessage(&message);
+        //ReleaseMessage(&message);
         
         ClearMailboxFromCore( 1 );
     }
@@ -267,8 +277,8 @@ void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
         message.payload = bridge->coreMessages[coreID][2].payload;
         numberOfMessagesAvailable++;
         
-        ProcessMessage(&message);
-        ReleaseMessge(&message);
+        //ProcessMessage(&message);
+        //ReleaseMessage(&message);
         
         ClearMailboxFromCore( 2 );
     }
@@ -279,9 +289,9 @@ void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
         message.payload = bridge->coreMessages[coreID][3].payload;
         numberOfMessagesAvailable++;
         
-        ProcessMessage(&message);
-        ReleaseMessge(&message);
-        
+        //ProcessMessage(&message);
+        //ReleaseMessage(&message);
+
         ClearMailboxFromCore( 3 );
     }
 
@@ -360,9 +370,9 @@ void CoreMain(uint32_t coreID)
         CoreMessage*    msg     = NextMessage();
         if(msg != 0)
         {
-            //ProcessMessage( msg );
+            ProcessMessage( msg );
 
-            //ReleaseMessge( msg );
+            ReleaseMessage( msg );
         }
     }    
 }
@@ -379,27 +389,29 @@ uint8_t     irqStack[NUMBER_OF_ALLOY_CORES*STACK_SIZE];
 void __attribute__ ( ( naked ) ) EntryPoint()
 {
     //
-    // Setup the stack.
-    // TODO: Make this a different stack for each core (based on MPIDR).
+    // Setup the stack(s).
     //
     uint32_t   mpidr;
 
+    //
+    //
+    //
     __asm__ volatile("mrc p15, 0, %0, c0, c0, 5\n\t" : "=r"(mpidr) ); 
     uint32_t    coreID  = mpidr&0x3;   
 
+    //
+    //
+    //
     uint32_t            usrStackPointer    = ((uint32_t)&usrStack[coreID*STACK_SIZE]) + STACK_SIZE - 16;
     __asm__ volatile("MOV sp, %0\n\t" : : "r"(usrStackPointer));
 
+    //
+    //
+    //
     uint32_t            irqStackPointer    = ((uint32_t)&irqStack[coreID*STACK_SIZE]) + STACK_SIZE - 16;
     __asm__ volatile("MSR     CPSR_c, 0xd2");
     __asm__ volatile("MOV sp, %0\n\t" : : "r"(irqStackPointer));
     __asm__ volatile("MSR     CPSR_c, 0xd3");
-
-    //
-    //
-    //
-    //EnableMMU();
-    //EnableCache();
 
     //
     // Call the CoreMain.
