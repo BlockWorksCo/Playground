@@ -16,9 +16,15 @@
 //
 //
 //
+typedef struct
+{
+    CoreMessage             message;
+    uint32_t                numberOfMessagesAvailable;
+    
+} GlobalData;
+
+GlobalData              globals[NUMBER_OF_CORES];
 CoreServicesBridge*     bridge                      = (CoreServicesBridge*)BRIDGE_BASE;
-volatile CoreMessage             message                     = {0};
-volatile uint32_t                numberOfMessagesAvailable   = 0;
 
 
 //
@@ -59,13 +65,23 @@ void CWRR()
 }
 
 
+//
+//
+//
+GlobalData* Globals()
+{
+    uint32_t    coreID              = MPIDR();
+
+    return &globals[coreID];
+}
+
 
 //
 //
 //
 void WaitForMessage()
 {
-    while(numberOfMessagesAvailable == 0)
+    while(Globals()->numberOfMessagesAvailable == 0)
     {
         //WFI();
     }
@@ -161,9 +177,9 @@ bool IsThereMailFromCore(uint32_t fromID)
 //
 CoreMessage* NextMessage()
 {
-    if(numberOfMessagesAvailable > 0)
+    if(Globals()->numberOfMessagesAvailable > 0)
     {
-        return &message;
+        return &Globals()->message;
     }
     else
     {
@@ -176,7 +192,7 @@ CoreMessage* NextMessage()
 //
 void ReleaseMessage(CoreMessage* msg)
 {
-    numberOfMessagesAvailable--;
+    Globals()->numberOfMessagesAvailable--;
 }
 
 
@@ -249,9 +265,9 @@ void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
     //
     if(IsThereMailFromCore(0) == true)
     {
-        message.type    = bridge->coreMessages[coreID][0].type;
-        message.payload = bridge->coreMessages[coreID][0].payload;
-        numberOfMessagesAvailable++;
+        Globals()->message.type    = bridge->coreMessages[coreID][0].type;
+        Globals()->message.payload = bridge->coreMessages[coreID][0].payload;
+        Globals()->numberOfMessagesAvailable++;
 
         //ProcessMessage(&message);
         //ReleaseMessage(&message);
@@ -261,9 +277,9 @@ void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
 
     if(IsThereMailFromCore(1) == true)
     {
-        message.type    = bridge->coreMessages[coreID][1].type;
-        message.payload = bridge->coreMessages[coreID][1].payload;
-        numberOfMessagesAvailable++;
+        Globals()->message.type    = bridge->coreMessages[coreID][1].type;
+        Globals()->message.payload = bridge->coreMessages[coreID][1].payload;
+        Globals()->numberOfMessagesAvailable++;
         
         //ProcessMessage(&message);
         //ReleaseMessage(&message);
@@ -273,9 +289,9 @@ void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
 
     if(IsThereMailFromCore(2) == true)
     {
-        message.type    = bridge->coreMessages[coreID][2].type;
-        message.payload = bridge->coreMessages[coreID][2].payload;
-        numberOfMessagesAvailable++;
+        Globals()->message.type    = bridge->coreMessages[coreID][2].type;
+        Globals()->message.payload = bridge->coreMessages[coreID][2].payload;
+        Globals()->numberOfMessagesAvailable++;
         
         //ProcessMessage(&message);
         //ReleaseMessage(&message);
@@ -285,9 +301,9 @@ void  __attribute__ ((interrupt ("IRQ"))) IRQHandler()
 
     if(IsThereMailFromCore(3) == true)
     {
-        message.type    = bridge->coreMessages[coreID][3].type;
-        message.payload = bridge->coreMessages[coreID][3].payload;
-        numberOfMessagesAvailable++;
+        Globals()->message.type    = bridge->coreMessages[coreID][3].type;
+        Globals()->message.payload = bridge->coreMessages[coreID][3].payload;
+        Globals()->numberOfMessagesAvailable++;
         
         //ProcessMessage(&message);
         //ReleaseMessage(&message);
@@ -412,6 +428,12 @@ void __attribute__ ( ( naked ) ) EntryPoint()
     __asm__ volatile("MSR     CPSR_c, 0xd2");
     __asm__ volatile("MOV sp, %0\n\t" : : "r"(irqStackPointer));
     __asm__ volatile("MSR     CPSR_c, 0xd3");
+
+    //
+    //
+    //
+    Globals()->numberOfMessagesAvailable   = 0;
+    bridge                      = (CoreServicesBridge*)BRIDGE_BASE;    
 
     //
     // Call the CoreMain.
