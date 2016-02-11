@@ -198,8 +198,8 @@ bool IsThereMailFromCore(uint32_t fromID)
 irqreturn_t MailboxIRQHandler0(int irq, void *dev_id, struct pt_regs *regs)
 {
     CoreServicesBridge*     bridge  = (CoreServicesBridge*)ALLOY_RAM_BASE;
-    uint32_t                coreID  = read_cpuid_mpidr();
-    //uint32_t                mailboxSource       = readl( __io_address(ARM_LOCAL_MAILBOX0_CLR0 + (0x10*coreID)) );
+    uint32_t                coreID  = read_cpuid_mpidr() & 0x3;
+    uint32_t                mailboxSource       = readl( __io_address(ARM_LOCAL_MAILBOX0_CLR0) + (coreID*0x10));
 
     //
     // Clear the interrupt...
@@ -241,11 +241,11 @@ irqreturn_t MailboxIRQHandler0(int irq, void *dev_id, struct pt_regs *regs)
 
         //writel( 1<<3, __io_address(ARM_LOCAL_MAILBOX0_CLR0) + 0x00 );
     }
+    printk(KERN_INFO "MailboxIRQHandler 0 called. %08x\n", mailboxSource);
 
     writel( 0xffffffff, __io_address(ARM_LOCAL_MAILBOX0_CLR0) + 0x00 );
     dsb();
 
-    printk(KERN_INFO "MailboxIRQHandler 0 called.\n");
 #endif
 
     return IRQ_HANDLED;
