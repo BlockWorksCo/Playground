@@ -172,19 +172,14 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
 //
 bool IsThereMailFromCore(uint32_t fromID)
 {
-    uint32_t    coreID;
-    uint32_t    mailboxAddress;
-    uint32_t    mailboxSource;
+    uint32_t                coreID  = read_cpuid_mpidr() & 0x3;
+    uint32_t                mailboxSource       = readl( __io_address(ARM_LOCAL_MAILBOX0_CLR0) + (coreID*0x10));
 
-    coreID              = read_cpuid_mpidr();
-    mailboxAddress      = ARM_LOCAL_MAILBOX0_CLR0 + (0x10*coreID);
-    mailboxSource       = readl( __io_address(ARM_LOCAL_MAILBOX0_CLR0 + (0x10*coreID)) );
-
-    //if( (mailboxSource&(1<<fromID)) != 0)
+    if( (mailboxSource&(1<<fromID)) != 0)
     {
         return true;
     }
-    //else
+    else
     {
         return false;
     }
@@ -197,56 +192,47 @@ bool IsThereMailFromCore(uint32_t fromID)
 //
 irqreturn_t MailboxIRQHandler0(int irq, void *dev_id, struct pt_regs *regs)
 {
-    CoreServicesBridge*     bridge  = (CoreServicesBridge*)ALLOY_RAM_BASE;
+    CoreServicesBridge      bridge;
     uint32_t                coreID  = read_cpuid_mpidr() & 0x3;
     uint32_t                mailboxSource       = readl( __io_address(ARM_LOCAL_MAILBOX0_CLR0) + (coreID*0x10));
+
+    printk("mailboxSource = %08x\n",mailboxSource);
+
+    //memcpy_fromio( &bridge, __io_address(ALLOY_RAM_BASE), sizeof(bridge) );
 
     //
     // Clear the interrupt...
     //
-#if 0    
-    writel( 0xffffffff, __io_address(ARM_LOCAL_MAILBOX0_CLR0) + 0x00 );
+    if( (mailboxSource&(1<<0)) != 0 )
+    {
+        printk("Message from Core 0: type=%08x payload=%08x\n", bridge.coreMessages[coreID][0].type, bridge.coreMessages[coreID][0].payload );
+
+        writel( 1<<0, __io_address(ARM_LOCAL_MAILBOX0_CLR0) );
+    }
+
+    if( (mailboxSource&(1<<1)) != 0 )
+    {
+        printk("Message from Core 1: type=%08x payload=%08x\n", bridge.coreMessages[coreID][1].type, bridge.coreMessages[coreID][1].payload );
+
+        writel( 1<<1, __io_address(ARM_LOCAL_MAILBOX0_CLR0) );
+    }
+
+    if( (mailboxSource&(1<<2)) != 0 )
+    {
+        printk("Message from Core 2: type=%08x payload=%08x\n", bridge.coreMessages[coreID][2].type, bridge.coreMessages[coreID][2].payload );
+
+        writel( 1<<2, __io_address(ARM_LOCAL_MAILBOX0_CLR0) );
+    }
+
+    if( (mailboxSource&(1<<3)) != 0 )
+    {
+        printk("Message from Core 3: type=%08x payload=%08x\n", bridge.coreMessages[coreID][3].type, bridge.coreMessages[coreID][3].payload );
+
+        writel( 1<<3, __io_address(ARM_LOCAL_MAILBOX0_CLR0) );
+    }
+
+    //writel( 0xffffffff, __io_address(ARM_LOCAL_MAILBOX0_CLR0) );
     dsb();
-
-    printk(KERN_INFO "MailboxIRQHandler 0 called.\n");
-#else
-    //
-    //
-    //
-
-    //if(IsThereMailFromCore(0) == true)
-    {
-        //printk("Message from Core 0: type=%08x payload=%08x\n", bridge->coreMessages[coreID][0].type, bridge->coreMessages[coreID][0].payload );
-
-        //writel( 1<<0, __io_address(ARM_LOCAL_MAILBOX0_CLR0) + 0x00 );
-    }
-
-    //if(IsThereMailFromCore(1) == true)
-    {
-        //printk("Message from Core 1: type=%08x payload=%08x\n", bridge->coreMessages[coreID][1].type, bridge->coreMessages[coreID][1].payload );
-
-        //writel( 1<<1, __io_address(ARM_LOCAL_MAILBOX0_CLR0) + 0x00 );
-    }
-
-    //if(IsThereMailFromCore(2) == true)
-    {
-        //printk("Message from Core 2: type=%08x payload=%08x\n", bridge->coreMessages[coreID][2].type, bridge->coreMessages[coreID][2].payload );
-
-        //writel( 1<<2, __io_address(ARM_LOCAL_MAILBOX0_CLR0) + 0x00 );
-    }
-
-    //if(IsThereMailFromCore(3) == true)
-    {
-        //printk("Message from Core 3: type=%08x payload=%08x\n", bridge->coreMessages[coreID][3].type, bridge->coreMessages[coreID][3].payload );
-
-        //writel( 1<<3, __io_address(ARM_LOCAL_MAILBOX0_CLR0) + 0x00 );
-    }
-    printk(KERN_INFO "MailboxIRQHandler 0 called. %08x\n", mailboxSource);
-
-    writel( 0xffffffff, __io_address(ARM_LOCAL_MAILBOX0_CLR0) + 0x00 );
-    dsb();
-
-#endif
 
     return IRQ_HANDLED;
 }
