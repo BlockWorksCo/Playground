@@ -194,13 +194,12 @@ bool IsThereMailFromCore(uint32_t fromID)
 //
 irqreturn_t MailboxIRQHandler0(int irq, void *dev_id, struct pt_regs *regs)
 {
-    static CoreServicesBridge      bridge;
+    CoreServicesBridge*     bridge  = (CoreServicesBridge*)alloyRam;
     uint32_t                coreID  = read_cpuid_mpidr() & 0x3;
     uint32_t                mailboxSource       = readl( __io_address(ARM_LOCAL_MAILBOX0_CLR0) + (coreID*0x10));
 
     printk("mailboxSource = %08x\n",mailboxSource);
 
-    //memcpy_fromio( &bridge, __io_address(alloyRam), sizeof(bridge) );
     memcpy_fromio( &bridge, alloyRam, sizeof(bridge) );
 
     //
@@ -209,28 +208,28 @@ irqreturn_t MailboxIRQHandler0(int irq, void *dev_id, struct pt_regs *regs)
     coreID  = 0;
     if( (mailboxSource&(1<<0)) != 0 )
     {
-        printk("Message from Core 0: type=%08x payload=%08x\n", bridge.coreMessages[coreID][0].type, bridge.coreMessages[coreID][0].payload );
+        printk("Message from Core 0: type=%08x payload=%08x\n", bridge->coreMessages[coreID][0].type, bridge->coreMessages[coreID][0].payload );
 
         writel( 1<<0, __io_address(ARM_LOCAL_MAILBOX0_CLR0) );
     }
 
     if( (mailboxSource&(1<<1)) != 0 )
     {
-        printk("Message from Core 1: type=%08x payload=%08x\n", bridge.coreMessages[coreID][1].type, bridge.coreMessages[coreID][1].payload );
+        printk("Message from Core 1: type=%08x payload=%08x\n", bridge->coreMessages[coreID][1].type, bridge->coreMessages[coreID][1].payload );
 
         writel( 1<<1, __io_address(ARM_LOCAL_MAILBOX0_CLR0) );
     }
 
     if( (mailboxSource&(1<<2)) != 0 )
     {
-        printk("Message from Core 2: type=%08x payload=%08x\n", bridge.coreMessages[coreID][2].type, bridge.coreMessages[coreID][2].payload );
+        printk("Message from Core 2: type=%08x payload=%08x\n", bridge->coreMessages[coreID][2].type, bridge->coreMessages[coreID][2].payload );
 
         writel( 1<<2, __io_address(ARM_LOCAL_MAILBOX0_CLR0) );
     }
 
     if( (mailboxSource&(1<<3)) != 0 )
     {
-        printk("Message from Core 3: type=%08x payload=%08x\n", bridge.coreMessages[coreID][3].type, bridge.coreMessages[coreID][3].payload );
+        printk("Message from Core 3: type=%08x payload=%08x\n", bridge->coreMessages[coreID][3].type, bridge->coreMessages[coreID][3].payload );
 
         writel( 1<<3, __io_address(ARM_LOCAL_MAILBOX0_CLR0) );
     }
