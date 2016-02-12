@@ -138,45 +138,41 @@ static ssize_t device_read(struct file* file,   /* see include/linux/fs.h   */
                            size_t length,   /* length of the buffer     */
                            loff_t* offset)
 {
-#if 0
-    /*
-     * Number of bytes actually written to the buffer
-     */
-    int bytes_read = 0;
+    FullCoreMessage     msg;
+    uint32_t            i       = 0;
+    uint8_t*            src     = (uint8_t*)&msg;
 
-    /*
-     * If we're at the end of the message, return 0
-     * (which signifies end of file)
-     */
-    if (*Message_Ptr == 0)
+    if( length >= sizeof(msg) )
+    {
+        bool msgAvailable   = GetMessage( &msg );
+        if(msgAvailable == true)
+        {
+            /*
+             * Actually put the data into the buffer
+             */
+            for(i=0; i<sizeof(msg); i++)
+            {
+                put_user( (uint32_t)src, buffer );
+                src++;
+                buffer++;
+            }
+
+            /*
+             * Read functions are supposed to return the number
+             * of bytes actually inserted into the buffer
+             */
+            return sizeof(FullCoreMessage);
+        }
+        else
+        {
+            return 0;
+        }        
+    }
+    else
     {
         return 0;
     }
-
-    /*
-     * Actually put the data into the buffer
-     */
-    while (length && *Message_Ptr)
-    {
-        /*
-         * Because the buffer is in the user data segment,
-         * not the kernel data segment, assignment wouldn't
-         * work. Instead, we have to use put_user which
-         * copies data from the kernel data segment to the
-         * user data segment.
-         */
-        put_user(*(Message_Ptr++), buffer++);
-        length--;
-        bytes_read++;
-    }
-
-    /*
-     * Read functions are supposed to return the number
-     * of bytes actually inserted into the buffer
-     */
-    return bytes_read;
-#endif
-    return 0;
+    
 }
 
 
@@ -236,6 +232,7 @@ irqreturn_t MailboxIRQHandler0(int irq, void *dev_id, struct pt_regs *regs)
     CoreServicesBridge*     bridge  = (CoreServicesBridge*)alloyRam;
     uint32_t                coreID  = read_cpuid_mpidr() & 0x3;
     uint32_t                mailboxSource       = readl( __io_address(ARM_LOCAL_MAILBOX0_CLR0) + (coreID*0x10));
+    FullCoreMessage         msg;
 
     //printk("mailboxSource = %08x\n",mailboxSource);
 
@@ -249,12 +246,22 @@ irqreturn_t MailboxIRQHandler0(int irq, void *dev_id, struct pt_regs *regs)
     {
         printk("Message from Core 0: type=%08x payload=%08x\n", bridge->coreMessages[coreID][0].type, bridge->coreMessages[coreID][0].payload );
 
+        msg.coreID      = 0;
+        msg.type        = bridge->coreMessages[coreID][0].type;
+        msg.payload     = bridge->coreMessages[coreID][0].payload;
+        PutMessage( &msg );
+
         writel( 1<<0, __io_address(ARM_LOCAL_MAILBOX0_CLR0) );
     }
 
     if( (mailboxSource&(1<<1)) != 0 )
     {
         printk("Message from Core 1: type=%08x payload=%08x\n", bridge->coreMessages[coreID][1].type, bridge->coreMessages[coreID][1].payload );
+
+        msg.coreID      = 1;
+        msg.type        = bridge->coreMessages[coreID][1].type;
+        msg.payload     = bridge->coreMessages[coreID][1].payload;
+        PutMessage( &msg );
 
         writel( 1<<1, __io_address(ARM_LOCAL_MAILBOX0_CLR0) );
     }
@@ -263,6 +270,11 @@ irqreturn_t MailboxIRQHandler0(int irq, void *dev_id, struct pt_regs *regs)
     {
         printk("Message from Core 2: type=%08x payload=%08x\n", bridge->coreMessages[coreID][2].type, bridge->coreMessages[coreID][2].payload );
 
+        msg.coreID      = 2;
+        msg.type        = bridge->coreMessages[coreID][2].type;
+        msg.payload     = bridge->coreMessages[coreID][2].payload;
+        PutMessage( &msg );
+
         writel( 1<<2, __io_address(ARM_LOCAL_MAILBOX0_CLR0) );
     }
 
@@ -270,11 +282,14 @@ irqreturn_t MailboxIRQHandler0(int irq, void *dev_id, struct pt_regs *regs)
     {
         printk("Message from Core 3: type=%08x payload=%08x\n", bridge->coreMessages[coreID][3].type, bridge->coreMessages[coreID][3].payload );
 
+        msg.coreID      = 3;
+        msg.type        = bridge->coreMessages[coreID][3].type;
+        msg.payload     = bridge->coreMessages[coreID][3].payload;
+        PutMessage( &msg );
+
         writel( 1<<3, __io_address(ARM_LOCAL_MAILBOX0_CLR0) );
     }
 
-    //writel( 0xffffffff, __io_address(ARM_LOCAL_MAILBOX0_CLR0) );
-    dsb();
 
     return IRQ_HANDLED;
 }
