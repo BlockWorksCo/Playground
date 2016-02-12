@@ -44,6 +44,8 @@
 
 
 
+void*       alloyRam        = 0;
+
 
 
 /*
@@ -192,17 +194,19 @@ bool IsThereMailFromCore(uint32_t fromID)
 //
 irqreturn_t MailboxIRQHandler0(int irq, void *dev_id, struct pt_regs *regs)
 {
-    CoreServicesBridge      bridge;
+    static CoreServicesBridge      bridge;
     uint32_t                coreID  = read_cpuid_mpidr() & 0x3;
     uint32_t                mailboxSource       = readl( __io_address(ARM_LOCAL_MAILBOX0_CLR0) + (coreID*0x10));
 
     printk("mailboxSource = %08x\n",mailboxSource);
 
-    //memcpy_fromio( &bridge, __io_address(ALLOY_RAM_BASE), sizeof(bridge) );
+    //memcpy_fromio( &bridge, __io_address(alloyRam), sizeof(bridge) );
+    memcpy_fromio( &bridge, alloyRam, sizeof(bridge) );
 
     //
     // Clear the interrupt...
     //
+    coreID  = 0;
     if( (mailboxSource&(1<<0)) != 0 )
     {
         printk("Message from Core 0: type=%08x payload=%08x\n", bridge.coreMessages[coreID][0].type, bridge.coreMessages[coreID][0].payload );
@@ -498,6 +502,10 @@ static int __init CoreServicesInit(void)
     writel( currentSettings, __io_address(ARM_LOCAL_MAILBOX_INT_CONTROL0) );
 
 
+    //
+    //
+    //
+    alloyRam    = ioremap_nocache( ALLOY_RAM_BASE, ALLOY_DEDICATED_RAM_SIZE );
 
     printk(KERN_INFO "%s The major device number is %d.\n", "Registeration is a success", MAJOR_NUM);
     printk(KERN_INFO "If you want to talk to the device driver,\n");
