@@ -343,6 +343,9 @@ void CoreMain(uint32_t coreID)
             //
             // Notify ControllerCore that we've started up.
             //
+            bridge->coreMessages[0][coreID].type    = 123;
+            bridge->coreMessages[0][coreID].payload++;
+            dsb();
             TriggerMailboxInterrupt(0);            
         }
 

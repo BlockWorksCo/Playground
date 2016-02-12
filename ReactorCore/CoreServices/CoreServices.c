@@ -152,7 +152,7 @@ static ssize_t device_read(struct file* file,   /* see include/linux/fs.h   */
              */
             for(i=0; i<sizeof(msg); i++)
             {
-                put_user( (uint32_t)src, buffer );
+                put_user( *src, buffer );
                 src++;
                 buffer++;
             }
