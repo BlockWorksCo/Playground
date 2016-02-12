@@ -42,6 +42,45 @@
 #define DEVICE_NAME "CoreServices"
 #define BUF_LEN 80
 
+#define NUMBER_OF_ELEMENTS(a)      (sizeof(a)/sizeof(a[0]))
+
+
+FullCoreMessage     fullCoreMessages[128];
+uint32_t            head                    = 0;
+uint32_t            tail                    = 0;
+
+
+
+
+bool PutMessage(FullCoreMessage* message)
+{
+    uint32_t    newHead     = (head + 1) % NUMBER_OF_ELEMENTS(fullCoreMessages);
+
+    if(newHead != tail)
+    {
+        memcpy( &fullCoreMessages[head], message, sizeof(fullCoreMessages[0]) );
+        head    = newHead;        
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool GetMessage(FullCoreMessage* message)
+{
+    if(tail != head)
+    {
+        memcpy( message, &fullCoreMessages[tail], sizeof(fullCoreMessages[0]) );
+        tail    = (tail + 1) % NUMBER_OF_ELEMENTS(fullCoreMessages);        
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 
 
 void*       alloyRam        = 0;
@@ -198,9 +237,9 @@ irqreturn_t MailboxIRQHandler0(int irq, void *dev_id, struct pt_regs *regs)
     uint32_t                coreID  = read_cpuid_mpidr() & 0x3;
     uint32_t                mailboxSource       = readl( __io_address(ARM_LOCAL_MAILBOX0_CLR0) + (coreID*0x10));
 
-    printk("mailboxSource = %08x\n",mailboxSource);
+    //printk("mailboxSource = %08x\n",mailboxSource);
 
-    memcpy_fromio( &bridge, alloyRam, sizeof(bridge) );
+    //memcpy_fromio( &bridge, alloyRam, sizeof(bridge) );
 
     //
     // Clear the interrupt...
