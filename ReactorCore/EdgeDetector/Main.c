@@ -5,8 +5,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "CoreServices.h"
+#include <stdarg.h>
+#include <sys/types.h>
 
-
+int snprintf(char *str, size_t len, const char *fmt, ...);
 
 
 #define dsb(option) asm volatile ("dsb " #option : : : "memory")
@@ -26,6 +28,18 @@ typedef struct
 GlobalData              globals[NUMBER_OF_CORES];
 CoreServicesBridge*     bridge                      = (CoreServicesBridge*)BRIDGE_BASE;
 
+
+
+void __stack_chk_guard()
+{
+
+}
+
+
+void __stack_chk_fail()
+{
+    
+}
 
 //
 //
@@ -340,6 +354,12 @@ void CoreMain(uint32_t coreID)
         dsb();
         if( (bridge->heartBeats[coreID] % 0x4ffff) == 0 )
         {
+            //
+            //
+            //
+            char    string[64];
+            snprintf(string, sizeof(string), "Count is %d", bridge->heartBeats[coreID] );
+
             //
             // Notify ControllerCore that we've started up.
             //
