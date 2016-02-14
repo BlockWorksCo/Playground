@@ -1118,6 +1118,7 @@ typedef struct {
 #define R_ARM_GOT32     26  /* 32 bit GOT entry */
 #define R_ARM_PLT32     27  /* 32 bit PLT address */
 #define R_ARM_CALL      28
+#define R_ARM_JUMP24    29
 #define R_ARM_THM_JUMP24         30            /* Thumb32   ((S + A) | T) - P */
 #define R_ARM_ALU_PCREL_7_0     32
 #define R_ARM_ALU_PCREL_15_8    33

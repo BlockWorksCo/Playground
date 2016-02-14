@@ -484,6 +484,41 @@ static void relR_ARM_CALL(Elf32_Addr relAddr, int type, Elf32_Addr symAddr, Elf3
 }
 
 
+
+
+
+//
+//
+//
+static void relR_ARM_JUMP24(Elf32_Addr relAddr, int type, Elf32_Addr symAddr, Elf32_Addr relPhysAddr)
+{
+    uint32_t    insn = ( ((uint32_t*) relAddr)[0] );
+    int32_t     offset;
+    uint32_t    tmp;
+
+    if (symAddr & 3) {
+        return;
+    }
+
+    offset = ( ((uint32_t*) relAddr)[0] );
+    offset = (offset & 0x00ffffff) << 2;
+    if (offset & 0x02000000)
+        offset -= 0x04000000;
+
+    offset += symAddr - relPhysAddr;
+    if (offset <= (int32_t)0xfe000000 ||
+        offset >= (int32_t)0x02000000) {
+        return;
+    }
+
+    offset >>= 2;
+    offset &= 0x00ffffff;
+
+    *(uint32_t *)relAddr &= (0xff000000);
+    *(uint32_t *)relAddr |= (offset);
+}
+
+
 //
 // Modify the value to be relocated according to the relocation-type.
 //
@@ -525,6 +560,15 @@ static void relocateSymbol(Elf32_Addr relAddr, int type, Elf32_Addr symAddr, Elf
             DBG("  R_ARM_CALL relocated is 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
             break;
 
+        case R_ARM_JUMP24:
+            relR_ARM_JUMP24(relAddr, type, symAddr, relPhysAddr);
+            DBG("  R_ARM_JUMP24 relocated is 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
+            break;
+
+        case R_ARM_TLS_IE32:
+            DBG("  R_ARM_TLS_IE32  *not*relocated. 0x%08X\n", (unsigned int) * ((uint32_t*)relAddr));
+            break;
+
         default:
             ERR("  Undefined relocation type.");
             break;
@@ -561,7 +605,7 @@ static ELFSection_t* SectionFromIndex(ELFExec_t* e, int index)
 
     if(section == NULL)
     {
-        ERR("Unknown section.");
+        printf("Unknown section %d.\n", index);
     }
 
     return section;
@@ -580,6 +624,10 @@ static Elf32_Addr addressOf(ELFExec_t* e, Elf32_Sym* sym, const char* sName)
     if (sym->st_shndx == SHN_UNDEF)
     {
         printf("<undefined symbol %s>\n", sName);
+    }
+    else if(strcmp(sName, "__libc_errno") == 0)
+    {
+        return ALLOY_RAM_BASE;
     }
     else
     {
