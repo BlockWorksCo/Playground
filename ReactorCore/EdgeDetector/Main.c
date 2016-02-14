@@ -38,7 +38,7 @@ void __stack_chk_guard()
 
 void __stack_chk_fail()
 {
-    
+
 }
 
 //
@@ -358,13 +358,13 @@ void CoreMain(uint32_t coreID)
             //
             //
             char    string[64];
-            snprintf(string, sizeof(string), "Count is %d", bridge->heartBeats[coreID] );
+            snprintf(string, sizeof(string), "Count on core %d is %d", coreID, bridge->heartBeats[coreID] );
 
             //
             // Notify ControllerCore that we've started up.
             //
             bridge->coreMessages[0][coreID].type    = 123;
-            bridge->coreMessages[0][coreID].payload++;
+            bridge->coreMessages[0][coreID].payload     = (uint32_t)&string[0];
             dsb();
             TriggerMailboxInterrupt(0);            
         }

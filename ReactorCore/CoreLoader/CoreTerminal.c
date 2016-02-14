@@ -71,6 +71,8 @@ int main(int argc, char* argv[])
         if(r == sizeof(msg))
         {
             printf("core %d type=%08x payload=%08x\n", msg.coreID, msg.type, msg.payload );
+            uint32_t    offsetIntoAlloyRAM  = msg.payload - ALLOY_RAM_BASE;
+            printf("[%s]\n", &alloyRAM[offsetIntoAlloyRAM] );
         }
     }
 
