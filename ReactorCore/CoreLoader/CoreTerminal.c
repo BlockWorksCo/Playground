@@ -71,9 +71,24 @@ int main(int argc, char* argv[])
         if(r == sizeof(msg))
         {
             SystemCall*     systemCall  = (SystemCall*)&alloyRAM[msg.payload - ALLOY_RAM_BASE];
-            char*           string      = (char*)&alloyRAM[systemCall->payload - ALLOY_RAM_BASE];
-            printf("%d: %s\n", msg.coreID, string );
-            systemCall->processedFlag   = true;
+            switch(systemCall->type)
+            {
+                case 1:
+                {
+                    //
+                    // DebugText
+                    //
+                    char*           string      = (char*)&alloyRAM[systemCall->payload - ALLOY_RAM_BASE];
+                    printf("%d: %s\n", msg.coreID, string );
+                    systemCall->processedFlag   = true;
+
+                    break;
+                }
+
+                default:
+                    break;
+            }
+
         }
     }
 

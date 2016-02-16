@@ -321,6 +321,28 @@ void __attribute__ ( (naked, aligned(128) ) ) VectorTable()
 
 
 
+//
+//
+//
+void DebugText(char* text)
+{
+    uint32_t    coreID  = MPIDR();
+
+    SystemCall  systemCall  = 
+    {
+        .type           = 0x00000001,
+        .payload        = (uint32_t)text,
+        .processedFlag  = false,
+    };
+
+    bridge->coreMessages[0][coreID].type    = 123;
+    bridge->coreMessages[0][coreID].payload = (uint32_t)&systemCall;
+    dsb();
+    TriggerMailboxInterrupt(0);            
+
+    while( systemCall.processedFlag == false );    
+}
+
 
 
 //
@@ -361,20 +383,9 @@ void CoreMain(uint32_t coreID)
             snprintf(string, sizeof(string), "Count on core %d is %d", coreID, bridge->heartBeats[coreID] );
 
             //
-            // Notify ControllerCore that we've started up.
+            // 
             //
-            SystemCall  systemCall  = 
-            {
-                .type           = 0x00000001,
-                .payload        = (uint32_t)&string[0],
-                .processedFlag  = false,
-            };
-
-            bridge->coreMessages[0][coreID].type                = 123;
-            bridge->coreMessages[0][coreID].payload             = (uint32_t)&systemCall;
-            dsb();
-            TriggerMailboxInterrupt(0);            
-            while( systemCall.processedFlag == false );
+            DebugText( &string[0] );
         }
 
         //
