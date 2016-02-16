@@ -344,21 +344,15 @@ void DebugText(char* text)
 }
 
 
-
 //
 //
 //
-void CoreMain(uint32_t coreID)
+void Core1Main(uint32_t coreID)
 {
     //
     //
     //
     bridge->heartBeats[coreID]   = 0;
-
-    //
-    //
-    //
-    SetVectorTableAddress( (uint32_t)&VectorTable );
 
     //
     // Enable the malbox interrupt.
@@ -381,10 +375,6 @@ void CoreMain(uint32_t coreID)
             //
             char    string[64];
             snprintf(string, sizeof(string), "Count on core %d is %d", coreID, bridge->heartBeats[coreID] );
-
-            //
-            // 
-            //
             DebugText( &string[0] );
         }
 
@@ -395,10 +385,137 @@ void CoreMain(uint32_t coreID)
         if(msg != 0)
         {
             ProcessMessage( msg );
-
+            DebugText("Message Received!");
             ReleaseMessage( msg );
         }
-    }    
+    }        
+}
+
+//
+//
+//
+void Core2Main(uint32_t coreID)
+{
+    //
+    //
+    //
+    bridge->heartBeats[coreID]   = 0;
+
+    //
+    // Enable the malbox interrupt.
+    //
+    EnableMailboxFromCore();
+
+    EI();
+
+    //
+    //
+    //
+    while(true)    
+    {
+        bridge->heartBeats[coreID]++;
+        dsb();
+        if( (bridge->heartBeats[coreID] % 0x4ffff) == 0 )
+        {
+            //
+            //
+            //
+            char    string[64];
+            snprintf(string, sizeof(string), "Count on core %d is %d", coreID, bridge->heartBeats[coreID] );
+            DebugText( &string[0] );
+        }
+
+        //
+        //
+        //
+        CoreMessage*    msg     = NextMessage();
+        if(msg != 0)
+        {
+            ProcessMessage( msg );
+            DebugText("Message Received!");
+            ReleaseMessage( msg );
+        }
+    }        
+}
+
+//
+//
+//
+void Core3Main(uint32_t coreID)
+{
+    //
+    //
+    //
+    bridge->heartBeats[coreID]   = 0;
+
+    //
+    // Enable the malbox interrupt.
+    //
+    EnableMailboxFromCore();
+
+    EI();
+
+    //
+    //
+    //
+    while(true)    
+    {
+        bridge->heartBeats[coreID]++;
+        dsb();
+        if( (bridge->heartBeats[coreID] % 0x4ffff) == 0 )
+        {
+            //
+            //
+            //
+            char    string[64];
+            snprintf(string, sizeof(string), "Count on core %d is %d", coreID, bridge->heartBeats[coreID] );
+            DebugText( &string[0] );
+        }
+
+        //
+        //
+        //
+        CoreMessage*    msg     = NextMessage();
+        if(msg != 0)
+        {
+            ProcessMessage( msg );
+            DebugText("Message Received!");
+            ReleaseMessage( msg );
+        }
+    }        
+}
+
+
+//
+//
+//
+void CoreMain(uint32_t coreID)
+{
+    //
+    //
+    //
+    SetVectorTableAddress( (uint32_t)&VectorTable );
+
+    //
+    //
+    //
+    switch(coreID)
+    {
+        case 1:
+            Core1Main(coreID);
+            break;
+            
+        case 2:
+            Core2Main(coreID);
+            break;
+            
+        case 3:
+            Core3Main(coreID);
+            break;
+            
+        default:
+            break;
+    }
 }
 
 
