@@ -233,7 +233,7 @@ void ProcessMessage(CoreMessage* msg)
     if(msg->type == CORE_MESSAGE_TEST)
     {
     }
-
+#if 0
     if(coreID == 2)
     {
         TriggerMailboxInterrupt( 3 );        
@@ -242,6 +242,7 @@ void ProcessMessage(CoreMessage* msg)
     {
         TriggerMailboxInterrupt( 1 );        
     }
+#endif    
 }
 
 
@@ -376,6 +377,8 @@ void Core1Main(uint32_t coreID)
             char    string[64];
             snprintf(string, sizeof(string), "Count on core %d is %d", coreID, bridge->heartBeats[coreID] );
             DebugText( &string[0] );
+
+            TriggerMailboxInterrupt(2);            
         }
 
         //
@@ -433,6 +436,7 @@ void Core2Main(uint32_t coreID)
         {
             ProcessMessage( msg );
             DebugText("Message Received!");
+            TriggerMailboxInterrupt(3);            
             ReleaseMessage( msg );
         }
     }        
