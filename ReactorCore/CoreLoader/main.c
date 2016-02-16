@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
     //
     //
     exec_elf(argv[1], &env);
-
+#if 0
     //
     // Wait for completion.
     //
@@ -185,7 +185,7 @@ int main(int argc, char* argv[])
 
         sleep(1);
     }
-
+#endif
     return 0;
 }
 

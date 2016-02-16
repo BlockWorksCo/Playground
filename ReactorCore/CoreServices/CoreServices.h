@@ -44,6 +44,20 @@
 #define ALLOY_DEDICATED_RAM_SIZE        (1024*1024*706)
 #define ALLOY_RAM_BASE                  (UNCACHED_AREA+(256*1024*1024))
 #define BRIDGE_BASE                     (0x10000000)
+
+
+
+//
+//
+//
+typedef struct
+{
+    uint32_t    type;
+    uint32_t    payload;
+    bool        processedFlag;
+    
+} SystemCall;
+
  
 
 //

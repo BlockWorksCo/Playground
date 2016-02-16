@@ -70,9 +70,10 @@ int main(int argc, char* argv[])
         int r   = read(fd, &msg, sizeof(msg) );
         if(r == sizeof(msg))
         {
-            printf("core %d type=%08x payload=%08x\n", msg.coreID, msg.type, msg.payload );
-            uint32_t    offsetIntoAlloyRAM  = msg.payload - ALLOY_RAM_BASE;
-            printf("[%s]\n", &alloyRAM[offsetIntoAlloyRAM] );
+            SystemCall*     systemCall  = (SystemCall*)&alloyRAM[msg.payload - ALLOY_RAM_BASE];
+            char*           string      = (char*)&alloyRAM[systemCall->payload - ALLOY_RAM_BASE];
+            printf("%d: %s\n", msg.coreID, string );
+            systemCall->processedFlag   = true;
         }
     }
 

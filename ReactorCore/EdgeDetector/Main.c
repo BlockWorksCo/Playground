@@ -363,10 +363,18 @@ void CoreMain(uint32_t coreID)
             //
             // Notify ControllerCore that we've started up.
             //
-            bridge->coreMessages[0][coreID].type    = 123;
-            bridge->coreMessages[0][coreID].payload     = (uint32_t)&string[0];
+            SystemCall  systemCall  = 
+            {
+                .type           = 0x00000001,
+                .payload        = (uint32_t)&string[0],
+                .processedFlag  = false,
+            };
+
+            bridge->coreMessages[0][coreID].type                = 123;
+            bridge->coreMessages[0][coreID].payload             = (uint32_t)&systemCall;
             dsb();
             TriggerMailboxInterrupt(0);            
+            while( systemCall.processedFlag == false );
         }
 
         //
