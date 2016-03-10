@@ -9,12 +9,10 @@
 
 #include <linux/ioctl.h>
 
-/* 
- * The major device number. We can't rely on dynamic 
- * registration any more, because ioctls need to know 
- * it. 
- */
-#define MAJOR_NUM 100
+//
+// Device Number
+//
+#define MAJOR_NUM                   (100)
 
 
 
@@ -26,9 +24,9 @@
 
 
 
-/* 
- * The name of the device file 
- */
+//
+// The name of the device file 
+//
 #define DEVICE_FILE_NAME "/dev/ReactorCoreServices"
 
 
