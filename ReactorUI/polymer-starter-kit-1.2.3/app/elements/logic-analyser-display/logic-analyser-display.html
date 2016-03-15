@@ -43,6 +43,23 @@ Example:
       Cheers,<br/>
       <span class="name">{{author.name}}</span>
     </p>
+    <google-chart
+      type='line'
+      options='{"title": "Signal", "vAxis": {"minValue" : 0, "maxValue": 1, "ticks": [0,1] }, "hAxis": {"minValue" : 0, "maxValue": 1000}, "width":1300}'
+      data='[["Things", "SCL"],
+             [ 0,   1],
+             [ 100, 1],
+             [ 200, 1],
+             [ 300, 0],
+             [ 400, 1],
+             [ 500, 0],
+             [ 600, 0],
+             [ 700, 1],
+             [ 800, 0],
+             [ 900, 0],
+             [1000, 1] ]'>
+    </google-chart>
+    <i><content></content></i>
   </template>
 
 </dom-module>
