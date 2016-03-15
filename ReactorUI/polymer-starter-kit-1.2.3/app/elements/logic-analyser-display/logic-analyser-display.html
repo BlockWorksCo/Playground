@@ -27,7 +27,8 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 
     #signal-chart
     {
-       width:100%;
+       width:  100%;
+       height: 500px;
     }
 
   </style>
@@ -50,6 +51,8 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 <script>
 
   Polymer({
+
+    numberOfLines: 8,
 
     is: 'logic-analyser-display',
 
@@ -93,11 +96,22 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
     {
       var chart = Polymer.dom(_this.root).querySelector('#signal-chart');
 
-      data=[ ["Time", "SCL"] ];
+      headerRow  = ["Time"];
+      for(j=0; j<this.numberOfLines; j++)
+      {
+         headerRow.push("Line"+j);
+      }
+      data = [ headerRow ];
 
       for(i=0; i<100; i++)
       {
-         data.push([ i*100, Math.floor(Math.random()*2) ]);
+         row  = [i*100];
+         for(j=0; j<this.numberOfLines; j++)
+         {
+           v   = Math.floor(Math.random()*2)+j;
+           row.push( v );
+         }
+         data.push(row);
       }
 
       chart.data = data;
@@ -115,12 +129,12 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 
       var chart = Polymer.dom(this.root).querySelector('#signal-chart');
 
-      options={"title": "Signal", "vAxis": {"minValue" : 0, "maxValue": 1, "ticks": [0,1] }, "hAxis": {"minValue" : 0, "maxValue": 1000} };
+      options={"title": "Signal", "vAxis": {"minValue" : 0, "maxValue": 1, "ticks": [0,2] }, "hAxis": {"minValue" : 0, "maxValue": 1000} };
 
       chart.options = options;
 
       var _this = this;
-      setInterval(function(){_this.redrawChart(_this);}, 50);   
+      setInterval(function(){_this.redrawChart(_this);}, 100);   
     },
 
     attached: function() {
