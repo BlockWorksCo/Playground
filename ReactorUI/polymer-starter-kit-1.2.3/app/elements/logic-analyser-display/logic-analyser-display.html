@@ -34,16 +34,8 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
   </style>
 
   <template>
-    <h1>&lt;logic-analyser-display&gt;</h1>
-    <content></content>
-    <p class="author">
-      <img src="{{author.image}}">
-      Cheers,<br/>
-      <span class="name">{{author.name}}</span>
-    </p>
     <google-chart id="signal-chart" type='line'
     </google-chart>
-    <i><content></content></i>
   </template>
 
 </dom-module>
@@ -108,7 +100,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
          row  = [i*100];
          for(j=0; j<this.numberOfLines; j++)
          {
-           v   = Math.floor(Math.random()*2)+j;
+           v   = Math.floor(Math.random()*2)+(j*1.2);
            row.push( v );
          }
          data.push(row);
