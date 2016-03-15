@@ -96,9 +96,7 @@ Example:
     {
       var chart = Polymer.dom(_this.root).querySelector('#signal-chart');
 
-      options={"title": "Signal", "vAxis": {"minValue" : 0, "maxValue": 1, "ticks": [0,1] }, "hAxis": {"minValue" : 0, "maxValue": 1000}, "width":1300};
-      data=[ ["Time", "SCL"],
-          ];
+      data=[ ["Time", "SCL"] ];
 
       for(i=0; i<10; i++)
       {
@@ -106,8 +104,6 @@ Example:
       }
 
       chart.data = data;
-      chart.options = options;
-
     },
 
     // Element Lifecycle
@@ -119,8 +115,15 @@ Example:
       //
       // This is the point where you should make modifications to the DOM (when
       // necessary), or kick off any processes the element wants to perform.
+
+      var chart = Polymer.dom(this.root).querySelector('#signal-chart');
+
+      options={"title": "Signal", "vAxis": {"minValue" : 0, "maxValue": 1, "ticks": [0,1] }, "hAxis": {"minValue" : 0, "maxValue": 1000}, "width":1300};
+
+      chart.options = options;
+
       var _this = this;
-      setInterval(_this.redrawChart(_this), 1000)      
+      setInterval(function(){_this.redrawChart(_this);}, 1000);   
     },
 
     attached: function() {
