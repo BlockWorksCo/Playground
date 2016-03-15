@@ -1,24 +1,15 @@
 <!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+Copyright (C) BlockWorks Consulting Ltd - All Rights Reserved.
+Unauthorized copying of this file, via any medium is strictly prohibited.
+Proprietary and confidential.
+Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 -->
+
+
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 
-<!--
-An element providing a solution to no problem in particular.
 
-Example:
-
-    <seed-element></seed-element>
-
-@demo
--->
 <dom-module id="logic-analyser-display">
 
   <style>
@@ -33,6 +24,12 @@ Example:
       max-height: 100px;
       max-width: 100px;
     }
+
+    #signal-chart
+    {
+       width:100%;
+    }
+
   </style>
 
   <template>
@@ -98,9 +95,9 @@ Example:
 
       data=[ ["Time", "SCL"] ];
 
-      for(i=0; i<10; i++)
+      for(i=0; i<100; i++)
       {
-         data.push([i*100, Math.random()]);
+         data.push([ i*100, Math.floor(Math.random()*2) ]);
       }
 
       chart.data = data;
@@ -118,12 +115,12 @@ Example:
 
       var chart = Polymer.dom(this.root).querySelector('#signal-chart');
 
-      options={"title": "Signal", "vAxis": {"minValue" : 0, "maxValue": 1, "ticks": [0,1] }, "hAxis": {"minValue" : 0, "maxValue": 1000}, "width":1300};
+      options={"title": "Signal", "vAxis": {"minValue" : 0, "maxValue": 1, "ticks": [0,1] }, "hAxis": {"minValue" : 0, "maxValue": 1000} };
 
       chart.options = options;
 
       var _this = this;
-      setInterval(function(){_this.redrawChart(_this);}, 1000);   
+      setInterval(function(){_this.redrawChart(_this);}, 50);   
     },
 
     attached: function() {
