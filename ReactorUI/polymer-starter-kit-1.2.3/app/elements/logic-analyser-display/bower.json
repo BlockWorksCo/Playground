@@ -1,0 +1,29 @@
+{
+  "name": "LogicAnalyserDisplay",
+  "version": "1.0.0",
+  "authors": [
+    "Steve Tickle <Steve@BlockWorks.co>"
+  ],
+  "description": "An element providing a display for the Reactor LogicAnalyser component.",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "Logic Analyser"
+  ],
+  "main": "seed-element.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/BlockWorksCo/seed-element/",
+  "ignore": [
+    "/.*",
+    "/test/",
+    "/demo/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "*"
+  }
+}

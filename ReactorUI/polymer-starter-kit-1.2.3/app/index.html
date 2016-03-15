@@ -145,20 +145,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
               <paper-material elevation="1">
                 <google-chart
-    type='line'
-    options='{"title": "Signal", "vAxis": {"minValue" : 0, "maxValue": 1, "ticks": [0,1] }, "hAxis": {"minValue" : 0, "maxValue": 1000}, "width":1300}'
-    data='[["Things", "SCL"],
-           [ 0,   1],
-           [ 100, 1],
-           [ 200, 1],
-           [ 300, 0],
-           [ 400, 1],
-           [ 500, 0],
-           [ 600, 0],
-           [ 700, 1],
-           [ 800, 0],
-           [ 900, 0],
-           [1000, 1] ]'>
+                  type='line'
+                  options='{"title": "Signal", "vAxis": {"minValue" : 0, "maxValue": 1, "ticks": [0,1] }, "hAxis": {"minValue" : 0, "maxValue": 1000}, "width":1300}'
+                  data='[["Things", "SCL"],
+                         [ 0,   1],
+                         [ 100, 1],
+                         [ 200, 1],
+                         [ 300, 0],
+                         [ 400, 1],
+                         [ 500, 0],
+                         [ 600, 0],
+                         [ 700, 1],
+                         [ 800, 0],
+                         [ 900, 0],
+                         [1000, 1] ]'>
                 </google-chart>
               </paper-material>
 
@@ -188,14 +188,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             <section data-route="users">
               <paper-material elevation="1">
-                <h2 class="page-title">Users</h2>
-                <p>This is the users section</p>
-                <a href$="{{baseUrl}}users/Addy">Addy</a><br>
-                <a href$="{{baseUrl}}users/Rob">Rob</a><br>
-                <a href$="{{baseUrl}}users/Chuck">Chuck</a><br>
-                <a href$="{{baseUrl}}users/Sam">Sam</a>
+                <logic-analyser-display>
+                </logic-analyser-display>
               </paper-material>
             </section>
+
 
             <section data-route="user-info">
               <paper-material elevation="1">
