@@ -8,6 +8,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<script src="http://d3js.org/d3.v3.min.js"></script>
 
 
 <dom-module id="logic-analyser-display">
@@ -34,15 +35,76 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
   </style>
 
   <template>
-    <google-chart id="signal-chart" type='line'
-    </google-chart>
+    <svg id="svg"></svg>
+    <google-chart id="signal-chart" type='line'></google-chart>
   </template>
 
 </dom-module>
 
+
 <script>
 
   Polymer({
+
+
+
+
+    createElements: function () 
+    {
+      var width = 500,
+          height = 500
+
+      this.svg = d3.select(this.$.svg)
+          .attr("width", width)
+          .attr("height", height);
+
+      xScale = d3.scale.linear()
+          .domain([0,100])
+          .range([0, width])
+
+      yScale = d3.scale.linear()
+          .domain([0, 1])
+          .range([height, 0])    
+
+      this.limit = 60 * 1,
+          duration = 750
+
+
+
+    var lineFun = d3.svg.line()
+      .x(function(d) 
+      {
+        return xScale(d.x);
+      })
+      .y(function(d) 
+      {
+        return yScale(d.y);
+      })
+      .interpolate("linear");
+
+
+    this.signalData   = [{"x":10, "y":0},
+                    {"x":20, "y":1},
+                    {"x":30, "y":1},
+                    {"x":40, "y":0},
+                    {"x":50, "y":1},
+                    {"x":60, "y":0},
+                    {"x":70, "y":1},
+                    {"x":80, "y":0},
+                    {"x":90, "y":1},
+                    {"x":100,"y":0}];
+
+    var paths  = this.svg.append('path').attr({
+        "d" : lineFun(this.signalData),
+        "stroke" : "purple",
+        "stroke-width" : 3,
+        "fill" : "none"
+      });
+    this.paths = paths;
+
+
+        var _this   = this;
+    },
 
     numberOfLines: 8,
 
@@ -109,6 +171,21 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       chart.data = data;
     },
 
+    Nothing: function()
+    {
+
+    },
+
+    UpdateChart: function()
+    {
+        this.paths.transition()
+                .style("color", "green")
+                .duration(5000)
+                .style("color", "red")
+                .each('end', this.UpdateChart.bind(this) );
+
+    },
+
     // Element Lifecycle
 
     ready: function() {
@@ -125,17 +202,31 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 
       chart.options = options;
 
+
+      //
+      // Initialise the timer.
+      //
       var _this = this;
-      setInterval(function(){_this.redrawChart(_this);}, 100);   
+      setInterval(function(){_this.redrawChart(_this);}, 500);   
     },
 
-    attached: function() {
+    attached: function() 
+    {
       // `attached` fires once the element and its parents have been inserted
       // into a document.
       //
       // This is a good place to perform any work related to your element's
       // visual state or active behavior (measuring sizes, beginning animations,
       // loading resources, etc).
+
+      //
+      // Initialise the D3.js chart.
+      //
+      this.createElements();
+      //this.getData();
+
+      this.UpdateChart();
+
     },
 
     detached: function() {
