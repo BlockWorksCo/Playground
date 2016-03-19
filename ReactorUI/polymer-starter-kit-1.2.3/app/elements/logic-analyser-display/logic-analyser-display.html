@@ -174,10 +174,14 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 
     UpdateChart: function()
     {
+      var x = d3.scale.linear()
+          .domain([0, this.numberOfLines - 1])
+          .range([0, this.width]);
+
         this.paths.transition()
-                .style("color", "green")
-                .duration(5000)
-                .style("color", "red")
+                .duration(500)
+                .ease("linear")
+                .attr("transform", "translate(-100,0)")
                 .each('end', this.UpdateChart.bind(this) );
 
     },
