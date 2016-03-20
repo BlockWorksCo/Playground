@@ -51,8 +51,8 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 
     createElements: function () 
     {
-      var width = 1000,
-          height = 500
+      var width = '100%',
+          height = 300
 
       this.svg = d3.select(this.$.svg)
           .attr("width", width)
@@ -60,7 +60,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 
       this.xScale = d3.scale.linear()
           .domain([0,100])
-          .range([0, width])
+          .range([0, 1000])
 
       this.yScale = d3.scale.linear()
           .domain([0, 1])
@@ -83,16 +83,17 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       .interpolate("linear");
 
 
-    this.signalData   = [{"x":10, "y":0},
-                    {"x":20, "y":1},
-                    {"x":30, "y":1},
-                    {"x":40, "y":0},
-                    {"x":50, "y":1},
-                    {"x":60, "y":0},
-                    {"x":70, "y":1},
-                    {"x":80, "y":0},
-                    {"x":90, "y":1},
-                    {"x":100,"y":0}];
+      this.numberOfPoints   = 100;
+      this.pixelsPerPoint   = 1;
+
+      this.signalData   = [];
+      for(i=0; i<this.numberOfPoints; i++)
+      {
+        x = i*this.pixelsPerPoint;
+        y = Math.floor(Math.random()*2);
+        this.signalData.push({"x":x, "y":y});
+      }
+
 
     var paths  = this.svg.append('path').attr({
         "d" : this.lineFun(this.signalData),
@@ -174,7 +175,6 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 
     UpdateChart: function()
     {
-
       //this.signalData   = [];
       //for(i=0; i<10; i++)
       //{
@@ -183,12 +183,12 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       //    this.signalData.push( {"x":x, "y":y} );
       //}
       this.signalData.shift();
-      x = 100;
+      x = this.pixelsPerPoint * this.numberOfPoints;
       y = Math.floor(Math.random()*2);
       this.signalData.push( {"x":x, "y":y} );
-      for(i=0; i<10; i++)
+      for(i=0; i<this.numberOfPoints; i++)
       {
-        this.signalData[i].x = i*10;
+        this.signalData[i].x = i*this.pixelsPerPoint;
       }
 
       var paths  = this.svg.select('path')
@@ -232,7 +232,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       // Initialise the timer.
       //
       var _this = this;
-      setInterval(function(){_this.redrawChart(_this);}, 500);   
+      //setInterval(function(){_this.redrawChart(_this);}, 500);   
     },
 
     attached: function() 
@@ -249,6 +249,8 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       //
       this.createElements();
       //this.getData();
+
+      this.width = this.offsetWidth;
 
       this.UpdateChart();
 
