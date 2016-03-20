@@ -65,7 +65,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       })
       .y(function(d) 
       {
-        return this.yScale(d.y);
+        return this.yScale(d.y/10);
       })
       .interpolate("linear");
 
@@ -82,13 +82,12 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       }
 
 
-    var paths  = this.svg.append('path').attr({
+    this.paths  = this.svg.append('path').attr({
         "d" : this.lineFun(this.signalData),
         "stroke" : "purple",
         "stroke-width" : 3,
         "fill" : "none"
       });
-    this.paths = paths;
 
 
         var _this   = this;
@@ -153,8 +152,8 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       var paths  = this.svg.select('path')
         .attr(
         {
-          "d" : this.lineFun(this.signalData),
-          "stroke"        : "purple",
+          "d"             : this.lineFun(this.signalData),
+          "stroke"        : "red",
           "stroke-width"  : 3,
           "fill"          : "none"
         })
