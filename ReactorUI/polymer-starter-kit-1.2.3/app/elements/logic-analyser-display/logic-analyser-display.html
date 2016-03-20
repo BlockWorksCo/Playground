@@ -56,6 +56,13 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       this.limit = 60 * 1,
           duration = 750
 
+      this.colours  = ["red",
+                       "green",
+                       "yellow",
+                       "orange",
+                       "purple",
+                       "green",
+                       "blue"];
 
 
     this.lineFun = d3.svg.line()
@@ -162,7 +169,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
         .attr(
         {
           "d"             : this.lineFun(this.signalData),
-          "stroke"        : "blue",
+          "stroke"        : this.colours[i],
           "stroke-width"  : 3,
           "fill"          : "none"
         })
