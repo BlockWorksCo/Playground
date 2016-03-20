@@ -51,7 +51,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 
     createElements: function () 
     {
-      var width = 500,
+      var width = 1000,
           height = 500
 
       this.svg = d3.select(this.$.svg)
@@ -175,27 +175,39 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
     UpdateChart: function()
     {
 
-      this.signalData   = [];
+      //this.signalData   = [];
+      //for(i=0; i<10; i++)
+      //{
+      //    x = i*10;
+      //    y = Math.floor(Math.random()*2);
+      //    this.signalData.push( {"x":x, "y":y} );
+      //}
+      this.signalData.shift();
+      x = 100;
+      y = Math.floor(Math.random()*2);
+      this.signalData.push( {"x":x, "y":y} );
       for(i=0; i<10; i++)
       {
-          x = i*10;
-          y = Math.floor(Math.random()*2);
-          this.signalData.push( {"x":x, "y":y} );
+        this.signalData[i].x = i*10;
       }
 
-    var paths  = this.svg.select('path').attr({
-        "d" : this.lineFun(this.signalData),
-        "stroke" : "purple",
-        "stroke-width" : 3,
-        "fill" : "none"
-      });
+      var paths  = this.svg.select('path')
+        .attr(
+        {
+          "d" : this.lineFun(this.signalData),
+          "stroke"        : "purple",
+          "stroke-width"  : 3,
+          "fill"          : "none"
+        })
+      .attr("transform", "translate(0,0)");
 
 
-        this.paths.transition()
-                .duration(1000)
-                .ease("linear")
-                .attr("transform", "translate(-100,0)")
-                .each('end', this.UpdateChart.bind(this) );
+
+      this.paths.transition()
+              .duration(100)
+              .ease("linear")
+              .attr("transform", "translate(-100,0)")
+              .each('end', this.UpdateChart.bind(this) );
 
     },
 
