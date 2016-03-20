@@ -163,9 +163,9 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 
 
       this.paths.transition()
-              .duration(100)
+              .duration(10)
               .ease("linear")
-              .attr("transform", "translate(-100,0)")
+              .attr("transform", "translate("+ (-this.pixelsPerPoint) +",0)")
               .each('end', this.UpdateChart.bind(this) );
 
     },
