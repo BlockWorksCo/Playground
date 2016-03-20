@@ -72,6 +72,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 
       this.numberOfPoints   = 100;
       this.pixelsPerPoint   = 1;
+      this.heightPerSignal  = 50;
 
       this.signalData   = [];
       for(i=0; i<this.numberOfPoints; i++)
@@ -82,9 +83,16 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       }
 
 
-    this.paths  = this.svg.append('path').attr({
+    this.paths0  = this.svg.append('path').attr({
         "d" : this.lineFun(this.signalData),
         "stroke" : "purple",
+        "stroke-width" : 3,
+        "fill" : "none"
+      });
+
+    this.paths1  = this.svg.append('path').attr({
+        "d" : this.lineFun(this.signalData),
+        "stroke" : "red",
         "stroke-width" : 3,
         "fill" : "none"
       });
@@ -149,7 +157,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
         this.signalData[i].x = i*this.pixelsPerPoint;
       }
 
-      var paths  = this.svg.select('path')
+      this.paths0
         .attr(
         {
           "d"             : this.lineFun(this.signalData),
@@ -159,12 +167,28 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
         })
       .attr("transform", "translate(0,0)");
 
+      this.paths1
+        .attr(
+        {
+          "d"             : this.lineFun(this.signalData),
+          "stroke"        : "blue",
+          "stroke-width"  : 3,
+          "fill"          : "none"
+        })
+      .attr("transform", "translate(0,"+(-this.heightPerSignal*1)+")");
 
 
-      this.paths.transition()
-              .duration(10)
+
+      this.paths0.transition()
+              .duration(25)
               .ease("linear")
-              .attr("transform", "translate("+ (-this.pixelsPerPoint) +",0)")
+              .attr("transform", "translate("+ (-this.pixelsPerPoint) +","+(-this.heightPerSignal*0)+")")
+              .each('end', this.UpdateChart.bind(this) );
+
+      this.paths1.transition()
+              .duration(25)
+              .ease("linear")
+              .attr("transform", "translate("+ (-this.pixelsPerPoint) +","+(-this.heightPerSignal*1)+")")
               .each('end', this.UpdateChart.bind(this) );
 
     },
