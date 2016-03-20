@@ -73,6 +73,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       this.numberOfPoints   = 100;
       this.pixelsPerPoint   = 1;
       this.heightPerSignal  = 50;
+      this.numberOfSignals  = 4;
 
       this.signalData   = [];
       for(i=0; i<this.numberOfPoints; i++)
@@ -84,19 +85,15 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 
     this.paths = [];
 
-    this.paths[0]  = this.svg.append('path').attr({
-        "d" : this.lineFun(this.signalData),
-        "stroke" : "purple",
-        "stroke-width" : 3,
-        "fill" : "none"
-      });
-
-    this.paths[1]  = this.svg.append('path').attr({
-        "d" : this.lineFun(this.signalData),
-        "stroke" : "red",
-        "stroke-width" : 3,
-        "fill" : "none"
-      });
+    for(i=0; i<this.numberOfSignals; i++)
+    {
+      this.paths[i]  = this.svg.append('path').attr({
+          "d" : this.lineFun(this.signalData),
+          "stroke" : "purple",
+          "stroke-width" : 3,
+          "fill" : "none"
+        });
+    }
 
 
         var _this   = this;
@@ -158,17 +155,10 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
         this.signalData[i].x = i*this.pixelsPerPoint;
       }
 
-      this.paths[0]
-        .attr(
-        {
-          "d"             : this.lineFun(this.signalData),
-          "stroke"        : "red",
-          "stroke-width"  : 3,
-          "fill"          : "none"
-        })
-      .attr("transform", "translate(0,0)");
 
-      this.paths[1]
+    for(i=0; i<this.numberOfSignals; i++)
+    {
+      this.paths[i]
         .attr(
         {
           "d"             : this.lineFun(this.signalData),
@@ -176,21 +166,17 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
           "stroke-width"  : 3,
           "fill"          : "none"
         })
-      .attr("transform", "translate(0,"+(-this.heightPerSignal*1)+")");
+      .attr("transform", "translate(0,"+(-this.heightPerSignal*i)+")");
 
-
-
-      this.paths[0].transition()
+      this.paths[i].transition()
               .duration(20)
               .ease("linear")
-              .attr("transform", "translate("+ (-this.pixelsPerPoint) +","+(-this.heightPerSignal*0)+")")
+              .attr("transform", "translate("+ (-this.pixelsPerPoint) +","+(-this.heightPerSignal*i)+")")
               .each('end', this.UpdateChart.bind(this) );
+    }
 
-      this.paths[1].transition()
-              .duration(20)
-              .ease("linear")
-              .attr("transform", "translate("+ (-this.pixelsPerPoint) +","+(-this.heightPerSignal*1)+")")
-              .each('end', this.UpdateChart.bind(this) );
+
+
 
     },
 
