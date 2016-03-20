@@ -19,24 +19,11 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       box-sizing: border-box;
     }
 
-    .author img {
-      float: left;
-      margin-right: 5px;
-      max-height: 100px;
-      max-width: 100px;
-    }
-
-    #signal-chart
-    {
-       width:  100%;
-       height: 500px;
-    }
 
   </style>
 
   <template>
     <svg id="svg"></svg>
-    <google-chart id="signal-chart" type='line'></google-chart>
   </template>
 
 </dom-module>
@@ -149,39 +136,11 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 
     redrawChart: function(_this)
     {
-      var chart = Polymer.dom(_this.root).querySelector('#signal-chart');
-
-      headerRow  = ["Time"];
-      for(j=0; j<this.numberOfLines; j++)
-      {
-         headerRow.push("Line"+j);
-      }
-      data = [ headerRow ];
-
-      for(i=0; i<100; i++)
-      {
-         row  = [i*100];
-         for(j=0; j<this.numberOfLines; j++)
-         {
-           v   = Math.floor(Math.random()*2)+(j*1.2);
-           row.push( v );
-         }
-         data.push(row);
-      }
-
-      chart.data = data;
     },
 
 
     UpdateChart: function()
     {
-      //this.signalData   = [];
-      //for(i=0; i<10; i++)
-      //{
-      //    x = i*10;
-      //    y = Math.floor(Math.random()*2);
-      //    this.signalData.push( {"x":x, "y":y} );
-      //}
       this.signalData.shift();
       x = this.pixelsPerPoint * this.numberOfPoints;
       y = Math.floor(Math.random()*2);
@@ -221,17 +180,6 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       // This is the point where you should make modifications to the DOM (when
       // necessary), or kick off any processes the element wants to perform.
 
-      var chart = Polymer.dom(this.root).querySelector('#signal-chart');
-
-      options={"title": "Signal", "vAxis": {"minValue" : 0, "maxValue": 1, "ticks": [0,2] }, "hAxis": {"minValue" : 0, "maxValue": 1000} };
-
-      chart.options = options;
-
-
-      //
-      // Initialise the timer.
-      //
-      var _this = this;
       //setInterval(function(){_this.redrawChart(_this);}, 500);   
     },
 
@@ -271,27 +219,6 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
      * @event seed-element-lasers
      * @detail {{sound: String}}
      */
-
-    /**
-     * Sometimes it's just nice to say hi.
-     *
-     * @param {string} greeting A positive greeting.
-     * @return {string} The full greeting.
-     */
-    sayHello: function(greeting) {
-      var response = greeting || 'Hello World!';
-      return 'seed-element says, ' + response;
-    },
-
-    /**
-     * Attempts to destroy this element's enemies with an any beam of light!
-     *
-     * Or, at least, dispatches an event in the vain hope that someone else will
-     * do the zapping.
-     */
-    fireLasers: function() {
-      this.fire('seed-element-lasers', {sound: 'Pew pew!'});
-    }
 
   });
 
