@@ -73,7 +73,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       this.numberOfPoints   = 100;
       this.pixelsPerPoint   = 1;
       this.heightPerSignal  = 50;
-      this.numberOfSignals  = 4;
+      this.numberOfSignals  = 6;
 
       this.signalData   = [];
       for(i=0; i<this.numberOfPoints; i++)
@@ -171,8 +171,8 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       this.paths[i].transition()
               .duration(20)
               .ease("linear")
-              .attr("transform", "translate("+ (-this.pixelsPerPoint) +","+(-this.heightPerSignal*i)+")")
-              .each('end', this.UpdateChart.bind(this) );
+              .attr("transform", "translate("+ (-this.pixelsPerPoint) +","+(-this.heightPerSignal*i)+")");
+              //.each('end', this.UpdateChart.bind(this) );
     }
 
 
@@ -190,7 +190,8 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       // This is the point where you should make modifications to the DOM (when
       // necessary), or kick off any processes the element wants to perform.
 
-      //setInterval(function(){_this.redrawChart(_this);}, 500);   
+      var _this   = this;
+      setInterval(function(){_this.UpdateChart(_this);}, 20);   
     },
 
     attached: function() 
