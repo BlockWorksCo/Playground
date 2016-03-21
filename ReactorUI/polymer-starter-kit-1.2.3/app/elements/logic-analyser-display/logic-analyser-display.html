@@ -184,7 +184,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       .attr("transform", "translate(0,"+(-this.heightPerSignal*i)+")");
 
       this.paths[i].transition()
-              .duration(20)
+              .duration(10)
               .ease("linear")
               .attr("transform", "translate("+ (-this.pixelsPerPoint) +","+(-this.heightPerSignal*i)+")");
               //.each('end', this.UpdateChart.bind(this) );
@@ -206,7 +206,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       // necessary), or kick off any processes the element wants to perform.
 
       var _this   = this;
-      setInterval(function(){_this.UpdateChart(_this);}, 20);   
+      setInterval(function(){_this.UpdateChart(_this);}, 10);   
     },
 
     attached: function() 
