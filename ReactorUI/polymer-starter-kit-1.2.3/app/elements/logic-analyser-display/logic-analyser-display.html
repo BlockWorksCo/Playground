@@ -53,8 +53,6 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
           .domain([0, 1])
           .range([height, 0])    
 
-      this.limit = 60 * 1,
-          duration = 750
 
       this.colours  = ["red",
                        "green",
@@ -173,7 +171,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
     {
 
       setInterval(function(){this.UpdateChartData(this);}.bind(this), 5);   
-      setInterval(function(){this.UpdateChart(this);}.bind(this), 40);   
+      setInterval(function(){this.UpdateChart(this);}.bind(this), 50);   
     },
 
     attached: function() 
