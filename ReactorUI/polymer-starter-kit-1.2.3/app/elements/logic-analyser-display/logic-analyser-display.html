@@ -83,11 +83,16 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       this.numberOfSignals  = 6;
 
       this.signalData   = [];
-      for(i=0; i<this.numberOfPoints; i++)
+      for(j=0; j<this.numberOfSignals; j++)
       {
-        x = i*this.pixelsPerPoint;
-        y = Math.floor(Math.random()*2);
-        this.signalData.push({"x":x, "y":y});
+
+        this.signalData[j]   = [];
+        for(i=0; i<this.numberOfPoints; i++)
+        {
+          x = i*this.pixelsPerPoint;
+          y = Math.floor(Math.random()*2);
+          this.signalData[j].push({"x":x, "y":y});
+        }
       }
 
     this.paths = [];
@@ -153,22 +158,25 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 
     UpdateChart: function()
     {
-      this.signalData.shift();
-      x = this.pixelsPerPoint * this.numberOfPoints;
-      y = Math.floor(Math.random()*2);
-      this.signalData.push( {"x":x, "y":y} );
-      for(i=0; i<this.numberOfPoints; i++)
-      {
-        this.signalData[i].x = i*this.pixelsPerPoint;
-      }
-
 
     for(i=0; i<this.numberOfSignals; i++)
     {
+
+      this.signalData[i].shift();
+      x = this.pixelsPerPoint * this.numberOfPoints;
+      y = Math.floor(Math.random()*2);
+      this.signalData[i].push( {"x":x, "y":y} );
+      for(j=0; j<this.numberOfPoints; j++)
+      {
+        this.signalData[i][j].x = j*this.pixelsPerPoint;
+      }
+
+
+
       this.paths[i]
         .attr(
         {
-          "d"             : this.lineFun(this.signalData),
+          "d"             : this.lineFun(this.signalData[i]),
           "stroke"        : this.colours[i],
           "stroke-width"  : 3,
           "fill"          : "none"
