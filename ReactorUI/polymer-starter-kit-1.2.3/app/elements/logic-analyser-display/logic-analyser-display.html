@@ -77,98 +77,60 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
                        "orange",
                        "purple",
                        "green",
+                       "orange",
+                       "purple",
+                       "green",
+                       "orange",
+                       "purple",
+                       "green",
                        "blue"];
 
 
-    this.lineFun = d3.svg.line()
-      .x(function(d) 
-      {
-        return this.xScale(d.x);
-      })
-      .y(function(d) 
-      {
-        return this.yScale(d.y/20);
-      })
-      .interpolate("linear");
+        this.lineFun = d3.svg.line()
+          .x(function(d) 
+          {
+            return this.xScale(d.x);
+          })
+          .y(function(d) 
+          {
+            return this.yScale(d.y/20);
+          })
+          .interpolate("linear");
 
 
-      this.numberOfPoints   = 100;
-      this.pixelsPerPoint   = 1;
-      this.heightPerSignal  = 45;
-      this.numberOfSignals  = 16;
+          this.numberOfPoints   = 100;
+          this.pixelsPerPoint   = 1;
+          this.heightPerSignal  = 45;
+          this.numberOfSignals  = 16;
 
-      this.signalData   = [];
-      for(j=0; j<this.numberOfSignals; j++)
-      {
+          this.signalData   = [];
+          for(j=0; j<this.numberOfSignals; j++)
+          {
 
-        this.signalData[j]   = [];
-        for(i=0; i<this.numberOfPoints; i++)
+            this.signalData[j]   = [];
+            for(i=0; i<this.numberOfPoints; i++)
+            {
+              x = i*this.pixelsPerPoint;
+              y = Math.floor(Math.random()*2);
+              this.signalData[j].push({"x":x, "y":y});
+            }
+          }
+
+        this.paths = [];
+
+        for(i=0; i<this.numberOfSignals; i++)
         {
-          x = i*this.pixelsPerPoint;
-          y = Math.floor(Math.random()*2);
-          this.signalData[j].push({"x":x, "y":y});
+          this.paths[i]  = this.svg.append('path').attr({
+              "d" : this.lineFun(this.signalData),
+              "stroke" : "purple",
+              "stroke-width" : 3,
+              "fill" : "none"
+            });
         }
-      }
 
-    this.paths = [];
-
-    for(i=0; i<this.numberOfSignals; i++)
-    {
-      this.paths[i]  = this.svg.append('path').attr({
-          "d" : this.lineFun(this.signalData),
-          "stroke" : "purple",
-          "stroke-width" : 3,
-          "fill" : "none"
-        });
-    }
-
-
-        var _this   = this;
     },
-
-    numberOfLines: 8,
 
     is: 'logic-analyser-display',
-
-    properties: {
-
-      /**
-       * `fancy` indicates that the element should don a monocle and tophat,
-       * while checking its pocket watch.
-       */
-      fancy: Boolean,
-
-      /**
-       * Describes the author of the element, but is really just an excuse to
-       * show off JSDoc annotations.
-       *
-       * @type {{name: string, image: string}}
-       */
-      author: {
-        type: Object,
-        // Use `value` to provides a default value for a property, by setting it
-        // on your element's prototype.
-        //
-        // If you provide a function, as we do here, Polymer will call that
-        // _per element instance_.
-        //
-        // We do that to ensure that each element gets its own copy of the
-        // value, rather than having it shared across all instances (via the
-        // prototype).
-        value: function() {
-          return {
-            name:  'Steve Tickle',
-            image: '',
-          };
-        }
-      },
-
-    },
-
-
-    redrawChart: function(_this)
-    {
-    },
 
 
     UpdateChart: function()
@@ -186,10 +148,6 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
             })
           .attr("transform", "translate(0,"+(-this.heightPerSignal*i)+")");
         }
-
-
-
-
     },
 
 
@@ -206,62 +164,30 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
             {
                 this.signalData[i][j].x = j*this.pixelsPerPoint;
             }
-
-
         }
     },
 
     // Element Lifecycle
 
-    ready: function() {
-      // `ready` is called after all elements have been configured, but
-      // propagates bottom-up. This element's children are ready, but parents
-      // are not.
-      //
-      // This is the point where you should make modifications to the DOM (when
-      // necessary), or kick off any processes the element wants to perform.
+    ready: function()
+    {
 
-      var _this   = this;
-      setInterval(function(){_this.UpdateChartData(_this);}.bind(this), 5);   
-      setInterval(function(){_this.UpdateChart(_this);}.bind(this), 40);   
+      setInterval(function(){this.UpdateChartData(this);}.bind(this), 5);   
+      setInterval(function(){this.UpdateChart(this);}.bind(this), 40);   
     },
 
     attached: function() 
     {
-      // `attached` fires once the element and its parents have been inserted
-      // into a document.
-      //
-      // This is a good place to perform any work related to your element's
-      // visual state or active behavior (measuring sizes, beginning animations,
-      // loading resources, etc).
-
       //
       // Initialise the D3.js chart.
       //
       this.createElements();
-      //this.getData();
-
-      this.width = this.offsetWidth;
-
-      this.UpdateChart();
-
     },
 
-    detached: function() {
-      // The analog to `attached`, `detached` fires when the element has been
-      // removed from a document.
-      //
-      // Use this to clean up anything you did in `attached`.
+    detached: function() 
+    {
     },
 
-    // Element Behavior
-
-    /**
-     * The `seed-element-lasers` event is fired whenever `fireLasers` is called.
-     *
-     * @event seed-element-lasers
-     * @detail {{sound: String}}
-     */
 
   });
 
