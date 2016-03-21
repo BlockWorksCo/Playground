@@ -39,7 +39,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
     createElements: function () 
     {
       var width = '100%',
-          height = 600
+          height = 800
 
       this.svg = d3.select(this.$.svg)
           .attr("width", width)
@@ -87,15 +87,15 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       })
       .y(function(d) 
       {
-        return this.yScale(d.y/10);
+        return this.yScale(d.y/20);
       })
       .interpolate("linear");
 
 
       this.numberOfPoints   = 100;
       this.pixelsPerPoint   = 1;
-      this.heightPerSignal  = 60;
-      this.numberOfSignals  = 12;
+      this.heightPerSignal  = 45;
+      this.numberOfSignals  = 16;
 
       this.signalData   = [];
       for(j=0; j<this.numberOfSignals; j++)
