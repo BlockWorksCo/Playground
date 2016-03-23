@@ -18,8 +18,6 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       display: block;
       box-sizing: border-box;
     }
-
-
   </style>
 
   <template>
@@ -169,10 +167,50 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 
     ready: function()
     {
-
+      //
+      //
+      //
       setInterval(function(){this.UpdateChartData(this);}.bind(this), 5);   
       setInterval(function(){this.UpdateChart(this);}.bind(this), 50);   
+
+      //
+      //
+      //
+      //this.websocket           = new WebSocket("ws://echo.websocket.org/");
+      this.websocket           = new WebSocket("ws://localhost:7681/");
+      this.websocket.onopen    = function(evt) { this.SocketOpen(evt) }.bind(this);
+      this.websocket.onclose   = function(evt) { this.SocketClose(evt) }.bind(this);
+      this.websocket.onmessage = function(evt) { this.SocketMessage(evt) }.bind(this);
+      this.websocket.onerror   = function(evt) { this.SocketError(evt) }.bind(this);      
     },
+
+
+
+    SocketOpen: function (evt)
+    {
+      this.SocketSend("WebSocket rocks");
+    },
+
+    SocketClose: function (evt)
+    {
+    },
+
+    SocketMessage: function (evt)
+    {
+      //this.websocket.close();
+      this.websocket.send("blaa");
+    },
+
+    SocketError: function (evt)
+    {
+    },
+
+    SocketSend: function (message)
+    {
+      this.websocket.send(message);
+    },
+
+
 
     attached: function() 
     {
