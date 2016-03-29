@@ -197,6 +197,8 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
 
     SocketMessage: function (evt)
     {
+      data  = JSON.parse(evt.data);
+      
       //this.websocket.close();
       this.websocket.send("blaa");
     },
