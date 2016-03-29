@@ -47,7 +47,7 @@ int callback_dumb_increment(struct lws* wsi, enum lws_callback_reasons reason,
 
             char*   buf     = (char*)malloc(1024);
 
-            strcpy(buf, "{ \"data\":[0,1,2,3] }");
+            strcpy(buf, "{ \"data\":[[11,22,33,44],[21,22,23,24],[31,32,33,34],[41,42,43,44]] }");
 
             // send response
             // just notice that we have to tell where exactly our response starts. That's
