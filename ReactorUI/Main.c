@@ -69,7 +69,7 @@ int ReactorUIProtocolCallback(struct lws* wsi, enum lws_callback_reasons reason,
 
     case LWS_CALLBACK_RECEIVE:   // the funny part
         {
-            printf("received request\n");
+            //printf("received request\n");
 
             //char   buf[1024*2];
             char*   buf         = (char*)malloc(1024*32);
@@ -111,7 +111,7 @@ int ReactorUIProtocolCallback(struct lws* wsi, enum lws_callback_reasons reason,
             }
             strcat(payload, "] }");
 
-            printf("\n\n(%d)    %s\n", (uint32_t)strlen(payload), payload);
+            //printf("\n\n(%d)    %s\n", (uint32_t)strlen(payload), payload);
 
             //
             //
