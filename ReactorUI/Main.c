@@ -1,5 +1,9 @@
-
-
+//
+// Copyright (C) BlockWorks Consulting Ltd - All Rights Reserved.
+// Unauthorized copying of this file, via any medium is strictly prohibited.
+// Proprietary and confidential.
+// Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
+//
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,14 +13,18 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <assert.h>
-
-#include "libwebsockets.h"
-
 #include <syslog.h>
 #include <sys/time.h>
 #include <unistd.h>
 
+#include "libwebsockets.h"
 
+
+
+
+//
+//
+//
 int callback_http(struct lws* wsi, enum lws_callback_reasons reason, void* user, void* in, size_t len)
 {
     return 0;
@@ -26,14 +34,10 @@ int callback_http(struct lws* wsi, enum lws_callback_reasons reason, void* user,
 
 
 
-
-
-
-
-
-
-int callback_dumb_increment(struct lws* wsi, enum lws_callback_reasons reason,
-                            void* user, void* in, size_t len)
+//
+//
+//
+int ReactorUIProtocolCallback(struct lws* wsi, enum lws_callback_reasons reason, void* user, void* in, size_t len)
 {
     switch (reason)
     {
@@ -83,7 +87,7 @@ static struct lws_protocols protocols[] =
     },
     {
         "ReactorUI", // protocol name - very important!
-        callback_dumb_increment,   // callback
+        ReactorUIProtocolCallback,   // callback
         0                          // we don't use any per session data
 
     },
@@ -99,45 +103,39 @@ static struct lws_protocols protocols[] =
 
 int main(int argc, char** argv)
 {
-    // server url will be http://localhost:9000
-    int port = 9000;
-    const char* interface = NULL;
-    struct lws_context* context;
-    // we're not using ssl
-    const char* cert_path = NULL;
-    const char* key_path = NULL;
-    // no special options
-    int opts = 0;
-    struct lws_context_creation_info info;
     //
     //
     //
-    memset( &info, 0, sizeof(info) );
-    info.port           = port;
-    info.iface          = interface;
+    struct lws_context_creation_info   info    = {0};
+    info.port           = 9000;
+    info.iface          = NULL;
     info.protocols      = protocols;
-    // create libwebsocket context representing this server
-    context = lws_create_context( &info );
 
+    //
+    // create libwebsocket context representing this server
+    //
+    struct lws_context* context = lws_create_context( &info );
     if (context == NULL)
     {
         fprintf(stderr, "libwebsocket init failed\n");
         return -1;
     }
 
-    printf("starting server...\n");
+    printf("Starting ReactorUI server...\n");
 
-    // infinite loop, to end this server send SIGTERM. (CTRL+C)
+    //
+    // Forever....
+    //
     while (1)
     {
         lws_service(context, 50);
-        // libwebsocket_service will process all waiting events with their
-        // callback functions and then wait 50 ms.
-        // (this is a single threaded webserver and this will keep our server
-        // from generating load while there are not requests to process)
     }
 
+    //
+    // Cleanup.
+    //
     lws_context_destroy(context);
+
     return 0;
 }
 
