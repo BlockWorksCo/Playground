@@ -31,6 +31,20 @@ int callback_http(struct lws* wsi, enum lws_callback_reasons reason, void* user,
 }
 
 
+uint32_t    signals[100][16];
+
+
+
+void GenerateSignalData()
+{
+    for(uint32_t signal=0; signal<16; signal++)
+    {
+        for(uint32_t i=0; i<100; i++)
+        {
+            signals[i][signal]  = rand() % 2;
+        }
+    }
+}
 
 
 
@@ -39,6 +53,14 @@ int callback_http(struct lws* wsi, enum lws_callback_reasons reason, void* user,
 //
 int ReactorUIProtocolCallback(struct lws* wsi, enum lws_callback_reasons reason, void* user, void* in, size_t len)
 {
+    //
+    //
+    //
+    GenerateSignalData();
+
+    //
+    //
+    //
     switch (reason)
     {
     case LWS_CALLBACK_ESTABLISHED: // just log message that someone is connecting
@@ -49,18 +71,55 @@ int ReactorUIProtocolCallback(struct lws* wsi, enum lws_callback_reasons reason,
         {
             printf("received request\n");
 
-            char*   buf     = (char*)malloc(1024);
+            //char   buf[1024*2];
+            char*   buf         = (char*)malloc(1024*32);
+            char*   payload     = &buf[0];
+            //char*   payload     = &buf[LWS_PRE];
+            //strcpy(buf, "{ \"data\":[[11,22,33,44],[21,22,23,24],[31,32,33,34],[41,42,43,44]] }");
 
-            strcpy(buf, "{ \"data\":[[11,22,33,44],[21,22,23,24],[31,32,33,34],[41,42,43,44]] }");
+            strcpy(payload, "{ \"data\":[");
+            for(uint32_t signal=0; signal<16; signal++)
+            {
+                //
+                //
+                //
+                char    signalJSONData[1024*32]    = {0};
+                strcpy(&signalJSONData[0], "\t[");
+                for(uint32_t i=0; i<100; i++)
+                {
+                    char    temp[16]    = {0};
+                    sprintf( &temp[0], "{\"x\":%d, \"y\":%d}", i*1, signals[i][signal] );
 
-            // send response
-            // just notice that we have to tell where exactly our response starts. That's
-            // why there's `buf[LWS_SEND_BUFFER_PRE_PADDING]` and how long it is.
-            // we know that our response has the same length as request because
-            // it's the same message in reverse order.
+                    if( i > 0 )
+                    {
+                        strcat( &signalJSONData[0], ",");
+                    }
+                    strcat( &signalJSONData[0], temp);
+                }
+                strcat(&signalJSONData[0], "]");
+
+                //printf("%d:%s\n", signal, signalJSONData);
+
+                //
+                //
+                //
+                if( signal > 0 )
+                {
+                    strcat( payload, ", \n" );
+                }
+                strcat( payload, &signalJSONData[0] );
+            }
+            strcat(payload, "] }");
+
+            printf("\n\n(%d)    %s\n", (uint32_t)strlen(payload), payload);
+
+            //
+            //
+            //
             lws_write(wsi, buf, strlen(buf), LWS_WRITE_TEXT);
-            // release memory back into the wild
-            free(buf);
+
+            //free(buf);
+
             break;
         }
 
