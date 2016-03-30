@@ -71,8 +71,8 @@ int ReactorUIProtocolCallback(struct lws* wsi, enum lws_callback_reasons reason,
         {
             //printf("received request\n");
 
-            //char   buf[1024*2];
-            char*   buf         = (char*)malloc(1024*32);
+            static char   buf[1024*32];
+            //char*   buf         = (char*)malloc(1024*32);
             char*   payload     = &buf[0];
             //char*   payload     = &buf[LWS_PRE];
             //strcpy(buf, "{ \"data\":[[11,22,33,44],[21,22,23,24],[31,32,33,34],[41,42,43,44]] }");
