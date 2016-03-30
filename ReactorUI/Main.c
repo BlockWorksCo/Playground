@@ -39,10 +39,11 @@ void GenerateSignalData()
 {
     for(uint32_t signal=0; signal<16; signal++)
     {
-        for(uint32_t i=0; i<100; i++)
+        for(uint32_t i=0; i<99; i++)
         {
-            signals[i][signal]  = rand() % 2;
+            signals[i][signal]  = signals[i+1][signal];
         }
+        signals[99][signal]  = rand() % 2;
     }
 }
 

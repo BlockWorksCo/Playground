@@ -160,7 +160,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
       //
       //
       //setInterval(function(){this.UpdateChartData(this);}.bind(this), 5);   
-      setInterval(function(){this.UpdateChart(this);}.bind(this), 25);   
+      //setInterval(function(){this.UpdateChart(this);}.bind(this), 25);   
 
       //
       //
@@ -188,6 +188,7 @@ Written by Steve Tickle <Steve@BlockWorks.co>, November 2015.
     {
       message  = JSON.parse(evt.data);
       this.signalData   = message.data;
+      this.UpdateChart(this);
 
       //this.websocket.close();
       this.websocket.send("blaa");
