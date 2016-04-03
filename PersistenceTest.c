@@ -23,38 +23,41 @@ PersistentCircularBufferContext context = {0};
 
 
 
+void Add()
+{
+    static uint8_t      element[100]    = {0};
+    uint32_t*           value           = (uint32_t*)&element[0];
+
+    (*value)++;
+    PersistentCircularBufferAdd( &context, &element[0] );
+}
+
+void Remove()
+{
+    uint8_t     element[100]    = {0};
+    uint32_t*   value           = (uint32_t*)&element[0];
+
+    PersistentCircularBufferRemove( &context, &element[0] );
+    printf("[%d]\n", *value);
+}
+
+
 int main()
 {
     FLASHDeviceInitialise();
     PersistentCircularBufferInitialise( &context, &layout );
-    ShowState( &context );
+    //ShowState( &context );
 
-    uint8_t     element[100]    = {0};
-    strcpy(&element[0], "one");
-    PersistentCircularBufferAdd( &context, &element[0] );
-    ShowState( &context );
-#if 1
-    strcpy(&element[0], "two");
-    PersistentCircularBufferAdd( &context, &element[0] );
 
-    strcpy(&element[0], "three");
-    PersistentCircularBufferAdd( &context, &element[0] );
+    uint32_t    i = 0;
+    while(i<1000)
+    {
+        Add();
+        Remove();
 
-    ShowState( &context );
-#endif
-    memset(&element[0], 0, sizeof(element));
-    PersistentCircularBufferRemove( &context, &element[0] );
-    printf("[%s]\n", element);
-    ShowState( &context );
-#if 1
-    memset(&element[0], 0, sizeof(element));
-    PersistentCircularBufferRemove( &context, &element[0] );
-    printf("[%s]\n", element);
+        i++;
+    }
 
-    memset(&element[0], 0, sizeof(element));
-    PersistentCircularBufferRemove( &context, &element[0] );
-    printf("[%s]\n", element);
-#endif
     PersistentCircularBufferFlush( &context );
 }
 

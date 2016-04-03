@@ -44,7 +44,7 @@ void Read( PersistentCircularBufferContext* context, uint32_t offset, uint32_t n
     {
         uint32_t    pageOffset  = offset % PAGE_SIZE;
 
-        printf("-- Loading cache from page %d\n", page);
+        //printf("-- Loading cache from page %d\n", page);
         memcpy( data, &context->writeBuffer[pageOffset], numberOfBytes );
     }
     else
@@ -66,7 +66,7 @@ void Write( PersistentCircularBufferContext* context, uint32_t offset, uint32_t 
     {
         uint32_t    pageOffset  = offset % PAGE_SIZE;
         memcpy( &context->writeBuffer[pageOffset], data, numberOfBytes );
-        printf("-- Saving cache to page %d\n", page);
+        //printf("-- Saving cache to page %d\n", page);
     }
     else
     {
