@@ -37,7 +37,8 @@ void Read( PersistentCircularBufferContext* context, uint32_t offset, uint32_t n
 {
     uint32_t    page    = offset / PAGE_SIZE;
 
-    if(page == context->writeBufferedPage)
+    //if(page == context->writeBufferedPage)
+    if(true)
     {
         uint32_t    pageOffset  = offset % PAGE_SIZE;
         memcpy( data, &context->writeBuffer[pageOffset], numberOfBytes );
@@ -57,7 +58,8 @@ void Write( PersistentCircularBufferContext* context, uint32_t offset, uint32_t 
 {
     uint32_t    page    = offset / PAGE_SIZE;
 
-    if(page == context->writeBufferedPage)
+    //if(page == context->writeBufferedPage)
+    if(true)
     {
         uint32_t    pageOffset  = offset % PAGE_SIZE;
         memcpy( &context->writeBuffer[pageOffset], data, numberOfBytes );

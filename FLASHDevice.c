@@ -27,13 +27,16 @@ void FLASHDeviceInitialise()
         exit(-1);
     }
 
+    lseek(fd, RAW_DEVICE_SIZE-1, SEEK_SET);
+    write(fd, "", 1);
+
     FLASHDeviceEraseDevice();
 }
 
 
 bool FLASHDeviceEraseDevice()
 {
-    for(uint32_t i=NUMBER_OF_PAGES-1; i>=0; i--)
+    for(uint32_t i=0; i<NUMBER_OF_PAGES; i++)
     {
         FLASHDeviceErasePage( i );        
     }
@@ -45,8 +48,8 @@ bool FLASHDeviceEraseDevice()
 bool FLASHDeviceErasePage(uint32_t page)
 {
     printf("erasing page %d\n", page);
-    lseek( fd, SEEK_SET, (uint32_t)page*PAGE_SIZE );
-    off_t   pos     = lseek( fd, SEEK_CUR, 0 );
+    lseek( fd, (uint32_t)page*PAGE_SIZE, SEEK_SET );
+    off_t   pos     = lseek( fd, 0, SEEK_CUR );
     if(pos != page*PAGE_SIZE)
     {
         printf("pos %d != %d\n", (int)pos, page*PAGE_SIZE);
@@ -70,7 +73,7 @@ bool FLASHDeviceErasePage(uint32_t page)
 
 bool FLASHDeviceWrite(uint32_t offset, uint32_t numberOfBytes, uint8_t* data)
 {
-    off_t   pos = lseek( fd, SEEK_SET, offset );
+    off_t   pos = lseek( fd, offset, SEEK_SET );
     if(pos != offset)
     {
         printf("pos %d != %d\n", (int)pos, offset );
@@ -78,7 +81,7 @@ bool FLASHDeviceWrite(uint32_t offset, uint32_t numberOfBytes, uint8_t* data)
     }
     write( fd, &data[0], numberOfBytes );
 
-    printf("Writing %d bytes to %08x\n", numberOfBytes, offset );
+    printf("-- Writing %d bytes to %08x\n", numberOfBytes, offset );
 
     return true;
 }
@@ -86,7 +89,7 @@ bool FLASHDeviceWrite(uint32_t offset, uint32_t numberOfBytes, uint8_t* data)
 
 void FLASHDeviceRead(uint32_t offset, uint32_t numberOfBytes, uint8_t* data)
 {
-    off_t   pos = lseek( fd, SEEK_SET, offset );
+    off_t   pos = lseek( fd, offset, SEEK_SET );
     if(pos != offset)
     {
         printf("pos %d != %d\n", (int)pos, offset );
@@ -94,7 +97,7 @@ void FLASHDeviceRead(uint32_t offset, uint32_t numberOfBytes, uint8_t* data)
     }
     read( fd, &data[0], numberOfBytes );
     
-    printf("Reading %d bytes from %08x\n", numberOfBytes, offset);
+    printf("-- Reading %d bytes from %08x\n", numberOfBytes, offset);
 }
 
 
