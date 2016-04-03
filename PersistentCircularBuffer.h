@@ -1,4 +1,13 @@
 //
+// Copyright (C) BlockWorks Consulting Ltd - All Rights Reserved.
+// Unauthorized copying of this file, via any medium is strictly prohibited.
+// Proprietary and confidential.
+// Written by Steve Tickle <Steve@BlockWorks.co>, September 2014.
+//
+
+
+
+//
 // This buffer acts as its own journal and cache.
 // - The last element is cached and can be updated before its flushed out.
 // - The caching works because it is no longer a random-access device, only the last element needs

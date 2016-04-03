@@ -1,3 +1,9 @@
+//
+// Copyright (C) BlockWorks Consulting Ltd - All Rights Reserved.
+// Unauthorized copying of this file, via any medium is strictly prohibited.
+// Proprietary and confidential.
+// Written by Steve Tickle <Steve@BlockWorks.co>, September 2014.
+//
 
 
 
@@ -88,6 +94,8 @@ void FindFirstAndLastElement( PersistentCircularBufferContext* context )
     uint32_t    highestSequenceNumber   = 0;
     uint8_t     elementNumber           = 0;
 
+    context->firstElement   = 0;
+    context->lastElement    = 0;
     for(uint32_t page=0; page<context->layout->numberOfPages; page++)
     {
         for(uint32_t i=0; i<context->layout->numberOfElementsPerPage; i++)
@@ -95,7 +103,7 @@ void FindFirstAndLastElement( PersistentCircularBufferContext* context )
             ElementMetadata     metadata;
             Read( context, (page*PAGE_SIZE)+(FULL_ELEMENT_SIZE(context)*i), sizeof(metadata), (uint8_t*)&metadata );
 
-            printf("%d,%d) %d\n", page,i, metadata.sequenceNumber );
+            //printf("%d,%d) %d\n", page,i, metadata.sequenceNumber );
 
             if( metadata.sequenceNumber >= highestSequenceNumber )
             {
