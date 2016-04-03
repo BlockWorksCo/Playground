@@ -187,7 +187,6 @@ void PersistentCircularBufferAdd( PersistentCircularBufferContext* context, uint
     context->lastElement   = (context->lastElement + 1) % context->layout->numberOfElementsInTotal;
 
     Write( context, elementOffset,                    sizeof(metadata),                           (uint8_t*)&metadata );
-    printf("(write) elementOffset = %d, num=%d\n", elementOffset, context->layout->numberOfBytesPerElement);
     Write( context, elementOffset+sizeof(metadata),   context->layout->numberOfBytesPerElement,   data );
 }
 
@@ -210,7 +209,6 @@ void PersistentCircularBufferRemove( PersistentCircularBufferContext* context, u
     //
     // Read the data 
     //
-    printf("(read) elementOffset = %d, num=%d\n", elementOffset, context->layout->numberOfBytesPerElement);
     Read( context, elementOffset+sizeof(ElementMetadata),   context->layout->numberOfBytesPerElement,   data );
 
     //

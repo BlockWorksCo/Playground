@@ -32,7 +32,7 @@ int main()
 
     uint8_t     element[100]    = {0};
     strcpy(&element[0], "one");
-    PersistentCircularBufferAdd( &context, &element[0] );
+    //PersistentCircularBufferAdd( &context, &element[0] );
     //PersistentCircularBufferAdd( &context, "two" );
     //PersistentCircularBufferAdd( &context, "three" );
 

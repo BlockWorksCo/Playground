@@ -20,9 +20,10 @@ int     fd  = -1;
 
 void FLASHDeviceInitialise()
 {
-    fd  = creat("FLASH.bin", O_RDWR|S_IRWXU);
+    fd  = open("FLASH.bin", O_RDWR|O_CREAT, S_IRWXU);
     if(fd == -1)
     {
+        perror("Couldn't create file.\n");
         exit(-1);
     }
 
@@ -43,7 +44,12 @@ bool FLASHDeviceEraseDevice()
 
 bool FLASHDeviceErasePage(uint32_t page)
 {
-    lseek( fd, SEEK_SET, page*PAGE_SIZE );
+    off_t   pos     = lseek( fd, SEEK_SET, page*PAGE_SIZE );
+    if(pos != page*PAGE_SIZE)
+    {
+        printf("pos %d != %d\n", (int)pos, page*PAGE_SIZE);
+        //exit(-1);
+    }
 
     uint8_t     data[PAGE_SIZE];
     memset(&data[0], 0xff, PAGE_SIZE);
@@ -62,8 +68,15 @@ bool FLASHDeviceErasePage(uint32_t page)
 
 bool FLASHDeviceWrite(uint32_t offset, uint32_t numberOfBytes, uint8_t* data)
 {
-    lseek( fd, SEEK_SET, offset );
+    off_t   pos = lseek( fd, SEEK_SET, offset );
+    if(pos != offset)
+    {
+        printf("pos %d != %d\n", (int)pos, offset );
+        exit(-1);
+    }
     write( fd, &data[0], numberOfBytes );
+
+    printf("Writing %d bytes to %08x\n", numberOfBytes, offset );
 
     return true;
 }
@@ -71,8 +84,15 @@ bool FLASHDeviceWrite(uint32_t offset, uint32_t numberOfBytes, uint8_t* data)
 
 void FLASHDeviceRead(uint32_t offset, uint32_t numberOfBytes, uint8_t* data)
 {
-    lseek( fd, SEEK_SET, offset );
+    off_t   pos = lseek( fd, SEEK_SET, offset );
+    if(pos != offset)
+    {
+        printf("pos %d != %d\n", (int)pos, offset );
+        exit(-1);
+    }
     read( fd, &data[0], numberOfBytes );
+    
+    printf("Reading %d bytes from %08x\n", numberOfBytes, offset);
 }
 
 

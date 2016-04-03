@@ -1,0 +1,3 @@
+gcc -g -o PersistenceTest PersistenceTest.c PersistentCircularBuffer.c FLASHDevice.c
+
+
