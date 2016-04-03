@@ -33,15 +33,16 @@ int main()
     uint8_t     element[100]    = {0};
     strcpy(&element[0], "one");
     PersistentCircularBufferAdd( &context, &element[0] );
-#if 0
     //PersistentCircularBufferAdd( &context, "two" );
     //PersistentCircularBufferAdd( &context, "three" );
 
     ShowState( &context );
 
+    memset(&element[0], 0, sizeof(element));
     PersistentCircularBufferRemove( &context, &element[0] );
     printf("[%s]\n", element);
-#endif    
+
+    PersistentCircularBufferFlush( &context );
 }
 
 
