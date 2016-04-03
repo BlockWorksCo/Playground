@@ -40,10 +40,12 @@ void Read( PersistentCircularBufferContext* context, uint32_t offset, uint32_t n
 {
     uint32_t    page    = offset / PAGE_SIZE;
 
-    //if(page == context->writeBufferedPage)
-    if(true)
+    if(page == context->writeBufferedPage)
+    //if(true)
     {
         uint32_t    pageOffset  = offset % PAGE_SIZE;
+
+        FLASHDeviceRead( page*PAGE_SIZE,   PAGE_SIZE,  &context->writeBuffer[0] );
         memcpy( data, &context->writeBuffer[pageOffset], numberOfBytes );
     }
     else
@@ -61,11 +63,12 @@ void Write( PersistentCircularBufferContext* context, uint32_t offset, uint32_t 
 {
     uint32_t    page    = offset / PAGE_SIZE;
 
-    //if(page == context->writeBufferedPage)
-    if(true)
+    if(page == context->writeBufferedPage)
+    //if(true)
     {
         uint32_t    pageOffset  = offset % PAGE_SIZE;
         memcpy( &context->writeBuffer[pageOffset], data, numberOfBytes );
+        FLASHDeviceWrite( page*PAGE_SIZE,   PAGE_SIZE,  &context->writeBuffer[0] );
     }
     else
     {
