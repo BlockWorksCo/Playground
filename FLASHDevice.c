@@ -47,7 +47,7 @@ bool FLASHDeviceEraseDevice()
 
 bool FLASHDeviceErasePage(uint32_t page)
 {
-    printf("erasing page %d\n", page);
+    //printf("erasing page %d\n", page);
     lseek( fd, (uint32_t)page*PAGE_SIZE, SEEK_SET );
     off_t   pos     = lseek( fd, 0, SEEK_CUR );
     if(pos != page*PAGE_SIZE)
@@ -76,12 +76,12 @@ bool FLASHDeviceWrite(uint32_t offset, uint32_t numberOfBytes, uint8_t* data)
     off_t   pos = lseek( fd, offset, SEEK_SET );
     if(pos != offset)
     {
-        printf("pos %d != %d\n", (int)pos, offset );
+        //printf("pos %d != %d\n", (int)pos, offset );
         exit(-1);
     }
     write( fd, &data[0], numberOfBytes );
 
-    printf("-- Writing %d bytes to %08x\n", numberOfBytes, offset );
+    //printf("-- Writing %d bytes to %08x\n", numberOfBytes, offset );
 
     return true;
 }
@@ -92,12 +92,12 @@ void FLASHDeviceRead(uint32_t offset, uint32_t numberOfBytes, uint8_t* data)
     off_t   pos = lseek( fd, offset, SEEK_SET );
     if(pos != offset)
     {
-        printf("pos %d != %d\n", (int)pos, offset );
+        //printf("pos %d != %d\n", (int)pos, offset );
         exit(-1);
     }
     read( fd, &data[0], numberOfBytes );
     
-    printf("-- Reading %d bytes from %08x\n", numberOfBytes, offset);
+    //printf("-- Reading %d bytes from %08x\n", numberOfBytes, offset);
 }
 
 

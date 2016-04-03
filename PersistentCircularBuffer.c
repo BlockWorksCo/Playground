@@ -44,7 +44,7 @@ void Read( PersistentCircularBufferContext* context, uint32_t offset, uint32_t n
     {
         uint32_t    pageOffset  = offset % PAGE_SIZE;
 
-        FLASHDeviceRead( page*PAGE_SIZE,   PAGE_SIZE,  &context->writeBuffer[0] );
+        printf("-- Loading cache from page %d\n", page);
         memcpy( data, &context->writeBuffer[pageOffset], numberOfBytes );
     }
     else
@@ -66,7 +66,7 @@ void Write( PersistentCircularBufferContext* context, uint32_t offset, uint32_t 
     {
         uint32_t    pageOffset  = offset % PAGE_SIZE;
         memcpy( &context->writeBuffer[pageOffset], data, numberOfBytes );
-        FLASHDeviceWrite( page*PAGE_SIZE,   PAGE_SIZE,  &context->writeBuffer[0] );
+        printf("-- Saving cache to page %d\n", page);
     }
     else
     {
@@ -119,7 +119,7 @@ void FindFirstAndLastElement( PersistentCircularBufferContext* context )
         for(uint32_t i=0; i<context->layout->numberOfElementsPerPage; i++)
         {
             ElementMetadata     metadata;
-            Read( context, (page*PAGE_SIZE)+(FULL_ELEMENT_SIZE(context)*i), sizeof(metadata), (uint8_t*)&metadata );
+            FLASHDeviceRead( (page*PAGE_SIZE)+(FULL_ELEMENT_SIZE(context)*i), sizeof(metadata), (uint8_t*)&metadata );
 
             //printf("%d, %d,%d) %d\n", elementNumber, page,i, metadata.sequenceNumber );
 
