@@ -33,7 +33,7 @@ int main()
     strcpy(&element[0], "one");
     PersistentCircularBufferAdd( &context, &element[0] );
     ShowState( &context );
-#if 0
+#if 1
     strcpy(&element[0], "two");
     PersistentCircularBufferAdd( &context, &element[0] );
 
@@ -46,7 +46,7 @@ int main()
     PersistentCircularBufferRemove( &context, &element[0] );
     printf("[%s]\n", element);
     ShowState( &context );
-#if 0
+#if 1
     memset(&element[0], 0, sizeof(element));
     PersistentCircularBufferRemove( &context, &element[0] );
     printf("[%s]\n", element);
