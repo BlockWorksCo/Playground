@@ -37,8 +37,8 @@ void Read( PersistentCircularBufferContext* context, uint32_t offset, uint32_t n
 {
     uint32_t    page    = offset / PAGE_SIZE;
 
-    //if(page == context->writeBufferedPage)
-    if(true)
+    if(page == context->writeBufferedPage)
+    //if(true)
     {
         uint32_t    pageOffset  = offset % PAGE_SIZE;
         memcpy( data, &context->writeBuffer[pageOffset], numberOfBytes );
@@ -58,8 +58,8 @@ void Write( PersistentCircularBufferContext* context, uint32_t offset, uint32_t 
 {
     uint32_t    page    = offset / PAGE_SIZE;
 
-    //if(page == context->writeBufferedPage)
-    if(true)
+    if(page == context->writeBufferedPage)
+    //if(true)
     {
         uint32_t    pageOffset  = offset % PAGE_SIZE;
         memcpy( &context->writeBuffer[pageOffset], data, numberOfBytes );
@@ -79,7 +79,7 @@ void Write( PersistentCircularBufferContext* context, uint32_t offset, uint32_t 
 //
 void PersistentCircularBufferFlush( PersistentCircularBufferContext* context )
 {
-    FLASHDeviceWrite( context->writeBufferedPage,   PAGE_SIZE,  &context->writeBuffer[0] );
+    FLASHDeviceWrite( context->writeBufferedPage*PAGE_SIZE,   PAGE_SIZE,  &context->writeBuffer[0] );
 }
 
 
@@ -144,7 +144,10 @@ void PersistentCircularBufferInitialise( PersistentCircularBufferContext* contex
     //
     // TODO: Load up the write buffer.
     //
-
+    context->writeBufferedPage  = context->lastElement / context->layout->numberOfElementsPerPage;
+    FLASHDeviceRead( context->writeBufferedPage*PAGE_SIZE,   PAGE_SIZE,  &context->writeBuffer[0] );
+    FLASHDeviceErasePage( context->writeBufferedPage );
+    printf("Preloaded page %d %d\n", context->writeBufferedPage, context->writeBufferedPage*PAGE_SIZE);
 }
 
 
@@ -195,6 +198,20 @@ void PersistentCircularBufferAdd( PersistentCircularBufferContext* context, uint
 
     Write( context, elementOffset,                    sizeof(metadata),                           (uint8_t*)&metadata );
     Write( context, elementOffset+sizeof(metadata),   context->layout->numberOfBytesPerElement,   data );
+
+    //
+    // If the write-bufferd page has changed (to accomodate the new lastElement) then flush the
+    // write-buffered page and read the new one.
+    //
+    if( (context->lastElement/context->layout->numberOfElementsPerPage) != context->writeBufferedPage )
+    {
+        PersistentCircularBufferFlush(context);
+        
+        context->writeBufferedPage  = context->lastElement / context->layout->numberOfElementsPerPage;
+        FLASHDeviceRead( context->writeBufferedPage*PAGE_SIZE,   PAGE_SIZE,  &context->writeBuffer[0] );
+        FLASHDeviceErasePage( context->writeBufferedPage );
+        printf("Preloaded page %d %d\n", context->writeBufferedPage, context->writeBufferedPage*PAGE_SIZE);
+    }
 }
 
 
