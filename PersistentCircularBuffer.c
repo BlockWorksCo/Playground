@@ -92,7 +92,7 @@ void FindFirstAndLastElement( PersistentCircularBufferContext* context )
 {
     uint32_t    lowestSequenceNumber    = (uint32_t)-1;
     uint32_t    highestSequenceNumber   = 0;
-    uint8_t     elementNumber           = 0;
+    uint32_t    elementNumber           = 0;
 
     context->firstElement   = 0;
     context->lastElement    = 0;
@@ -103,16 +103,18 @@ void FindFirstAndLastElement( PersistentCircularBufferContext* context )
             ElementMetadata     metadata;
             Read( context, (page*PAGE_SIZE)+(FULL_ELEMENT_SIZE(context)*i), sizeof(metadata), (uint8_t*)&metadata );
 
-            //printf("%d,%d) %d\n", page,i, metadata.sequenceNumber );
+            printf("%d, %d,%d) %d\n", elementNumber, page,i, metadata.sequenceNumber );
 
             if( metadata.sequenceNumber >= highestSequenceNumber )
             {
+                printf("<high>\n");
                 highestSequenceNumber   = metadata.sequenceNumber;
                 context->lastElement    = elementNumber;
             }
 
             if( metadata.sequenceNumber <= lowestSequenceNumber )
             {
+                printf("<low>\n");
                 lowestSequenceNumber    = metadata.sequenceNumber;
                 context->firstElement   = elementNumber;
             }

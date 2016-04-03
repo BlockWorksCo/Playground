@@ -27,6 +27,7 @@ int main()
     FLASHDeviceInitialise();
     PersistentCircularBufferInitialise( &context, &layout );
     ShowState( &context );
+    printf("\n\n");
 
     PersistentCircularBufferAdd( &context, "one" );
     //PersistentCircularBufferAdd( &context, "two" );
