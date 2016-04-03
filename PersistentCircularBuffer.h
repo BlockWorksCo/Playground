@@ -28,13 +28,13 @@
 #include <stdbool.h>
 
 
-#define LAYOUT(page,numPages,elementSize)                                           \
-{                                                                                   \
-    .startPage                  = page,                                             \
-    .numberOfPages              = numPages,                                         \
-    .numberOfBytesPerElement    = elementSize,                                      \
-    .numberOfElementsPerPage    = PAGE_SIZE/(elementSize+sizeof(ElementMetadata)),  \
-    .numberOfElementsInTotal    = numPages * (PAGE_SIZE/elementSize),               \
+#define LAYOUT(page,numPages,elementSize)                                                           \
+{                                                                                                   \
+    .startPage                  = page,                                                             \
+    .numberOfPages              = numPages,                                                         \
+    .numberOfBytesPerElement    = elementSize,                                                      \
+    .numberOfElementsPerPage    = PAGE_SIZE/(elementSize+sizeof(ElementMetadata)),                  \
+    .numberOfElementsInTotal    = numPages * (PAGE_SIZE/(elementSize+sizeof(ElementMetadata))),     \
 }
 
 #define FULL_ELEMENT_SIZE(context)  (sizeof(ElementMetadata)+context->layout->numberOfBytesPerElement)
