@@ -104,7 +104,10 @@ void FindFirstAndLastElement( PersistentCircularBufferContext* context )
 
 
 
-
+//
+// Setup the dynamic context data for the circular buffer.
+// - Finds the first and last element
+//
 void PersistentCircularBufferInitialise( PersistentCircularBufferContext* context, PersistentCircularBufferLayout* layout )
 {
     context->layout     = layout;
@@ -139,12 +142,22 @@ void PersistentCircularBufferAdd( PersistentCircularBufferContext* context, uint
     uint32_t    elementIndex    = context->lastElement % context->layout->numberOfElementsPerPage;
     uint32_t    elementOffset   = (page * PAGE_SIZE) + (elementIndex * FULL_ELEMENT_SIZE(context));
 
+    //
+    // Make a new element with an increasing sequence number (so we can identify the
+    // first an dlast after a reset).
+    //
     context->lastSequenceNumber++;
     ElementMetadata     metadata    = 
     {
         .sequenceNumber     = context->lastSequenceNumber,
         .crc                = 0xa5a5,
     };
+
+    //
+    // Move the last-element pointer around the buffer in a circular manner, overwriting
+    // old data when needed.
+    //
+    context->lastElement   = (context->lastElement + 1) % context->layout->numberOfElementsInTotal;
 
     Write( context, elementOffset,                    sizeof(metadata),                           (uint8_t*)&metadata );
     Write( context, elementOffset+sizeof(metadata),   context->layout->numberOfBytesPerElement,   data );
@@ -164,6 +177,9 @@ void PersistentCircularBufferRemove( PersistentCircularBufferContext* context )
     uint32_t    elementIndex    = context->firstElement % context->layout->numberOfElementsPerPage;
     uint32_t    elementOffset   = (page * PAGE_SIZE) + (elementIndex * FULL_ELEMENT_SIZE(context));
 
+    //
+    // Update the metadata of the current last-element to remove it from the buffer.
+    //
     ElementMetadata     metadata    = 
     {
         .sequenceNumber     = (uint32_t)-1,
@@ -172,7 +188,10 @@ void PersistentCircularBufferRemove( PersistentCircularBufferContext* context )
 
     Write( context, elementOffset,     sizeof(metadata),   (uint8_t*)&metadata );
 
-    context->lastSequenceNumber++;
+    //
+    // Move the first element index around the buffer.
+    //
+    context->firstElement   = (context->firstElement + 1) % context->layout->numberOfElementsInTotal;
 
     //
     // Check to see if we can erase the page that contained the last element now that we've
@@ -180,6 +199,13 @@ void PersistentCircularBufferRemove( PersistentCircularBufferContext* context )
     // This is effectively the "pre-erase" so we can shutdown quickly by just doing a 'Write'
     // operation.
     //
+    if( (context->firstElement/PAGE_SIZE) != page )
+    {
+        //
+        // New first-page != old first-page, so erase old first-page.
+        //
+        FLASHDeviceErase( page/PAGE_SIZE );
+    }
 }
 
 
