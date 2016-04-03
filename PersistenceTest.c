@@ -13,7 +13,7 @@
 #include "PersistentCircularBuffer.h"
 #include <stdio.h>
 #include <string.h>
-
+#include <stdlib.h>
 
 
 
@@ -34,11 +34,22 @@ void Add()
 
 void Remove()
 {
-    uint8_t     element[100]    = {0};
-    uint32_t*   value           = (uint32_t*)&element[0];
+    static uint32_t checkValue      = 0;
+    uint8_t         element[100]    = {0};
+    uint32_t*       value           = (uint32_t*)&element[0];
 
     PersistentCircularBufferRemove( &context, &element[0] );
-    printf("[%d]\n", *value);
+
+    checkValue++;
+    if(checkValue == *value)
+    {
+        printf("[%d]\n", *value);
+    }
+    else
+    {
+        printf("BAD! [%d != %d]\n", checkValue, *value);
+        exit(-1);
+    }
 }
 
 
