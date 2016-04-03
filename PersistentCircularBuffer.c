@@ -16,6 +16,8 @@
 
 void ShowState( PersistentCircularBufferContext* context )
 {
+    printf("\n\n");
+
     printf("firstElement = %d\n", context->firstElement );
     printf("lastElement = %d\n", context->lastElement );
     printf("lastSequenceNumber = %d\n", context->lastSequenceNumber );
@@ -27,6 +29,7 @@ void ShowState( PersistentCircularBufferContext* context )
     printf("numberOfElementsPerPage = %d\n", context->layout->numberOfElementsPerPage );
     printf("numberOfElementsInTotal = %d\n", context->layout->numberOfElementsInTotal );
 
+    printf("\n\n");
 }
 
 
@@ -83,6 +86,18 @@ void PersistentCircularBufferFlush( PersistentCircularBufferContext* context )
 }
 
 
+//
+//
+//
+void PersistentCircularBufferMoveWriteBuffer( PersistentCircularBufferContext* context, uint32_t newPage )
+{
+    FLASHDeviceWrite( context->writeBufferedPage*PAGE_SIZE,   PAGE_SIZE,  &context->writeBuffer[0] );
+    context->writeBufferedPage  = newPage;
+    FLASHDeviceRead( context->writeBufferedPage*PAGE_SIZE,   PAGE_SIZE,  &context->writeBuffer[0] );
+    FLASHDeviceErasePage( context->writeBufferedPage );
+}
+
+
 
 
 
@@ -128,7 +143,17 @@ void FindFirstAndLastElement( PersistentCircularBufferContext* context )
 
 
 
+//
+//
+//
+uint32_t OffsetOfElement( PersistentCircularBufferContext* context, uint32_t elementNumber)
+{
+    uint32_t    page            = elementNumber / context->layout->numberOfElementsPerPage;
+    uint32_t    elementIndex    = elementNumber % context->layout->numberOfElementsPerPage;
+    uint32_t    elementOffset   = (page * PAGE_SIZE) + (elementIndex * FULL_ELEMENT_SIZE(context));
 
+    return elementOffset;    
+}
 
 
 //
@@ -158,9 +183,7 @@ void PersistentCircularBufferInitialise( PersistentCircularBufferContext* contex
 //
 void PersistentCircularBufferUpdateLast( PersistentCircularBufferContext* context, uint8_t* data )
 {
-    uint32_t    page            = context->lastElement / context->layout->numberOfElementsPerPage;
-    uint32_t    elementIndex    = context->lastElement % context->layout->numberOfElementsPerPage;
-    uint32_t    elementOffset   = (page * PAGE_SIZE) + (elementIndex * FULL_ELEMENT_SIZE(context));
+    uint32_t    elementOffset   = OffsetOfElement(context, context->lastElement);
 
     Write( context, elementOffset+sizeof(ElementMetadata),   context->layout->numberOfBytesPerElement,   data );
 }
@@ -173,15 +196,13 @@ void PersistentCircularBufferUpdateLast( PersistentCircularBufferContext* contex
 //
 void PersistentCircularBufferAdd( PersistentCircularBufferContext* context, uint8_t* data )
 {
-    uint32_t    page            = context->lastElement / context->layout->numberOfElementsPerPage;
-    uint32_t    elementIndex    = context->lastElement % context->layout->numberOfElementsPerPage;
-    uint32_t    elementOffset   = (page * PAGE_SIZE) + (elementIndex * FULL_ELEMENT_SIZE(context));
+    uint32_t    elementOffset   = OffsetOfElement(context, context->lastElement);
 
-    printf("Adding element %d,%d = %d\n", page, elementIndex, (page*context->layout->numberOfElementsPerPage)+elementIndex);
+    printf("Adding element = %d\n", elementOffset );
 
     //
     // Make a new element with an increasing sequence number (so we can identify the
-    // first an dlast after a reset).
+    // first and last after a reset).
     //
     context->lastSequenceNumber++;
     ElementMetadata     metadata    = 
@@ -200,17 +221,12 @@ void PersistentCircularBufferAdd( PersistentCircularBufferContext* context, uint
     Write( context, elementOffset+sizeof(metadata),   context->layout->numberOfBytesPerElement,   data );
 
     //
-    // If the write-bufferd page has changed (to accomodate the new lastElement) then flush the
+    // If the write-buffered page has changed (to accomodate the new lastElement) then flush the
     // write-buffered page and read the new one.
     //
     if( (context->lastElement/context->layout->numberOfElementsPerPage) != context->writeBufferedPage )
     {
-        PersistentCircularBufferFlush(context);
-        
-        context->writeBufferedPage  = context->lastElement / context->layout->numberOfElementsPerPage;
-        FLASHDeviceRead( context->writeBufferedPage*PAGE_SIZE,   PAGE_SIZE,  &context->writeBuffer[0] );
-        FLASHDeviceErasePage( context->writeBufferedPage );
-        printf("Preloaded page %d %d\n", context->writeBufferedPage, context->writeBufferedPage*PAGE_SIZE);
+        PersistentCircularBufferMoveWriteBuffer(context, context->lastElement / context->layout->numberOfElementsPerPage );
     }
 }
 
@@ -224,11 +240,9 @@ void PersistentCircularBufferAdd( PersistentCircularBufferContext* context, uint
 //
 void PersistentCircularBufferRemove( PersistentCircularBufferContext* context, uint8_t* data )
 {
-    uint32_t    page            = context->firstElement / context->layout->numberOfElementsPerPage;
-    uint32_t    elementIndex    = context->firstElement % context->layout->numberOfElementsPerPage;
-    uint32_t    elementOffset   = (page * PAGE_SIZE) + (elementIndex * FULL_ELEMENT_SIZE(context));
+    uint32_t    elementOffset   = OffsetOfElement(context, context->firstElement);
 
-    printf("Removing element %d,%d = %d\n", page, elementIndex, (page*context->layout->numberOfElementsPerPage)+elementIndex);
+    printf("Removing element %d\n", elementOffset );
 
     //
     // Read the data 
@@ -257,7 +271,7 @@ void PersistentCircularBufferRemove( PersistentCircularBufferContext* context, u
     // This is effectively the "pre-erase" so we can shutdown quickly by just doing a 'Write'
     // operation.
     //
-    if( (context->firstElement/PAGE_SIZE) != page )
+    //if( (context->firstElement/PAGE_SIZE) != page )
     {
         //
         // New first-page != old first-page, so erase old first-page.
@@ -281,10 +295,7 @@ void PersistentCircularBufferForEach( PersistentCircularBufferContext* context, 
 
     while(i <= context->lastElement)
     {
-        uint32_t    page            = i / context->layout->numberOfElementsPerPage;
-        uint32_t    elementIndex    = i % context->layout->numberOfElementsPerPage;
-        uint32_t    elementOffset   = (page * PAGE_SIZE) + (elementIndex * FULL_ELEMENT_SIZE(context));
-
+        uint32_t            elementOffset   = OffsetOfElement( context, i );
         uint8_t             data[PAGE_SIZE];
         ElementMetadata     metadata;
 

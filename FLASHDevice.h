@@ -26,6 +26,7 @@ void FLASHDeviceInitialise();
 bool FLASHDeviceErasePage(uint32_t page);
 bool FLASHDeviceEraseDevice();
 bool FLASHDeviceWrite(uint32_t offset, uint32_t numberOfBytes, uint8_t* data);
+bool FLASHDeviceAsyncWrite(uint32_t offset, uint32_t numberOfBytes, uint8_t* data);
 void FLASHDeviceRead(uint32_t offset, uint32_t numberOfBytes, uint8_t* data);
 
 #endif

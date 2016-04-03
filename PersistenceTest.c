@@ -28,11 +28,11 @@ int main()
     FLASHDeviceInitialise();
     PersistentCircularBufferInitialise( &context, &layout );
     ShowState( &context );
-    printf("\n\n");
 
     uint8_t     element[100]    = {0};
     strcpy(&element[0], "one");
     PersistentCircularBufferAdd( &context, &element[0] );
+    ShowState( &context );
 #if 0
     strcpy(&element[0], "two");
     PersistentCircularBufferAdd( &context, &element[0] );
@@ -45,6 +45,7 @@ int main()
     memset(&element[0], 0, sizeof(element));
     PersistentCircularBufferRemove( &context, &element[0] );
     printf("[%s]\n", element);
+    ShowState( &context );
 #if 0
     memset(&element[0], 0, sizeof(element));
     PersistentCircularBufferRemove( &context, &element[0] );
