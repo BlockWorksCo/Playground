@@ -63,8 +63,23 @@ int main()
     uint32_t    i = 0;
     while(i<1000)
     {
-        Add();
-        Remove();
+        static uint32_t    oustanding  = 0;
+
+        if( (rand()%1000) > 50)
+        {
+            oustanding++;
+            printf("oustanding = %d\n", oustanding);
+            Add();
+        }
+        else
+        {
+            if(oustanding>0)
+            {
+                printf("oustanding = %d\n", oustanding);
+                oustanding--;
+                Remove();                
+            }
+        }
 
         i++;
     }
