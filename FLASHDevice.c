@@ -33,7 +33,7 @@ void FLASHDeviceInitialise()
 
 bool FLASHDeviceEraseDevice()
 {
-    for(uint32_t i=0; i<NUMBER_OF_PAGES; i++)
+    for(uint32_t i=NUMBER_OF_PAGES-1; i>=0; i--)
     {
         FLASHDeviceErasePage( i );        
     }
@@ -44,7 +44,9 @@ bool FLASHDeviceEraseDevice()
 
 bool FLASHDeviceErasePage(uint32_t page)
 {
-    off_t   pos     = lseek( fd, SEEK_SET, page*PAGE_SIZE );
+    printf("erasing page %d\n", page);
+    lseek( fd, SEEK_SET, (uint32_t)page*PAGE_SIZE );
+    off_t   pos     = lseek( fd, SEEK_CUR, 0 );
     if(pos != page*PAGE_SIZE)
     {
         printf("pos %d != %d\n", (int)pos, page*PAGE_SIZE);

@@ -107,14 +107,14 @@ void FindFirstAndLastElement( PersistentCircularBufferContext* context )
 
             if( metadata.sequenceNumber >= highestSequenceNumber )
             {
-                printf("<high>\n");
+                //printf("<high>\n");
                 highestSequenceNumber   = metadata.sequenceNumber;
                 context->lastElement    = elementNumber;
             }
 
             if( metadata.sequenceNumber <= lowestSequenceNumber )
             {
-                printf("<low>\n");
+                //printf("<low>\n");
                 lowestSequenceNumber    = metadata.sequenceNumber;
                 context->firstElement   = elementNumber;
             }
@@ -138,6 +138,11 @@ void PersistentCircularBufferInitialise( PersistentCircularBufferContext* contex
     context->layout     = layout;
 
     FindFirstAndLastElement( context );
+
+    //
+    // TODO: Load up the write buffer.
+    //
+
 }
 
 
