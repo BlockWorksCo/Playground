@@ -10,6 +10,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
 
 
 int     fd  = -1;
@@ -23,19 +26,35 @@ void FLASHDeviceInitialise()
         exit(-1);
     }
 
-    for(uint32_t i=0; i<NUMBER_OF_PAGES; i++)
-    {
-        FLASHDeviceErase( i );        
-    }
+    FLASHDeviceEraseDevice();
 }
 
 
-bool FLASHDeviceErase(uint32_t page)
+bool FLASHDeviceEraseDevice()
+{
+    for(uint32_t i=0; i<NUMBER_OF_PAGES; i++)
+    {
+        FLASHDeviceErasePage( i );        
+    }
+
+    return true;
+}
+
+
+bool FLASHDeviceErasePage(uint32_t page)
 {
     lseek( fd, SEEK_SET, page*PAGE_SIZE );
 
     uint8_t     data[PAGE_SIZE];
-    write( fd, &data[0], PAGE_SIZE );
+    memset(&data[0], 0xff, PAGE_SIZE);
+
+    ssize_t result = write( fd, &data[0], PAGE_SIZE );
+    if(result != PAGE_SIZE)
+    {
+        printf("<Cant write to FLASH!>\n");
+        exit(-1);
+        return false;
+    }
 
     return true;
 }

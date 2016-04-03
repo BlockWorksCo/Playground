@@ -23,7 +23,8 @@
 
 
 void FLASHDeviceInitialise();
-bool FLASHDeviceErase(uint32_t page);
+bool FLASHDeviceErasePage(uint32_t page);
+bool FLASHDeviceEraseDevice();
 bool FLASHDeviceWrite(uint32_t offset, uint32_t numberOfBytes, uint8_t* data);
 void FLASHDeviceRead(uint32_t offset, uint32_t numberOfBytes, uint8_t* data);
 

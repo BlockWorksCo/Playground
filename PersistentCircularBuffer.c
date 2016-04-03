@@ -103,7 +103,7 @@ void FindFirstAndLastElement( PersistentCircularBufferContext* context )
             ElementMetadata     metadata;
             Read( context, (page*PAGE_SIZE)+(FULL_ELEMENT_SIZE(context)*i), sizeof(metadata), (uint8_t*)&metadata );
 
-            printf("%d, %d,%d) %d\n", elementNumber, page,i, metadata.sequenceNumber );
+            //printf("%d, %d,%d) %d\n", elementNumber, page,i, metadata.sequenceNumber );
 
             if( metadata.sequenceNumber >= highestSequenceNumber )
             {
@@ -167,6 +167,8 @@ void PersistentCircularBufferAdd( PersistentCircularBufferContext* context, uint
     uint32_t    elementIndex    = context->lastElement % context->layout->numberOfElementsPerPage;
     uint32_t    elementOffset   = (page * PAGE_SIZE) + (elementIndex * FULL_ELEMENT_SIZE(context));
 
+    printf("Adding element %d,%d = %d\n", page, elementIndex, (page*context->layout->numberOfElementsPerPage)+elementIndex);
+
     //
     // Make a new element with an increasing sequence number (so we can identify the
     // first an dlast after a reset).
@@ -202,6 +204,8 @@ void PersistentCircularBufferRemove( PersistentCircularBufferContext* context, u
     uint32_t    elementIndex    = context->firstElement % context->layout->numberOfElementsPerPage;
     uint32_t    elementOffset   = (page * PAGE_SIZE) + (elementIndex * FULL_ELEMENT_SIZE(context));
 
+    printf("Removing element %d,%d = %d\n", page, elementIndex, (page*context->layout->numberOfElementsPerPage)+elementIndex);
+
     //
     // Read the data 
     //
@@ -234,7 +238,7 @@ void PersistentCircularBufferRemove( PersistentCircularBufferContext* context, u
         //
         // New first-page != old first-page, so erase old first-page.
         //
-        FLASHDeviceErase( page/PAGE_SIZE );
+        //FLASHDeviceErasePage( page/PAGE_SIZE );
     }
 }
 
