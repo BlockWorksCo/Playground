@@ -86,9 +86,12 @@ void PersistentCircularBufferInitialise( PersistentCircularBufferContext* contex
 
 void PersistentCircularBufferUpdateLast( PersistentCircularBufferContext* context, uint8_t* data );
 void PersistentCircularBufferAdd( PersistentCircularBufferContext* context, uint8_t* data );
-void PersistentCircularBufferRemove( PersistentCircularBufferContext* context );
+void PersistentCircularBufferRemove( PersistentCircularBufferContext* context, uint8_t* data  );
 void PersistentCircularBufferForEach( PersistentCircularBufferContext* context, bool (*fn)(uint32_t,uint8_t*) );
 void PersistentCircularBufferFlush( PersistentCircularBufferContext* context );
+
+
+void ShowState( PersistentCircularBufferContext* context );
 
 #endif
 

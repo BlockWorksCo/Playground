@@ -16,6 +16,11 @@ void FLASHDeviceInitialise()
     {
         exit(-1);
     }
+
+    for(uint32_t i=0; i<NUMBER_OF_PAGES; i++)
+    {
+        FLASHDeviceErase( i );        
+    }
 }
 
 

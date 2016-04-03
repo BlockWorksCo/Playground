@@ -5,7 +5,7 @@
 
 
 #include "PersistentCircularBuffer.h"
-
+#include <stdio.h>
 
 
 
@@ -24,6 +24,12 @@ int main()
     PersistentCircularBufferAdd( &context, "one" );
     PersistentCircularBufferAdd( &context, "two" );
     PersistentCircularBufferAdd( &context, "three" );
+
+    ShowState( &context );
+
+    uint8_t     element[100];
+    PersistentCircularBufferRemove( &context, &element[0] );
+    printf("[%s]\n", element);
 }
 
 

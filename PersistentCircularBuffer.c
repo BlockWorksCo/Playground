@@ -3,12 +3,25 @@
 
 #include "PersistentCircularBuffer.h"
 #include <string.h>
+#include <stdio.h>
 
 
 
 
+void ShowState( PersistentCircularBufferContext* context )
+{
+    printf("firstElement = %d\n", context->firstElement );
+    printf("lastElement = %d\n", context->lastElement );
+    printf("lastSequenceNumber = %d\n", context->lastSequenceNumber );
+    printf("writeBufferedPage = %d\n", context->writeBufferedPage );
 
+    printf("startPage = %d\n", context->layout->startPage );
+    printf("numberOfPages = %d\n", context->layout->numberOfPages );
+    printf("numberOfBytesPerElement = %d\n", context->layout->numberOfBytesPerElement );
+    printf("numberOfElementsPerPage = %d\n", context->layout->numberOfElementsPerPage );
+    printf("numberOfElementsInTotal = %d\n", context->layout->numberOfElementsInTotal );
 
+}
 
 
 //
@@ -81,6 +94,8 @@ void FindFirstAndLastElement( PersistentCircularBufferContext* context )
         {
             ElementMetadata     metadata;
             Read( context, (page*PAGE_SIZE)+(FULL_ELEMENT_SIZE(context)*i), sizeof(metadata), (uint8_t*)&metadata );
+
+            printf("%d,%d) %d\n", page,i, metadata.sequenceNumber );
 
             if( metadata.sequenceNumber >= highestSequenceNumber )
             {
@@ -171,11 +186,16 @@ void PersistentCircularBufferAdd( PersistentCircularBufferContext* context, uint
 // - Update dynamic context to the new last entry.
 // - Erase the metadata of the current last entry.
 //
-void PersistentCircularBufferRemove( PersistentCircularBufferContext* context )
+void PersistentCircularBufferRemove( PersistentCircularBufferContext* context, uint8_t* data )
 {
     uint32_t    page            = context->firstElement / context->layout->numberOfElementsPerPage;
     uint32_t    elementIndex    = context->firstElement % context->layout->numberOfElementsPerPage;
     uint32_t    elementOffset   = (page * PAGE_SIZE) + (elementIndex * FULL_ELEMENT_SIZE(context));
+
+    //
+    // Read the data 
+    //
+    Read( context, elementOffset+sizeof(ElementMetadata),   context->layout->numberOfBytesPerElement,   data );
 
     //
     // Update the metadata of the current last-element to remove it from the buffer.
