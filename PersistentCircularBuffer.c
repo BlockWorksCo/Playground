@@ -174,6 +174,11 @@ void PersistentCircularBufferInitialise( PersistentCircularBufferContext* contex
     FLASHDeviceRead( context->writeBufferedPage*PAGE_SIZE,   PAGE_SIZE,  &context->writeBuffer[0] );
     FLASHDeviceErasePage( context->writeBufferedPage );
     printf("Preloaded page %d %d\n", context->writeBufferedPage, context->writeBufferedPage*PAGE_SIZE);
+
+    //
+    // Set the current position to element 0.
+    //  
+    context->currentPosition        = 0;
 }
 
 
@@ -283,6 +288,32 @@ void PersistentCircularBufferRemove( PersistentCircularBufferContext* context, u
 
 
 
+//
+//
+//
+void PersistentCircularBufferEraseAll( PersistentCircularBufferContext* context )
+{
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
+// Navigation, search & status operations (read-only).
+//
+
+
+
 
 //
 // Call the given function for each element in the buffer in turn starting
@@ -308,4 +339,58 @@ void PersistentCircularBufferForEach( PersistentCircularBufferContext* context, 
         i++;
     }
 }
+
+
+uint32_t PersistentCircularBufferNumberOfElements( PersistentCircularBufferContext* context )
+{
+    //
+    // TODO: Count the elements.
+    //  
+    return 0;
+}
+
+
+uint32_t PersistentCircularBufferCapacity( PersistentCircularBufferContext* context )
+{
+    return context->layout->numberOfElementsInTotal;
+}
+
+
+void PersistentCircularBufferMoveToFirst( PersistentCircularBufferContext* context )
+{
+    context->currentPosition    = context->firstElement;
+}
+
+
+void PersistentCircularBufferMoveToLast( PersistentCircularBufferContext* context )
+{
+    context->currentPosition    = context->lastElement;
+}
+
+
+void PersistentCircularBufferBack( PersistentCircularBufferContext* context )
+{
+    context->currentPosition    = (context->currentPosition - 1) % context->layout->numberOfElementsInTotal;
+}
+
+
+void PersistentCircularBufferForward( PersistentCircularBufferContext* context )
+{
+    context->currentPosition    = (context->currentPosition + 1) % context->layout->numberOfElementsInTotal;
+}
+
+
+void PersistentCircularBufferPeek( PersistentCircularBufferContext* context, uint8_t* data )
+{
+    uint32_t            elementOffset   = OffsetOfElement( context, context->currentPosition );
+    ElementMetadata     metadata;
+
+    Read(context, elementOffset,                    sizeof(metadata),                           (uint8_t*)&metadata );
+    Read(context, elementOffset+sizeof(metadata),   context->layout->numberOfBytesPerElement,   &data[0] );
+}
+
+
+
+
+
 

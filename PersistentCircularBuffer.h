@@ -88,6 +88,8 @@ typedef struct
     uint8_t                         writeBuffer[PAGE_SIZE];
     uint32_t                        writeBufferedPage;
 
+    uint32_t                        currentPosition;
+
 } PersistentCircularBufferContext;
 
 
@@ -98,6 +100,16 @@ void PersistentCircularBufferAdd( PersistentCircularBufferContext* context, uint
 void PersistentCircularBufferRemove( PersistentCircularBufferContext* context, uint8_t* data  );
 void PersistentCircularBufferForEach( PersistentCircularBufferContext* context, bool (*fn)(uint32_t,uint8_t*) );
 void PersistentCircularBufferFlush( PersistentCircularBufferContext* context );
+uint32_t PersistentCircularBufferNumberOfElements( PersistentCircularBufferContext* context );
+uint32_t PersistentCircularBufferCapacity( PersistentCircularBufferContext* context );
+
+void PersistentCircularBufferEraseAll( PersistentCircularBufferContext* context );
+
+void PersistentCircularBufferMoveToFirst( PersistentCircularBufferContext* context );
+void PersistentCircularBufferMoveToLast( PersistentCircularBufferContext* context );
+void PersistentCircularBufferBack( PersistentCircularBufferContext* context );
+void PersistentCircularBufferForward( PersistentCircularBufferContext* context );
+void PersistentCircularBufferPeek( PersistentCircularBufferContext* context, uint8_t* data );
 
 
 void ShowState( PersistentCircularBufferContext* context );
