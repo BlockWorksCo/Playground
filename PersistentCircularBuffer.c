@@ -244,7 +244,7 @@ void PersistentCircularBufferAdd( PersistentCircularBufferContext* context, uint
 // - Update dynamic context to the new last entry.
 // - Erase the metadata of the current last entry.
 //
-void PersistentCircularBufferRemove( PersistentCircularBufferContext* context, uint8_t* data )
+void PersistentCircularBufferRemoveFirst( PersistentCircularBufferContext* context, uint8_t* data )
 {
     uint32_t    elementOffset   = OffsetOfElement(context, context->firstElement);
 
@@ -287,16 +287,51 @@ void PersistentCircularBufferRemove( PersistentCircularBufferContext* context, u
 }
 
 
+void PersistentCircularBufferRemoveLast( PersistentCircularBufferContext* context )
+{
+    uint32_t    elementOffset   = OffsetOfElement(context, context->lastElement);
+
+    printf("Removing element %d\n", elementOffset );
+
+    //
+    // Update the metadata of the current last-element to remove it from the buffer.
+    //
+    ElementMetadata     metadata    = 
+    {
+        .sequenceNumber     = (uint32_t)-1,
+        .crc                = (uint32_t)-1,
+    };
+
+    Write( context, elementOffset,     sizeof(metadata),   (uint8_t*)&metadata );
+
+    //
+    // Move the first element index around the buffer.
+    //
+    context->lastElement   = (context->lastElement - 1) % context->layout->numberOfElementsInTotal;
+
+    //
+    // Check to see if we can erase the page that contained the last element now that we've
+    // moved on.
+    // This is effectively the "pre-erase" so we can shutdown quickly by just doing a 'Write'
+    // operation.
+    //
+    //if( (context->firstElement/PAGE_SIZE) != page )
+    {
+        //
+        // New first-page != old first-page, so erase old first-page.
+        //
+        //FLASHDeviceErasePage( page/PAGE_SIZE );
+    }
+}
+
+
 
 //
 //
 //
 void PersistentCircularBufferEraseAll( PersistentCircularBufferContext* context )
 {
-    for(uint32_t i=0; i<context->layout->numberOfPages; i++)
-    {
-        FLASHDeviceErasePage(context->layout->startPage + i);
-    }
+
 }
 
 
@@ -328,7 +363,7 @@ void PersistentCircularBufferForEach( PersistentCircularBufferContext* context, 
 {
     uint32_t    i       = context->firstElement;
 
-    while(i != context->lastElement)
+    while(i <= context->lastElement)
     {
         uint32_t            elementOffset   = OffsetOfElement( context, i );
         uint8_t             data[PAGE_SIZE];
@@ -337,30 +372,19 @@ void PersistentCircularBufferForEach( PersistentCircularBufferContext* context, 
         Read(context, elementOffset,                    sizeof(metadata),                           (uint8_t*)&metadata );
         Read(context, elementOffset+sizeof(metadata),   context->layout->numberOfBytesPerElement,   &data[0] );
 
-        fn( metadata.sequenceNumber, &data[0] );
+        fn( i-context->firstElement, &data[0] );
 
-        i   = (i+1) % context->layout->numberOfElementsInTotal;
+        i++;
     }
 }
 
 
 uint32_t PersistentCircularBufferNumberOfElements( PersistentCircularBufferContext* context )
 {
-    uint32_t    i       = context->firstElement;
-    uint32_t    count   = 0;
-
-    while(i != context->lastElement)
-    {
-        uint32_t            elementOffset   = OffsetOfElement( context, i );
-        ElementMetadata     metadata;
-
-        Read(context, elementOffset,                    sizeof(metadata),                           (uint8_t*)&metadata );
-
-        count++;
-        i   = (i+1) % context->layout->numberOfElementsInTotal;
-    }
-
-    return count;
+    //
+    // TODO: Count the elements.
+    //  
+    return 0;
 }
 
 

@@ -38,7 +38,7 @@ void Remove()
     uint8_t         element[100]    = {0};
     uint32_t*       value           = (uint32_t*)&element[0];
 
-    PersistentCircularBufferRemove( &context, &element[0] );
+    PersistentCircularBufferRemoveFirst( &context, &element[0] );
 
     checkValue++;
     if(checkValue == *value)
@@ -59,26 +59,23 @@ int main()
     PersistentCircularBufferInitialise( &context, &layout );
     //ShowState( &context );
 
-
+    srand(3);
     uint32_t    i = 0;
-    while(i<1000)
+    while(i<1000000)
     {
         static uint32_t    oustanding  = 0;
 
-        if( (rand()%1000) > 50)
+        if( (rand()%100) > 50)
         {
             oustanding++;
-            printf("oustanding = %d\n", oustanding);
+            printf("oustanding (add)= %d\n", oustanding);
             Add();
         }
-        else
+        else if(oustanding>0)
         {
-            if(oustanding>0)
-            {
-                printf("oustanding = %d\n", oustanding);
-                oustanding--;
-                Remove();                
-            }
+            oustanding--;
+            printf("oustanding (remove) = %d\n", oustanding);
+            Remove();                
         }
 
         i++;
