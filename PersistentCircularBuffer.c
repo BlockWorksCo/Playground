@@ -204,7 +204,7 @@ void PersistentCircularBufferAdd( PersistentCircularBufferContext* context, uint
 {
     uint32_t    elementOffset   = OffsetOfElement(context, context->lastElement);
 
-    printf("Adding element = %d\n", elementOffset );
+    //printf("Adding element = %d\n", elementOffset );
 
     //
     // Make a new element with an increasing sequence number (so we can identify the
@@ -248,7 +248,7 @@ void PersistentCircularBufferRemoveFirst( PersistentCircularBufferContext* conte
 {
     uint32_t    elementOffset   = OffsetOfElement(context, context->firstElement);
 
-    printf("Removing element %d\n", elementOffset );
+    //printf("Removing element %d\n", elementOffset );
 
     //
     // Read the data 
@@ -363,7 +363,7 @@ void PersistentCircularBufferForEach( PersistentCircularBufferContext* context, 
 {
     uint32_t    i       = context->firstElement;
 
-    while(i <= context->lastElement)
+    while(i != context->lastElement)
     {
         uint32_t            elementOffset   = OffsetOfElement( context, i );
         uint8_t             data[PAGE_SIZE];
@@ -374,17 +374,30 @@ void PersistentCircularBufferForEach( PersistentCircularBufferContext* context, 
 
         fn( i-context->firstElement, &data[0] );
 
-        i++;
+        i   = (i + 1) % context->layout->numberOfElementsInTotal;
     }
 }
 
 
 uint32_t PersistentCircularBufferNumberOfElements( PersistentCircularBufferContext* context )
 {
-    //
-    // TODO: Count the elements.
-    //  
-    return 0;
+    uint32_t    i       = context->firstElement;
+    uint32_t    count   = 0;
+
+    while(i != context->lastElement)
+    {
+        //uint32_t            elementOffset   = OffsetOfElement( context, i );
+        //ElementMetadata     metadata;
+
+        //Read(context, elementOffset,                    sizeof(metadata),                           (uint8_t*)&metadata );
+
+        i   = (i + 1) % context->layout->numberOfElementsInTotal;
+        count++;
+    }
+
+    printf("NumberOfElements = %d\n", count);
+
+    return count;
 }
 
 

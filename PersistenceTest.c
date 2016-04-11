@@ -57,25 +57,31 @@ int main()
 {
     FLASHDeviceInitialise();
     PersistentCircularBufferInitialise( &context, &layout );
-    //ShowState( &context );
+    ShowState( &context );
 
     srand(3);
     uint32_t    i = 0;
     while(i<1000000)
     {
-        static uint32_t    oustanding  = 0;
+        static uint32_t     outstanding     = 0;
+        uint32_t    capacity                = PersistentCircularBufferCapacity(&context);
+        uint32_t    numberOfElements        = PersistentCircularBufferNumberOfElements(&context);
 
-        if( (rand()%100) > 50)
+        if(outstanding != numberOfElements)
         {
-            oustanding++;
-            printf("oustanding (add)= %d\n", oustanding);
-            Add();
+            printf("MISCOUNT\n");
+            exit(-1);
         }
-        else if(oustanding>0)
+
+        if( ((rand()%100) > 50) && ((capacity - numberOfElements) > 0) )
         {
-            oustanding--;
-            printf("oustanding (remove) = %d\n", oustanding);
-            Remove();                
+            Add();
+            outstanding++;
+        }
+        else if(numberOfElements > 0)
+        {
+            Remove();     
+            outstanding--;           
         }
 
         i++;
