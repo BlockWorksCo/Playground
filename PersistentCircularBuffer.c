@@ -327,11 +327,14 @@ void PersistentCircularBufferRemoveLast( PersistentCircularBufferContext* contex
 
 
 //
-//
+// Erase all pages in the buffer.
 //
 void PersistentCircularBufferEraseAll( PersistentCircularBufferContext* context )
 {
-
+    for(uint32_t page=0; page<context->layout->numberOfPages; page++)
+    {
+        FLASHDeviceErasePage( context->layout->startPage+page );
+    }
 }
 
 
