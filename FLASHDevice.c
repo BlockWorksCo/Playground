@@ -88,7 +88,7 @@ bool FLASHDeviceWrite(uint32_t offset, uint32_t numberOfBytes, uint8_t* data)
     //
     for(uint32_t i=0; i<numberOfBytes; i++)
     {
-        existingPage[offsetIntoPage+i]  = data[i];
+        existingPage[offsetIntoPage+i]  = existingPage[offsetIntoPage+i] & data[i];
     }
 
     //
