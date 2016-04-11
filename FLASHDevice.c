@@ -73,13 +73,18 @@ bool FLASHDeviceErasePage(uint32_t page)
 
 bool FLASHDeviceWrite(uint32_t offset, uint32_t numberOfBytes, uint8_t* data)
 {
-    off_t   pos = lseek( fd, offset, SEEK_SET );
-    if(pos != offset)
+    uint32_t    pageNumber  = offset / PAGE_SIZE; 
+    lseek( fd, pageNumber*PAGE_SIZE, SEEK_SET );
+    uint8_t     existingPage[PAGE_SIZE];
+    read( fd, &existingPage[0], PAGE_SIZE );
+
+    uint32_t    offsetIntoPage  = offset % PAGE_SIZE;
+    for(uint32_t i=0; i<numberOfBytes; i++)
     {
-        //printf("pos %d != %d\n", (int)pos, offset );
-        exit(-1);
+        existingPage[offsetIntoPage+i]  = data[i];
     }
-    write( fd, &data[0], numberOfBytes );
+    lseek( fd, pageNumber*PAGE_SIZE, SEEK_SET );
+    write( fd, &existingPage[0], PAGE_SIZE );
 
     //printf("-- Writing %d bytes to %08x\n", numberOfBytes, offset );
 
