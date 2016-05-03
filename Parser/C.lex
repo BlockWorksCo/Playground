@@ -70,7 +70,7 @@ static int check_type(void);
 "void"                  { strcpy(yylval.text, yytext); return(VOID); }
 "volatile"              { strcpy(yylval.text, yytext); return(VOLATILE); }
 
-{L}{A}*                 { return check_type(); }
+{L}{A}*                 { strcpy(yylval.text, yytext); return check_type(); }
 
 {HP}{H}+{IS}?               { strcpy(yylval.text, yytext); return I_CONSTANT; }
 {NZ}{D}*{IS}?               { strcpy(yylval.text, yytext); return I_CONSTANT; }
@@ -101,7 +101,6 @@ static int check_type(void);
 "<<"                    { return LEFT_OP; }
 "++"                    { return INC_OP; }
 "--"                    { return DEC_OP; }
-"->"                    { return PTR_OP; }
 "&&"                    { return AND_OP; }
 "||"                    { return OR_OP; }
 "<="                    { return LE_OP; }

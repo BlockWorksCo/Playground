@@ -15,7 +15,6 @@ int yylineno;
 %token <text> F_CONSTANT 
 %token <text> STRING_LITERAL 
 %token <text> SIZEOF
-%token <text> PTR_OP 
 %token <text> INC_OP 
 %token <text> DEC_OP 
 %token <text> LEFT_OP 
@@ -106,7 +105,6 @@ postfix_expression
     | postfix_expression '(' ')'
     | postfix_expression '(' argument_expression_list ')'
     | postfix_expression '.' IDENTIFIER
-    | postfix_expression PTR_OP IDENTIFIER
     | postfix_expression INC_OP
     | postfix_expression DEC_OP
     | '(' type_name ')' '{' initializer_list '}'
@@ -210,7 +208,7 @@ assignment_expression
     ;
 
 assignment_operator
-    : '='                                                   {printf("<ASSIGN>\n");}
+    : '='                                                   {printf("<ASSIGN op>\n");}
     | MUL_ASSIGN  
     | DIV_ASSIGN
     | MOD_ASSIGN
@@ -224,8 +222,8 @@ assignment_operator
     ;
 
 expression
-    : assignment_expression                                 {printf("<1>\n");}
-    | expression ',' assignment_expression                  {printf("<2>\n");}
+    : assignment_expression                                 {printf("<assign>\n");}
+    | expression ',' assignment_expression                  {printf("<expression>\n");}
     ;
 
 constant_expression
@@ -233,8 +231,8 @@ constant_expression
     ;
 
 declaration
-    : declaration_specifiers ';'                            {printf("<3>\n");}
-    | declaration_specifiers init_declarator_list ';'       {printf("<4>\n");}
+    : declaration_specifiers ';'                            {printf("<declaration1>\n");}
+    | declaration_specifiers init_declarator_list ';'       {printf("<declaration2>\n");}
     ;
 
 declaration_specifiers
