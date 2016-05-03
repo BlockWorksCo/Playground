@@ -12,7 +12,7 @@ int yylineno;
 %token  XOR_ASSIGN OR_ASSIGN
 %token  TYPEDEF_NAME ENUMERATION_CONSTANT
 
-%token  TYPEDEF EXTERN STATIC AUTO REGISTER INLINE
+%token  TYPEDEF EXTERN STATIC
 %token  CONST RESTRICT VOLATILE
 %token  BOOL VOID
 %token  FLOAT32 FLOAT64
@@ -20,7 +20,7 @@ int yylineno;
 %token  UINT8 UINT16 UINT32 UINT64
 %token  STRUCT ENUM ELLIPSIS
 
-%token  CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+%token  CASE DEFAULT IF ELSE SWITCH FOR RETURN
 
 
 %start translation_unit
@@ -193,8 +193,6 @@ declaration_specifiers
     | type_specifier
     | type_qualifier declaration_specifiers
     | type_qualifier
-    | function_specifier declaration_specifiers
-    | function_specifier
     ;
 
 init_declarator_list
@@ -210,9 +208,6 @@ init_declarator
 storage_class_specifier
     : TYPEDEF   /* identifiers must be flagged as TYPEDEF_NAME */
     | EXTERN
-    | STATIC
-    | AUTO
-    | REGISTER
     ;
 
 type_specifier
@@ -291,10 +286,6 @@ type_qualifier
     : CONST
     | RESTRICT
     | VOLATILE
-    ;
-
-function_specifier
-    : INLINE
     ;
 
 declarator
@@ -457,19 +448,14 @@ selection_statement
     ;
 
 iteration_statement
-    : WHILE '(' expression ')' statement
-    | DO statement WHILE '(' expression ')' ';'
-    | FOR '(' expression_statement expression_statement ')' statement
+    : FOR '(' expression_statement expression_statement ')' statement
     | FOR '(' expression_statement expression_statement expression ')' statement
     | FOR '(' declaration expression_statement ')' statement
     | FOR '(' declaration expression_statement expression ')' statement
     ;
 
 jump_statement
-    : GOTO IDENTIFIER ';'
-    | CONTINUE ';'
-    | BREAK ';'
-    | RETURN ';'
+    : RETURN ';'
     | RETURN expression ';'
     ;
 

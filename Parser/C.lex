@@ -51,13 +51,9 @@ static int check_type(void);
 "uint32_t"               { return(UINT32); }
 "uint64_t"               { return(UINT64); }
 
-"auto"                  { return(AUTO); }
-"break"                 { return(BREAK); }
 "case"                  { return(CASE); }
 "const"                 { return(CONST); }
-"continue"              { return(CONTINUE); }
 "default"               { return(DEFAULT); }
-"do"                    { return(DO); }
 "float64"               { return(FLOAT64); }
 "else"                  { return(ELSE); }
 "enum"                  { return(ENUM); }
@@ -65,18 +61,14 @@ static int check_type(void);
 "float32"               { return(FLOAT32); }
 "for"                   { return(FOR); }
 "if"                    { return(IF); }
-"inline"                { return(INLINE); }
-"register"              { return(REGISTER); }
 "restrict"              { return(RESTRICT); }
 "return"                { return(RETURN); }
 "sizeof"                { return(SIZEOF); }
-"static"                { return(STATIC); }
 "struct"                { return(STRUCT); }
 "switch"                { return(SWITCH); }
 "typedef"               { return(TYPEDEF); }
 "void"                  { return(VOID); }
 "volatile"              { return(VOLATILE); }
-"while"                 { return(WHILE); }
 "__func__"                              { return FUNC_NAME; }
 
 {L}{A}*                 { return check_type(); }
