@@ -5,7 +5,7 @@ void yyerror(const char *s);
 int yylineno;
 %}
 
-%token  IDENTIFIER I_CONSTANT F_CONSTANT STRING_LITERAL FUNC_NAME SIZEOF
+%token  IDENTIFIER I_CONSTANT F_CONSTANT STRING_LITERAL SIZEOF
 %token  PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
 %token  AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token  SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
@@ -45,7 +45,6 @@ enumeration_constant        /* before it has been defined as such */
 
 string
     : STRING_LITERAL
-    | FUNC_NAME
     ;
 
 

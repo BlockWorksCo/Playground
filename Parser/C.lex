@@ -69,7 +69,6 @@ static int check_type(void);
 "typedef"               { return(TYPEDEF); }
 "void"                  { return(VOID); }
 "volatile"              { return(VOLATILE); }
-"__func__"                              { return FUNC_NAME; }
 
 {L}{A}*                 { return check_type(); }
 
