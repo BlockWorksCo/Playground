@@ -41,50 +41,50 @@ static int check_type(void);
 "/*"                                    { comment(); }
 "//".*                                    { /* consume //-comment */ }
 
-"int8_t"               { return(UINT8); }
-"int16_t"               { return(UINT16); }
-"int32_t"               { return(UINT32); }
-"int64_t"               { return(UINT64); }
+"int8_t"               { strcpy(yylval.text, yytext); return(INT8); }
+"int16_t"               { strcpy(yylval.text, yytext); return(INT16); }
+"int32_t"               { strcpy(yylval.text, yytext); return(INT32); }
+"int64_t"               { return(INT64); }
 
-"uint8_t"               { return(UINT8); }
-"uint16_t"               { return(UINT16); }
-"uint32_t"               { return(UINT32); }
-"uint64_t"               { return(UINT64); }
+"uint8_t"               { strcpy(yylval.text, yytext); return(UINT8); }
+"uint16_t"               { strcpy(yylval.text, yytext); return(UINT16); }
+"uint32_t"               { strcpy(yylval.text, yytext); return(UINT32); }
+"uint64_t"               { strcpy(yylval.text, yytext); return(UINT64); }
 
-"case"                  { return(CASE); }
-"const"                 { return(CONST); }
-"default"               { return(DEFAULT); }
-"float64"               { return(FLOAT64); }
-"else"                  { return(ELSE); }
-"enum"                  { return(ENUM); }
-"extern"                { return(EXTERN); }
-"float32"               { return(FLOAT32); }
-"for"                   { return(FOR); }
-"if"                    { return(IF); }
-"restrict"              { return(RESTRICT); }
-"return"                { return(RETURN); }
-"sizeof"                { return(SIZEOF); }
-"struct"                { return(STRUCT); }
-"switch"                { return(SWITCH); }
-"typedef"               { return(TYPEDEF); }
-"void"                  { return(VOID); }
-"volatile"              { return(VOLATILE); }
+"case"                  { strcpy(yylval.text, yytext); return(CASE); }
+"const"                 { strcpy(yylval.text, yytext); return(CONST); }
+"default"               { strcpy(yylval.text, yytext); return(DEFAULT); }
+"float64"               { strcpy(yylval.text, yytext); return(FLOAT64); }
+"else"                  { strcpy(yylval.text, yytext); return(ELSE); }
+"enum"                  { strcpy(yylval.text, yytext); return(ENUM); }
+"extern"                { strcpy(yylval.text, yytext); return(EXTERN); }
+"float32"               { strcpy(yylval.text, yytext); return(FLOAT32); }
+"for"                   { strcpy(yylval.text, yytext); return(FOR); }
+"if"                    { strcpy(yylval.text, yytext); return(IF); }
+"restrict"              { strcpy(yylval.text, yytext); return(RESTRICT); }
+"return"                { strcpy(yylval.text, yytext); return(RETURN); }
+"sizeof"                { strcpy(yylval.text, yytext); return(SIZEOF); }
+"struct"                { strcpy(yylval.text, yytext); return(STRUCT); }
+"switch"                { strcpy(yylval.text, yytext); return(SWITCH); }
+"typedef"               { strcpy(yylval.text, yytext); return(TYPEDEF); }
+"void"                  { strcpy(yylval.text, yytext); return(VOID); }
+"volatile"              { strcpy(yylval.text, yytext); return(VOLATILE); }
 
 {L}{A}*                 { return check_type(); }
 
-{HP}{H}+{IS}?               { return I_CONSTANT; }
-{NZ}{D}*{IS}?               { return I_CONSTANT; }
-"0"{O}*{IS}?                { return I_CONSTANT; }
-{CP}?"'"([^'\\\n]|{ES})+"'"     { return I_CONSTANT; }
+{HP}{H}+{IS}?               { strcpy(yylval.text, yytext); return I_CONSTANT; }
+{NZ}{D}*{IS}?               { strcpy(yylval.text, yytext); return I_CONSTANT; }
+"0"{O}*{IS}?                { strcpy(yylval.text, yytext); return I_CONSTANT; }
+{CP}?"'"([^'\\\n]|{ES})+"'"     { strcpy(yylval.text, yytext); return I_CONSTANT; }
 
-{D}+{E}{FS}?                { return F_CONSTANT; }
-{D}*"."{D}+{E}?{FS}?            { return F_CONSTANT; }
-{D}+"."{E}?{FS}?            { return F_CONSTANT; }
-{HP}{H}+{P}{FS}?            { return F_CONSTANT; }
-{HP}{H}*"."{H}+{P}{FS}?         { return F_CONSTANT; }
-{HP}{H}+"."{P}{FS}?         { return F_CONSTANT; }
+{D}+{E}{FS}?                { strcpy(yylval.text, yytext); return F_CONSTANT; }
+{D}*"."{D}+{E}?{FS}?            { strcpy(yylval.text, yytext); return F_CONSTANT; }
+{D}+"."{E}?{FS}?            { strcpy(yylval.text, yytext); return F_CONSTANT; }
+{HP}{H}+{P}{FS}?            { strcpy(yylval.text, yytext); return F_CONSTANT; }
+{HP}{H}*"."{H}+{P}{FS}?         { strcpy(yylval.text, yytext); return F_CONSTANT; }
+{HP}{H}+"."{P}{FS}?         { strcpy(yylval.text, yytext); return F_CONSTANT; }
 
-({SP}?\"([^"\\\n]|{ES})*\"{WS}*)+   { return STRING_LITERAL; }
+({SP}?\"([^"\\\n]|{ES})*\"{WS}*)+   { strcpy(yylval.text, yytext); return STRING_LITERAL; }
 
 "..."                   { return ELLIPSIS; }
 ">>="                   { return RIGHT_ASSIGN; }

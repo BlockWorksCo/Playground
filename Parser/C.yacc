@@ -1,27 +1,78 @@
 
 %{
 #include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
 int yylex();
 void yyerror(const char *s);
 int yylineno;
+
+
 %}
 
-%token  IDENTIFIER I_CONSTANT F_CONSTANT STRING_LITERAL SIZEOF
-%token  PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
-%token  AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
-%token  SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
-%token  XOR_ASSIGN OR_ASSIGN
-%token  TYPEDEF_NAME ENUMERATION_CONSTANT
+%token <text> IDENTIFIER 
+%token <text> I_CONSTANT 
+%token <text> F_CONSTANT 
+%token <text> STRING_LITERAL 
+%token <text> SIZEOF
+%token <text> PTR_OP 
+%token <text> INC_OP 
+%token <text> DEC_OP 
+%token <text> LEFT_OP 
+%token <text> RIGHT_OP 
+%token <text> LE_OP 
+%token <text> GE_OP 
+%token <text> EQ_OP 
+%token <text> NE_OP
+%token <text> AND_OP 
+%token <text> OR_OP 
+%token <text> MUL_ASSIGN 
+%token <text> DIV_ASSIGN 
+%token <text> MOD_ASSIGN 
+%token <text> ADD_ASSIGN
+%token <text> SUB_ASSIGN 
+%token <text> LEFT_ASSIGN 
+%token <text> RIGHT_ASSIGN 
+%token <text> AND_ASSIGN
+%token <text> XOR_ASSIGN 
+%token <text> OR_ASSIGN
+%token <text> TYPEDEF_NAME 
+%token <text> ENUMERATION_CONSTANT
+%token <text> TYPEDEF 
+%token <text> EXTERN 
+%token <text> STATIC
+%token <text> CONST 
+%token <text> RESTRICT 
+%token <text> VOLATILE
+%token <text> BOOL 
+%token <text> VOID
+%token <text> FLOAT32 
+%token <text> FLOAT64
+%token <text> INT8 
+%token <text> INT16 
+%token <text> INT32 
+%token <text> INT64
+%token <text> UINT8 
+%token <text> UINT16 
+%token <text> UINT32 
+%token <text> UINT64
+%token <text> STRUCT 
+%token <text> ENUM 
+%token <text> ELLIPSIS
+%token <text> CASE 
+%token <text> DEFAULT 
+%token <text> IF 
+%token <text> ELSE 
+%token <text> SWITCH 
+%token <text> FOR 
+%token <text> RETURN
 
-%token  TYPEDEF EXTERN STATIC
-%token  CONST RESTRICT VOLATILE
-%token  BOOL VOID
-%token  FLOAT32 FLOAT64
-%token  INT8 INT16 INT32 INT64
-%token  UINT8 UINT16 UINT32 UINT64
-%token  STRUCT ENUM ELLIPSIS
+%union 
+{
+        int     number;
+        char    text[256];
+}
 
-%token  CASE DEFAULT IF ELSE SWITCH FOR RETURN
 
 
 %start translation_unit
@@ -159,8 +210,8 @@ assignment_expression
     ;
 
 assignment_operator
-    : '='
-    | MUL_ASSIGN
+    : '='                                                   {printf("<ASSIGN>\n");}
+    | MUL_ASSIGN  
     | DIV_ASSIGN
     | MOD_ASSIGN
     | ADD_ASSIGN
@@ -173,8 +224,8 @@ assignment_operator
     ;
 
 expression
-    : assignment_expression
-    | expression ',' assignment_expression
+    : assignment_expression                                 {printf("<1>\n");}
+    | expression ',' assignment_expression                  {printf("<2>\n");}
     ;
 
 constant_expression
@@ -182,17 +233,17 @@ constant_expression
     ;
 
 declaration
-    : declaration_specifiers ';'
-    | declaration_specifiers init_declarator_list ';'
+    : declaration_specifiers ';'                            {printf("<3>\n");}
+    | declaration_specifiers init_declarator_list ';'       {printf("<4>\n");}
     ;
 
 declaration_specifiers
-    : storage_class_specifier declaration_specifiers
-    | storage_class_specifier
-    | type_specifier declaration_specifiers
-    | type_specifier
-    | type_qualifier declaration_specifiers
-    | type_qualifier
+    : storage_class_specifier declaration_specifiers        {printf("<5>\n");}
+    | storage_class_specifier                               {printf("<6>\n");}
+    | type_specifier declaration_specifiers                 {printf("<7>\n");}
+    | type_specifier                                        {printf("<%s>\n",yylval.text);}
+    | type_qualifier declaration_specifiers                 {printf("<9>\n");}
+    | type_qualifier                                        {printf("<10>\n");}
     ;
 
 init_declarator_list
@@ -211,19 +262,19 @@ storage_class_specifier
     ;
 
 type_specifier
-    : VOID
-    | BOOL
-    | INT8
-    | INT16
-    | INT32
-    | INT64
-    | UINT8
-    | UINT16
-    | UINT32
-    | UINT64
-    | struct_specifier
-    | enum_specifier
-    | TYPEDEF_NAME      /* after it has been defined as such */
+    : BOOL                                                  /*{printf("<%s>\n",$1);}*/
+    | INT8                                                  /*{printf("<%s>\n",$1);}*/
+    | INT16                                                 /*{printf("<%s>\n",$1);}*/
+    | VOID                                                  /*{printf("<%s>\n",$1);}*/
+    | INT32                                                 {printf("<%s>\n",$1);}
+    | INT64                                                 /*{printf("<%s>\n",$1);}*/
+    | UINT8                                                 /*{printf("<%s>\n",$1);}*/
+    | UINT16                                                /*{printf("<%s>\n",$1);}*/
+    | UINT32                                                /*{printf("<%s>\n",$1);}*/
+    | UINT64                                                /*{printf("<%s>\n",$1);}*/
+    | struct_specifier                                      /*{printf("<%s>\n",$1);}*/
+    | enum_specifier                                        /*{printf("<%s>\n",$1);}*/
+    | TYPEDEF_NAME                                          /*{printf("<%s>\n",$1);}*/
     ;
 
 struct_specifier
@@ -408,18 +459,18 @@ labeled_statement
     ;
 
 compound_statement
-    : '{' '}'                                                   {printf("<function_definition>\n");}
-    | '{'  block_item_list '}'                                  {printf("<function_definition>\n");}
+    : '{' '}'                                                   {printf("<compound_statement1>\n");}
+    | '{'  block_item_list '}'                                  {printf("<compound_statement2>\n");}
     ;
 
 block_item_list
-    : block_item
-    | block_item_list block_item
+    : block_item                                                {printf("<block_item_list1>\n");}
+    | block_item_list block_item                                {printf("<block_item_list2>\n");}
     ;
 
 block_item
-    : declaration
-    | statement
+    : declaration                                               {printf("<block_item1>\n");}
+    | statement                                                 {printf("<block_item2>\n");}
     ;
 
 expression_statement
@@ -451,18 +502,18 @@ translation_unit
     ;
 
 external_declaration
-    : function_definition                               {printf("<function_definition>\n");}
-    | declaration                                       {printf("<declaration>\n");}
+    : function_definition                               {printf("<external_declaration1>\n");}
+    | declaration                                       {printf("<external_declaration2>\n");}
     ;
 
 function_definition
-    : declaration_specifiers declarator declaration_list compound_statement     {printf("<function_definition>\n");}
-    | declaration_specifiers declarator compound_statement                      {printf("<function_definition>\n");}
+    : declaration_specifiers declarator declaration_list compound_statement     {printf("<function_definition1>\n");}
+    | declaration_specifiers declarator compound_statement                      {printf("<function_definition2>\n");}
     ;
 
 declaration_list
-    : declaration                                                               {printf("<function_definition>\n");}
-    | declaration_list declaration                                              {printf("<function_definition>\n");}
+    : declaration                                                               {printf("<declaration_list1>\n");}
+    | declaration_list declaration                                              {printf("<declaration_list2>\n");}
     ;
 
 %%
