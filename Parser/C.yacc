@@ -2,6 +2,7 @@
 %{
 int yylex();
 void yyerror(const char *s);
+int yylineno;
 %}
 
 %token  IDENTIFIER I_CONSTANT F_CONSTANT STRING_LITERAL FUNC_NAME SIZEOF
@@ -531,10 +532,5 @@ declaration_list
     ;
 
 %%
-#include <stdio.h>
 
-void yyerror(const char *s)
-{
-    fflush(stdout);
-    fprintf(stderr, "*** %s\n", s);
-}
+
