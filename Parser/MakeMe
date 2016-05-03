@@ -1,0 +1,7 @@
+#!/bin/sh
+
+yacc -d C.yacc
+lex C.lex
+cc -o Main lex.yy.c y.tab.c Main.c
+
+
