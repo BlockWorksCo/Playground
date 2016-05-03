@@ -4,8 +4,6 @@
 #include "y.tab.h"
 
 
-int yylex();
-
 
 //
 //
@@ -23,7 +21,7 @@ void yyerror(const char *s)
 //
 int main(int argc, char** argv)
 {
-    yylex();
+    yyparse();
 }
 
 

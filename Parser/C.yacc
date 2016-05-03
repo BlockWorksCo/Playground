@@ -1,5 +1,6 @@
 
 %{
+#include <stdio.h>
 int yylex();
 void yyerror(const char *s);
 int yylineno;
@@ -288,18 +289,15 @@ type_qualifier
     ;
 
 declarator
-    : pointer direct_declarator
-    | direct_declarator
+    : direct_declarator
     ;
 
 direct_declarator
     : IDENTIFIER
     | '(' declarator ')'
     | direct_declarator '[' ']'
-    | direct_declarator '[' '*' ']'
     | direct_declarator '[' STATIC type_qualifier_list assignment_expression ']'
     | direct_declarator '[' STATIC assignment_expression ']'
-    | direct_declarator '[' type_qualifier_list '*' ']'
     | direct_declarator '[' type_qualifier_list STATIC assignment_expression ']'
     | direct_declarator '[' type_qualifier_list assignment_expression ']'
     | direct_declarator '[' type_qualifier_list ']'
@@ -307,13 +305,6 @@ direct_declarator
     | direct_declarator '(' parameter_type_list ')'
     | direct_declarator '(' ')'
     | direct_declarator '(' identifier_list ')'
-    ;
-
-pointer
-    : '*' type_qualifier_list pointer
-    | '*' type_qualifier_list
-    | '*' pointer
-    | '*'
     ;
 
 type_qualifier_list
@@ -349,15 +340,12 @@ type_name
     ;
 
 abstract_declarator
-    : pointer direct_abstract_declarator
-    | pointer
-    | direct_abstract_declarator
+    : direct_abstract_declarator
     ;
 
 direct_abstract_declarator
     : '(' abstract_declarator ')'
     | '[' ']'
-    | '[' '*' ']'
     | '[' STATIC type_qualifier_list assignment_expression ']'
     | '[' STATIC assignment_expression ']'
     | '[' type_qualifier_list STATIC assignment_expression ']'
@@ -365,7 +353,6 @@ direct_abstract_declarator
     | '[' type_qualifier_list ']'
     | '[' assignment_expression ']'
     | direct_abstract_declarator '[' ']'
-    | direct_abstract_declarator '[' '*' ']'
     | direct_abstract_declarator '[' STATIC type_qualifier_list assignment_expression ']'
     | direct_abstract_declarator '[' STATIC assignment_expression ']'
     | direct_abstract_declarator '[' type_qualifier_list assignment_expression ']'
@@ -421,8 +408,8 @@ labeled_statement
     ;
 
 compound_statement
-    : '{' '}'
-    | '{'  block_item_list '}'
+    : '{' '}'                                                   {printf("<function_definition>\n");}
+    | '{'  block_item_list '}'                                  {printf("<function_definition>\n");}
     ;
 
 block_item_list
@@ -459,23 +446,23 @@ jump_statement
     ;
 
 translation_unit
-    : external_declaration
-    | translation_unit external_declaration
+    : external_declaration                              {printf("<translation_unit1>\n");}
+    | translation_unit external_declaration             {printf("<translation_unit2>\n");}
     ;
 
 external_declaration
-    : function_definition
-    | declaration
+    : function_definition                               {printf("<function_definition>\n");}
+    | declaration                                       {printf("<declaration>\n");}
     ;
 
 function_definition
-    : declaration_specifiers declarator declaration_list compound_statement
-    | declaration_specifiers declarator compound_statement
+    : declaration_specifiers declarator declaration_list compound_statement     {printf("<function_definition>\n");}
+    | declaration_specifiers declarator compound_statement                      {printf("<function_definition>\n");}
     ;
 
 declaration_list
-    : declaration
-    | declaration_list declaration
+    : declaration                                                               {printf("<function_definition>\n");}
+    | declaration_list declaration                                              {printf("<function_definition>\n");}
     ;
 
 %%
