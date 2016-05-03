@@ -23,11 +23,7 @@ void yyerror(const char *s)
 //
 int main(int argc, char** argv)
 {
-    printf("NewC\r\n");
-
-    FILE*   yyin = fopen(argv[1], "r");
     yylex();
-    fclose(yyin);    
 }
 
 
