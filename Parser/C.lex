@@ -41,37 +41,41 @@ static int check_type(void);
 "/*"                                    { comment(); }
 "//".*                                    { /* consume //-comment */ }
 
+"int8_t"               { return(UINT8); }
+"int16_t"               { return(UINT16); }
+"int32_t"               { return(UINT32); }
+"int64_t"               { return(UINT64); }
+
+"uint8_t"               { return(UINT8); }
+"uint16_t"               { return(UINT16); }
+"uint32_t"               { return(UINT32); }
+"uint64_t"               { return(UINT64); }
+
 "auto"                  { return(AUTO); }
 "break"                 { return(BREAK); }
 "case"                  { return(CASE); }
-"char"                  { return(CHAR); }
 "const"                 { return(CONST); }
 "continue"              { return(CONTINUE); }
 "default"               { return(DEFAULT); }
 "do"                    { return(DO); }
-"double"                { return(DOUBLE); }
+"float64"               { return(FLOAT64); }
 "else"                  { return(ELSE); }
 "enum"                  { return(ENUM); }
 "extern"                { return(EXTERN); }
-"float"                 { return(FLOAT); }
+"float32"               { return(FLOAT32); }
 "for"                   { return(FOR); }
 "goto"                  { return(GOTO); }
 "if"                    { return(IF); }
 "inline"                { return(INLINE); }
-"int"                   { return(INT); }
-"long"                  { return(LONG); }
 "register"              { return(REGISTER); }
 "restrict"              { return(RESTRICT); }
 "return"                { return(RETURN); }
-"short"                 { return(SHORT); }
-"signed"                { return(SIGNED); }
 "sizeof"                { return(SIZEOF); }
 "static"                { return(STATIC); }
 "struct"                { return(STRUCT); }
 "switch"                { return(SWITCH); }
 "typedef"               { return(TYPEDEF); }
 "union"                 { return(UNION); }
-"unsigned"              { return(UNSIGNED); }
 "void"                  { return(VOID); }
 "volatile"              { return(VOLATILE); }
 "while"                 { return(WHILE); }
@@ -79,9 +83,7 @@ static int check_type(void);
 "_Alignof"                              { return ALIGNOF; }
 "_Atomic"                               { return ATOMIC; }
 "_Bool"                                 { return BOOL; }
-"_Complex"                              { return COMPLEX; }
 "_Generic"                              { return GENERIC; }
-"_Imaginary"                            { return IMAGINARY; }
 "_Noreturn"                             { return NORETURN; }
 "_Static_assert"                        { return STATIC_ASSERT; }
 "_Thread_local"                         { return THREAD_LOCAL; }

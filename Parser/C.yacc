@@ -14,8 +14,10 @@ int yylineno;
 
 %token  TYPEDEF EXTERN STATIC AUTO REGISTER INLINE
 %token  CONST RESTRICT VOLATILE
-%token  BOOL CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE VOID
-%token  COMPLEX IMAGINARY 
+%token  BOOL VOID
+%token  FLOAT32 FLOAT64
+%token  INT8 INT16 INT32 INT64
+%token  UINT8 UINT16 UINT32 UINT64
 %token  STRUCT UNION ENUM ELLIPSIS
 
 %token  CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
@@ -235,17 +237,15 @@ storage_class_specifier
 
 type_specifier
     : VOID
-    | CHAR
-    | SHORT
-    | INT
-    | LONG
-    | FLOAT
-    | DOUBLE
-    | SIGNED
-    | UNSIGNED
     | BOOL
-    | COMPLEX
-    | IMAGINARY     /* non-mandated extension */
+    | INT8
+    | INT16
+    | INT32
+    | INT64
+    | UINT8
+    | UINT16
+    | UINT32
+    | UINT64
     | atomic_type_specifier
     | struct_or_union_specifier
     | enum_specifier
