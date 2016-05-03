@@ -18,11 +18,10 @@ int yylineno;
 %token  FLOAT32 FLOAT64
 %token  INT8 INT16 INT32 INT64
 %token  UINT8 UINT16 UINT32 UINT64
-%token  STRUCT UNION ENUM ELLIPSIS
+%token  STRUCT ENUM ELLIPSIS
 
 %token  CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
-%token  ALIGNAS ALIGNOF ATOMIC GENERIC NORETURN STATIC_ASSERT THREAD_LOCAL
 
 %start translation_unit
 %%
@@ -32,7 +31,6 @@ primary_expression
     | constant
     | string
     | '(' expression ')'
-    | generic_selection
     ;
 
 constant
@@ -50,19 +48,6 @@ string
     | FUNC_NAME
     ;
 
-generic_selection
-    : GENERIC '(' assignment_expression ',' generic_assoc_list ')'
-    ;
-
-generic_assoc_list
-    : generic_association
-    | generic_assoc_list ',' generic_association
-    ;
-
-generic_association
-    : type_name ':' assignment_expression
-    | DEFAULT ':' assignment_expression
-    ;
 
 postfix_expression
     : primary_expression
@@ -89,7 +74,6 @@ unary_expression
     | unary_operator cast_expression
     | SIZEOF unary_expression
     | SIZEOF '(' type_name ')'
-    | ALIGNOF '(' type_name ')'
     ;
 
 unary_operator
@@ -200,7 +184,6 @@ constant_expression
 declaration
     : declaration_specifiers ';'
     | declaration_specifiers init_declarator_list ';'
-    | static_assert_declaration
     ;
 
 declaration_specifiers
@@ -212,8 +195,6 @@ declaration_specifiers
     | type_qualifier
     | function_specifier declaration_specifiers
     | function_specifier
-    | alignment_specifier declaration_specifiers
-    | alignment_specifier
     ;
 
 init_declarator_list
@@ -230,7 +211,6 @@ storage_class_specifier
     : TYPEDEF   /* identifiers must be flagged as TYPEDEF_NAME */
     | EXTERN
     | STATIC
-    | THREAD_LOCAL
     | AUTO
     | REGISTER
     ;
@@ -246,21 +226,19 @@ type_specifier
     | UINT16
     | UINT32
     | UINT64
-    | atomic_type_specifier
-    | struct_or_union_specifier
+    | struct_specifier
     | enum_specifier
     | TYPEDEF_NAME      /* after it has been defined as such */
     ;
 
-struct_or_union_specifier
-    : struct_or_union '{' struct_declaration_list '}'
-    | struct_or_union IDENTIFIER '{' struct_declaration_list '}'
-    | struct_or_union IDENTIFIER
+struct_specifier
+    : struct '{' struct_declaration_list '}'
+    | struct IDENTIFIER '{' struct_declaration_list '}'
+    | struct IDENTIFIER
     ;
 
-struct_or_union
+struct
     : STRUCT
-    | UNION
     ;
 
 struct_declaration_list
@@ -271,7 +249,6 @@ struct_declaration_list
 struct_declaration
     : specifier_qualifier_list ';'  /* for anonymous struct/union */
     | specifier_qualifier_list struct_declarator_list ';'
-    | static_assert_declaration
     ;
 
 specifier_qualifier_list
@@ -310,25 +287,14 @@ enumerator  /* identifiers must be flagged as ENUMERATION_CONSTANT */
     | enumeration_constant
     ;
 
-atomic_type_specifier
-    : ATOMIC '(' type_name ')'
-    ;
-
 type_qualifier
     : CONST
     | RESTRICT
     | VOLATILE
-    | ATOMIC
     ;
 
 function_specifier
     : INLINE
-    | NORETURN
-    ;
-
-alignment_specifier
-    : ALIGNAS '(' type_name ')'
-    | ALIGNAS '(' constant_expression ')'
     ;
 
 declarator
@@ -447,10 +413,6 @@ designator_list
 designator
     : '[' constant_expression ']'
     | '.' IDENTIFIER
-    ;
-
-static_assert_declaration
-    : STATIC_ASSERT '(' constant_expression ',' STRING_LITERAL ')' ';'
     ;
 
 statement

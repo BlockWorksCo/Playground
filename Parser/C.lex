@@ -64,7 +64,6 @@ static int check_type(void);
 "extern"                { return(EXTERN); }
 "float32"               { return(FLOAT32); }
 "for"                   { return(FOR); }
-"goto"                  { return(GOTO); }
 "if"                    { return(IF); }
 "inline"                { return(INLINE); }
 "register"              { return(REGISTER); }
@@ -75,18 +74,9 @@ static int check_type(void);
 "struct"                { return(STRUCT); }
 "switch"                { return(SWITCH); }
 "typedef"               { return(TYPEDEF); }
-"union"                 { return(UNION); }
 "void"                  { return(VOID); }
 "volatile"              { return(VOLATILE); }
 "while"                 { return(WHILE); }
-"_Alignas"                              { return ALIGNAS; }
-"_Alignof"                              { return ALIGNOF; }
-"_Atomic"                               { return ATOMIC; }
-"_Bool"                                 { return BOOL; }
-"_Generic"                              { return GENERIC; }
-"_Noreturn"                             { return NORETURN; }
-"_Static_assert"                        { return STATIC_ASSERT; }
-"_Thread_local"                         { return THREAD_LOCAL; }
 "__func__"                              { return FUNC_NAME; }
 
 {L}{A}*                 { return check_type(); }
