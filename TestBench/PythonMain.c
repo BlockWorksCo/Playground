@@ -2,23 +2,31 @@
 
 
 
-
+#include <time.h>
 #include <python3.5/Python.h>
-
-
+#include <python3.5/frameobject.h>
 
 
 //
 //
 //
-int main(int argc, char* argv[])
+int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
 {
-    //
-    // Setup the interpreter.
-    //
-    setenv("PYTHONPATH",".",1);
-    Py_SetProgramName(L"BlockWorks TestBench");
-    Py_Initialize();
+    int   lineNumber    = PyFrame_GetLineNumber(frame);
+    char* filename      = PyUnicode_AsUTF8(frame->f_code->co_filename);
+    char* funcname      = PyUnicode_AsUTF8(frame->f_code->co_name);    
+
+    printf("(TraceFunc %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+    sleep(1);
+
+    return 0;
+}
+
+
+
+void UseTBDB()
+{
+
 
     //
     // Import PDB.
@@ -68,6 +76,37 @@ int main(int argc, char* argv[])
     // Show the result.
     //
     //printf("result is %f\n", result);
+
+}
+
+
+//
+//
+//
+int main(int argc, char* argv[])
+{
+    //
+    // Setup the interpreter.
+    //
+    setenv("PYTHONPATH",".",1);
+    Py_SetProgramName(L"BlockWorks TestBench");
+    Py_Initialize();
+
+
+    //
+    //
+    //
+    PyEval_SetTrace( &TraceFunc, NULL );
+
+    //
+    //
+    //
+    PyObject* myModuleString    = PyUnicode_FromString("SequenceOne");
+    PyObject* myModule          = PyImport_Import(myModuleString);
+    PyObject* myFunction        = PyObject_GetAttrString(myModule,"Blaa");
+    PyObject* args              = PyTuple_Pack(1, PyLong_FromLong(123) );
+    PyObject* myResult          = PyObject_CallObject(myFunction, args);
+
 
     //
     // Clean up.
