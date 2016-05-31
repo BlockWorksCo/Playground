@@ -1,0 +1,93 @@
+{
+	"name": "mock-debug",
+	"displayName": "Mock Debug",
+	"version": "0.10.26",
+	"publisher": "andreweinand",
+	"description": "Starter extension for developing debug adapters for VS Code.",
+	"author": {
+		"name": "Microsoft Corporation",
+		"email": "aweinand@microsoft.com"
+	},
+	"engines": {
+		"vscode": "^1.1.0",
+		"node": "^5.10.0"
+	},
+	"icon": "images/mock-debug-icon.svg",
+	"categories": [
+		"Debuggers"
+	],
+	"private": true,
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Microsoft/vscode-mock-debug.git"
+	},
+	"bugs": {
+		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
+	},
+	"dependencies": {
+		"vscode-debugprotocol": "^1.9.0",
+		"vscode-debugadapter": "^1.9.0"
+	},
+	"devDependencies": {
+		"typescript": "^1.8.5",
+		"mocha": "^2.4.5",
+		"vscode": "^0.11.13",
+		"vscode-debugadapter-testsupport": "^1.9.0"
+	},
+	"scripts": {
+		"prepublish": "node ./node_modules/typescript/bin/tsc -p ./src",
+		"compile": "node ./node_modules/typescript/bin/tsc -p ./src",
+		"watch": "node ./node_modules/typescript/bin/tsc -w -p ./src",
+		"test": "node ./node_modules/mocha/bin/mocha -u tdd ./out/tests/",
+		"postinstall": "node ./node_modules/vscode/bin/install"
+	},
+    "main": "./out/extension",
+    "activationEvents": [
+        "onCommand:extension.pickProcess"
+    ],
+	"contributes": {
+		"debuggers": [
+			{
+				"type": "mock",
+				"label": "Mock Debug",
+
+				"enableBreakpointsFor": { "languageIds": [ "markdown" ] },
+
+				"program": "./out/mockDebug.js",
+				"runtime": "node",
+
+				"variables": {
+					"PickProcess": "extension.pickProcess"
+				},
+
+				"configurationAttributes": {
+					"launch": {
+						"required": [ "program" ],
+						"properties": {
+							"program": {
+								"type": "string",
+								"description": "Workspace relative path to a text file.",
+								"default": "readme.md"
+							},
+							"stopOnEntry": {
+								"type": "boolean",
+								"description": "Automatically stop after launch.",
+								"default": true
+							}
+						}
+					}
+				},
+
+				"initialConfigurations": [
+					{
+						"name": "Mock-Debug",
+						"type": "mock",
+						"request": "launch",
+						"program": "readme.md",
+						"stopOnEntry": true
+					}
+				]
+			}
+		]
+	}
+}
