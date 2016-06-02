@@ -1,3 +1,13 @@
+//
+// Purpose of this shell is:
+//  - Abstract the details of the debugger from the GUI (portable interface, not shell/stdio related).
+//  - Provide isolation of the test script (multiple scripts shall not interfere with each other).
+//  - Provide watchdog type facilities for the test script (maybe this is better done outside?).
+//  - Abstract the details of the interpreter (potentially use different Python API for old/new versions).
+//  - Potentially run scripts simultaeously that need different interpreters/environments.
+//  - Provide GUI reconnection facilities.
+//  - Provide remote debug facility, potentially without a shell/stdio.
+//
 
 
 
@@ -5,9 +15,37 @@
 #include <time.h>
 #include <python3.5/Python.h>
 #include <python3.5/frameobject.h>
+#include <signal.h>
+#include <time.h>
 
 
 
+
+static volatile int keepRunning = 1;
+
+
+//
+//
+//
+void intHandler(int dummy) 
+{
+    exit(-1);
+}
+
+
+//
+//
+//
+void MilliSleep(uint32_t milliseconds)
+{
+   struct timespec  tim;
+   struct timespec  tim2;
+
+   tim.tv_sec   = 0;
+   tim.tv_nsec  = milliseconds*1000000;
+
+   nanosleep(&tim , &tim2);    
+}
 
 
 //
@@ -20,7 +58,7 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
     char* funcname      = PyUnicode_AsUTF8(frame->f_code->co_name);    
 
     printf("(TraceFunc %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
-    sleep(1);
+    MilliSleep(100);
 
     return 0;
 }
@@ -88,6 +126,11 @@ void UseTBDB()
 //
 int main(int argc, char* argv[])
 {
+    //
+    //
+    //
+    signal(SIGINT, intHandler);
+
     //
     // Setup the interpreter.
     //
