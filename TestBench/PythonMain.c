@@ -353,6 +353,16 @@ int main(int argc, char* argv[])
 
 
     //
+    //
+    //
+    printf("<Execution finished>\n");
+    while(true)
+    {
+        usleep(100000);
+    }
+
+
+    //
     // Clean up.
     //
     Py_Finalize();
