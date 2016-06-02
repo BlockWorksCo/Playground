@@ -167,7 +167,6 @@ void UseTBDB()
 void error(char *msg) 
 {
   perror(msg);
-  exit(1);
 }
 
 
@@ -178,7 +177,7 @@ pthread_t   serverThreadID  = {0};
 //
 //
 //
-void* doSomeThing(void *arg)
+void* UIServer(void *arg)
 {
     int                 parentfd; /* parent socket */
     int                 childfd; /* child socket */
@@ -273,40 +272,38 @@ void* doSomeThing(void *arg)
         printf("server established connection with %s (%s)\n", 
         hostp->h_name, hostaddrp);
 
-        /* 
-        * read: read input string from the client
-        */
-        bzero(buf, BUFSIZE);
-        n = read(childfd, buf, BUFSIZE);
-        if (n < 0) 
+        do
         {
-            error("ERROR reading from socket");
-        }
-        printf("server received %d bytes: %s", n, buf);
+            /* 
+            * read: read input string from the client
+            */
+            bzero(buf, BUFSIZE);
+            n = read(childfd, buf, BUFSIZE);
+            if (n <= 0) 
+            {
+                error("ERROR reading from socket");
+            }
+            printf("server received %d bytes: %s", n, buf);
 
-        /* 
-        * write: echo the input string back to the client 
-        */
-        n = write(childfd, buf, strlen(buf));
-        if (n < 0) 
-        {
-            error("ERROR writing to socket");
-        }
+            /* 
+            * write: echo the input string back to the client 
+            */
+            n = write(childfd, buf, strlen(buf));
+            if (n <= 0) 
+            {
+                error("ERROR writing to socket");
+            }
 
-        close(childfd);
+        } while(n > 0);
+
+        //
+        // UI Connection terminated.
+        //
+        printf("UI Socket closed.\n");
+
     }
 
-
-
-
-
-    while(true)
-    {
-        //MilliSleep(1000);
-
-        usleep(500000);
-        printf("<tick>\n");
-    }
+    close(childfd);
 }
 
 
@@ -319,14 +316,14 @@ void* doSomeThing(void *arg)
 int main(int argc, char* argv[])
 {
     //
-    //
+    // Make sure we behave with CTRL-C.
     //
     signal(SIGINT, intHandler);
 
     //
+    // Create the UIServer thread.
     //
-    //
-    pthread_create(&serverThreadID, NULL, &doSomeThing, NULL);
+    pthread_create(&serverThreadID, NULL, &UIServer, NULL);
 
     //
     // Setup the interpreter.
@@ -337,7 +334,7 @@ int main(int argc, char* argv[])
 
 
     //
-    //
+    // Hook into the interpreter.
     //
     //PyEval_SetTrace( &TraceFunc, NULL );
     PyEval_SetProfile( &TraceFunc, NULL );
