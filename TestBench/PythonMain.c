@@ -12,12 +12,15 @@
 
 
 
+#include <stdint.h>
+#include <stdbool.h>
 #include <time.h>
 #include <python3.5/Python.h>
 #include <python3.5/frameobject.h>
 #include <signal.h>
 #include <time.h>
-
+#include <pthread.h>
+#include <unistd.h>
 
 
 
@@ -33,20 +36,6 @@ void intHandler(int dummy)
 }
 
 
-//
-//
-//
-void MilliSleep(uint32_t milliseconds)
-{
-   struct timespec  tim;
-   struct timespec  tim2;
-
-   tim.tv_sec   = 0;
-   tim.tv_nsec  = milliseconds*1000000;
-
-   nanosleep(&tim , &tim2);    
-}
-
 
 //
 //
@@ -57,8 +46,46 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
     char* filename      = PyUnicode_AsUTF8(frame->f_code->co_filename);
     char* funcname      = PyUnicode_AsUTF8(frame->f_code->co_name);    
 
-    printf("(TraceFunc %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
-    MilliSleep(100);
+
+    //
+    //
+    //
+    switch(what)
+    {
+        case PyTrace_CALL:
+            printf("(PyTrace_CALL %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+            break;
+
+        case PyTrace_EXCEPTION:
+            printf("(PyTrace_EXCEPTION %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+            break;
+
+        case PyTrace_LINE:
+            printf("(PyTrace_LINE %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+            break;
+
+        case PyTrace_RETURN:
+            printf("(PyTrace_RETURN %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+            break;
+
+        case PyTrace_C_CALL:
+            printf("(PyTrace_C_CALL %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+            break;
+
+        case PyTrace_C_EXCEPTION:
+            printf("(PyTrace_C_EXCEPTION %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+            break;
+
+        case PyTrace_C_RETURN:
+            printf("(PyTrace_C_RETURN %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+            break;
+
+        default:
+            break;
+    }
+
+    //printf("(TraceFunc %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+    usleep(100000);
 
     return 0;
 }
@@ -121,6 +148,30 @@ void UseTBDB()
 }
 
 
+
+
+
+pthread_t   serverThreadID  = {0};
+
+
+//
+//
+//
+void* doSomeThing(void *arg)
+{
+    while(true)
+    {
+        //MilliSleep(1000);
+
+        usleep(500000);
+        printf("<tick>\n");
+    }
+}
+
+
+
+
+
 //
 //
 //
@@ -130,6 +181,11 @@ int main(int argc, char* argv[])
     //
     //
     signal(SIGINT, intHandler);
+
+    //
+    //
+    //
+    pthread_create(&serverThreadID, NULL, &doSomeThing, NULL);
 
     //
     // Setup the interpreter.
@@ -142,7 +198,8 @@ int main(int argc, char* argv[])
     //
     //
     //
-    PyEval_SetTrace( &TraceFunc, NULL );
+    //PyEval_SetTrace( &TraceFunc, NULL );
+    PyEval_SetProfile( &TraceFunc, NULL );
 
     //
     //
