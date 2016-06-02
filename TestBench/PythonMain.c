@@ -54,6 +54,37 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
     char* filename      = PyUnicode_AsUTF8(frame->f_code->co_filename);
     char* funcname      = PyUnicode_AsUTF8(frame->f_code->co_name);    
 
+    printf("\n\n%p %p %p\n", frame->f_localsplus[1], frame->f_globals, frame->f_builtins);
+
+    //
+    //
+    //
+    if(frame->f_localsplus[1] != NULL)
+    {
+        if( PyDict_Check(frame->f_localsplus[1]) == true )
+        {
+            printf("locals is a dict.\n");
+
+            PyObject*   key     = 0;
+            PyObject*   value   = 0;
+            Py_ssize_t  pos     = 0;
+
+            while (PyDict_Next(frame->f_localsplus[1], &pos, &key, &value)) 
+            {
+                char*   keyText     = PyUnicode_AsUTF8(key);
+                char*   valueText   = PyUnicode_AsUTF8(value);
+                //char*   posText     = PyUnicode_AsUTF8(pos);
+                //if(keyText!=NULL && valueText!=NULL)
+                {
+                    printf("%s:%s\n", keyText, valueText);
+                }
+            }        
+        }        
+        else
+        {
+            printf("locals is NOT a dict.\n");
+        }
+    }
 
     //
     //
@@ -336,8 +367,8 @@ int main(int argc, char* argv[])
     //
     // Hook into the interpreter.
     //
-    //PyEval_SetTrace( &TraceFunc, NULL );
-    PyEval_SetProfile( &TraceFunc, NULL );
+    PyEval_SetTrace( &TraceFunc, NULL );
+    //PyEval_SetProfile( &TraceFunc, NULL );
 
     //
     //
