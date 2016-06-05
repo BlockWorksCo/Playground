@@ -1,0 +1,24 @@
+{
+  "name": "android-debugger",
+  "main": "./lib/debugger",
+  "version": "0.1.0",
+  "description": "Android remote GDB debugger",
+  "activationCommands": {
+    "atom-workspace": "debugger:toggle"
+  },
+  "repository": "https://github.com/longseespace/atom-android-debugger",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=0.174.0 <2.0.0"
+  },
+  "dependencies": {
+    "atom-space-pen-views": "^2.0.0"
+  },
+  "keywords": [
+    "android",
+    "debugger",
+    "gdb",
+    "debug",
+    "remote"
+  ]
+}
