@@ -8,7 +8,7 @@ module.exports = Debugger =
   config:
     gdbPath:
       type: 'string'
-      default: "Path to the gdb"
+      default: "../PythonMain"
     adbPath:
       type: 'string'
       default: "Path to the adb"
