@@ -1,13 +1,13 @@
 {
-  "name": "android-debugger",
+  "name": "testbench-debugger",
   "main": "./lib/debugger",
   "version": "0.1.0",
-  "description": "Android remote GDB debugger",
+  "description": "TestBench debugger",
   "activationCommands": {
-    "atom-workspace": "debugger:toggle"
+    "atom-workspace": "testbench:toggle"
   },
-  "repository": "https://github.com/longseespace/atom-android-debugger",
-  "license": "MIT",
+  "repository": "https://github.com/blockworksco/testbench-debugger",
+  "license": "Proprietary",
   "engines": {
     "atom": ">=0.174.0 <2.0.0"
   },
@@ -15,10 +15,8 @@
     "atom-space-pen-views": "^2.0.0"
   },
   "keywords": [
-    "android",
+    "TestBench",
     "debugger",
-    "gdb",
     "debug",
-    "remote"
   ]
 }

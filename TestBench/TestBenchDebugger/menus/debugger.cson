@@ -3,7 +3,7 @@
   {
     'label': 'Packages'
     'submenu': [
-      'label': 'Android Debugger'
+      'label': 'TestBench Debugger'
       'submenu': [
         {
           'label': 'Toggle Debugging...'
