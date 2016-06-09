@@ -31,7 +31,11 @@
 #include "Shell.h"
 
 
-static volatile int keepRunning = 1;
+
+
+
+char        currentFilename[1024]   = {0};
+uint32_t    currentLineNumber       = 0;
 
 
 //
@@ -52,6 +56,12 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
     int   lineNumber    = PyFrame_GetLineNumber(frame);
     char* filename      = PyUnicode_AsUTF8(frame->f_code->co_filename);
     char* funcname      = PyUnicode_AsUTF8(frame->f_code->co_name);
+
+    //
+    //
+    //
+    strcpy( &currentFilename[0], filename );
+    currentLineNumber   = lineNumber;
 
     //printf("\n\n%p %p %p\n", frame->f_localsplus[1], frame->f_globals, frame->f_builtins);
 #if 0
@@ -135,7 +145,30 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
 //
 void ProcessRequest(char* request)
 {
-    ProcessResponse(request);
+    char    response[1024];
+    
+    if(strcmp(request, "quit") == 0)
+    {
+        //
+        // Quit the shell/app/debugger.
+        //
+        exit(-1);
+    }
+    else if(strcmp(request, "curpos") == 0)
+    {
+        //
+        // Report the current position.
+        //
+        sprintf(response, "%s:%d", currentFilename, currentLineNumber);
+        ProcessResponse(response);
+    }
+    else
+    {
+        //
+        // Unknown request.
+        //
+        ProcessResponse(request);
+    }
 }
 
 
