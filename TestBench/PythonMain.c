@@ -53,8 +53,8 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
     char* filename      = PyUnicode_AsUTF8(frame->f_code->co_filename);
     char* funcname      = PyUnicode_AsUTF8(frame->f_code->co_name);
 
-    printf("\n\n%p %p %p\n", frame->f_localsplus[1], frame->f_globals, frame->f_builtins);
-
+    //printf("\n\n%p %p %p\n", frame->f_localsplus[1], frame->f_globals, frame->f_builtins);
+#if 0
     //
     //
     //
@@ -84,7 +84,7 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
             printf("locals is NOT a dict.\n");
         }
     }
-
+#endif
     //
     //
     //
@@ -123,67 +123,32 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
     }
 
     //printf("(TraceFunc %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
-    usleep(100000);
+    usleep(10000);
 
     return 0;
 }
 
 
 
-void UseTBDB()
+//
+//
+//
+void ProcessRequest(char* request)
 {
-
-
-    //
-    // Import PDB.
-    //
-    PyObject* dbModuleString   = PyUnicode_FromString("tbdb");
-    PyObject* dbModule         = PyImport_Import(dbModuleString);
-    PyObject* dbClass          = PyObject_GetAttrString(dbModule,"tbdb");
-
-    PyObject* dbFunction       = PyObject_GetAttrString(dbClass,"runcall");
-    //PyObject* dbFunctionString = PyUnicode_FromString("Test");
-
-    //
-    // Create a new instance of the debugger.
-    //
-    PyObject* dbInstance       = PyObject_CallObject(dbClass, NULL);
-
-    //
-    // Import the sequence.
-    //
-    PyObject* myModuleString    = PyUnicode_FromString("SequenceOne");
-    PyObject* myModule          = PyImport_Import(myModuleString);
-
-    PyObject* myFunction        = PyObject_GetAttrString(myModule,"Blaa");
-    //PyObject* args              = PyTuple_Pack(1,PyFloat_FromDouble(2.0));
-
-    //PyObject* myResult          = PyObject_CallObject(myFunction, args);
-    //double result               = PyFloat_AsDouble(myResult);
-
-    //
-    //
-    //
-    //PyObject* args              = PyTuple_Pack(2, myFunction, PyLong_FromLong(123) );
-    //PyObject* myResult          = PyObject_CallObject(dbFunction, args);
-    //PyObject* myResult          = PyObject_CallMethodObjArgs(dbInstance, dbFunctionString,  PyLong_FromLong(123), NULL);
-    if(PyCallable_Check(dbFunction) != 0)
-    {
-        printf("is callable.\n");
-        PyObject* args              = PyTuple_Pack(3, dbInstance, myFunction, PyLong_FromLong(123) );
-        PyObject* myResult          = PyObject_CallObject(dbFunction, args);
-    }
-    else
-    {
-        printf("Not callable.\n");
-    }
-
-    //
-    // Show the result.
-    //
-    //printf("result is %f\n", result);
-
+    ProcessResponse(request);
 }
+
+
+//
+//
+//
+void ProcessResponse(char* response)
+{
+    printf("[%s]\n",response);
+}
+
+
+
 
 
 
@@ -228,8 +193,8 @@ int main(int argc, char* argv[])
     //
     // Hook into the interpreter.
     //
-    PyEval_SetTrace( &TraceFunc, NULL );
-    //PyEval_SetProfile( &TraceFunc, NULL );
+    //PyEval_SetTrace( &TraceFunc, NULL );
+    PyEval_SetProfile( &TraceFunc, NULL );
 
     //
     //
