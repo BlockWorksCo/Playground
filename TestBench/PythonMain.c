@@ -172,6 +172,13 @@ void ProcessRequest(char* request)
         uint32_t    command     = 1;
         write( commandPipe[1], &command, sizeof(command) );
     }
+    else if(strcmp(request, "b") == 0)
+    {
+        //
+        // Add a breakpoint to the list.
+        //
+        ProcessResponse("Breakpoint added.");
+    }
     else
     {
         //
