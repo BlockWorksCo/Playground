@@ -1,3 +1,1 @@
-gcc -g -o PythonMain PythonMain.c /usr/lib/x86_64-linux-gnu/libpython3.5m.so `pkg-config --cflags --libs gtk+-3.0`
-
-
+gcc -g -o PythonMain PythonMain.c TCPShell.c /usr/lib/x86_64-linux-gnu/libpython3.5m.so `pkg-config --cflags --libs gtk+-3.0`

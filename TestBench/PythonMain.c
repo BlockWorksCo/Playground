@@ -2,6 +2,7 @@
 // Purpose of this shell is:
 //  - Abstract the details of the debugger from the GUI (portable interface, not shell/stdio related).
 //  - Provide isolation of the test script (multiple scripts shall not interfere with each other).
+//  - Test reliability not linked to GUI.
 //  - Provide watchdog type facilities for the test script (maybe this is better done outside?).
 //  - Abstract the details of the interpreter (potentially use different Python API for old/new versions).
 //  - Potentially run scripts simultaeously that need different interpreters/environments.
@@ -22,14 +23,12 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <netdb.h>
-#include <sys/types.h> 
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
-
-
-#define BUFSIZE 1024
+#include "Common.h"
+#include "Shell.h"
 
 
 static volatile int keepRunning = 1;
@@ -38,7 +37,7 @@ static volatile int keepRunning = 1;
 //
 //
 //
-void intHandler(int dummy) 
+void intHandler(int dummy)
 {
     exit(-1);
 }
@@ -52,7 +51,7 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
 {
     int   lineNumber    = PyFrame_GetLineNumber(frame);
     char* filename      = PyUnicode_AsUTF8(frame->f_code->co_filename);
-    char* funcname      = PyUnicode_AsUTF8(frame->f_code->co_name);    
+    char* funcname      = PyUnicode_AsUTF8(frame->f_code->co_name);
 
     printf("\n\n%p %p %p\n", frame->f_localsplus[1], frame->f_globals, frame->f_builtins);
 
@@ -69,7 +68,7 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
             PyObject*   value   = 0;
             Py_ssize_t  pos     = 0;
 
-            while (PyDict_Next(frame->f_localsplus[1], &pos, &key, &value)) 
+            while (PyDict_Next(frame->f_localsplus[1], &pos, &key, &value))
             {
                 char*   keyText     = PyUnicode_AsUTF8(key);
                 char*   valueText   = PyUnicode_AsUTF8(value);
@@ -78,8 +77,8 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
                 {
                     printf("%s:%s\n", keyText, valueText);
                 }
-            }        
-        }        
+            }
+        }
         else
         {
             printf("locals is NOT a dict.\n");
@@ -192,10 +191,7 @@ void UseTBDB()
 //
 //
 //
-/*
- * error - wrapper for perror
- */
-void error(char *msg) 
+void error(char *msg)
 {
   perror(msg);
 }
@@ -203,141 +199,6 @@ void error(char *msg)
 
 
 pthread_t   serverThreadID  = {0};
-
-
-//
-//
-//
-void* UIServer(void *arg)
-{
-    int                 parentfd; /* parent socket */
-    int                 childfd; /* child socket */
-    int                 portno; /* port to listen on */
-    int                 clientlen; /* byte size of client's address */
-    struct sockaddr_in  serveraddr; /* server's addr */
-    struct sockaddr_in  clientaddr; /* client addr */
-    struct hostent*     hostp; /* client host info */
-    char                buf[BUFSIZE]; /* message buffer */
-    char*               hostaddrp; /* dotted decimal host addr string */
-    int                 optval; /* flag value for setsockopt */
-    int                 n; /* message byte size */
-
-    portno = 1234;
-
-    /* 
-    * socket: create the parent socket 
-    */
-    parentfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (parentfd < 0) 
-    {
-        error("ERROR opening socket");
-    }
-
-    /* setsockopt: Handy debugging trick that lets 
-    * us rerun the server immediately after we kill it; 
-    * otherwise we have to wait about 20 secs. 
-    * Eliminates "ERROR on binding: Address already in use" error. 
-    */
-    optval = 1;
-    setsockopt(parentfd, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval , sizeof(int));
-
-    /*
-    * build the server's Internet address
-    */
-    bzero((char *) &serveraddr, sizeof(serveraddr));
-
-    /* this is an Internet address */
-    serveraddr.sin_family = AF_INET;
-
-    /* let the system figure out our IP address */
-    serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-    /* this is the port we will listen on */
-    serveraddr.sin_port = htons((unsigned short)portno);
-
-    /* 
-    * bind: associate the parent socket with a port 
-    */
-    if (bind(parentfd, (struct sockaddr *) &serveraddr, sizeof(serveraddr)) < 0) 
-    {
-        error("ERROR on binding");        
-    }
-
-    /* 
-    * listen: make this socket ready to accept connection requests 
-    */
-    if (listen(parentfd, 5) < 0) /* allow 5 requests to queue up */ 
-    {
-        error("ERROR on listen");
-    }
-
-    /* 
-    * main loop: wait for a connection request, echo input line, 
-    * then close connection.
-    */
-    clientlen = sizeof(clientaddr);
-    while(true)
-    {
-        /* 
-        * accept: wait for a connection request 
-        */
-        childfd = accept(parentfd, (struct sockaddr *) &clientaddr, &clientlen);
-        if (childfd < 0) 
-        {
-          error("ERROR on accept");
-        }
-
-        /* 
-        * gethostbyaddr: determine who sent the message 
-        */
-        hostp = gethostbyaddr((const char *)&clientaddr.sin_addr.s_addr, sizeof(clientaddr.sin_addr.s_addr), AF_INET);
-        if (hostp == NULL)
-        {
-            error("ERROR on gethostbyaddr");
-        }
-        hostaddrp = inet_ntoa(clientaddr.sin_addr);
-        if (hostaddrp == NULL)
-        {
-            error("ERROR on inet_ntoa\n");
-        }
-        printf("server established connection with %s (%s)\n", 
-        hostp->h_name, hostaddrp);
-
-        do
-        {
-            /* 
-            * read: read input string from the client
-            */
-            bzero(buf, BUFSIZE);
-            n = read(childfd, buf, BUFSIZE);
-            if (n <= 0) 
-            {
-                error("ERROR reading from socket");
-            }
-            printf("server received %d bytes: %s", n, buf);
-
-            /* 
-            * write: echo the input string back to the client 
-            */
-            n = write(childfd, buf, strlen(buf));
-            if (n <= 0) 
-            {
-                error("ERROR writing to socket");
-            }
-
-        } while(n > 0);
-
-        //
-        // UI Connection terminated.
-        //
-        printf("UI Socket closed.\n");
-
-    }
-
-    close(childfd);
-}
-
-
 
 
 
@@ -354,7 +215,7 @@ int main(int argc, char* argv[])
     //
     // Create the UIServer thread.
     //
-    pthread_create(&serverThreadID, NULL, &UIServer, NULL);
+    pthread_create(&serverThreadID, NULL, &ShellMain, NULL);
 
     //
     // Setup the interpreter.
@@ -397,6 +258,3 @@ int main(int argc, char* argv[])
 
     return 0;
 }
-
-
-
