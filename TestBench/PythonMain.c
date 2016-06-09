@@ -37,6 +37,8 @@
 char        currentFilename[1024]   = {0};
 uint32_t    currentLineNumber       = 0;
 
+int         commandPipe[2]          = {0};
+
 
 //
 //
@@ -146,7 +148,7 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
 void ProcessRequest(char* request)
 {
     char    response[1024];
-    
+
     if(strcmp(request, "quit") == 0)
     {
         //
@@ -161,6 +163,14 @@ void ProcessRequest(char* request)
         //
         sprintf(response, "%s:%d", currentFilename, currentLineNumber);
         ProcessResponse(response);
+    }
+    else if(strcmp(request, "go") == 0)
+    {
+        //
+        // Start the script.
+        //
+        uint32_t    command     = 1;
+        write( commandPipe[1], &command, sizeof(command) );
     }
     else
     {
@@ -191,7 +201,7 @@ void ProcessResponse(char* response)
 //
 void error(char *msg)
 {
-  perror(msg);
+    perror(msg);
 }
 
 
@@ -209,6 +219,14 @@ int main(int argc, char* argv[])
     // Make sure we behave with CTRL-C.
     //
     signal(SIGINT, intHandler);
+
+    //
+    // Create the command pipe before the Shell thread.
+    //
+    if (pipe(commandPipe) == -1)
+    {
+        exit(-1);
+    }
 
     //
     // Create the UIServer thread.
@@ -245,6 +263,12 @@ int main(int argc, char* argv[])
     printf("<Execution finished>\n");
     while(true)
     {
+        uint32_t    command     = 0;
+        while (read( commandPipe    [0], &command, sizeof(command) ) > 0)
+        {
+            printf("<%d>\n", command);
+        }
+
         usleep(100000);
     }
 
