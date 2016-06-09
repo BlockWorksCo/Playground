@@ -247,14 +247,6 @@ int main(int argc, char* argv[])
     //PyEval_SetTrace( &TraceFunc, NULL );
     PyEval_SetProfile( &TraceFunc, NULL );
 
-    //
-    //
-    //
-    PyObject* myModuleString    = PyUnicode_FromString("SequenceOne");
-    PyObject* myModule          = PyImport_Import(myModuleString);
-    PyObject* myFunction        = PyObject_GetAttrString(myModule,"Blaa");
-    PyObject* args              = PyTuple_Pack(1, PyLong_FromLong(123) );
-    PyObject* myResult          = PyObject_CallObject(myFunction, args);
 
 
     //
@@ -267,6 +259,27 @@ int main(int argc, char* argv[])
         while (read( commandPipe    [0], &command, sizeof(command) ) > 0)
         {
             printf("<%d>\n", command);
+
+            switch(command)
+            {
+                case 1:
+                    printf("<Starting>\n");
+                    printf("<Done>\n");
+
+                    //
+                    //
+                    //
+                    PyObject* myModuleString    = PyUnicode_FromString("SequenceOne");
+                    PyObject* myModule          = PyImport_Import(myModuleString);
+                    PyObject* myFunction        = PyObject_GetAttrString(myModule,"Blaa");
+                    PyObject* args              = PyTuple_Pack(1, PyLong_FromLong(123) );
+                    PyObject* myResult          = PyObject_CallObject(myFunction, args);
+
+                    break;
+
+                default:
+                    printf("<Unknown command>\n");
+            }
         }
 
         usleep(100000);
