@@ -1,5 +1,8 @@
 
 
+import time
+import zlib
+
 globalX = 1.11
 globalY = 2.22
 
@@ -13,6 +16,7 @@ def Blaa(a):
     localsZ = 3.33
     localsA = 4.44
     for i in range(10):
+        time.sleep(0.5)
         print("Blaa %f %d"%(a,i))
     Oops()
     return 3.14

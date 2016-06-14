@@ -111,8 +111,57 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
             break;
 
         case PyTrace_LINE:
+        {
             printf("(PyTrace_LINE %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+
+            PyGILState_STATE gstate;
+            gstate = PyGILState_Ensure();
+
+
+            PyObject*   locals  = PyEval_GetLocals();
+            if(locals != NULL)
+            {
+                if( PyDict_Check(locals) == true )
+                {
+                    printf("locals is a dict.\n");
+
+                    PyObject*   key     = 0;
+                    PyObject*   value   = 0;
+                    Py_ssize_t  pos     = 0;
+
+                    while (PyDict_Next(locals, &pos, &key, &value))
+                    {
+                        PyObject*   keyStringRepresentation     = PyObject_Str(key);
+                        char*       keyText                     = PyUnicode_AsUTF8(keyStringRepresentation);
+                        if(keyText != NULL)
+                        {
+                            PyObject*   valueStringRepresentation   = PyObject_Str(value);
+                            if(valueStringRepresentation != NULL)
+                            {
+                                char*       valueText                   = PyUnicode_AsUTF8(valueStringRepresentation);
+                                printf("\t%s:%s\n", keyText, valueText);
+                                Py_DECREF(valueStringRepresentation);
+                            }
+                            else
+                            {
+                                printf("\t%s:%s\n", keyText, "<None>");
+                            }
+                        }
+
+                        Py_DECREF(keyStringRepresentation);
+                    }
+                }
+                else
+                {
+                    printf("locals is NOT a dict.\n");
+                }
+            }
+
+            /* Release the thread. No Python API allowed beyond this point. */
+            PyGILState_Release(gstate);
+
             break;
+        }
 
         case PyTrace_RETURN:
             printf("(PyTrace_RETURN %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
@@ -244,15 +293,29 @@ int main(int argc, char* argv[])
     // Setup the interpreter.
     //
     setenv("PYTHONPATH",".",1);
+    //PySys_SetArgv();
+    //Py_SetPythonHome();
+    //Py_GetVersion();
+    //Py_GetPlatform();
+    //Py_GetCopyright();
+    //Py_GetCompiler();
+    //Py_GetBuildInfo();
+    //Py_GetProgramFullPath();
     Py_SetProgramName(L"BlockWorks TestBench");
     Py_Initialize();
+    PyEval_InitThreads();
 
+    //
+    //
+    //
+    PyObject* myModuleString    = PyUnicode_FromString("SequenceOne");
+    PyObject* myModule          = PyImport_Import(myModuleString);
 
     //
     // Hook into the interpreter.
     //
-    //PyEval_SetTrace( &TraceFunc, NULL );
-    PyEval_SetProfile( &TraceFunc, NULL );
+    PyEval_SetTrace( &TraceFunc, NULL );
+    //PyEval_SetProfile( &TraceFunc, NULL );
 
 
 
@@ -276,11 +339,16 @@ int main(int argc, char* argv[])
                     //
                     //
                     //
-                    PyObject* myModuleString    = PyUnicode_FromString("SequenceOne");
-                    PyObject* myModule          = PyImport_Import(myModuleString);
-                    PyObject* myFunction        = PyObject_GetAttrString(myModule,"Blaa");
-                    PyObject* args              = PyTuple_Pack(1, PyLong_FromLong(123) );
-                    PyObject* myResult          = PyObject_CallObject(myFunction, args);
+                    if(myModule != NULL)
+                    {
+                        PyObject* myFunction        = PyObject_GetAttrString(myModule,"Blaa");
+                        PyObject* args              = PyTuple_Pack(1, PyLong_FromLong(123) );
+                        PyObject* myResult          = PyObject_CallObject(myFunction, args);
+                    }
+                    else
+                    {
+                        printf("Couldn't find module.\n");
+                    }
 
                     break;
 
