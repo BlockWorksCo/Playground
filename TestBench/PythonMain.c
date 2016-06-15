@@ -31,6 +31,24 @@
 #include "Shell.h"
 
 
+#define NUMBER_OF_ELEMENTS(a)   (sizeof(a)/sizeof(a[0]))
+
+
+
+//
+// Definition of a breakpoint.
+//
+typedef struct
+{
+    uint32_t    lineNumber;
+    char        fileName[1024];
+
+} Breakpoint;
+
+//
+// Array of breakpoints.
+//
+Breakpoint  breakpoints[128];
 
 
 
@@ -46,6 +64,62 @@ int         commandPipe[2]          = {0};
 void intHandler(int dummy)
 {
     exit(-1);
+}
+
+
+
+//
+//
+//
+uint32_t AddBreakpoint(char* fileName, uint32_t lineNumber)
+{
+    uint32_t    breakpointId    = (uint32_t)-1;
+
+    for(uint32_t i=0; i<NUMBER_OF_ELEMENTS(breakpoints); i++)
+    {
+        if(breakpoints[i].lineNumber == (uint32_t)-1)
+        {
+            breakpoints[i].lineNumber   = lineNumber;
+            strcpy(breakpoints[i].fileName, fileName);
+            breakpointId    = i;
+
+            break;
+        }
+    }
+
+    return breakpointId;
+}
+
+//
+//
+//
+void DeleteBreakpoint(uint32_t breakpointId)
+{
+    breakpoints[breakpointId].lineNumber   = (uint32_t)-1;
+}
+
+
+
+//
+//
+//
+uint32_t LookupBreakpoint(char* fileName, uint32_t lineNumber)
+{
+    uint32_t    breakpointId    = (uint32_t)-1;
+
+    for(uint32_t i=0; i<NUMBER_OF_ELEMENTS(breakpoints); i++)
+    {
+        if(breakpoints[i].lineNumber == lineNumber)
+        {
+            if(strcmp(breakpoints[i].fileName, fileName) == 0)
+            {
+                breakpointId    = i;
+                break;
+            }
+        }
+    }
+
+    return breakpointId;
 }
 
 
@@ -114,10 +188,21 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
         {
             printf("(PyTrace_LINE %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
 
+            //
+            //
+            //
+            if(LookupBreakpoint(filename, lineNumber) != (uint32_t)-1)
+            {
+                printf("<break at %s:%d>\n", filename, lineNumber);
+            }
+
+
             PyGILState_STATE gstate;
             gstate = PyGILState_Ensure();
 
-
+            //
+            //
+            //
             PyObject*   locals  = PyEval_GetLocals();
             if(locals != NULL)
             {
