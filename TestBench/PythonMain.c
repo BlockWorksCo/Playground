@@ -134,6 +134,65 @@ uint32_t LookupBreakpoint(char* fileName, uint32_t lineNumber)
 }
 
 
+//
+//
+//
+void DisplayLocals()
+{
+    //PyGILState_STATE gstate;
+    //gstate = PyGILState_Ensure();
+
+    //
+    //
+    //
+    PyObject*   locals  = PyEval_GetLocals();
+    if(locals != NULL)
+    {
+        if( PyDict_Check(locals) == true )
+        {
+            printf("locals is a dict.\n");
+
+            PyObject*   key     = 0;
+            PyObject*   value   = 0;
+            Py_ssize_t  pos     = 0;
+
+            while (PyDict_Next(locals, &pos, &key, &value))
+            {
+                PyObject*   keyStringRepresentation     = PyObject_Str(key);
+                char*       keyText                     = PyUnicode_AsUTF8(keyStringRepresentation);
+                if(keyText != NULL)
+                {
+                    PyObject*   valueStringRepresentation   = PyObject_Str(value);
+                    if(valueStringRepresentation != NULL)
+                    {
+                        char*       valueText                   = PyUnicode_AsUTF8(valueStringRepresentation);
+                        printf("\t%s:%s\n", keyText, valueText);
+                        Py_DECREF(valueStringRepresentation);
+                    }
+                    else
+                    {
+                        printf("\t%s:%s\n", keyText, "<None>");
+                    }
+                }
+
+                Py_DECREF(keyStringRepresentation);
+            }
+        }
+        else
+        {
+            printf("locals is NOT a dict.\n");
+        }
+    }
+    else
+    {
+        printf("Locals is NULL\n" );
+    }
+
+    /* Release the thread. No Python API allowed beyond this point. */
+    //PyGILState_Release(gstate);
+
+}
+
 
 //
 //
@@ -150,38 +209,6 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
     strcpy( &currentFilename[0], filename );
     currentLineNumber   = lineNumber;
 
-    //printf("\n\n%p %p %p\n", frame->f_localsplus[1], frame->f_globals, frame->f_builtins);
-#if 0
-    //
-    //
-    //
-    if(frame->f_localsplus[1] != NULL)
-    {
-        if( PyDict_Check(frame->f_localsplus[1]) == true )
-        {
-            printf("locals is a dict.\n");
-
-            PyObject*   key     = 0;
-            PyObject*   value   = 0;
-            Py_ssize_t  pos     = 0;
-
-            while (PyDict_Next(frame->f_localsplus[1], &pos, &key, &value))
-            {
-                char*   keyText     = PyUnicode_AsUTF8(key);
-                char*   valueText   = PyUnicode_AsUTF8(value);
-                //char*   posText     = PyUnicode_AsUTF8(pos);
-                //if(keyText!=NULL && valueText!=NULL)
-                {
-                    printf("%s:%s\n", keyText, valueText);
-                }
-            }
-        }
-        else
-        {
-            printf("locals is NOT a dict.\n");
-        }
-    }
-#endif
     //
     //
     //
@@ -208,7 +235,7 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
                 sem_wait(&breakpointSemaphore);
             }
 
-
+#if 0
             PyGILState_STATE gstate;
             gstate = PyGILState_Ensure();
 
@@ -253,9 +280,9 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
                     printf("locals is NOT a dict.\n");
                 }
             }
-
             /* Release the thread. No Python API allowed beyond this point. */
             PyGILState_Release(gstate);
+#endif
 
             break;
         }
@@ -368,6 +395,16 @@ void ProcessRequest(char* request)
         // Give the breakpointSemaphore.
         //
         sem_post(&breakpointSemaphore);
+    }
+    else if(strcmp(request, "locals") == 0)
+    {
+        //
+        // Respond with the locals.
+        //
+        DisplayLocals();
+        uint32_t    command     = 1;
+        write( commandPipe[1], &command, sizeof(command) );
+        ProcessResponse("Locals:");
     }
     else
     {
