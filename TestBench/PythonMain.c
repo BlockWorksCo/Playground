@@ -111,7 +111,17 @@ uint32_t LookupBreakpoint(char* fileName, uint32_t lineNumber)
     {
         if(breakpoints[i].lineNumber == lineNumber)
         {
-            if(strcmp(breakpoints[i].fileName, fileName) == 0)
+            char*   temp        = &fileName[0];
+            char*   lastSlash   = strrchr(&fileName[0], '/');
+            if(lastSlash != NULL)
+            {
+                temp    = lastSlash + 1;
+            }
+
+            //
+            //
+            //
+            if(strcmp(temp, &breakpoints[i].fileName[0]) == 0)
             {
                 breakpointId    = i;
                 break;
@@ -306,11 +316,22 @@ void ProcessRequest(char* request)
         uint32_t    command     = 1;
         write( commandPipe[1], &command, sizeof(command) );
     }
-    else if(strcmp(request, "b") == 0)
+    else if(strncmp(request, "b ", 2) == 0)
     {
         //
         // Add a breakpoint to the list.
         //
+        char        fileName[1024]  = {0};
+        uint32_t    lineNumber      = (uint32_t)-1;
+        sscanf(request, "b %s %d", &fileName[0], &lineNumber);
+        char*       colon           = strchr( &fileName[0], ':' );
+        if(colon != NULL)
+        {
+            *colon  = 0;
+        }
+        uint32_t    breakpointId    = AddBreakpoint( &fileName[0], lineNumber );
+        printf("BreakpointID (%s:%d) = %d.", fileName, lineNumber, breakpointId);
+
         ProcessResponse("Breakpoint added.");
     }
     else
@@ -372,6 +393,7 @@ int main(int argc, char* argv[])
     //
     // Create the UIServer thread.
     //
+    memset(&breakpoints[0], 0xff, sizeof(breakpoints));
     pthread_create(&serverThreadID, NULL, &ShellMain, NULL);
 
     //
