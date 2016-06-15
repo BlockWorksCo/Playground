@@ -21,6 +21,7 @@
 #include <signal.h>
 #include <time.h>
 #include <pthread.h>
+#include "semaphore.h"
 #include <unistd.h>
 #include <netdb.h>
 #include <sys/types.h>
@@ -49,7 +50,7 @@ typedef struct
 // Array of breakpoints.
 //
 Breakpoint  breakpoints[128];
-
+sem_t       breakpointSemaphore     = {0};
 
 
 char        currentFilename[1024]   = {0};
@@ -204,6 +205,7 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
             if(LookupBreakpoint(filename, lineNumber) != (uint32_t)-1)
             {
                 printf("<break at %s:%d>\n", filename, lineNumber);
+                sem_wait(&breakpointSemaphore);
             }
 
 
@@ -334,6 +336,13 @@ void ProcessRequest(char* request)
 
         ProcessResponse("Breakpoint added.");
     }
+    else if(strcmp(request, "cont") == 0)
+    {
+        //
+        // Give the breakpointSemaphore.
+        //
+        sem_post(&breakpointSemaphore);
+    }
     else
     {
         //
@@ -394,6 +403,7 @@ int main(int argc, char* argv[])
     // Create the UIServer thread.
     //
     memset(&breakpoints[0], 0xff, sizeof(breakpoints));
+    sem_init(&breakpointSemaphore, 0, 0);
     pthread_create(&serverThreadID, NULL, &ShellMain, NULL);
 
     //
