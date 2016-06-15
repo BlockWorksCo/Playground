@@ -336,6 +336,32 @@ void ProcessRequest(char* request)
 
         ProcessResponse("Breakpoint added.");
     }
+    else if(strncmp(request, "del ", 4) == 0)
+    {
+        //
+        // Remove a breakpoint from the list.
+        //
+        char        fileName[1024]  = {0};
+        uint32_t    lineNumber      = (uint32_t)-1;
+        sscanf(request, "del %s %d", &fileName[0], &lineNumber);
+        char*       colon           = strchr( &fileName[0], ':' );
+        if(colon != NULL)
+        {
+            *colon  = 0;
+        }
+        uint32_t    breakpointId    = LookupBreakpoint( &fileName[0], lineNumber );
+        if(breakpointId != (uint32_t)-1)
+        {
+            DeleteBreakpoint(breakpointId);
+            printf("BreakpointID (%s:%d) = %d deleted.", fileName, lineNumber, breakpointId);
+
+            ProcessResponse("Breakpoint deleted.");
+        }
+        else
+        {
+            ProcessResponse("Breakpoint deletion failed.");
+        }
+    }
     else if(strcmp(request, "cont") == 0)
     {
         //
