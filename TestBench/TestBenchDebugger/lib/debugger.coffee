@@ -17,7 +17,7 @@ module.exports = Debugger =
       default: "Shared library search path"
     targetBinary:
       type: 'string'
-      default: '~/BlockWorks/Playground/TestBench/SequenceOne.py'
+      default: '/home/steve/BlockWorks/Playground/TestBench/SequenceOne.py'
     processId:
       type: 'string'
       default: ''

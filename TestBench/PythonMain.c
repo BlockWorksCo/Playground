@@ -474,8 +474,8 @@ int main(int argc, char* argv[])
     //
     //
     //
-    PyObject* myModuleString    = PyUnicode_FromString("SequenceOne");
-    PyObject* myModule          = PyImport_Import(myModuleString);
+    //PyObject* myModuleString    = PyUnicode_FromString("SequenceOne");
+    //PyObject* myModule          = PyImport_Import(myModuleString);
 
     //
     // Hook into the interpreter.
@@ -519,16 +519,22 @@ int main(int argc, char* argv[])
                     //
                     //
                     //
-                    if(myModule != NULL)
+                    //if(myModule != NULL)
                     {
-                        PyObject* myFunction        = PyObject_GetAttrString(myModule,"Blaa");
-                        PyObject* args              = PyTuple_Pack(1, PyLong_FromLong(123) );
-                        PyObject* myResult          = PyObject_CallObject(myFunction, args);
-                        printf("<Execution finished>\n");
-                    }
-                    else
-                    {
-                        printf("Couldn't find module.\n");
+                        //PyObject* myFunction        = PyObject_GetAttrString(myModule,"Blaa");
+                        //PyObject* args              = PyTuple_Pack(1, PyLong_FromLong(123) );
+                        //PyObject* myResult          = PyObject_CallObject(myFunction, args);
+
+                        FILE*   scriptFile  = fopen(argv[1], "r");
+                        if(scriptFile != NULL)
+                        {
+                            PyRun_SimpleFile(scriptFile, argv[1]);
+                            printf("<Execution finished>\n");
+                        }
+                        else
+                        {
+                            printf("<Couldn't open script file>\n");
+                        }
                     }
 
                     break;
