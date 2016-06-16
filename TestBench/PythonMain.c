@@ -156,6 +156,10 @@ void DisplayLocals()
             PyObject*   value   = 0;
             Py_ssize_t  pos     = 0;
 
+
+            printf("{\n");
+
+
             while (PyDict_Next(locals, &pos, &key, &value))
             {
                 PyObject*   keyStringRepresentation     = PyObject_Str(key);
@@ -166,17 +170,21 @@ void DisplayLocals()
                     if(valueStringRepresentation != NULL)
                     {
                         char*       valueText                   = PyUnicode_AsUTF8(valueStringRepresentation);
-                        printf("\t%s:%s\n", keyText, valueText);
+                        printf("\"%s\" : \"%s\",\n", keyText, valueText);
+                        //printf("\t%s:%s\n", keyText, valueText);
                         Py_DECREF(valueStringRepresentation);
                     }
                     else
                     {
-                        printf("\t%s:%s\n", keyText, "<None>");
+                        printf("\"%s\" : \"%s\",\n", keyText, "<None>");
+                        //printf("\t%s:%s\n", keyText, "<None>");
                     }
                 }
 
                 Py_DECREF(keyStringRepresentation);
             }
+
+            printf("}\n");
         }
         else
         {
@@ -190,7 +198,6 @@ void DisplayLocals()
 
     /* Release the thread. No Python API allowed beyond this point. */
     //PyGILState_Release(gstate);
-
 }
 
 
