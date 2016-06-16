@@ -127,43 +127,43 @@ module.exports =
         handler(abreak)
 
     run: (handler) ->
-      command = 'exec-run'
+      command = 'go'
       @postCommand command, (clazz, result) =>
         handler(clazz == RESULT.RUNNING)
 
     continue: (handler) ->
-      command = 'exec-continue'
+      command = 'cont'
       @postCommand command, (clazz, result) =>
         handler(clazz == RESULT.RUNNING)
 
     interrupt: (params, handler) ->
-      command = 'exec-interrupt'
+      command = 'break'
       handler = params if not handler
       @postCommand command, (clazz, result) =>
         handler(clazz == RESULT.DONE)
 
     next: (handler) ->
-      command = 'exec-next'
+      command = 'next'
       @postCommand command, (clazz, result) =>
         handler(clazz == RESULT.RUNNING)
 
     step: (handler) ->
-      command = 'exec-step'
+      command = 'step'
       @postCommand command, (clazz, result) =>
         handler(clazz == RESULT.RUNNING)
 
     finish: (handler) ->
-      command = 'exec-finish'
+      command = 'quit'
       @postCommand command, (clazz, result) =>
         handler(clazz == RESULT.RUNNING)
 
     exit: (handler) ->
-      command = 'gdb-exit'
+      command = 'quit'
       @postCommand command, (clazz, result) =>
         handler(clazz == RESULT.DONE)
 
     set: (key, value, handler) ->
-      command = "gdb-set #{key} #{value}"
+      command = "set #{key} #{value}"
       @postCommand command, (clazz, result) =>
         handler(clazz == RESULT.DONE)
 

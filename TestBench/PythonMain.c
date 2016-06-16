@@ -52,6 +52,8 @@ typedef struct
 Breakpoint  breakpoints[128];
 sem_t       breakpointSemaphore     = {0};
 
+bool        breakOnNext             = false;
+
 
 char        currentFilename[1024]   = {0};
 uint32_t    currentLineNumber       = 0;
@@ -150,7 +152,7 @@ void DisplayLocals()
     {
         if( PyDict_Check(locals) == true )
         {
-            printf("locals is a dict.\n");
+            //printf("locals is a dict.\n");
 
             PyObject*   key     = 0;
             PyObject*   value   = 0;
@@ -188,12 +190,12 @@ void DisplayLocals()
         }
         else
         {
-            printf("locals is NOT a dict.\n");
+            //printf("locals is NOT a dict.\n");
         }
     }
     else
     {
-        printf("Locals is NULL\n" );
+        //printf("Locals is NULL\n" );
     }
 
     /* Release the thread. No Python API allowed beyond this point. */
@@ -234,62 +236,13 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
             printf("(PyTrace_LINE %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
 
             //
+            // See if we need to break or not.
             //
-            //
-            if(LookupBreakpoint(filename, lineNumber) != (uint32_t)-1)
+            if((LookupBreakpoint(filename, lineNumber) != (uint32_t)-1) || (breakOnNext == true))
             {
                 printf("<break at %s:%d>\n", filename, lineNumber);
                 sem_wait(&breakpointSemaphore);
             }
-
-#if 0
-            PyGILState_STATE gstate;
-            gstate = PyGILState_Ensure();
-
-            //
-            //
-            //
-            PyObject*   locals  = PyEval_GetLocals();
-            if(locals != NULL)
-            {
-                if( PyDict_Check(locals) == true )
-                {
-                    printf("locals is a dict.\n");
-
-                    PyObject*   key     = 0;
-                    PyObject*   value   = 0;
-                    Py_ssize_t  pos     = 0;
-
-                    while (PyDict_Next(locals, &pos, &key, &value))
-                    {
-                        PyObject*   keyStringRepresentation     = PyObject_Str(key);
-                        char*       keyText                     = PyUnicode_AsUTF8(keyStringRepresentation);
-                        if(keyText != NULL)
-                        {
-                            PyObject*   valueStringRepresentation   = PyObject_Str(value);
-                            if(valueStringRepresentation != NULL)
-                            {
-                                char*       valueText                   = PyUnicode_AsUTF8(valueStringRepresentation);
-                                printf("\t%s:%s\n", keyText, valueText);
-                                Py_DECREF(valueStringRepresentation);
-                            }
-                            else
-                            {
-                                printf("\t%s:%s\n", keyText, "<None>");
-                            }
-                        }
-
-                        Py_DECREF(keyStringRepresentation);
-                    }
-                }
-                else
-                {
-                    printf("locals is NOT a dict.\n");
-                }
-            }
-            /* Release the thread. No Python API allowed beyond this point. */
-            PyGILState_Release(gstate);
-#endif
 
             break;
         }
@@ -349,6 +302,7 @@ void ProcessRequest(char* request)
         //
         // Start the script.
         //
+        breakOnNext     = false;
         uint32_t    command     = 1;
         write( commandPipe[1], &command, sizeof(command) );
     }
@@ -401,6 +355,7 @@ void ProcessRequest(char* request)
         //
         // Give the breakpointSemaphore.
         //
+        breakOnNext     = false;
         sem_post(&breakpointSemaphore);
     }
     else if(strcmp(request, "locals") == 0)
@@ -412,6 +367,29 @@ void ProcessRequest(char* request)
         uint32_t    command     = 1;
         write( commandPipe[1], &command, sizeof(command) );
         ProcessResponse("Locals:");
+    }
+    else if(strcmp(request, "break") == 0)
+    {
+        //
+        // Set the breakOnNext flag;
+        //
+        breakOnNext     = true;
+    }
+    else if(strcmp(request, "step") == 0)
+    {
+        //
+        // Set the breakOnNext flag and let the script run;
+        //
+        breakOnNext     = true;
+        sem_post(&breakpointSemaphore);
+    }
+    else if(strcmp(request, "next") == 0)
+    {
+        //
+        // Set the breakOnNext flag and let the script run;
+        //
+        breakOnNext     = true;
+        sem_post(&breakpointSemaphore);
     }
     else
     {
