@@ -442,6 +442,7 @@ int main(int argc, char* argv[])
     //
     // Create the command pipe before the Shell thread.
     //
+    setbuf(stdout, NULL);
     if (pipe(commandPipe) == -1)
     {
         exit(-1);
@@ -483,6 +484,21 @@ int main(int argc, char* argv[])
     //PyEval_SetProfile( &TraceFunc, NULL );
 
 
+    if(argc == 2)
+    {
+        printf("<TestBenchCore %s>\n", argv[1]);
+
+
+        {
+            uint32_t    command     = 1;
+            write( commandPipe[1], &command, sizeof(command) );
+        }
+    }
+    else
+    {
+        printf("bad parameters\n");
+        exit(-1);
+    }
 
     //
     //

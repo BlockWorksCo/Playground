@@ -8,7 +8,7 @@ module.exports = Debugger =
   config:
     gdbPath:
       type: 'string'
-      default: "~/BlockWorks/Playground/TestBench/PythonMain"
+      default: "/home/steve/BlockWorks/Playground/TestBench/PythonMain"
     adbPath:
       type: 'string'
       default: "Path to the adb"
@@ -17,7 +17,7 @@ module.exports = Debugger =
       default: "Shared library search path"
     targetBinary:
       type: 'string'
-      default: 'Target Binary'
+      default: '~/BlockWorks/Playground/TestBench/SequenceOne.py'
     processId:
       type: 'string'
       default: ''

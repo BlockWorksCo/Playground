@@ -20,10 +20,10 @@ module.exports =
       stderr = (lines) =>
         console.info(lines)
 
-      command = executable
       args = [target] #
-      console.log("Starting TestBenchDebugger", executable)
-      console.log("target", target)
+      command = executable
+      console.log(executable)
+      console.log(target)
       @process = new BufferedProcess({command, args, stdout, stderr}).process
       @stdin = @process.stdin
       @status = STATUS.NOTHING
@@ -123,7 +123,7 @@ module.exports =
         handler(clazz == RESULT.RUNNING)
 
     continue: (handler) ->
-      command = 'cont'
+      command = 'go'
       @postCommand command, (clazz, result) =>
         handler(clazz == RESULT.RUNNING)
 
@@ -195,6 +195,4 @@ module.exports =
         handler(clazz == RESULT.DONE, result)
 
     postCommand: (command, handler) ->
-      @handler[@token] = handler
-      @stdin.write("#{@token}-#{command}\n")
-      @token = @token + 1
+      @stdin.write("#{command}\n")
