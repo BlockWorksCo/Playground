@@ -9,7 +9,7 @@ module.exports =
       STOPPED: 2
       DESTROYED: 3
 
-    constructor: (gdb, target) ->
+    constructor: (executable, target) ->
       @token = 0
       @handler = {}
       @emitter = new Emitter
@@ -20,9 +20,9 @@ module.exports =
       stderr = (lines) =>
         console.info(lines)
 
-      command = gdb
-      args = ['--interpreter=mi2', target] #
-      console.log("gdb", gdb)
+      command = executable
+      args = [target] #
+      console.log("Starting TestBenchDebugger", executable)
       console.log("target", target)
       @process = new BufferedProcess({command, args, stdout, stderr}).process
       @stdin = @process.stdin
@@ -84,7 +84,7 @@ module.exports =
         handler(breaks)
 
     deleteBreak: (number, handler) ->
-      command = "break-delete #{number}"
+      command = "del #{number}"
       @postCommand command, (clazz, result) =>
         handler(clazz == RESULT.DONE)
 
@@ -108,17 +108,8 @@ module.exports =
         handler(instructions)
 
     insertBreak: ({location, condition, count, thread, temporary, hardware, disabled, tracepoint}, handler) ->
-      args = []
-      args.push('-t') if temporary is true
-      args.push('-h') if hardware is true
-      args.push('-d') if disabled is true
-      args.push('-a') if tracepoint is true
-      args.push("-c #{condition}") if condition
-      args.push("-i #{count}") if count
-      args.push("-p #{thread}") if thread
-      args.push(location)
 
-      command = 'break-insert ' + args.join(' ')
+      command = 'b #{location}'
 
       @postCommand command, (clazz, result) =>
         abreak = null

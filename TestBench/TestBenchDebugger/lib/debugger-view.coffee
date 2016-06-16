@@ -184,14 +184,14 @@ class DebuggerView extends View
 
   insertBreak: (editor, line) ->
     fullpath = editor.getPath()
-    @GDB.insertBreak {location: "#{fullpath}:#{line+1}"}, (abreak) =>
+    @GDB.insertBreak {location: "#{fullpath} #{line+1}"}, (abreak) =>
       if abreak
         marker = @markBreakLine(editor, line)
         @breaks[fullpath][line] = {abreak, marker}
 
   insertBreakWithoutEditor: (fullpath, line) ->
     @breaks[fullpath] ?= {}
-    @GDB.insertBreak {location: "#{fullpath}:#{line+1}"}, (abreak) =>
+    @GDB.insertBreak {location: "#{fullpath} #{line+1}"}, (abreak) =>
       if abreak
         if editor = @getEditor(fullpath)
           marker = @markBreakLine(editor, line)

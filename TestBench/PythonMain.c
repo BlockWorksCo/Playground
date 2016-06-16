@@ -487,7 +487,6 @@ int main(int argc, char* argv[])
     //
     //
     //
-    printf("<Execution finished>\n");
     while(true)
     {
         uint32_t    command     = 0;
@@ -509,6 +508,7 @@ int main(int argc, char* argv[])
                         PyObject* myFunction        = PyObject_GetAttrString(myModule,"Blaa");
                         PyObject* args              = PyTuple_Pack(1, PyLong_FromLong(123) );
                         PyObject* myResult          = PyObject_CallObject(myFunction, args);
+                        printf("<Execution finished>\n");
                     }
                     else
                     {
