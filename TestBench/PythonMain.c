@@ -53,7 +53,7 @@ Breakpoint  breakpoints[128];
 sem_t       breakpointSemaphore     = {0};
 
 bool        breakOnNext             = false;
-
+bool        stopped                 = false;
 
 char        currentFilename[1024]   = {0};
 uint32_t    currentLineNumber       = 0;
@@ -206,6 +206,41 @@ void DisplayLocals()
 //
 //
 //
+void ShowCallStack()
+{
+    //
+    // Request a break and wait for it to happen.
+    //
+    /*
+    breakOnNext     = true;
+    while(stopped == false)
+    {
+        usleep(100000);
+    }
+    */
+
+    PyThreadState*  tstate = PyThreadState_GET();
+    if (NULL != tstate && NULL != tstate->frame)
+    {
+        PyFrameObject*  frame = tstate->frame;
+
+        printf("Python stack trace:\n");
+        while (NULL != frame)
+        {
+            int line = frame->f_lineno;
+            const char *filename = PyUnicode_AsUTF8(frame->f_code->co_filename);
+            const char *funcname = PyUnicode_AsUTF8(frame->f_code->co_name);
+            printf("    %s(%d): %s\n", filename, line, funcname);
+            frame = frame->f_back;
+        }
+    }
+}
+
+
+
+//
+//
+//
 int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
 {
     int   lineNumber    = PyFrame_GetLineNumber(frame);
@@ -241,7 +276,9 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
             if((LookupBreakpoint(filename, lineNumber) != (uint32_t)-1) || (breakOnNext == true))
             {
                 printf("<break at %s:%d>\n", filename, lineNumber);
+                stopped     = true;
                 sem_wait(&breakpointSemaphore);
+                stopped     = false;
             }
 
             break;
@@ -391,6 +428,14 @@ void ProcessRequest(char* request)
         breakOnNext     = true;
         sem_post(&breakpointSemaphore);
     }
+    else if(strcmp(request, "stack") == 0)
+    {
+        //
+        // Show the call stack.
+        //
+        stopped     = false;
+        ShowCallStack();
+    }
     else
     {
         //
@@ -487,12 +532,6 @@ int main(int argc, char* argv[])
     if(argc == 2)
     {
         printf("<TestBenchCore %s>\n", argv[1]);
-
-
-        {
-            uint32_t    command     = 1;
-            write( commandPipe[1], &command, sizeof(command) );
-        }
     }
     else
     {

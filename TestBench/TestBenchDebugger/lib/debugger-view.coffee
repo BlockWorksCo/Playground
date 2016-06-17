@@ -20,6 +20,7 @@ class DebuggerView extends View
           @div class: 'btn', outlet: 'attachButton', 'Attach'
           @div class: 'btn disabled', outlet: 'detachButton', 'Detach'
         @div class: 'btn-group', =>
+          @div class: 'btn disabled', outlet: 'playPauseButton', 'Play'
           @div class: 'btn disabled', outlet: 'continueButton', 'Continue'
           @div class: 'btn disabled', outlet: 'pauseButton', 'Pause'
         @div class: 'btn-group', =>
@@ -278,6 +279,10 @@ class DebuggerView extends View
 
     @continueButton.on 'click', =>
       @GDB.continue (result) ->
+        console.log(result)
+
+    @playPauseButton.on 'click', =>
+      @GDB.go (result) ->
         console.log(result)
 
     @detachButton.on 'click', =>
