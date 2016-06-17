@@ -153,6 +153,11 @@ module.exports =
       @postCommand command, (clazz, result) =>
         handler(clazz == RESULT.DONE)
 
+    go: (handler) ->
+      command = 'go'
+      @postCommand command, (clazz, result) =>
+        handler(clazz == RESULT.DONE)
+
     set: (key, value, handler) ->
       command = "set #{key} #{value}"
       @postCommand command, (clazz, result) =>
