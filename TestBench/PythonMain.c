@@ -224,15 +224,19 @@ void ShowCallStack()
     {
         PyFrameObject*  frame = tstate->frame;
 
-        printf("Python stack trace:\n");
+        printf("[\n");
         while (NULL != frame)
         {
             int line = frame->f_lineno;
             const char *filename = PyUnicode_AsUTF8(frame->f_code->co_filename);
-            const char *funcname = PyUnicode_AsUTF8(frame->f_code->co_name);
-            printf("    %s(%d): %s\n", filename, line, funcname);
+            //const char *funcname = PyUnicode_AsUTF8(frame->f_code->co_name);
+            printf("  {\n");
+            printf("    \"fileName\" : \"%s\",\n", filename);
+            printf("    \"lineNumber\" : \"%d\"\n", line);
+            printf("  },\n");
             frame = frame->f_back;
         }
+        printf("]\n");
     }
 }
 
