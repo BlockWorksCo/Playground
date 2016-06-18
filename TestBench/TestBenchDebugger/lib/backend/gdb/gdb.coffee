@@ -12,10 +12,19 @@ module.exports =
     constructor: (executable, target) ->
       @token = 0
       @handler = {}
+      @jsonText = ''
       @emitter = new Emitter
 
       stdout = (lines) =>
-        console.log(lines)
+        for line in lines.split('\n')
+            @jsonText    = @jsonText + line
+            if line == '{'
+                @jsonText   = line
+            if line == '}'
+                #console.log(@jsonText)
+                response    = JSON.parse(@jsonText)
+                @processReponse(response)
+                @jsonText    = ''
 
       stderr = (lines) =>
         console.info(lines)
@@ -32,6 +41,10 @@ module.exports =
       @status = STATUS.DESTROYED
       @process.kill()
       @emitter.dispose()
+
+    processReponse: (response) ->
+      console.log(response)
+
 
     isRunning: ->
       @status is STATUS.RUNNING

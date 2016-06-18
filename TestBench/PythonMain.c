@@ -263,23 +263,25 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
     switch(what)
     {
         case PyTrace_CALL:
-            printf("(PyTrace_CALL %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+            //printf("(PyTrace_CALL %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
             break;
 
         case PyTrace_EXCEPTION:
-            printf("(PyTrace_EXCEPTION %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+            //printf("(PyTrace_EXCEPTION %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
             break;
 
         case PyTrace_LINE:
         {
-            printf("(PyTrace_LINE %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+            //printf("(PyTrace_LINE %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+
+            printf("{\n\"type\":\"PositionReport\",\n\"fileName\":\"%s\",\n\"lineNumber\":\"%d\"\n}\n", filename, lineNumber);
 
             //
             // See if we need to break or not.
             //
             if((LookupBreakpoint(filename, lineNumber) != (uint32_t)-1) || (breakOnNext == true))
             {
-                printf("<break at %s:%d>\n", filename, lineNumber);
+                //printf("<break at %s:%d>\n", filename, lineNumber);
                 stopped     = true;
                 sem_wait(&breakpointSemaphore);
                 stopped     = false;
@@ -289,19 +291,19 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
         }
 
         case PyTrace_RETURN:
-            printf("(PyTrace_RETURN %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+            //printf("(PyTrace_RETURN %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
             break;
 
         case PyTrace_C_CALL:
-            printf("(PyTrace_C_CALL %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+            //printf("(PyTrace_C_CALL %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
             break;
 
         case PyTrace_C_EXCEPTION:
-            printf("(PyTrace_C_EXCEPTION %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+            //printf("(PyTrace_C_EXCEPTION %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
             break;
 
         case PyTrace_C_RETURN:
-            printf("(PyTrace_C_RETURN %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+            //printf("(PyTrace_C_RETURN %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
             break;
 
         default:
@@ -336,7 +338,7 @@ void ProcessRequest(char* request)
         // Report the current position.
         //
         sprintf(response, "%s:%d", currentFilename, currentLineNumber);
-        ProcessResponse(response);
+        //ProcessResponse(response);
     }
     else if(strcmp(request, "go") == 0)
     {
@@ -361,9 +363,9 @@ void ProcessRequest(char* request)
             *colon  = 0;
         }
         uint32_t    breakpointId    = AddBreakpoint( &fileName[0], lineNumber );
-        printf("BreakpointID (%s:%d) = %d.", fileName, lineNumber, breakpointId);
+        //printf("BreakpointID (%s:%d) = %d.", fileName, lineNumber, breakpointId);
 
-        ProcessResponse("Breakpoint added.");
+        //ProcessResponse("Breakpoint added.");
     }
     else if(strncmp(request, "del ", 4) == 0)
     {
@@ -382,13 +384,13 @@ void ProcessRequest(char* request)
         if(breakpointId != (uint32_t)-1)
         {
             DeleteBreakpoint(breakpointId);
-            printf("BreakpointID (%s:%d) = %d deleted.", fileName, lineNumber, breakpointId);
+            //printf("BreakpointID (%s:%d) = %d deleted.", fileName, lineNumber, breakpointId);
 
-            ProcessResponse("Breakpoint deleted.");
+            //ProcessResponse("Breakpoint deleted.");
         }
         else
         {
-            ProcessResponse("Breakpoint deletion failed.");
+            //ProcessResponse("Breakpoint deletion failed.");
         }
     }
     else if(strcmp(request, "cont") == 0)
@@ -407,7 +409,7 @@ void ProcessRequest(char* request)
         DisplayLocals();
         uint32_t    command     = 1;
         write( commandPipe[1], &command, sizeof(command) );
-        ProcessResponse("Locals:");
+        //ProcessResponse("Locals:");
     }
     else if(strcmp(request, "break") == 0)
     {
@@ -445,7 +447,7 @@ void ProcessRequest(char* request)
         //
         // Unknown request.
         //
-        ProcessResponse(request);
+        //ProcessResponse(request);
     }
 }
 
@@ -530,16 +532,15 @@ int main(int argc, char* argv[])
     // Hook into the interpreter.
     //
     PyEval_SetTrace( &TraceFunc, NULL );
-    //PyEval_SetProfile( &TraceFunc, NULL );
 
 
     if(argc == 2)
     {
-        printf("<TestBenchCore %s>\n", argv[1]);
+        printf("{\n\"type\":\"Announce\",\n\"Message\":\"TestBench starting\"\n}\n");
     }
     else
     {
-        printf("bad parameters\n");
+        printf("{\n\"type\":\"Announce\",\n\"Message\":\"TestBench failed to start\"\n}\n");
         exit(-1);
     }
 
@@ -551,13 +552,12 @@ int main(int argc, char* argv[])
         uint32_t    command     = 0;
         while (read( commandPipe    [0], &command, sizeof(command) ) > 0)
         {
-            printf("<%d>\n", command);
+            //printf("<%d>\n", command);
 
             switch(command)
             {
                 case 1:
-                    printf("<Starting>\n");
-                    printf("<Done>\n");
+                    printf("{\n\"type\":\"StateChange\",\n\"newState\":\"Executing\"\n}\n");
 
                     //
                     //
@@ -572,11 +572,11 @@ int main(int argc, char* argv[])
                         if(scriptFile != NULL)
                         {
                             PyRun_SimpleFile(scriptFile, argv[1]);
-                            printf("<Execution finished>\n");
+                            printf("{\n\"type\":\"StateChange\",\n\"newState\":\"ExecutionComplete\"\n}\n");
                         }
                         else
                         {
-                            printf("<Couldn't open script file>\n");
+                            printf("{\n\"type\":\"StateChange\",\n\"newState\":\"LoadScriptFailure\"\n}\n");
                         }
                     }
 
