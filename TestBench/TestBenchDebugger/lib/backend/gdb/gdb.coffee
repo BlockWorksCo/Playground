@@ -46,7 +46,7 @@ module.exports =
       switch response.type
           when 'PositionReport' then @emitter.emit 'position-report',response
           when 'StateChange' then console.log('<StateChange!>')
-      console.log(response)
+      #console.log(response)
 
 
     isRunning: ->
