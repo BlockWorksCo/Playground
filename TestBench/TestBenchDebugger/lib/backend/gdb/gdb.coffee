@@ -43,6 +43,9 @@ module.exports =
       @emitter.dispose()
 
     processReponse: (response) ->
+      switch response.type
+          when 'PositionReport' then @emitter.emit 'position-report',response
+          when 'StateChange' then console.log('<StateChange!>')
       console.log(response)
 
 
@@ -54,6 +57,9 @@ module.exports =
 
     isDestroyed: ->
       @status is STATUS.DESTROYED
+
+    onPositionReport: (callback) ->
+      @emitter.on 'position-report', callback
 
     onExecAsyncOutput: (callback) ->
       @emitter.on 'exec-async-output', callback

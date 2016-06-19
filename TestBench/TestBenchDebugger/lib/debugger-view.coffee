@@ -87,7 +87,14 @@ class DebuggerView extends View
 
     @listExecFile()
 
+    @GDB.onPositionReport(@OnPositionReport)
+
     @pauseRequired = false
+
+
+
+  OnPositionReport: (response) ->
+      console.log(response)
 
   getActiveTextEditor: ->
     atom.workspace.getActiveTextEditor()
