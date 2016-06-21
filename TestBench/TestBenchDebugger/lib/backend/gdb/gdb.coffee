@@ -128,7 +128,8 @@ module.exports =
 
     insertBreak: ({location, condition, count, thread, temporary, hardware, disabled, tracepoint}, handler) ->
 
-      command = 'b #{location}'
+      command = "b #{location}"
+      console.log("break @ #{location}")
 
       @postCommand command, (clazz, result) =>
         abreak = null
@@ -142,7 +143,7 @@ module.exports =
         handler(clazz == RESULT.RUNNING)
 
     continue: (handler) ->
-      command = 'go'
+      command = 'cont'
       @postCommand command, (clazz, result) =>
         handler(clazz == RESULT.RUNNING)
 
@@ -219,4 +220,5 @@ module.exports =
         handler(clazz == RESULT.DONE, result)
 
     postCommand: (command, handler) ->
+      console.log("postCommand #{command}")
       @stdin.write("#{command}\n")
