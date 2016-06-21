@@ -55,10 +55,15 @@ sem_t       breakpointSemaphore     = {0};
 bool        breakOnNext             = false;
 bool        stopped                 = false;
 
+bool        running                 = false;
+
 char        currentFilename[1024]   = {0};
 uint32_t    currentLineNumber       = 0;
 
 int         commandPipe[2]          = {0};
+
+char        fileBreak[1024]         = {0};
+bool        breakOnFileMatch        = false;
 
 
 //
@@ -279,7 +284,9 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
             //
             // See if we need to break or not.
             //
-            if((LookupBreakpoint(filename, lineNumber) != (uint32_t)-1) || (breakOnNext == true))
+            if( (LookupBreakpoint(filename, lineNumber) != (uint32_t)-1) ||
+                (breakOnNext == true) ||
+                ((breakOnFileMatch == true) && (strcmp(filename, fileBreak) == 0)) )
             {
                 //printf("<break at %s:%d>\n", filename, lineNumber);
                 stopped     = true;
@@ -425,6 +432,19 @@ void ProcessRequest(char* request)
         //
         breakOnNext     = true;
         sem_post(&breakpointSemaphore);
+
+        //
+        // Start the script.
+        // In this case, we need to set the breakOnFileMatch to stop at the first
+        // line in the file.
+        //
+        if(running == false)
+        {
+            breakOnNext         = false;
+            breakOnFileMatch    = true;
+            uint32_t    command     = 1;
+            write( commandPipe[1], &command, sizeof(command) );
+        }
     }
     else if(strcmp(request, "next") == 0)
     {
@@ -433,6 +453,19 @@ void ProcessRequest(char* request)
         //
         breakOnNext     = true;
         sem_post(&breakpointSemaphore);
+
+        //
+        // Start the script.
+        // In this case, we need to set the breakOnFileMatch to stop at the first
+        // line in the file.
+        //
+        if(running == false)
+        {
+            breakOnNext         = false;
+            breakOnFileMatch    = true;
+            uint32_t    command     = 1;
+            write( commandPipe[1], &command, sizeof(command) );
+        }
     }
     else if(strcmp(request, "stack") == 0)
     {
@@ -485,6 +518,11 @@ pthread_t   serverThreadID  = {0};
 //
 int main(int argc, char* argv[])
 {
+    //
+    // Save the specified script as the file break (for an immediate step break).
+    //
+    strcpy( &fileBreak[0], argv[1] );
+
     //
     // Make sure we behave with CTRL-C.
     //
@@ -562,7 +600,7 @@ int main(int argc, char* argv[])
                     //
                     //
                     //
-                    //if(myModule != NULL)
+                    if(running == false)
                     {
                         //PyObject* myFunction        = PyObject_GetAttrString(myModule,"Blaa");
                         //PyObject* args              = PyTuple_Pack(1, PyLong_FromLong(123) );
@@ -571,11 +609,14 @@ int main(int argc, char* argv[])
                         FILE*   scriptFile  = fopen(argv[1], "r");
                         if(scriptFile != NULL)
                         {
+                            running     = true;
                             PyRun_SimpleFile(scriptFile, argv[1]);
+                            running     = false;
                             printf("{\n\"type\":\"StateChange\",\n\"newState\":\"ExecutionComplete\"\n}\n");
                         }
                         else
                         {
+                            running     = false;
                             printf("{\n\"type\":\"StateChange\",\n\"newState\":\"LoadScriptFailure\"\n}\n");
                         }
                     }
