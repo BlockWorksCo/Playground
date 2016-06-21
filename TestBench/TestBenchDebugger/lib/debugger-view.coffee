@@ -95,15 +95,15 @@ class DebuggerView extends View
 
   OnPositionReport: (response) ->
       fileName = response.fileName
-      lineNumber = response.lineNumber
+      lineNumber = parseInt(response.lineNumber, 10)-1
 
       editors   = atom.workspace.getTextEditors()
       for k,v of editors
           #console.log(v.getPath())
-          if v.getPath() == fileName
-              v.scrollToBufferPosition([lineNumber,1])
-
-      console.log(response);
+          thisPath  = v.getPath()
+          if thisPath == fileName
+              console.log(response);
+              v.setCursorBufferPosition([lineNumber,1])
 
   getActiveTextEditor: ->
     atom.workspace.getActiveTextEditor()
