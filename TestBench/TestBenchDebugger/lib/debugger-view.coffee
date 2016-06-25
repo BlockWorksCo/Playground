@@ -17,9 +17,6 @@ class DebuggerView extends View
         @span class: 'header-item sub-title', outlet: 'targetLabel'
       @div class: 'btn-toolbar', =>
         @div class: 'btn-group', =>
-          @div class: 'btn', outlet: 'attachButton', 'Attach'
-          @div class: 'btn disabled', outlet: 'detachButton', 'Detach'
-        @div class: 'btn-group', =>
           @div class: 'btn disabled', outlet: 'playPauseButton', 'Play'
           @div class: 'btn disabled', outlet: 'continueButton', 'Continue'
           @div class: 'btn disabled', outlet: 'pauseButton', 'Pause'
@@ -116,8 +113,6 @@ class DebuggerView extends View
 
   goExitedStatus: ->
     @pauseButton.addClass('disabled')
-    @detachButton.addClass('disabled')
-
     @continueButton.addClass('disabled')
     @stepIntoButton.addClass('disabled')
     @stepOverButton.addClass('disabled')
@@ -128,7 +123,6 @@ class DebuggerView extends View
 
   goStoppedStatus: ->
     @pauseButton.addClass('disabled')
-    @detachButton.removeClass('disabled')
 
     @continueButton.removeClass('disabled')
 
@@ -145,7 +139,6 @@ class DebuggerView extends View
     @stopped = {marker: null, fullpath: null, line: null}
 
     @pauseButton.removeClass('disabled')
-    @detachButton.removeClass('disabled')
 
     @continueButton.addClass('disabled')
     @stepIntoButton.addClass('disabled')
@@ -281,18 +274,6 @@ class DebuggerView extends View
     # @runButton.on 'click', =>
     #   @GDB.run (result) ->
 
-    @attachButton.on 'click', =>
-      @openDialogView = new OpenDialogView (pid) =>
-        atom.config.set('testbench-debugger.processId', pid)
-        @pid = pid
-
-        do (@GDB, @pid, @destroy) ->
-          @GDB.target 'attach', @pid, (ok) ->
-            if ok
-              atom.notifications.addSuccess "Attached to process #{@pid}", { dismissable: true }
-            else
-              atom.notifications.addError "Attaching to process #{@pid} failed", { dismissable: true }
-
     @continueButton.on 'click', =>
       @GDB.continue (result) ->
         console.log(result)
@@ -300,11 +281,6 @@ class DebuggerView extends View
     @playPauseButton.on 'click', =>
       @GDB.go (result) ->
         console.log(result)
-
-    @detachButton.on 'click', =>
-      @pauseRequired = true
-      @GDB.interrupt (result) =>
-        @detachRequired = true
 
     @pauseButton.on 'click', =>
       @pauseRequired = true
@@ -374,11 +350,6 @@ class DebuggerView extends View
             @GDB.next (result) ->
           @pauseRequired = false
 
-          if @detachRequired
-            @detachRequired = false
-            @GDB.target 'detach', @pid, (result) =>
-              @goExitedStatus()
-              console.log(result)
 
 
   # Tear down any state and detach
@@ -400,4 +371,3 @@ class DebuggerView extends View
 
     @panel.destroy()
     @varsPanel.destroy()
-    @detach()

@@ -65,6 +65,11 @@ int         commandPipe[2]          = {0};
 char        fileBreak[1024]         = {0};
 bool        breakOnFileMatch        = false;
 
+uint32_t    breakOnStackDepth       = (uint32_t)-1;
+uint32_t    currentStackDepth       = 0;
+
+
+
 
 //
 //
@@ -129,7 +134,13 @@ uint32_t LookupBreakpoint(char* fileName, uint32_t lineNumber)
             //
             //
             //
-            if(strcmp(temp, &breakpoints[i].fileName[0]) == 0)
+            char*   temp2   = &breakpoints[i].fileName[0];
+            lastSlash   = strrchr(temp2, '/');
+            if(lastSlash != NULL)
+            {
+                temp2    = lastSlash + 1;
+            }
+            if(strcmp(temp, temp2) == 0)
             {
                 breakpointId    = i;
                 break;
@@ -163,9 +174,7 @@ void DisplayLocals()
             PyObject*   value   = 0;
             Py_ssize_t  pos     = 0;
 
-
             printf("{\n");
-
 
             while (PyDict_Next(locals, &pos, &key, &value))
             {
@@ -248,6 +257,47 @@ void ShowCallStack()
 
 
 //
+// Walk the stack to work out its depth.... yes, we can do this more efficiently...
+//
+uint32_t CallStackDepth()
+{
+    PyThreadState*  tstate      = PyThreadState_GET();
+    uint32_t        stackDepth  = 0;
+
+    if (NULL != tstate && NULL != tstate->frame)
+    {
+        PyFrameObject*  frame = tstate->frame;
+
+        while (NULL != frame)
+        {
+            frame = frame->f_back;
+            stackDepth++;
+        }
+    }
+
+    return stackDepth;
+}
+
+
+
+//
+// Waits for a command via the UI.
+//
+void WaitForCommand()
+{
+    //printf("<break at %s:%d>\n", filename, lineNumber);
+
+    //
+    // Stop and wait for user input.
+    //
+    stopped     = true;
+    sem_wait(&breakpointSemaphore);
+    stopped     = false;
+
+}
+
+
+//
 //
 //
 int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
@@ -282,23 +332,63 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
             printf("{\n\"type\":\"PositionReport\",\n\"fileName\":\"%s\",\n\"lineNumber\":\"%d\"\n}\n", filename, lineNumber);
 
             //
+            // Calculate the current stack depth.
+            //
+            currentStackDepth   = CallStackDepth();
+
+            //
             // See if we need to break or not.
             //
-            if( (LookupBreakpoint(filename, lineNumber) != (uint32_t)-1) ||
-                (breakOnNext == true) ||
-                ((breakOnFileMatch == true) && (strcmp(filename, fileBreak) == 0)) )
+            if( LookupBreakpoint(filename, lineNumber) != (uint32_t)-1 )
             {
-                //printf("<break at %s:%d>\n", filename, lineNumber);
-                stopped     = true;
-                sem_wait(&breakpointSemaphore);
-                stopped     = false;
+                WaitForCommand();
             }
 
+            if(breakOnNext == true)
+            {
+                WaitForCommand();
+            }
+
+            if((breakOnFileMatch == true) && (strcmp(filename, fileBreak) == 0))
+            {
+                WaitForCommand();
+            }
+
+            if( breakOnStackDepth == CallStackDepth() )
+            {
+                WaitForCommand();
+            }
+
+            //
+            // Reset the temporary break conditions.
+            //
+            breakOnFileMatch    = false;
             break;
         }
 
         case PyTrace_RETURN:
             //printf("(PyTrace_RETURN %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
+
+            //
+            // See if we need to break or not.
+            //
+            if( breakOnStackDepth == CallStackDepth() )
+            {
+                //printf("<break at %s:%d>\n", filename, lineNumber);
+
+                //
+                // Stop and wait for user input.
+                //
+                stopped     = true;
+                sem_wait(&breakpointSemaphore);
+                stopped     = false;
+
+                //
+                // Reset the temporary break conditions.
+                //
+                currentStackDepth   = (uint32_t)-1;
+            }
+
             break;
 
         case PyTrace_C_CALL:
@@ -318,7 +408,7 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
     }
 
     //printf("(TraceFunc %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
-    usleep(10000);
+    //usleep(10000);
 
     return 0;
 }
@@ -405,7 +495,8 @@ void ProcessRequest(char* request)
         //
         // Give the breakpointSemaphore.
         //
-        breakOnNext     = false;
+        breakOnNext         = false;
+        breakOnFileMatch    = false;
         sem_post(&breakpointSemaphore);
     }
     else if(strcmp(request, "locals") == 0)
@@ -451,7 +542,7 @@ void ProcessRequest(char* request)
         //
         // Set the breakOnNext flag and let the script run;
         //
-        breakOnNext     = true;
+        breakOnStackDepth   = currentStackDepth;
         sem_post(&breakpointSemaphore);
 
         //
