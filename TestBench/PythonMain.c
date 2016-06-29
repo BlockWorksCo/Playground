@@ -30,6 +30,7 @@
 #include <arpa/inet.h>
 #include "Common.h"
 #include "Shell.h"
+#include <stdlib.h>
 
 
 #define NUMBER_OF_ELEMENTS(a)   (sizeof(a)/sizeof(a[0]))
@@ -124,6 +125,7 @@ uint32_t LookupBreakpoint(char* fileName, uint32_t lineNumber)
     {
         if(breakpoints[i].lineNumber == lineNumber)
         {
+#if 0
             char*   temp        = &fileName[0];
             char*   lastSlash   = strrchr(&fileName[0], '/');
             if(lastSlash != NULL)
@@ -145,6 +147,13 @@ uint32_t LookupBreakpoint(char* fileName, uint32_t lineNumber)
                 breakpointId    = i;
                 break;
             }
+#else
+            if(strcmp( &fileName[0], &breakpoints[i].fileName[0] ) == 0)
+            {
+                breakpointId    = i;
+                break;
+            }
+#endif
         }
     }
 
@@ -609,10 +618,13 @@ pthread_t   serverThreadID  = {0};
 //
 int main(int argc, char* argv[])
 {
+    char    fullPath[PATH_MAX]  = {0};
+
     //
     // Save the specified script as the file break (for an immediate step break).
     //
-    strcpy( &fileBreak[0], argv[1] );
+    realpath( argv[1], &fullPath[0] );
+    strcpy( &fileBreak[0], &fullPath[0] );
 
     //
     // Make sure we behave with CTRL-C.
@@ -697,11 +709,11 @@ int main(int argc, char* argv[])
                         //PyObject* args              = PyTuple_Pack(1, PyLong_FromLong(123) );
                         //PyObject* myResult          = PyObject_CallObject(myFunction, args);
 
-                        FILE*   scriptFile  = fopen(argv[1], "r");
+                        FILE*   scriptFile  = fopen( &fullPath[0], "r" );
                         if(scriptFile != NULL)
                         {
                             running     = true;
-                            PyRun_SimpleFile(scriptFile, argv[1]);
+                            PyRun_SimpleFile( scriptFile, &fullPath[0] );
                             running     = false;
                             printf("{\n\"type\":\"StateChange\",\n\"newState\":\"ExecutionComplete\"\n}\n");
                         }
