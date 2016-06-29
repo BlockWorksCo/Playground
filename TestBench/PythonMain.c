@@ -125,35 +125,11 @@ uint32_t LookupBreakpoint(char* fileName, uint32_t lineNumber)
     {
         if(breakpoints[i].lineNumber == lineNumber)
         {
-#if 0
-            char*   temp        = &fileName[0];
-            char*   lastSlash   = strrchr(&fileName[0], '/');
-            if(lastSlash != NULL)
-            {
-                temp    = lastSlash + 1;
-            }
-
-            //
-            //
-            //
-            char*   temp2   = &breakpoints[i].fileName[0];
-            lastSlash   = strrchr(temp2, '/');
-            if(lastSlash != NULL)
-            {
-                temp2    = lastSlash + 1;
-            }
-            if(strcmp(temp, temp2) == 0)
-            {
-                breakpointId    = i;
-                break;
-            }
-#else
             if(strcmp( &fileName[0], &breakpoints[i].fileName[0] ) == 0)
             {
                 breakpointId    = i;
                 break;
             }
-#endif
         }
     }
 
@@ -352,18 +328,15 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
             {
                 WaitForCommand();
             }
-
-            if(breakOnNext == true)
+            else if(breakOnNext == true)
             {
                 WaitForCommand();
             }
-
-            if((breakOnFileMatch == true) && (strcmp(filename, fileBreak) == 0))
+            else if((breakOnFileMatch == true) && (strcmp(filename, fileBreak) == 0))
             {
                 WaitForCommand();
             }
-
-            if( breakOnStackDepth == CallStackDepth() )
+            else if( breakOnStackDepth == currentStackDepth )
             {
                 WaitForCommand();
             }
@@ -417,7 +390,7 @@ int TraceFunc(PyObject *obj, PyFrameObject *frame, int what, PyObject *arg)
     }
 
     //printf("(TraceFunc %d @%s:%d %s)\n", what, filename,lineNumber,funcname);
-    //usleep(10000);
+    usleep(10000);
 
     return 0;
 }
@@ -506,6 +479,7 @@ void ProcessRequest(char* request)
         //
         breakOnNext         = false;
         breakOnFileMatch    = false;
+        currentStackDepth   = (uint32_t)-1;
         sem_post(&breakpointSemaphore);
     }
     else if(strcmp(request, "locals") == 0)
@@ -542,6 +516,7 @@ void ProcessRequest(char* request)
         {
             breakOnNext         = false;
             breakOnFileMatch    = true;
+            currentStackDepth   = (uint32_t)-1;
             uint32_t    command     = 1;
             write( commandPipe[1], &command, sizeof(command) );
         }

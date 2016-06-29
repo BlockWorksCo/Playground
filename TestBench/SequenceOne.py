@@ -12,11 +12,18 @@ def Oops():
     print("Ooopps...")
 
 
+def StepTwo():
+    print('Step Two! part 1.')
+    print('Step Two! part 2.')
+    print('Step Two! part 3.')
+
+
 def Blaa(a):
     localsZ = 3.33
     localsA = 4.44
     for i in range(10):
         time.sleep(0.5)
+        StepTwo()
         print("Blaa %f %d"%(a,i))
         Oops()
     return 3.14
