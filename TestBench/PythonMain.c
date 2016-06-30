@@ -479,7 +479,7 @@ void ProcessRequest(char* request)
         //
         breakOnNext         = false;
         breakOnFileMatch    = false;
-        currentStackDepth   = (uint32_t)-1;
+        breakOnStackDepth   = (uint32_t)-1;
         sem_post(&breakpointSemaphore);
     }
     else if(strcmp(request, "locals") == 0)
@@ -516,7 +516,7 @@ void ProcessRequest(char* request)
         {
             breakOnNext         = false;
             breakOnFileMatch    = true;
-            currentStackDepth   = (uint32_t)-1;
+            breakOnStackDepth   = (uint32_t)-1;
             uint32_t    command     = 1;
             write( commandPipe[1], &command, sizeof(command) );
         }
