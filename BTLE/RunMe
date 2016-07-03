@@ -1,0 +1,1 @@
+openocd -f interface/jlink.cfg -c "transport select swd" -c "set WORKAREASIZE 0" -f target/nrf51.cfg -c "adapter_khz 2000"
