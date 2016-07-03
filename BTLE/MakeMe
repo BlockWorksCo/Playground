@@ -1,0 +1,5 @@
+
+
+
+arm-none-eabi-gcc -mcpu=cortex-m0 -mthumb -mabi=aapcs --std=gnu99 -Wall -Werror -O3 -g3 -mfloat-abi=soft -c Main.c
+arm-none-eabi-gcc -mthumb -mabi=aapcs -mcpu=cortex-m0 --specs=nano.specs -lc -lnosys -nostdlib -T Main.ld -o Main.elf Main.o
