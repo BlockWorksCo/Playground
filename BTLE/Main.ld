@@ -1,10 +1,8 @@
 
 MEMORY
 {
-    FLASH (rx) : ORIGIN = 0x200000, LENGTH = 0x0007FFD4
-    FLASH_CCA (RX) : ORIGIN = 0x0027FFD4, LENGTH = 12
-    SRAM_NON_RETENTION (RWX) : ORIGIN =  0x20000000, LENGTH = 0x00004000
-    SRAM_RETENTION (RWX) : ORIGIN = 0x20004000, LENGTH = 0x00004000
+    CODEFLASH (RWX)   : ORIGIN = 0x00000000, LENGTH = 0x20000
+    SRAM (RWX)        : ORIGIN = 0x20000000, LENGTH = 0x4000
 }
 
 SECTIONS
@@ -16,7 +14,8 @@ SECTIONS
         *(.text*)
         *(.rodata*)
         _etext = .;
-    } > FLASH= 0
+
+    } > CODEFLASH= 0
 
     .data : AT(ADDR(.text) + SIZEOF(.text))
     {
@@ -24,7 +23,8 @@ SECTIONS
         *(vtable)
         *(.data*)
         _edata = .;
-    } > SRAM_NON_RETENTION
+
+    } > SRAM
 
     .bss :
     {
@@ -32,9 +32,7 @@ SECTIONS
         *(.bss*)
         *(COMMON)
         _ebss = .;
-    } > SRAM_NON_RETENTION
 
-    .flashcca :
-    {
-    } > FLASH_CCA
+    } > SRAM
+
 }
