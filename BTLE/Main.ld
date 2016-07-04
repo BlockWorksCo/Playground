@@ -1,38 +1,22 @@
+/* Linker script to configure memory regions. */
+
+SEARCH_DIR(.)
+GROUP(-lgcc -lc -lnosys)
 
 MEMORY
 {
-    CODEFLASH (RWX)   : ORIGIN = 0x00000000, LENGTH = 0x40000
-    SRAM (RWX)        : ORIGIN = 0x20000000, LENGTH = 0x4000
+  FLASH (rx) : ORIGIN = 0x18000, LENGTH = 0x28000
+  RAM (rwx) :  ORIGIN = 0x20002000, LENGTH = 0x6000
 }
 
 SECTIONS
 {
-    .text :
-    {
-        _text = .;
-        KEEP(*(.vectors))
-        *(.text*)
-        *(.rodata*)
-        _etext = .;
-
-    } > CODEFLASH= 0
-
-    .data : AT(ADDR(.text) + SIZEOF(.text))
-    {
-        _data = .;
-        *(vtable)
-        *(.data*)
-        _edata = .;
-
-    } > SRAM
-
-    .bss :
-    {
-        _bss = .;
-        *(.bss*)
-        *(COMMON)
-        _ebss = .;
-
-    } > SRAM
-
+  .fs_data_out ALIGN(4):
+  {
+    PROVIDE( __start_fs_data = .);
+    KEEP(*(fs_data))
+    PROVIDE( __stop_fs_data = .);
+  } = 0
 }
+
+INCLUDE "nrf5x_common.ld"
