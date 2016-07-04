@@ -37,6 +37,8 @@ INCLUDES 	+= -I./NRF51SDK/components/libraries/button
 INCLUDES 	+= -I./NRF51SDK/components/libraries/timer
 INCLUDES 	+= -I./NRF51SDK/components/drivers_nrf/delay
 INCLUDES 	+= -I./NRF51SDK/components/drivers_nrf/gpiote
+INCLUDES 	+= -I./NRF51SDK/components/drivers_nrf/config
+INCLUDES 	+= -I./NRF51SDK/components/drivers_nrf/common
 
 LIBDIRS 	+= -L./NRF51SDK/components/toolchain/gcc
 
@@ -55,13 +57,14 @@ OBJECTS 	+= app_timer.o
 OBJECTS 	+= app_button.o
 OBJECTS 	+= bsp.o
 OBJECTS 	+= ble_advdata.o
+OBJECTS		+= nrf_drv_gpiote.o
 
 VPATH 		+= ./NRF51SDK/components/softdevice/common/softdevice_handler
 VPATH 		+= ./NRF51SDK/components/libraries/timer
 VPATH 		+= ./NRF51SDK/components/libraries/button
 VPATH 		+= ./NRF51SDK/examples/bsp
 VPATH 		+= ./NRF51SDK/components/ble/common
-
+VPATH 		+= ./NRF51SDK/components/drivers_nrf/gpiote
 
 clean:
 	- $(RM) *.o
