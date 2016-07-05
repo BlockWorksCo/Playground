@@ -62,7 +62,7 @@ OBJECTS		+= nrf_drv_gpiote.o
 OBJECTS 	+= nrf_drv_common.o
 OBJECTS 	+= app_error.o
 OBJECTS 	+= gcc_startup_nrf51.o
-OBJECTS 	+= system_nrf52.o
+OBJECTS 	+= system_nrf51.o
 
 VPATH 		+= ./NRF51SDK/components/softdevice/common/softdevice_handler
 VPATH 		+= ./NRF51SDK/components/libraries/timer
