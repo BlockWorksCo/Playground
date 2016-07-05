@@ -58,6 +58,8 @@ OBJECTS 	+= app_button.o
 OBJECTS 	+= bsp.o
 OBJECTS 	+= ble_advdata.o
 OBJECTS		+= nrf_drv_gpiote.o
+OBJECTS 	+= nrf_drv_common.o
+OBJECTS 	+= app_error.o
 
 VPATH 		+= ./NRF51SDK/components/softdevice/common/softdevice_handler
 VPATH 		+= ./NRF51SDK/components/libraries/timer
@@ -65,6 +67,8 @@ VPATH 		+= ./NRF51SDK/components/libraries/button
 VPATH 		+= ./NRF51SDK/examples/bsp
 VPATH 		+= ./NRF51SDK/components/ble/common
 VPATH 		+= ./NRF51SDK/components/drivers_nrf/gpiote
+VPATH 		+= ./NRF51SDK/components/drivers_nrf/common
+VPATH 		+= ./NRF51SDK/components/libraries/util
 
 clean:
 	- $(RM) *.o
