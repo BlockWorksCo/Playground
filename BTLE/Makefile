@@ -3,6 +3,7 @@
 
 CC 			= arm-none-eabi-gcc
 LD 			= arm-none-eabi-gcc
+AS 			= arm-none-eabi-gcc
 RM 			= rm
 
 
@@ -60,6 +61,7 @@ OBJECTS 	+= ble_advdata.o
 OBJECTS		+= nrf_drv_gpiote.o
 OBJECTS 	+= nrf_drv_common.o
 OBJECTS 	+= app_error.o
+OBJECTS 	+= gcc_startup_nrf51.o
 
 VPATH 		+= ./NRF51SDK/components/softdevice/common/softdevice_handler
 VPATH 		+= ./NRF51SDK/components/libraries/timer
@@ -69,6 +71,7 @@ VPATH 		+= ./NRF51SDK/components/ble/common
 VPATH 		+= ./NRF51SDK/components/drivers_nrf/gpiote
 VPATH 		+= ./NRF51SDK/components/drivers_nrf/common
 VPATH 		+= ./NRF51SDK/components/libraries/util
+VPATH 		+= ./NRF51SDK/components/toolchain/gcc
 
 clean:
 	- $(RM) *.o
@@ -85,3 +88,6 @@ Main.elf: $(OBJECTS)
 
 %.o : %.c
 	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -c $< -o $@
+
+%.o : %.s
+	$(AS) -x assembler-with-cpp $(DEFINES) $(INCLUDES) -c $< -o $@
