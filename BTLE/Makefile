@@ -8,7 +8,7 @@ RM 			= rm
 
 
 
-DEFINES 	+= -DBOARD_PCA10028
+DEFINES 	+= -DBOARD_PCA10001
 DEFINES 	+= -DSOFTDEVICE_PRESENT
 DEFINES 	+= -DNRF51
 DEFINES 	+= -DS110
@@ -48,7 +48,8 @@ LDFLAGS 	+= -mabi=aapcs
 LDFLAGS 	+= -mcpu=cortex-m0
 LDFLAGS 	+= --specs=nano.specs
 LDFLAGS		+= -lnosys
-LDFLAGS		+= -nostdlib -T Main.ld
+LDFLAGS		+= -T Main.ld
+LDFLAGS 	+= -Wl,--no-wchar-size-warning
 
 LIBS 		+= -lc
 

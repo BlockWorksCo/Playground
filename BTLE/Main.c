@@ -191,6 +191,11 @@ static void power_manage(void)
 }
 
 
+
+
+//uint32_t m_uicr_bootloader_start_address __attribute__((at(NRF_UICR_BOOT_START_ADDRESS))) = 0x00018000;
+
+
 /**
  * @brief Function for application main entry.
  */
@@ -218,8 +223,3 @@ int main(void)
 /**
  * @}
  */
-
-
-
-
- 
