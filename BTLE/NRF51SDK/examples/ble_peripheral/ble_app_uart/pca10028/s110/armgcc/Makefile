@@ -3,7 +3,7 @@ PROJECT_NAME := ble_app_uart_s110_pca10028
 export OUTPUT_FILENAME
 #MAKEFILE_NAME := $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 MAKEFILE_NAME := $(MAKEFILE_LIST)
-MAKEFILE_DIR := $(dir $(MAKEFILE_NAME) ) 
+MAKEFILE_DIR := $(dir $(MAKEFILE_NAME) )
 
 TEMPLATE_PATH = ../../../../../../components/toolchain/gcc
 ifeq ($(OS),Windows_NT)
@@ -17,7 +17,7 @@ RM := rm -rf
 
 #echo suspend
 ifeq ("$(VERBOSE)","1")
-NO_ECHO := 
+NO_ECHO :=
 else
 NO_ECHO := @
 endif
@@ -202,7 +202,7 @@ genbin:
 	$(NO_ECHO)$(OBJCOPY) -O binary $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).bin
 
 ## Create binary .hex file from the .out file
-genhex: 
+genhex:
 	@echo Preparing: $(OUTPUT_FILENAME).hex
 	$(NO_ECHO)$(OBJCOPY) -O ihex $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
 

@@ -60,7 +60,6 @@ typedef struct
     bool                use_easy_dma;
 #endif
 } nrf_drv_uart_config_t;
-
 /**@brief UART default configuration. */
 #ifdef NRF52
 #define NRF_DRV_UART_DEFAULT_CONFIG                                                   \
