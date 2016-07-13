@@ -189,6 +189,10 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
             final Intent mIntent = intent;
            //*********************//
             if (action.equals(UartService.ACTION_GATT_CONNECTED)) {
+
+                //
+                //
+                //
             	 runOnUiThread(new Runnable() {
                      public void run() {
                          	String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
@@ -225,8 +229,35 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
             
           
           //*********************//
-            if (action.equals(UartService.ACTION_GATT_SERVICES_DISCOVERED)) {
-             	 mService.enableTXNotification();
+            if (action.equals(UartService.ACTION_GATT_SERVICES_DISCOVERED))
+            {
+                //
+                //
+                //
+                mService.enableTXNotification();
+
+                //
+                // Send an identify message to the device after 1 second.
+                //
+                Handler handler = new Handler();
+
+                handler.postDelayed(new Runnable()
+                {
+                    public void run()
+                    {
+                        String message     = "<Identify>";
+                        try
+                        {
+                            byte[] value = message.getBytes("UTF-8");
+                            mService.writeRXCharacteristic(value);
+                        }
+                        catch(UnsupportedEncodingException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }, 1000);
+
             }
           //*********************//
             if (action.equals(UartService.ACTION_DATA_AVAILABLE)) {
