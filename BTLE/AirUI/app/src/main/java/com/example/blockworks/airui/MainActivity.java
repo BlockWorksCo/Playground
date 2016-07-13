@@ -338,7 +338,8 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 mDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(deviceAddress);
                
                 Log.d(TAG, "... onActivityResultdevice.address==" + mDevice + "mserviceValue" + mService);
-                ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ " - connecting");
+
+                Log.i(TAG, "Connecting device: "+deviceAddress);
                 mService.connect(deviceAddress);
                             
 
