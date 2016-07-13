@@ -129,10 +129,6 @@ static void gap_params_init(void)
 /**@snippet [Handling the data received over BLE] */
 static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t length)
 {
-    if(length > 0)
-    {
-        ble_nus_string_send(&m_nus, p_data, length);
-    }
 #if 0
     for (uint32_t i = 0; i < length; i++)
     {
@@ -140,6 +136,29 @@ static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t lengt
     }
     while(app_uart_put('\n') != NRF_SUCCESS);
 #endif
+
+    if(length > 0)
+    {
+        //
+        // Parse the message and respond.
+        //
+        if(memcmp(p_data, "<Identify>", 10) == 0)
+        {
+            //
+            // Send the identity string.
+            //
+            static uint8_t* identity    = (uint8_t*)"00000000";
+            ble_nus_string_send( &m_nus, &identity[0], 8 );
+        }
+        else
+        {
+            //
+            // Just echo the data.
+            //
+            ble_nus_string_send(&m_nus, p_data, length);
+        }
+    }
+
 }
 /**@snippet [Handling the data received over BLE] */
 
