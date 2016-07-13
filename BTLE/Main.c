@@ -133,12 +133,13 @@ static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t lengt
     {
         ble_nus_string_send(&m_nus, p_data, length);
     }
-    
+#if 0
     for (uint32_t i = 0; i < length; i++)
     {
         while(app_uart_put(p_data[i]) != NRF_SUCCESS);
     }
     while(app_uart_put('\n') != NRF_SUCCESS);
+#endif
 }
 /**@snippet [Handling the data received over BLE] */
 
@@ -519,11 +520,11 @@ int main(void)
 {
     uint32_t err_code;
     //bool erase_bonds;
-    uint8_t  start_string[] = START_STRING;
+    //uint8_t  start_string[] = START_STRING;
 
     // Initialize.
     APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
-    uart_init();
+    //uart_init();
     //buttons_leds_init(&erase_bonds);
     ble_stack_init();
     gap_params_init();
@@ -531,7 +532,7 @@ int main(void)
     advertising_init();
     conn_params_init();
 
-    printf("%s",start_string);
+    //printf("%s",start_string);
 
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);
