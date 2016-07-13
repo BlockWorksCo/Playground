@@ -91,12 +91,19 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
         edtMessage = (EditText) findViewById(R.id.sendText);
         service_init();
 
-     
+        //
+        // Start the DeviceListActivity intent.
+        //
+        Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
+        startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
+
        
         // Handle Disconnect & Connect button
         btnConnectDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+/*
                 if (!mBtAdapter.isEnabled()) {
                     Log.i(TAG, "onClick - BT not enabled yet");
                     Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -107,8 +114,6 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 		
                 		//Connect button pressed, open DeviceListActivity class, with popup windows that scan for devices
                 		
-            			Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
-            			startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
         			} else {
         				//Disconnect button pressed
         				if (mDevice!=null)
@@ -118,6 +123,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
         				}
         			}
                 }
+*/
             }
         });
         // Handle Send button

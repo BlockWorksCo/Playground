@@ -52,9 +52,14 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
-public class DeviceListActivity extends Activity {
+
+
+public class DeviceListActivity extends Activity
+{
     private BluetoothAdapter mBluetoothAdapter;
 
    // private BluetoothAdapter mBtAdapter;
@@ -65,7 +70,7 @@ public class DeviceListActivity extends Activity {
     private DeviceAdapter deviceAdapter;
     private ServiceConnection onService = null;
     Map<String, Integer> devRssiValues;
-    private static final long SCAN_PERIOD = 10000; //scanning for 10 seconds
+    private static final long SCAN_PERIOD = 1000;
     private Handler mHandler;
     private boolean mScanning;
 
@@ -102,6 +107,7 @@ public class DeviceListActivity extends Activity {
             return;
         }
         populateList();
+        /*
         mEmptyList = (TextView) findViewById(R.id.empty);
         Button cancelButton = (Button) findViewById(R.id.btn_cancel);
         cancelButton.setOnClickListener(new OnClickListener() {
@@ -112,6 +118,28 @@ public class DeviceListActivity extends Activity {
             	else finish();
             }
         });
+*/
+
+        //
+        // Start the scan timer off.
+        //
+        mBluetoothAdapter.startLeScan(mLeScanCallback);
+        /*
+        Timer t = new Timer();
+        t.scheduleAtFixedRate(new TimerTask()
+                              {
+                                  @Override
+                                  public void run()
+                                  {
+                                      mBluetoothAdapter.startLeScan(mLeScanCallback);
+                                  }
+
+                              },
+                            0,
+                            1000);
+*/
+
+
 
     }
 
@@ -133,6 +161,7 @@ public class DeviceListActivity extends Activity {
     private void scanLeDevice(final boolean enable) {
         final Button cancelButton = (Button) findViewById(R.id.btn_cancel);
         if (enable) {
+            /*
             // Stops scanning after a pre-defined scan period.
             mHandler.postDelayed(new Runnable() {
                 @Override
@@ -144,6 +173,7 @@ public class DeviceListActivity extends Activity {
 
                 }
             }, SCAN_PERIOD);
+            */
 
             mScanning = true;
             mBluetoothAdapter.startLeScan(mLeScanCallback);
@@ -170,10 +200,41 @@ public class DeviceListActivity extends Activity {
             });
         }
     };
-    
-    private void addDevice(BluetoothDevice device, int rssi) {
+
+
+
+
+    private void addDevice(BluetoothDevice device, int rssi)
+    {
         boolean deviceFound = false;
 
+        Log.i(TAG, "Device with RSSI of "+rssi+" found");
+
+
+        //
+        // Check the proximity to the target device.
+        // If we're close enough, connect and interrogate it.
+        //
+        if(rssi >= -60)
+        {
+            Log.i(TAG, "Device within range! "+rssi);
+
+            //
+            // Connect and interrogate this device.
+            //
+/*
+            Bundle b = new Bundle();
+            b.putString(BluetoothDevice.EXTRA_DEVICE, device.getAddress());
+
+            Intent result = new Intent();
+            result.putExtras(b);
+            setResult(Activity.RESULT_OK, result);
+*/
+            //finish();
+        }
+
+
+        /*
         for (BluetoothDevice listDev : deviceList) {
             if (listDev.getAddress().equals(device.getAddress())) {
                 deviceFound = true;
@@ -192,6 +253,8 @@ public class DeviceListActivity extends Activity {
             
             deviceAdapter.notifyDataSetChanged();
         }
+
+        */
     }
 
     @Override
@@ -221,6 +284,7 @@ public class DeviceListActivity extends Activity {
     	
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            /*
             BluetoothDevice device = deviceList.get(position);
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
   
@@ -231,7 +295,7 @@ public class DeviceListActivity extends Activity {
             result.putExtras(b);
             setResult(Activity.RESULT_OK, result);
             finish();
-        	
+            */
         }
     };
 
