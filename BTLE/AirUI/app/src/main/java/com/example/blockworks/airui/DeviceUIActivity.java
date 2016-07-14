@@ -5,6 +5,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
@@ -95,6 +96,18 @@ public class DeviceUIActivity extends Activity {
         //mControlsView = findViewById(R.id.fullscreen_content_controls);
         WebView webView     = (WebView)findViewById(R.id.webview);
 
+        //
+        // Get the device identity.
+        //
+        Bundle b = getIntent().getExtras();
+
+        String  url     = "http://ZooKoo.com/DeviceUI/" + b.getString("Identity");
+        Log.i("DeviceUI","loading URL: "+url);
+
+        //
+        // Show the webview with the UI on it.
+        //
+        webView.loadUrl(url);
 
         // Set up the user interaction to manually show or hide the system UI.
         /*mContentView.setOnClickListener(new View.OnClickListener() {

@@ -262,31 +262,43 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 }, 1000);
 
             }
+
+
           //*********************//
             if (action.equals(UartService.ACTION_DATA_AVAILABLE))
             {
 
                 //
-                // Start the DeviceUIActivity intent.
+                // Get the data from the UartService
                 //
-                Intent newIntent = new Intent(MainActivity.this, DeviceUIActivity.class);
-                startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
-
                 final byte[] txValue = intent.getByteArrayExtra(UartService.EXTRA_DATA);
-                 runOnUiThread(new Runnable() {
+                runOnUiThread(new Runnable() {
                      public void run() {
-                         try {
+                         try
+                         {
                          	String text = new String(txValue, "UTF-8");
                          	String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
                         	 	listAdapter.add("["+currentDateTimeString+"] RX: "+text);
                         	 	messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
-                        	
-                         } catch (Exception e) {
+
+                             //
+                             // Start the DeviceUIActivity intent.
+                             //
+                             Intent newIntent = new Intent(MainActivity.this, DeviceUIActivity.class);
+                             Bundle b = new Bundle();
+                             b.putString("Identity", text);
+                             newIntent.putExtras(b);
+                             startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
+                         }
+                         catch (Exception e)
+                         {
                              Log.e(TAG, e.toString());
                          }
                      }
                  });
              }
+
+
            //*********************//
             if (action.equals(UartService.DEVICE_DOES_NOT_SUPPORT_UART)){
             	showMessage("Device doesn't support UART. Disconnecting");
