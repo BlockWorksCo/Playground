@@ -3,8 +3,10 @@ package com.example.blockworks.airui;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.ResultReceiver;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -94,7 +96,6 @@ public class DeviceUIActivity extends Activity {
         setContentView(R.layout.activity_device_ui);
 
         mVisible = true;
-        //mControlsView = findViewById(R.id.fullscreen_content_controls);
         WebView webView     = (WebView)findViewById(R.id.webview);
         webView.setWebChromeClient(new WebChromeClient());
         webView.getSettings().setJavaScriptEnabled(true);
@@ -104,6 +105,9 @@ public class DeviceUIActivity extends Activity {
         //
         Bundle b = getIntent().getExtras();
 
+        //
+        // Form the URL for the device UI.
+        //
         String  url     = "http://ZooKoo.com/DeviceUI/" + b.getString("Identity");
         Log.i("DeviceUI","loading URL: "+url);
 
@@ -178,4 +182,43 @@ public class DeviceUIActivity extends Activity {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
+
+
+
+
+
+    //
+    //
+    //
+    class MyResultReceiver extends ResultReceiver
+    {
+
+        public MyResultReceiver(Handler handler)
+        {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData)
+        {
+            Log.i("receiver","resultCode: "+resultCode);
+        }
+    }
+
+
+
+
+
+
+    //
+    //
+    //
+    @Override
+    public void onBackPressed()
+    {
+        setResult(Activity.RESULT_CANCELED, null);
+        finish();
+    }
+
+
 }

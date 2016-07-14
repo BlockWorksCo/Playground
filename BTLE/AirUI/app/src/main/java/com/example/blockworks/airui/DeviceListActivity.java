@@ -92,6 +92,7 @@ public class DeviceListActivity extends Activity
             return;
         }
 
+
         //
         // Start the scan.
         //
@@ -152,4 +153,22 @@ public class DeviceListActivity extends Activity
 
     }
 
+
+
+    //
+    //
+    //
+    @Override
+    public void onBackPressed()
+    {
+        Bundle b = new Bundle();
+        Intent result = new Intent();
+        result.putExtras(b);
+        setResult(Activity.RESULT_CANCELED, result);
+        finish();
+    }
 }
+
+
+
+

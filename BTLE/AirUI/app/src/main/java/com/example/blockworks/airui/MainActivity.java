@@ -42,6 +42,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.ResultReceiver;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
@@ -73,7 +74,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
     private ArrayAdapter<String> listAdapter;
     private Button btnConnectDisconnect,btnSend;
     private EditText edtMessage;
-
+    private Intent uiIntent;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -212,8 +213,23 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
             }
            
           //*********************//
-            if (action.equals(UartService.ACTION_GATT_DISCONNECTED)) {
-            	 runOnUiThread(new Runnable() {
+            if (action.equals(UartService.ACTION_GATT_DISCONNECTED))
+            {
+
+                //
+                // Close the sub activity.
+                //
+                finishActivity(123);
+
+                //
+                // Start the DeviceList activity again.
+                //
+                Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
+                startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
+
+
+
+                runOnUiThread(new Runnable() {
                      public void run() {
                     	 	 String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
                              Log.d(TAG, "UART_DISCONNECT_MSG");
@@ -284,11 +300,11 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                              //
                              // Start the DeviceUIActivity intent.
                              //
-                             Intent newIntent = new Intent(MainActivity.this, DeviceUIActivity.class);
+                             uiIntent = new Intent(MainActivity.this, DeviceUIActivity.class);
                              Bundle b = new Bundle();
                              b.putString("Identity", text);
-                             newIntent.putExtras(b);
-                             startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
+                             uiIntent .putExtras(b);
+                             startActivityForResult(uiIntent , 123);
                          }
                          catch (Exception e)
                          {
@@ -381,21 +397,38 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+
+
+        if (resultCode == Activity.RESULT_CANCELED && data == null)
+        {
+            //
+            // Start the DeviceList activity again.
+            //
+            Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
+            startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
+        }
+
+
+        switch (requestCode)
+        {
+
 
         case REQUEST_SELECT_DEVICE:
         	//When the DeviceListActivity return, with the selected device address
-            if (resultCode == Activity.RESULT_OK && data != null) {
+            if (resultCode == Activity.RESULT_OK && data != null)
+            {
+                //
+                // Get the selected device and connect to it.
+                //
                 String deviceAddress = data.getStringExtra(BluetoothDevice.EXTRA_DEVICE);
                 mDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(deviceAddress);
-               
+
                 Log.d(TAG, "... onActivityResultdevice.address==" + mDevice + "mserviceValue" + mService);
 
                 Log.i(TAG, "Connecting device: "+deviceAddress);
                 mService.connect(deviceAddress);
-                            
-
             }
             break;
         case REQUEST_ENABLE_BT:
@@ -414,6 +447,8 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
             Log.e(TAG, "wrong request code");
             break;
         }
+
+
     }
 
     @Override
@@ -452,4 +487,8 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
             .show();
         }
     }
+
+
+
+
 }
