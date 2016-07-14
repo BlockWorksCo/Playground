@@ -45,6 +45,7 @@ import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -72,6 +73,8 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
     private ArrayAdapter<String> listAdapter;
     private Button btnConnectDisconnect,btnSend;
     private EditText edtMessage;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,7 +100,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
         Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
         startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
 
-       
+
         // Handle Disconnect & Connect button
         btnConnectDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -260,9 +263,16 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
 
             }
           //*********************//
-            if (action.equals(UartService.ACTION_DATA_AVAILABLE)) {
-              
-                 final byte[] txValue = intent.getByteArrayExtra(UartService.EXTRA_DATA);
+            if (action.equals(UartService.ACTION_DATA_AVAILABLE))
+            {
+
+                //
+                // Start the DeviceUIActivity intent.
+                //
+                Intent newIntent = new Intent(MainActivity.this, DeviceUIActivity.class);
+                startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
+
+                final byte[] txValue = intent.getByteArrayExtra(UartService.EXTRA_DATA);
                  runOnUiThread(new Runnable() {
                      public void run() {
                          try {
