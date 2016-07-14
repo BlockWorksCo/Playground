@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
 
@@ -95,6 +96,8 @@ public class DeviceUIActivity extends Activity {
         mVisible = true;
         //mControlsView = findViewById(R.id.fullscreen_content_controls);
         WebView webView     = (WebView)findViewById(R.id.webview);
+        webView.setWebChromeClient(new WebChromeClient());
+        webView.getSettings().setJavaScriptEnabled(true);
 
         //
         // Get the device identity.
