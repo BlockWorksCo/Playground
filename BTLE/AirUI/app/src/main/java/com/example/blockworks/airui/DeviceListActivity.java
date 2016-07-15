@@ -22,38 +22,14 @@
  */
 package com.example.blockworks.airui;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-import java.util.Timer;
-import java.util.TimerTask;
 
 
 
@@ -62,36 +38,18 @@ public class DeviceListActivity extends Activity
 {
     private BluetoothAdapter mBluetoothAdapter;
 
-   // private BluetoothAdapter mBtAdapter;
-    //private TextView mEmptyList;
-    public static final String TAG = "DeviceListActivity";
-    
-    List<BluetoothDevice> deviceList;
-    private ServiceConnection onService = null;
-    Map<String, Integer> devRssiValues;
-    //private static final long SCAN_PERIOD = 1000;
-    //private Handler mHandler;
-    //private boolean mScanning;
-
-
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
+        //
         // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
         // BluetoothAdapter through BluetoothManager.
+        //
         final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
-
-        // Checks if Bluetooth is supported on the device.
-        if (mBluetoothAdapter == null) {
-            Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-
 
         //
         // Start the scan.
@@ -109,49 +67,41 @@ public class DeviceListActivity extends Activity
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                	
-                              addDevice(device,rssi);
+
+                    Log.i( "DeviceListActivity", "Device with RSSI of "+rssi+" found");
+
+
+                    //
+                    // Check the proximity to the target device.
+                    // If we're close enough, connect and interrogate it.
+                    //
+                    if(rssi >= -60)
+                    {
+                        //
+                        // Stop the scan.
+                        //
+                        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+
+                        Log.i( "DeviceListActivity", "Device within range! "+rssi);
+
+                        //
+                        // return to connect and interrogate this device.
+                        //
+                        Bundle b = new Bundle();
+                        b.putString(BluetoothDevice.EXTRA_DEVICE, device.getAddress());
+
+                        Intent result = new Intent();
+                        result.putExtras(b);
+                        setResult(Activity.RESULT_OK, result);
+                        finish();
+                    }
+
                 }
             });
         }
     };
 
 
-
-
-    private void addDevice(BluetoothDevice device, int rssi)
-    {
-        boolean deviceFound = false;
-
-        Log.i(TAG, "Device with RSSI of "+rssi+" found");
-
-
-        //
-        // Check the proximity to the target device.
-        // If we're close enough, connect and interrogate it.
-        //
-        if(rssi >= -60)
-        {
-            //
-            // Stop the scan.
-            //
-            mBluetoothAdapter.stopLeScan(mLeScanCallback);
-
-            Log.i(TAG, "Device within range! "+rssi);
-
-            //
-            // return to connect and interrogate this device.
-            //
-            Bundle b = new Bundle();
-            b.putString(BluetoothDevice.EXTRA_DEVICE, device.getAddress());
-
-            Intent result = new Intent();
-            result.putExtras(b);
-            setResult(Activity.RESULT_OK, result);
-            finish();
-        }
-
-    }
 
 
 
