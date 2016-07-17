@@ -30,6 +30,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -42,11 +43,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.ResultReceiver;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.View;
-import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -57,6 +55,8 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity implements RadioGroup.OnCheckedChangeListener
 {
+    private BluetoothAdapter mBluetoothAdapter;
+
     private static final int REQUEST_SELECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
     private static final int UART_PROFILE_READY = 10;
@@ -99,10 +99,67 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
         //
         // Start the DeviceListActivity intent.
         //
-        Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
-        startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
+        //Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
+        //startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
+
+        //
+        // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
+        // BluetoothAdapter through BluetoothManager.
+        //
+        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
+
+        //
+        // Start the scan.
+        //
+        mBluetoothAdapter.startLeScan(mLeScanCallback);
 
     }
+
+
+    private BluetoothAdapter.LeScanCallback mLeScanCallback =
+            new BluetoothAdapter.LeScanCallback() {
+
+                @Override
+                public void onLeScan(final BluetoothDevice device, final int rssi, byte[] scanRecord) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            Log.i( "DeviceListActivity", "Device with RSSI of "+rssi+" found");
+
+
+                            //
+                            // Check the proximity to the target device.
+                            // If we're close enough, connect and interrogate it.
+                            //
+                            if(rssi >= -60)
+                            {
+                                //
+                                // Stop the scan.
+                                //
+                                mBluetoothAdapter.stopLeScan(mLeScanCallback);
+
+                                Log.i( "DeviceListActivity", "Device within range! "+rssi);
+
+                                //
+                                // return to connect and interrogate this device.
+                                //
+                                Bundle b = new Bundle();
+                                b.putString(BluetoothDevice.EXTRA_DEVICE, device.getAddress());
+
+                                Intent result = new Intent();
+                                result.putExtras(b);
+                                setResult(Activity.RESULT_OK, result);
+                                finish();
+                            }
+
+                        }
+                    });
+                }
+            };
+
+
 
 
     //
