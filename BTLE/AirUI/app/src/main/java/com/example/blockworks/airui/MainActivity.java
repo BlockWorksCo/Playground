@@ -26,6 +26,9 @@ package com.example.blockworks.airui;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -72,7 +75,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
     private Button btnConnectDisconnect,btnSend;
     private EditText edtMessage;
     private Intent uiIntent;
-
+    private boolean    alreadyInUI     = false;
 
 
 
@@ -122,9 +125,11 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
 
                 @Override
                 public void onLeScan(final BluetoothDevice device, final int rssi, byte[] scanRecord) {
-                    runOnUiThread(new Runnable() {
+                    runOnUiThread(new Runnable()
+                    {
                         @Override
-                        public void run() {
+                        public void run()
+                        {
 
                             Log.i( "DeviceListActivity", "Device with RSSI of "+rssi+" found");
 
@@ -135,24 +140,35 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                             //
                             if(rssi >= -60)
                             {
-                                //
-                                // Stop the scan.
-                                //
-                                mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                                if(alreadyInUI == false)
+                                {
+                                    //
+                                    // Stop the scan.
+                                    //
+                                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
 
-                                Log.i( "DeviceListActivity", "Device within range! "+rssi);
+                                    Log.i( "DeviceListActivity", "Device within range! "+rssi);
 
-                                //
-                                //
-                                //
-                                Log.i(TAG, "Connecting device: "+ device.getAddress() );
+                                    //
+                                    //
+                                    //
+                                    Log.i(TAG, "Connecting device: "+ device.getAddress() );
 
-                                runOnUiThread(new Runnable() {
-                                    public void run()
+                                    alreadyInUI     = true;
+
+                                    runOnUiThread(new Runnable()
                                     {
-                                        mService.connect( device.getAddress() );
-                                    }
-                                });
+                                        public void run()
+                                        {
+                                            mService.connect( device.getAddress() );
+                                        }
+                                    });
+
+                                }
+                                else
+                                {
+                                    Log.i(TAG, "alreadyInUI....");
+                                }
 
                             }
 
@@ -178,21 +194,6 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                     Log.e(TAG, "Unable to initialize Bluetooth");
                     finish();
                 }
-/*
-                //
-                // Now we're connected to a device, send the identity-request message.
-                //
-                String message     = "<Identify>";
-                try
-                {
-                    byte[] value = message.getBytes("UTF-8");
-                    mService.writeRXCharacteristic(value);
-                }
-                catch(UnsupportedEncodingException e)
-                {
-                    e.printStackTrace();
-                }
-*/
         }
 
         public void onServiceDisconnected(ComponentName classname)
@@ -232,19 +233,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 //
                 //
                 //
-                runOnUiThread(new Runnable() {
-                public void run() {
-                    //String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
-                    Log.d(TAG, "UART_CONNECT_MSG");
-                    //btnConnectDisconnect.setText("Disconnect");
-                    //edtMessage.setEnabled(true);
-                    //btnSend.setEnabled(true);
-                    //((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ " - ready");
-                    //listAdapter.add("["+currentDateTimeString+"] Connected to: "+ mDevice.getName());
-                    //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
-                    //mState = UART_PROFILE_CONNECTED;
-                }
-                });
+                Log.d(TAG, "UART_CONNECT_MSG");
             }
            
             if (action.equals(UartService.ACTION_GATT_DISCONNECTED))
@@ -260,21 +249,16 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
                 startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
 
+                Log.d(TAG, "UART_DISCONNECT_MSG");
 
                 //
                 // Update the UI.
                 //
-                runOnUiThread(new Runnable() {
-                     public void run() {
-                    	 	 String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
-                             Log.d(TAG, "UART_DISCONNECT_MSG");
-                             btnConnectDisconnect.setText("Connect");
-                             edtMessage.setEnabled(false);
-                             btnSend.setEnabled(false);
-                             ((TextView) findViewById(R.id.deviceName)).setText("Not Connected");
-                             listAdapter.add("["+currentDateTimeString+"] Disconnected to: "+ mDevice.getName());
-                             mState = UART_PROFILE_DISCONNECTED;
-                             mService.close();
+                runOnUiThread(new Runnable()
+                {
+                     public void run()
+                     {
+                         mService.close();
                      }
                 });
             }
@@ -287,15 +271,29 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 //
                 mService.enableTXNotification();
 
+
                 //
                 // Send an identify message to the device after 1 second.
                 //
-                Handler handler = new Handler();
-
-                handler.postDelayed(new Runnable()
+                runOnUiThread(new Runnable()
                 {
                     public void run()
                     {
+                        //
+                        // Wait a little while for the device to settle before sending the request.
+                        //
+                        try
+                        {
+                            Thread.sleep(100);
+                        }
+                        catch(Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        //
+                        // Send the request.
+                        //
                         String message     = "<Identify>";
                         try
                         {
@@ -307,7 +305,8 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                             e.printStackTrace();
                         }
                     }
-                }, 1000);
+                });
+
 
             }
 
@@ -318,28 +317,30 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 // Get the data from the UartService
                 //
                 final byte[] txValue = intent.getByteArrayExtra(UartService.EXTRA_DATA);
-                runOnUiThread(new Runnable() {
-                     public void run() {
-                     try
+                runOnUiThread(new Runnable()
+                {
+                     public void run()
                      {
-                        String text = new String(txValue, "UTF-8");
-                        String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
-                        listAdapter.add("["+currentDateTimeString+"] RX: "+text);
-                        messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
+                         try
+                         {
+                            String text = new String(txValue, "UTF-8");
+                            String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
+                            listAdapter.add("["+currentDateTimeString+"] RX: "+text);
+                            messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
 
-                         //
-                         // Start the DeviceUIActivity intent.
-                         //
-                         uiIntent = new Intent(MainActivity.this, DeviceUIActivity.class);
-                         Bundle b = new Bundle();
-                         b.putString("Identity", text);
-                         uiIntent .putExtras(b);
-                         startActivityForResult(uiIntent , 123);
-                     }
-                     catch (Exception e)
-                     {
-                         Log.e(TAG, e.toString());
-                     }
+                             //
+                             // Start the DeviceUIActivity intent.
+                             //
+                             uiIntent = new Intent(MainActivity.this, DeviceUIActivity.class);
+                             Bundle b = new Bundle();
+                             b.putString("Identity", text);
+                             uiIntent .putExtras(b);
+                             startActivityForResult(uiIntent , 123);
+                         }
+                         catch (Exception e)
+                         {
+                             Log.e(TAG, e.toString());
+                         }
                      }
                  });
              }

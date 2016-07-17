@@ -40,6 +40,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 /**
@@ -85,6 +87,8 @@ public class UartService extends Service
     //
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback()
     {
+        private Timer mRssiTimer;
+
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState)
         {
@@ -100,6 +104,21 @@ public class UartService extends Service
                 Log.i(TAG, "Attempting to start service discovery:" +
                         mBluetoothGatt.discoverServices());
 
+
+                //
+                // Start the RSSI reading task.
+                //
+                TimerTask task = new TimerTask()
+                {
+                    @Override
+                    public void run()
+                    {
+                        mBluetoothGatt.readRemoteRssi();
+                    }
+                };
+                mRssiTimer = new Timer();
+                mRssiTimer.schedule(task, 1000, 1000);
+
             }
             else if (newState == BluetoothProfile.STATE_DISCONNECTED)
             {
@@ -108,6 +127,12 @@ public class UartService extends Service
                 Log.i(TAG, "Disconnected from GATT server.");
                 broadcastUpdate(intentAction);
             }
+        }
+
+        @Override
+        public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status)
+        {
+            Log.i(TAG,"rssi = " + rssi);
         }
 
         @Override
