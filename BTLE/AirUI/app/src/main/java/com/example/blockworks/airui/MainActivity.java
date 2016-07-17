@@ -143,15 +143,17 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                                 Log.i( "DeviceListActivity", "Device within range! "+rssi);
 
                                 //
-                                // return to connect and interrogate this device.
                                 //
-                                Bundle b = new Bundle();
-                                b.putString(BluetoothDevice.EXTRA_DEVICE, device.getAddress());
+                                //
+                                Log.i(TAG, "Connecting device: "+ device.getAddress() );
 
-                                Intent result = new Intent();
-                                result.putExtras(b);
-                                setResult(Activity.RESULT_OK, result);
-                                finish();
+                                runOnUiThread(new Runnable() {
+                                    public void run()
+                                    {
+                                        mService.connect( device.getAddress() );
+                                    }
+                                });
+
                             }
 
                         }
@@ -163,7 +165,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
 
 
     //
-    //UART service connected/disconnected
+    // UART service connected/disconnected
     //
     private ServiceConnection mServiceConnection = new ServiceConnection()
     {
@@ -176,6 +178,21 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                     Log.e(TAG, "Unable to initialize Bluetooth");
                     finish();
                 }
+/*
+                //
+                // Now we're connected to a device, send the identity-request message.
+                //
+                String message     = "<Identify>";
+                try
+                {
+                    byte[] value = message.getBytes("UTF-8");
+                    mService.writeRXCharacteristic(value);
+                }
+                catch(UnsupportedEncodingException e)
+                {
+                    e.printStackTrace();
+                }
+*/
         }
 
         public void onServiceDisconnected(ComponentName classname)
@@ -217,15 +234,15 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 //
                 runOnUiThread(new Runnable() {
                 public void run() {
-                    String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
+                    //String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
                     Log.d(TAG, "UART_CONNECT_MSG");
-                    btnConnectDisconnect.setText("Disconnect");
-                    edtMessage.setEnabled(true);
-                    btnSend.setEnabled(true);
-                    ((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ " - ready");
-                    listAdapter.add("["+currentDateTimeString+"] Connected to: "+ mDevice.getName());
-                    messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
-                    mState = UART_PROFILE_CONNECTED;
+                    //btnConnectDisconnect.setText("Disconnect");
+                    //edtMessage.setEnabled(true);
+                    //btnSend.setEnabled(true);
+                    //((TextView) findViewById(R.id.deviceName)).setText(mDevice.getName()+ " - ready");
+                    //listAdapter.add("["+currentDateTimeString+"] Connected to: "+ mDevice.getName());
+                    //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
+                    //mState = UART_PROFILE_CONNECTED;
                 }
                 });
             }
@@ -495,21 +512,6 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
 
                     Log.i(TAG, "Connecting device: "+deviceAddress);
                     mService.connect(deviceAddress);
-                }
-                break;
-
-            case REQUEST_ENABLE_BT:
-                // When the request to enable Bluetooth returns
-                if (resultCode == Activity.RESULT_OK)
-                {
-                    Toast.makeText(this, "Bluetooth has turned on ", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    // User did not enable Bluetooth or an error occurred
-                    Log.d(TAG, "BT not enabled");
-                    Toast.makeText(this, "Problem in BT Turning ON ", Toast.LENGTH_SHORT).show();
-                    finish();
                 }
                 break;
 
