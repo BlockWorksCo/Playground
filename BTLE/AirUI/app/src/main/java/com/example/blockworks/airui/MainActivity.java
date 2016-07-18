@@ -24,8 +24,6 @@
 package com.example.blockworks.airui;
 
 import java.io.UnsupportedEncodingException;
-import java.text.DateFormat;
-import java.util.Date;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -43,34 +41,26 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
+
 
 public class MainActivity extends Activity implements RadioGroup.OnCheckedChangeListener
 {
     private BluetoothAdapter mBluetoothAdapter;
 
-    private static final int REQUEST_SELECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
-    private static final int UART_PROFILE_READY = 10;
     public static final String TAG = "AirUI";
     private static final int UART_PROFILE_CONNECTED = 20;
     private static final int UART_PROFILE_DISCONNECTED = 21;
     private int mState = UART_PROFILE_DISCONNECTED;
     private UartService mService = null;
-    private BluetoothDevice mDevice = null;
     private BluetoothAdapter mBtAdapter = null;
-    private ListView messageListView;
-    private ArrayAdapter<String> listAdapter;
-    private Button btnConnectDisconnect,btnSend;
-    private EditText edtMessage;
     private Intent uiIntent;
 
 
@@ -86,13 +76,6 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
 
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        messageListView = (ListView) findViewById(R.id.listMessage);
-        listAdapter = new ArrayAdapter<String>(this, R.layout.message_detail);
-        messageListView.setAdapter(listAdapter);
-        messageListView.setDivider(null);
-        btnConnectDisconnect=(Button) findViewById(R.id.btn_select);
-        btnSend=(Button) findViewById(R.id.sendButton);
-        edtMessage = (EditText) findViewById(R.id.sendText);
         service_init();
 
         //
@@ -105,8 +88,14 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
         //
         // Start the scan.
         //
-        mBluetoothAdapter.startLeScan(mLeScanCallback);
-
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable()
+        {
+            public void run()
+            {
+                mBluetoothAdapter.startLeScan(mLeScanCallback);
+            }
+        }, 2000);
     }
 
 
@@ -184,19 +173,6 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
     };
 
 
-    //
-    //
-    //
-    private Handler mHandler = new Handler()
-    {
-        @Override
-        //Handler events that received from UART service 
-        public void handleMessage(Message msg)
-        {
-  
-        }
-    };
-
 
     //
     //
@@ -227,22 +203,16 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 Log.d(TAG, "UART_DISCONNECT_MSG");
 
                 //
-                // Update the UI.
-                //
-                /*
-                runOnUiThread(new Runnable()
-                {
-                     public void run()
-                     {
-                         mService.close();
-                     }
-                });
-                */
-
-                //
                 // Start the scan.
                 //
-                mBluetoothAdapter.startLeScan(mLeScanCallback);
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.postDelayed(new Runnable()
+                {
+                    public void run()
+                    {
+                        mBluetoothAdapter.startLeScan(mLeScanCallback);
+                    }
+                }, 2000);
 
             }
             
@@ -307,9 +277,6 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                          try
                          {
                             String text = new String(txValue, "UTF-8");
-                            String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
-                            listAdapter.add("["+currentDateTimeString+"] RX: "+text);
-                            messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
 
                              //
                              // Start the DeviceUIActivity intent.
