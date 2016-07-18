@@ -26,8 +26,6 @@ package com.example.blockworks.airui;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -75,7 +73,6 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
     private Button btnConnectDisconnect,btnSend;
     private EditText edtMessage;
     private Intent uiIntent;
-    private boolean    alreadyInUI     = false;
 
 
 
@@ -140,35 +137,26 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                             //
                             if(rssi >= -60)
                             {
-                                if(alreadyInUI == false)
+                                //
+                                // Stop the scan.
+                                //
+                                mBluetoothAdapter.stopLeScan(mLeScanCallback);
+
+                                Log.i( "DeviceListActivity", "Device within range! "+rssi);
+
+                                //
+                                //
+                                //
+                                Log.i(TAG, "Connecting device: "+ device.getAddress() );
+
+                                runOnUiThread(new Runnable()
                                 {
-                                    //
-                                    // Stop the scan.
-                                    //
-                                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
-
-                                    Log.i( "DeviceListActivity", "Device within range! "+rssi);
-
-                                    //
-                                    //
-                                    //
-                                    Log.i(TAG, "Connecting device: "+ device.getAddress() );
-
-                                    alreadyInUI     = true;
-
-                                    runOnUiThread(new Runnable()
+                                    public void run()
                                     {
-                                        public void run()
-                                        {
-                                            mService.connect( device.getAddress() );
-                                        }
-                                    });
+                                        mService.connect( device.getAddress() );
+                                    }
+                                });
 
-                                }
-                                else
-                                {
-                                    Log.i(TAG, "alreadyInUI....");
-                                }
 
                             }
 
@@ -246,14 +234,15 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 //
                 // Start the DeviceList activity again.
                 //
-                Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
-                startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
+                //Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
+                //startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
 
                 Log.d(TAG, "UART_DISCONNECT_MSG");
 
                 //
                 // Update the UI.
                 //
+                /*
                 runOnUiThread(new Runnable()
                 {
                      public void run()
@@ -261,6 +250,13 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                          mService.close();
                      }
                 });
+                */
+
+                //
+                // Start the scan.
+                //
+                mBluetoothAdapter.startLeScan(mLeScanCallback);
+
             }
             
           
@@ -488,10 +484,11 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
         if (resultCode == Activity.RESULT_CANCELED && data == null)
         {
             //
-            // Start the DeviceList activity again.
+            // Explicit close... Start the DeviceList activity again.
             //
-            Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
-            startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
+            //finish();
+            //Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
+            //startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
         }
 
 

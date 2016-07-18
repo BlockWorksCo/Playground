@@ -87,7 +87,8 @@ public class UartService extends Service
     //
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback()
     {
-        private Timer mRssiTimer;
+        private Timer       mRssiTimer;
+        private  boolean    disconnecting   = false;
 
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState)
@@ -104,6 +105,7 @@ public class UartService extends Service
                 Log.i(TAG, "Attempting to start service discovery:" +
                         mBluetoothGatt.discoverServices());
 
+                disconnecting   = false;
 
                 //
                 // Start the RSSI reading task.
@@ -113,7 +115,13 @@ public class UartService extends Service
                     @Override
                     public void run()
                     {
-                        mBluetoothGatt.readRemoteRssi();
+                        if(disconnecting == false)
+                        {
+                            //
+                            // Only read the RSSI is we're not disconnecting.
+                            //
+                            mBluetoothGatt.readRemoteRssi();
+                        }
                     }
                 };
                 mRssiTimer = new Timer();
@@ -133,6 +141,17 @@ public class UartService extends Service
         public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status)
         {
             Log.i(TAG,"rssi = " + rssi);
+
+            if(rssi <= -70)
+            {
+                Log.i(TAG,"device moving away, so disconnecting. rssi = " + rssi);
+
+                //
+                // disconnect.
+                //
+                disconnecting   = true;
+                gatt.disconnect();
+            }
         }
 
         @Override
