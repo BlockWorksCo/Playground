@@ -51,7 +51,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity implements RadioGroup.OnCheckedChangeListener
@@ -97,12 +96,6 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
         service_init();
 
         //
-        // Start the DeviceListActivity intent.
-        //
-        //Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
-        //startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
-
-        //
         // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
         // BluetoothAdapter through BluetoothManager.
         //
@@ -128,7 +121,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                         public void run()
                         {
 
-                            Log.i( "DeviceListActivity", "Device with RSSI of "+rssi+" found");
+                            Log.i( "Main", "Device with RSSI of "+rssi+" found");
 
 
                             //
@@ -142,7 +135,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                                 //
                                 mBluetoothAdapter.stopLeScan(mLeScanCallback);
 
-                                Log.i( "DeviceListActivity", "Device within range! "+rssi);
+                                Log.i( "Main", "Device within range! "+rssi);
 
                                 //
                                 //
@@ -230,12 +223,6 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 // Close the sub activity.
                 //
                 finishActivity(123);
-
-                //
-                // Start the DeviceList activity again.
-                //
-                //Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
-                //startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
 
                 Log.d(TAG, "UART_DISCONNECT_MSG");
 
@@ -481,44 +468,6 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        if (resultCode == Activity.RESULT_CANCELED && data == null)
-        {
-            //
-            // Explicit close... Start the DeviceList activity again.
-            //
-            //finish();
-            //Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
-            //startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
-        }
-
-
-        switch (requestCode)
-        {
-
-
-            case REQUEST_SELECT_DEVICE:
-                //When the DeviceListActivity return, with the selected device address
-                if (resultCode == Activity.RESULT_OK && data != null)
-                {
-                    //
-                    // Get the selected device and connect to it.
-                    //
-                    String deviceAddress = data.getStringExtra(BluetoothDevice.EXTRA_DEVICE);
-                    mDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(deviceAddress);
-
-                    Log.d(TAG, "... onActivityResultdevice.address==" + mDevice + "mserviceValue" + mService);
-
-                    Log.i(TAG, "Connecting device: "+deviceAddress);
-                    mService.connect(deviceAddress);
-                }
-                break;
-
-            default:
-                Log.e(TAG, "wrong request code");
-                break;
-        }
-
-
     }
 
 

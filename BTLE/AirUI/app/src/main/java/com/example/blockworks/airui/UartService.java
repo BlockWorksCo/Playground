@@ -150,6 +150,8 @@ public class UartService extends Service
                 // disconnect.
                 //
                 disconnecting   = true;
+                mRssiTimer.cancel();
+                mRssiTimer  = null;
                 gatt.disconnect();
             }
         }
