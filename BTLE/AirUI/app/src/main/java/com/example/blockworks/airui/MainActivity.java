@@ -130,7 +130,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
             // Check the proximity to the target device.
             // If we're close enough, connect and interrogate it.
             //
-            if(rssi >= -60)
+            if( (rssi >= -60) && (mService != null))
             {
                 //
                 // Stop the scan.
@@ -148,6 +148,9 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 {
                     public void run()
                     {
+                        //
+                        // Connect to the device.
+                        //
                         mService.connect( device.getAddress() );
                     }
                 });

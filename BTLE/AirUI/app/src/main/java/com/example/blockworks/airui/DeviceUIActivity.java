@@ -5,6 +5,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.os.ResultReceiver;
 import android.util.Log;
@@ -20,18 +21,6 @@ import android.webkit.WebView;
  */
 public class DeviceUIActivity extends Activity
 {
-    /**
-     * Whether or not the system UI should be auto-hidden after
-     * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
-     */
-    private static final boolean AUTO_HIDE = true;
-
-    /**
-     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
-     * user interaction before hiding the system UI.
-     */
-    private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
-
     /**
      * Some older devices needs a small delay between UI widget updates
      * and a change of the status and navigation bar.
@@ -72,7 +61,6 @@ public class DeviceUIActivity extends Activity
     //
     //
     //
-    private boolean mVisible;
     private final Runnable mHideRunnable = new Runnable()
     {
         @Override
@@ -81,26 +69,8 @@ public class DeviceUIActivity extends Activity
             hide();
         }
     };
+    private PowerManager.WakeLock   wakeLock    = null;
 
-
-
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener()
-    {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent)
-        {
-            if (AUTO_HIDE)
-            {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            }
-            return false;
-        }
-    };
 
 
     //
@@ -113,7 +83,6 @@ public class DeviceUIActivity extends Activity
 
         setContentView(R.layout.activity_device_ui);
 
-        mVisible = true;
         WebView webView     = (WebView)findViewById(R.id.webview);
         webView.setWebChromeClient(new WebChromeClient());
         webView.getSettings().setJavaScriptEnabled(true);
@@ -133,7 +102,21 @@ public class DeviceUIActivity extends Activity
         //
         // turn on the backlight.
         //
-        backlightOn();
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MyWakelockTag");
+        wakeLock.acquire();
+
+        //
+        // Release the wakelock after 2sec.
+        //
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable()
+        {
+            public void run()
+            {
+                wakeLock.release();
+            }
+        }, 2000);
 
         //
         // Show the webview with the UI on it.
@@ -142,14 +125,6 @@ public class DeviceUIActivity extends Activity
     }
 
 
-
-
-    private void backlightOn()
-    {
-        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakelockTag");
-        wakeLock.acquire();
-    }
 
 
     //
@@ -179,26 +154,14 @@ public class DeviceUIActivity extends Activity
         {
             actionBar.hide();
         }
-        mVisible = false;
 
         // Schedule a runnable to remove the status and navigation bar after a delay
         mHideHandler.removeCallbacks(mShowPart2Runnable);
         mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
+
     }
 
 
-    //
-    //
-    //
-    @SuppressLint("InlinedApi")
-    private void show()
-    {
-        mVisible = true;
-
-        // Schedule a runnable to display UI elements after a delay
-        mHideHandler.removeCallbacks(mHidePart2Runnable);
-        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
-    }
 
     /**
      * Schedules a call to hide() in [delay] milliseconds, canceling any
@@ -217,35 +180,11 @@ public class DeviceUIActivity extends Activity
     //
     //
     //
-    class MyResultReceiver extends ResultReceiver
-    {
-
-        public MyResultReceiver(Handler handler)
-        {
-            super(handler);
-        }
-
-        @Override
-        protected void onReceiveResult(int resultCode, Bundle resultData)
-        {
-            Log.i("receiver","resultCode: "+resultCode);
-        }
-    }
-
-
-
-
-
-
-    //
-    //
-    //
     @Override
     public void onBackPressed()
     {
         setResult(Activity.RESULT_CANCELED, null);
         finish();
     }
-
 
 }
