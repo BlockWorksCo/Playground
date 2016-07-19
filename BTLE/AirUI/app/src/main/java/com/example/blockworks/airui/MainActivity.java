@@ -24,12 +24,19 @@
 package com.example.blockworks.airui;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -63,6 +70,10 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
     private BluetoothAdapter mBtAdapter = null;
     private Intent uiIntent;
 
+    private BluetoothLeScanner mLEScanner;
+    //private ScanSettings settings;
+    //private ScanSettings settings;
+    //private List<ScanFilter> filters;
 
 
     //
@@ -84,21 +95,81 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
         //
         final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
+        mLEScanner = mBluetoothAdapter.getBluetoothLeScanner();
+
+        //
+        //
+        //
+        //settings = new ScanSettings.Builder()
+        //        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+        //        .build();
+        //filters = new ArrayList<ScanFilter>();
 
         //
         // Start the scan.
         //
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(new Runnable()
-        {
-            public void run()
-            {
-                mBluetoothAdapter.startLeScan(mLeScanCallback);
-            }
-        }, 2000);
+        mLEScanner.startScan(mScanCallback);
     }
 
 
+    private ScanCallback mScanCallback = new ScanCallback()
+    {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result)
+        {
+            //Log.i("callbackType", String.valueOf(callbackType));
+            //Log.i("result", result.toString());
+            final BluetoothDevice device = result.getDevice();
+            int rssi    = result.getRssi();
+
+            Log.i( "Main", "Device with RSSI of "+rssi+" found");
+
+
+            //
+            // Check the proximity to the target device.
+            // If we're close enough, connect and interrogate it.
+            //
+            if(rssi >= -60)
+            {
+                //
+                // Stop the scan.
+                //
+                mLEScanner.stopScan(mScanCallback);
+
+                Log.i( "Main", "Device within range! "+rssi);
+
+                //
+                //
+                //
+                Log.i(TAG, "Connecting device: "+ device.getAddress() );
+
+                runOnUiThread(new Runnable()
+                {
+                    public void run()
+                    {
+                        mService.connect( device.getAddress() );
+                    }
+                });
+
+            }
+        }
+
+        @Override
+        public void onBatchScanResults(List<ScanResult> results)
+        {
+            for (ScanResult sr : results)
+            {
+                Log.i("ScanResult - Results", sr.toString());
+            }
+        }
+
+        @Override
+        public void onScanFailed(int errorCode)
+        {
+            Log.e("Scan Failed", "Error Code: " + errorCode);
+        }
+    };
+/*
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
 
@@ -122,7 +193,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                                 //
                                 // Stop the scan.
                                 //
-                                mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                                mLEScanner.stopScan(mScanCallback);
 
                                 Log.i( "Main", "Device within range! "+rssi);
 
@@ -147,7 +218,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 }
             };
 
-
+*/
 
 
     //
@@ -210,7 +281,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 {
                     public void run()
                     {
-                        mBluetoothAdapter.startLeScan(mLeScanCallback);
+                        mLEScanner.startScan(mScanCallback);
                     }
                 }, 2000);
 
