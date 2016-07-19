@@ -50,6 +50,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.PowerManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.RadioGroup;
@@ -169,57 +170,6 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
             Log.e("Scan Failed", "Error Code: " + errorCode);
         }
     };
-/*
-    private BluetoothAdapter.LeScanCallback mLeScanCallback =
-            new BluetoothAdapter.LeScanCallback() {
-
-                @Override
-                public void onLeScan(final BluetoothDevice device, final int rssi, byte[] scanRecord) {
-                    runOnUiThread(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-
-                            Log.i( "Main", "Device with RSSI of "+rssi+" found");
-
-
-                            //
-                            // Check the proximity to the target device.
-                            // If we're close enough, connect and interrogate it.
-                            //
-                            if(rssi >= -60)
-                            {
-                                //
-                                // Stop the scan.
-                                //
-                                mLEScanner.stopScan(mScanCallback);
-
-                                Log.i( "Main", "Device within range! "+rssi);
-
-                                //
-                                //
-                                //
-                                Log.i(TAG, "Connecting device: "+ device.getAddress() );
-
-                                runOnUiThread(new Runnable()
-                                {
-                                    public void run()
-                                    {
-                                        mService.connect( device.getAddress() );
-                                    }
-                                });
-
-
-                            }
-
-                        }
-                    });
-                }
-            };
-
-*/
-
 
     //
     // UART service connected/disconnected

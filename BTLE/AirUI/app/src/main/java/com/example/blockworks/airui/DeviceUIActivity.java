@@ -3,9 +3,9 @@ package com.example.blockworks.airui;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.os.ResultReceiver;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -129,10 +129,26 @@ public class DeviceUIActivity extends Activity
         String  url     = "http://ZooKoo.com/DeviceUI/" + b.getString("Identity");
         Log.i("DeviceUI","loading URL: "+url);
 
+
+        //
+        // turn on the backlight.
+        //
+        backlightOn();
+
         //
         // Show the webview with the UI on it.
         //
         webView.loadUrl(url);
+    }
+
+
+
+
+    private void backlightOn()
+    {
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakelockTag");
+        wakeLock.acquire();
     }
 
 
