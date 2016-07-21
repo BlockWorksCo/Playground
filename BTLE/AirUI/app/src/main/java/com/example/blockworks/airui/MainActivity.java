@@ -70,6 +70,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
     private UartService mService = null;
     private BluetoothAdapter mBtAdapter = null;
     private Intent uiIntent;
+    private DeviceServer    deviceServer    = null;
 
     private BluetoothLeScanner mLEScanner;
     //private ScanSettings settings;
@@ -89,6 +90,11 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
 
         service_init();
+
+        //
+        //
+        //
+        deviceServer    = new DeviceServer();
 
         //
         // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to

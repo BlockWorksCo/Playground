@@ -67,7 +67,11 @@
             android:name=".DeviceUIActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_device_ui"
-            android:theme="@style/FullscreenTheme"></activity>
+            android:theme="@style/FullscreenTheme" />
+
+        <service
+            android:name=".DeviceServer"
+            android:exported="false"></service>
     </application>
 
 </manifest>
