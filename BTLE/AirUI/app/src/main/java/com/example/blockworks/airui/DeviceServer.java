@@ -33,7 +33,8 @@ public class DeviceServer extends IntentService
     private static final String EXTRA_PARAM1 = "com.example.blockworks.airui.extra.PARAM1";
     private static final String EXTRA_PARAM2 = "com.example.blockworks.airui.extra.PARAM2";
 
-    Thread    serverThread    = null;
+    Thread          serverThread    = null;
+    private int     readCounter     = 0;
 
     //
     //
@@ -180,9 +181,10 @@ public class DeviceServer extends IntentService
                                     "Connection: Closed.\n\n"+
                                     "<html>\n" +
                                     "<body>\n" +
-                                    "<h1>Hello, World!</h1>\n" +
+                                    "<h1>Hello, World("+readCounter+")!</h1>\n" +
                                     "</body>\n" +
                                     "</html>\n\n");
+                    readCounter++;
                     output.flush();
                     socket.close();
 
