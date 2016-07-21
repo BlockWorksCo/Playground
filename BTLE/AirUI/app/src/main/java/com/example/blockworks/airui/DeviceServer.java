@@ -174,6 +174,9 @@ public class DeviceServer extends IntentService
                                     //"Content-Length: 88\n" +
                                     "Content-Type: text/html\n" +
                                     "Access-Control-Allow-Origin: *\n"+
+                                    "Cache-Control: no-cache, no-store, must-revalidate\n" +
+                                    "Pragma: no-cache\n" +
+                                    "Expires: 0"+
                                     "Connection: Closed.\n\n"+
                                     "<html>\n" +
                                     "<body>\n" +

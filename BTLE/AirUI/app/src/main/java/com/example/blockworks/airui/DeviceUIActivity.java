@@ -47,12 +47,14 @@ public class DeviceUIActivity extends Activity
         @Override
         public void run()
         {
+            /*
             // Delayed display of UI elements
             ActionBar actionBar = getActionBar();
             if (actionBar != null)
             {
                 actionBar.show();
             }
+            */
         }
     };
 
@@ -119,6 +121,16 @@ public class DeviceUIActivity extends Activity
         }, 2000);
 
         //
+        // Hide the action bar.
+        //
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null)
+        {
+            actionBar.hide();
+        }
+
+
+        //
         // Show the webview with the UI on it.
         //
         webView.loadUrl(url);
@@ -138,7 +150,7 @@ public class DeviceUIActivity extends Activity
         // Trigger the initial hide() shortly after the activity has been
         // created, to briefly hint to the user that UI controls
         // are available.
-        delayedHide(100);
+        //delayedHide(100);
     }
 
 
@@ -148,13 +160,14 @@ public class DeviceUIActivity extends Activity
     //
     private void hide()
     {
+        /*
         // Hide UI first
         ActionBar actionBar = getActionBar();
         if (actionBar != null)
         {
             actionBar.hide();
         }
-
+        */
         // Schedule a runnable to remove the status and navigation bar after a delay
         mHideHandler.removeCallbacks(mShowPart2Runnable);
         mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
