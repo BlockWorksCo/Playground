@@ -6,8 +6,12 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -116,7 +120,7 @@ public class DeviceServer extends IntentService
     //
     class ServerThread implements Runnable
     {
-        private BufferedReader input;
+        private InputStream input;
 
         //
         //
@@ -147,18 +151,37 @@ public class DeviceServer extends IntentService
             {
                 try
                 {
+                    //
+                    // Open the socket for this connection.
+                    //
                     Socket socket = serverSocket.accept();
 
-                    try
-                    {
-                        input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                    }
+                    //
+                    // Read the text from the browser.
+                    //
+                    input = socket.getInputStream();
 
                     reader();
+
+                    //
+                    // Write the output.
+                    //
+                    OutputStreamWriter output = new OutputStreamWriter(socket.getOutputStream());
+                    output.write(   "HTTP/1.1 200 OK\n" +
+                                    "Date: Mon, 27 Jul 2009 12:28:53 GMT\n" +
+                                    "Server: Apache/2.2.14 (Win32)\n" +
+                                    "Last-Modified: Wed, 22 Jul 2009 19:15:56 GMT\n" +
+                                    //"Content-Length: 88\n" +
+                                    "Content-Type: text/html\n" +
+                                    "Connection: Closed.\n\n"+
+                                    "<html>\n" +
+                                    "<body>\n" +
+                                    "<h1>Hello, World!</h1>\n" +
+                                    "</body>\n" +
+                                    "</html>\n\n");
+                    output.flush();
+                    socket.close();
+
                 }
                 catch (IOException e)
                 {
@@ -173,28 +196,34 @@ public class DeviceServer extends IntentService
         //
         public void reader()
         {
-            String  line    = null;
-
-            do
-            {
-                try
+            String  request     = "";
+            try {
+                do
                 {
-                    line = input.readLine();
-                    if(line != null)
+                    try
                     {
-                        Log.i("Reader",line);
+                        byte[]  requestBytes     = new byte[128];
+
+                        int numberOfBytes = input.read(requestBytes);
+                        if(numberOfBytes > 0)
+                        {
+                            String str = new String(requestBytes, "UTF-8");
+                            request     = request + str;
+                        }
                     }
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                    line    = null;
-                }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
 
-            } while(line != null);
+                } while(input.available() > 0);
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
 
-            input   = null;
-            Log.i("Reader","<request complete>");
+            Log.i("Reader",request);
         }
 
     }
