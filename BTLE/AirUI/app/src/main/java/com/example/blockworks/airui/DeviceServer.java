@@ -173,6 +173,7 @@ public class DeviceServer extends IntentService
                                     "Last-Modified: Wed, 22 Jul 2009 19:15:56 GMT\n" +
                                     //"Content-Length: 88\n" +
                                     "Content-Type: text/html\n" +
+                                    "Access-Control-Allow-Origin: *\n"+
                                     "Connection: Closed.\n\n"+
                                     "<html>\n" +
                                     "<body>\n" +
