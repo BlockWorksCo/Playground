@@ -7,12 +7,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
-import android.os.ResultReceiver;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 
 /**
@@ -88,6 +86,21 @@ public class DeviceUIActivity extends Activity
         WebView webView     = (WebView)findViewById(R.id.webview);
         webView.setWebChromeClient(new WebChromeClient());
         webView.getSettings().setJavaScriptEnabled(true);
+
+        //
+        //
+        //
+        webView.setWebViewClient(new WebViewClient()
+        {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url)
+            {
+                view.loadUrl(url);
+                System.out.println("hello");
+                return true;
+            }
+        });
+        //webView.loadUrl(url);
 
         //
         // Get the device identity.
