@@ -10,9 +10,13 @@
    setTimeout(function()
    {
        $.ajax({ url: "http://localhost:8080/Ping", success: function(data)
-       {
-           alert('khkjhkj');
-       }, dataType: "text/html", complete: function(jqXHR,status){$("#div1").html(jqXHR.responseText); poll();} });
+           {
+               $("#div1").html(data);
+           }, complete: function(jqXHR,status)
+           {
+               poll();
+           }
+       });
 
    }, 1000);
 })();
