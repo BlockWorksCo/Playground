@@ -1,5 +1,9 @@
+
+
 import SimpleHTTPServer
 import SocketServer
+import time
+
 
 PORT = 8080
 
@@ -20,6 +24,7 @@ class SimpleServer(SimpleHTTPServer.SimpleHTTPRequestHandler):
             response    = '<h1>Counter %d</h1>'%(counter)
             counter     = counter + 1
 
+            time.sleep(0.5)
             self.send_response(200)
             self.send_header("Content-type", "text/html")
             self.send_header("Content-length", len(response))

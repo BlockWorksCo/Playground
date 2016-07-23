@@ -7,18 +7,15 @@
 
 (function poll()
 {
-   setTimeout(function()
-   {
-       $.ajax({ url: "http://localhost:8080/Ping", success: function(data)
-           {
-               $("#div1").html(data);
-           }, complete: function(jqXHR,status)
-           {
-               poll();
-           }
-       });
+   $.ajax({ url: "http://localhost:8080/Ping", success: function(data)
+       {
+           $("#div1").html(data);
+       }, complete: function(jqXHR,status)
+       {
+           poll();
+       }
+   });
 
-   }, 1000);
 })();
 
 
