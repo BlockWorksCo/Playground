@@ -6,24 +6,37 @@
 
 count = 0;
 
-setInterval(function()
-    {
-       $.ajax({ url: "http://localhost:8081/Pong", success: function(data)
-           {
-                $("#div2").html('sddfsdf '+data);
-           }
-       });
 
-    }
-    , 1000);
+//
+//
+//
+function Request(fn)
+{
+    $.ajax({ url: "http://localhost:8081/Pong", success: function(data)
+        {
+            $("#div2").html('sddfsdf '+data);
+        }
+    });
+}
 
 
+//
+//
+//
+function ProcessMessage(fn)
+{
+    $("#div1").html(fn);
+}
 
+//
+//
+//
 (function poll()
 {
    $.ajax({ url: "http://localhost:8080/Ping", success: function(data)
        {
-           $("#div1").html(data);
+           ProcessMessage(data);
+
        }, complete: function(jqXHR,status)
        {
            poll();
@@ -31,6 +44,19 @@ setInterval(function()
    });
 
 })();
+
+
+
+
+
+//
+//
+//
+setInterval(function()
+    {
+        Request('Blaa');
+    }
+    , 100);
 
 
 </script>
