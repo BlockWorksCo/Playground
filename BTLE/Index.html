@@ -4,6 +4,16 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script>
 
+count = 0;
+
+setInterval(function()
+    {
+        $("#div2").html('sddfsdf '+count);
+        count++;
+    }
+    , 1000);
+
+
 
 (function poll()
 {
@@ -24,8 +34,7 @@
 <body>
 
 <div id="div1"><h2>Let jQuery AJAX Change This Text</h2></div>
-
-<button>Get External Content</button>
+<div id="div2"><h2>Let jQuery AJAX Change This Text</h2></div>
 
 </body>
 </html>
