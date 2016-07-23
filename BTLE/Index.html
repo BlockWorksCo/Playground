@@ -3,16 +3,21 @@
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script>
-$(document).ready(function()
+
+
+(function poll()
 {
-        setInterval(function()
-        {
-                    $.ajax({url: "http://localhost:8080/Ping", success: function(result)
-                    {
-                          $("#div1").html(result);
-                    }});
-        }, 1000);
-});
+   setTimeout(function()
+   {
+       $.ajax({ url: "http://localhost:8080/Ping", success: function(data)
+       {
+           alert('khkjhkj');
+       }, dataType: "text/html", complete: function(jqXHR,status){$("#div1").html(jqXHR.responseText); poll();} });
+
+   }, 1000);
+})();
+
+
 </script>
 </head>
 <body>

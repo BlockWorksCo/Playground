@@ -14,15 +14,19 @@ class SimpleServer(SimpleHTTPServer.SimpleHTTPRequestHandler):
         SimpleHTTPServer.SimpleHTTPRequestHandler.__init__(self, *args)
 
     def do_GET(self):
-        global counter
-        response    = '<h1>Counter %d</h1>'%(counter)
-        counter     = counter + 1
 
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.send_header("Content-length", len(response))
-        self.end_headers()
-        self.wfile.write(response)
+        if self.path.endswith('/Ping'):
+            global counter
+            response    = '<h1>Counter %d</h1>'%(counter)
+            counter     = counter + 1
+
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.send_header("Content-length", len(response))
+            self.end_headers()
+            self.wfile.write(response)
+        else:
+            return SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
 
 
