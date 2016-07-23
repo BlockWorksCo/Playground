@@ -8,8 +8,12 @@ count = 0;
 
 setInterval(function()
     {
-        $("#div2").html('sddfsdf '+count);
-        count++;
+       $.ajax({ url: "http://localhost:8081/Pong", success: function(data)
+           {
+                $("#div2").html('sddfsdf '+data);
+           }
+       });
+
     }
     , 1000);
 
