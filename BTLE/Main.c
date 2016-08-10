@@ -37,6 +37,7 @@
 #include "app_util_platform.h"
 #include "bsp.h"
 #include "bsp_btn_ble.h"
+#include <ctype.h>
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 0                                           /**< Include the service_changed characteristic. If not enabled, the server's database cannot be changed for the lifetime of the device. */
 
@@ -129,7 +130,7 @@ static void gap_params_init(void)
 /**@snippet [Handling the data received over BLE] */
 static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t length)
 {
-#if 0
+#if 1
     for (uint32_t i = 0; i < length; i++)
     {
         while(app_uart_put(p_data[i]) != NRF_SUCCESS);
@@ -411,18 +412,31 @@ void bsp_event_handler(bsp_event_t event)
 /**@snippet [Handling the data received over UART] */
 void uart_event_handle(app_uart_evt_t * p_event)
 {
-    static uint8_t data_array[BLE_NUS_MAX_DATA_LEN];
-    static uint8_t index = 0;
-    uint32_t       err_code;
-
     switch (p_event->evt_type)
     {
-        case APP_UART_DATA_READY:
-            UNUSED_VARIABLE(app_uart_get(&data_array[index]));
-            index++;
+        case APP_UART_TX_EMPTY:
+        {
+            volatile uint8_t x = 0;
+            x++;
+            break;
+        }
 
+        case APP_UART_DATA_READY:
+        {
+            //static uint8_t  data_array[BLE_NUS_MAX_DATA_LEN];
+            //static uint8_t  index   = 0;
+            uint8_t         rxData  = 0;
+
+            app_uart_get(&rxData);
+            rxData  = toupper(rxData);
+
+            //index++;
+            //data_array[index]   = rxData;
+            app_uart_put(rxData);
+#if 0
             if ((data_array[index - 1] == '\n') || (index >= (BLE_NUS_MAX_DATA_LEN)))
             {
+                uint32_t       err_code;
                 err_code = ble_nus_string_send(&m_nus, data_array, index);
                 if (err_code != NRF_ERROR_INVALID_STATE)
                 {
@@ -431,7 +445,9 @@ void uart_event_handle(app_uart_evt_t * p_event)
 
                 index = 0;
             }
+#endif
             break;
+        }
 
         case APP_UART_COMMUNICATION_ERROR:
             APP_ERROR_HANDLER(p_event->data.error_communication);
@@ -460,9 +476,9 @@ static void uart_init(void)
         TX_PIN_NUMBER,
         RTS_PIN_NUMBER,
         CTS_PIN_NUMBER,
-        APP_UART_FLOW_CONTROL_ENABLED,
+        APP_UART_FLOW_CONTROL_DISABLED,
         false,
-        UART_BAUDRATE_BAUDRATE_Baud38400
+        UART_BAUDRATE_BAUDRATE_Baud115200
     };
 
     APP_UART_FIFO_INIT( &comm_params,
@@ -543,8 +559,15 @@ int main(void)
 
     // Initialize.
     APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
-    //uart_init();
+    uart_init();
+#if 0
+    while(true)
+    {
+        app_uart_put('A');
+    }
+#endif
     //buttons_leds_init(&erase_bonds);
+#if 1
     ble_stack_init();
     gap_params_init();
     services_init();
@@ -555,8 +578,16 @@ int main(void)
 
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);
-
+#endif
     // Enter main loop.
+#if 0
+    app_uart_put('A');
+    app_uart_put('u');
+    app_uart_put('r');
+    app_uart_put('a');
+    app_uart_put('\r');
+    app_uart_put('\n');
+#endif
     for (;;)
     {
         power_manage();
