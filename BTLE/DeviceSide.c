@@ -11,7 +11,7 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <unistd.h>
-
+#include <string.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,9 +48,9 @@ int     haloFd      = -1;
 typedef struct __attribute__ ((__packed__))
 {
     uint32_t    timestamp;
-    uint32_t    eventType;
+    uint32_t    type;
     uint32_t    numberOfPayloadBytes;
-    uint8_t     payload[1];
+    //uint8_t     payload[1];
 
 } HaloEvent;
 
@@ -63,7 +63,16 @@ typedef void (*EventNotificationHandler)(HaloEvent*);
 //
 void HaloTransmitEvent( HaloEvent* event )
 {
-    write( haloFd, event, sizeof(*event) );
+    int numberOfBytesWritten    = write( haloFd, event, sizeof(*event) );
+    if( numberOfBytesWritten != sizeof(*event) )
+    {
+        //
+        // We didn't manage to write a complete event to the pipe.
+        //
+        InternalFailure();
+    }
+
+    printf("<%d bytes written>\n", numberOfBytesWritten);
 }
 
 
@@ -95,20 +104,43 @@ bool HaloPollForEvent( HaloEvent* event )
     }
     else
     {
-        if(numberOfBytesAvailable > sizeof(*event) )
+        uint32_t            numberOfBytesToRead         = numberOfBytesAvailable;
+        static uint8_t      eventData[sizeof(*event)];
+        static uint32_t     numberOfBytesRead   = 0;
+
+        //
+        // Decide how many bytes we need to read to complete the event.
+        //
+        numberOfBytesToRead     = sizeof(*event);
+        if(numberOfBytesToRead >= numberOfBytesAvailable)
         {
-            ssize_t bytesRead  = read( haloFd, event, sizeof(*event) );
-            if( bytesRead == sizeof(*event) )
-            {
-                success     = true;
-            }
-            else
-            {
-                //
-                // Couldn't read advertised number of bytes.
-                //
-                InternalFailure();
-            }
+            numberOfBytesToRead     = numberOfBytesAvailable;
+        }
+
+        //
+        // Attempt to read the bytes from the pipe.
+        //
+        ssize_t bytesRead  = read( haloFd, &eventData[numberOfBytesRead], numberOfBytesToRead );
+        if(bytesRead != numberOfBytesToRead)
+        {
+            //
+            // Couldn't read advertised number of bytes.
+            //
+            InternalFailure();
+        }
+
+        //
+        // If we've got the correct number of bytes for an event, lets indicate success.
+        //
+        if(numberOfBytesRead >= sizeof(*event) )
+        {
+            memcpy( event, &eventData[0], sizeof(*event) );
+            success             = true;
+            numberOfBytesRead   = 0;
+        }
+        else
+        {
+            numberOfBytesRead   += numberOfBytesToRead;
         }
     }
 
@@ -121,7 +153,7 @@ bool HaloPollForEvent( HaloEvent* event )
 //
 void HaloInitialise()
 {
-    haloFd  = open("/dev/ttyAMA0", O_RDWR | O_NOCTTY | O_NDELAY );
+    haloFd  = open("/dev/ttyAMA0", O_RDWR | O_NONBLOCK | O_NDELAY );
     if(haloFd == -1)
     {
         //
@@ -168,14 +200,16 @@ int main()
         {
             HaloEvent   event;
 
+            printf("<Getting event>\n");
             if(HaloPollForEvent( &event ) == true)
             {
-                printf("<EventReceived>\n");
+                printf( "<EventReceived %08x %08x %08x>\n", event.timestamp, event.type, event.numberOfPayloadBytes );
+                HaloTransmitEvent( &event );
             }
 
-            uint8_t         rxData  = 0;
-            read( haloFd, &rxData, 1 );
-            printf("%c", rxData);
+            //uint8_t         rxData  = 0;
+            //read( haloFd, &rxData, 1 );
+            //printf("%c", rxData);
         }
         else if(ret == 0)
         {

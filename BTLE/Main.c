@@ -41,7 +41,7 @@
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 0                                           /**< Include the service_changed characteristic. If not enabled, the server's database cannot be changed for the lifetime of the device. */
 
-#define DEVICE_NAME                     "AirUI"                               /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "Halo"                               /**< Name of device. Will be included in the advertising data. */
 #define NUS_SERVICE_UUID_TYPE           BLE_UUID_TYPE_VENDOR_BEGIN                  /**< UUID type for the Nordic UART Service (vendor specific). */
 
 #define APP_ADV_INTERVAL                64                                          /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
@@ -402,6 +402,22 @@ void bsp_event_handler(bsp_event_t event)
 }
 
 
+
+
+//
+//
+//
+typedef struct __attribute__ ((__packed__))
+{
+    uint32_t    timestamp;
+    uint32_t    type;
+    uint32_t    numberOfPayloadBytes;
+    //uint8_t     payload[1];
+
+} HaloEvent;
+
+
+
 /**@brief   Function for handling app_uart events.
  *
  * @details This function will receive a single character from the app_uart module and append it to
@@ -423,21 +439,21 @@ void uart_event_handle(app_uart_evt_t * p_event)
 
         case APP_UART_DATA_READY:
         {
-            //static uint8_t  data_array[BLE_NUS_MAX_DATA_LEN];
-            //static uint8_t  index   = 0;
+            static uint8_t  data_array[sizeof(HaloEvent)];
+            static uint8_t  index   = 0;
             uint8_t         rxData  = 0;
 
             app_uart_get(&rxData);
-            rxData  = toupper(rxData);
+            //rxData  = toupper(rxData);
 
-            //index++;
-            //data_array[index]   = rxData;
-            app_uart_put(rxData);
-#if 0
-            if ((data_array[index - 1] == '\n') || (index >= (BLE_NUS_MAX_DATA_LEN)))
+            index++;
+            data_array[index]   = rxData;
+            //app_uart_put(rxData);
+#if 1
+            if( index == sizeof(HaloEvent) )
             {
                 uint32_t       err_code;
-                err_code = ble_nus_string_send(&m_nus, data_array, index);
+                err_code = ble_nus_string_send( &m_nus, data_array, sizeof(HaloEvent) );
                 if (err_code != NRF_ERROR_INVALID_STATE)
                 {
                     APP_ERROR_CHECK(err_code);
