@@ -39,6 +39,9 @@
 #include "bsp_btn_ble.h"
 #include <ctype.h>
 
+#include "Halo.h"
+
+
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 0                                           /**< Include the service_changed characteristic. If not enabled, the server's database cannot be changed for the lifetime of the device. */
 
 #define DEVICE_NAME                     "Halo"                               /**< Name of device. Will be included in the advertising data. */
@@ -69,6 +72,9 @@ static ble_nus_t                        m_nus;                                  
 static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
 
 static ble_uuid_t                       m_adv_uuids[] = {{BLE_UUID_NUS_SERVICE, NUS_SERVICE_UUID_TYPE}};  /**< Universally unique service identifier. */
+
+
+
 
 
 /**@brief Function for assert macro callback.
@@ -401,20 +407,6 @@ void bsp_event_handler(bsp_event_t event)
     }
 }
 
-
-
-
-//
-//
-//
-typedef struct __attribute__ ((__packed__))
-{
-    uint32_t    timestamp;
-    uint32_t    type;
-    uint32_t    numberOfPayloadBytes;
-    //uint8_t     payload[1];
-
-} HaloEvent;
 
 
 
