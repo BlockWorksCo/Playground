@@ -41,6 +41,21 @@ void ValidatePointerForRW( void* pointer )
 }
 
 
+//
+//
+//
+uint32_t GetCurrentTimestamp()
+{
+    static uint32_t     timestamp   = 0;
+    timestamp++;
+
+    return timestamp;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+
 
 int     haloFd      = -1;
 
@@ -192,12 +207,28 @@ int main()
             if(HaloPollForEvent( &event ) == true)
             {
                 printf( "<EventReceived %08x %08x %08x>\n", event.timestamp, event.type, event.numberOfPayloadBytes );
-                HaloTransmitEvent( &event );
+
+                switch(event.type)
+                {
+                    case HALO_IDENTITY:
+                    {
+                        static HaloEvent    identityReponseEvent     =
+                        {
+                            .type                   = HALO_IDENTITY,
+                            .numberOfPayloadBytes   = 0,
+                        };
+                        HaloTransmitEvent( &identityReponseEvent );
+
+                        break;
+                    }
+                    default:
+                    {
+                        HaloTransmitEvent( &event );
+                        break;
+                    }
+                }
             }
 
-            //uint8_t         rxData  = 0;
-            //read( haloFd, &rxData, 1 );
-            //printf("%c", rxData);
         }
         else if(ret == 0)
         {

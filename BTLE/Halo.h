@@ -6,7 +6,7 @@
 #define __HALO_H__
 
 
-
+#define HALO_IDENTITY           (0x00000001)
 
 
 //

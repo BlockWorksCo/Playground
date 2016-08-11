@@ -24,6 +24,8 @@
 package com.example.blockworks.airui;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -203,6 +205,40 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
     };
 
 
+    int     timestamp   = 0;
+
+    //
+    //
+    //
+    private final void TransmitHaloEvent( int type, byte[] payload)
+    {
+        try
+        {
+            //
+            // Get the timestamp;
+            //
+            timestamp++;
+
+            //
+            // form the HaloEvent data.
+            //
+            int[]  event   = {timestamp, type, 0x00000000};
+            ByteBuffer  byteBuffer  = ByteBuffer.allocate( event.length * 4 );
+            IntBuffer   intBuffer   = byteBuffer.asIntBuffer();
+            intBuffer.put(event);
+            byte[]  eventData   = byteBuffer.array();
+
+            //
+            // Send the HaloEvent.
+            //
+            mService.writeRXCharacteristic(eventData);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+    }
 
     //
     //
@@ -277,6 +313,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                         //
                         // Send the request.
                         //
+                        /*
                         String message     = "<Identify>";
                         try
                         {
@@ -287,6 +324,10 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                         {
                             e.printStackTrace();
                         }
+                        */
+
+                        byte[]  payload     = {};
+                        TransmitHaloEvent(0x00000001, payload);
                     }
                 });
 
