@@ -25,6 +25,7 @@ package com.example.blockworks.airui;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -222,8 +223,9 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
             //
             // form the HaloEvent data.
             //
-            int[]  event   = {timestamp, type, 0x00000000};
+            int[]  event   = {timestamp, type, 987654321};
             ByteBuffer  byteBuffer  = ByteBuffer.allocate( event.length * 4 );
+            byteBuffer.order( ByteOrder.LITTLE_ENDIAN );
             IntBuffer   intBuffer   = byteBuffer.asIntBuffer();
             intBuffer.put(event);
             byte[]  eventData   = byteBuffer.array();
@@ -348,6 +350,19 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                          try
                          {
                             String text = new String(txValue, "UTF-8");
+
+                             //
+                             // Parse the data into a HaloEvent.
+                             //
+                             ByteBuffer  byteBuffer  = ByteBuffer.allocate( txValue.length );
+                             byteBuffer.put(txValue);
+                             byteBuffer.order( ByteOrder.LITTLE_ENDIAN );
+                             int    timestamp       = byteBuffer.getInt(0);
+                             int    type            = byteBuffer.getInt(4);
+                             int    bytesInPayload  = byteBuffer.getInt(8);
+
+                             Log.i("Halo", "Received HaloEvent: "+timestamp+" "+type+" "+bytesInPayload );
+
 
                              //
                              // Start the DeviceUIActivity intent.

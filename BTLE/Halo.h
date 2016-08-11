@@ -7,6 +7,7 @@
 
 
 #define HALO_IDENTITY           (0x00000001)
+#define HALO_HEARTBEAT          (0x00000002)
 
 
 //

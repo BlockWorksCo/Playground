@@ -46,7 +46,7 @@ void ValidatePointerForRW( void* pointer )
 //
 uint32_t GetCurrentTimestamp()
 {
-    static uint32_t     timestamp   = 0;
+    static uint32_t     timestamp   = 1000;
     timestamp++;
 
     return timestamp;
@@ -57,7 +57,8 @@ uint32_t GetCurrentTimestamp()
 
 
 
-int     haloFd      = -1;
+int             haloFd              = -1;
+uint32_t        numberOfBytesRead   = 0;
 
 
 
@@ -66,6 +67,14 @@ int     haloFd      = -1;
 //
 void HaloTransmitEvent( HaloEvent* event )
 {
+    //
+    // Get the current timestamp for the event.
+    //
+    event->timestamp     = GetCurrentTimestamp();
+
+    //
+    // Write the event to the pipe.
+    //
     int numberOfBytesWritten    = write( haloFd, event, sizeof(*event) );
     if( numberOfBytesWritten != sizeof(*event) )
     {
@@ -103,18 +112,18 @@ bool HaloPollForEvent( HaloEvent* event )
         //
         // ioctl failed on haloFd.
         //
+        printf("ioctlResult != 0\n");
         InternalFailure();
     }
     else
     {
         uint32_t            numberOfBytesToRead         = numberOfBytesAvailable;
         static uint8_t      eventData[sizeof(*event)];
-        static uint32_t     numberOfBytesRead   = 0;
 
         //
         // Decide how many bytes we need to read to complete the event.
         //
-        numberOfBytesToRead     = sizeof(*event);
+        numberOfBytesToRead     = sizeof(*event) - numberOfBytesRead;
         if(numberOfBytesToRead >= numberOfBytesAvailable)
         {
             numberOfBytesToRead     = numberOfBytesAvailable;
@@ -129,21 +138,22 @@ bool HaloPollForEvent( HaloEvent* event )
             //
             // Couldn't read advertised number of bytes.
             //
+            printf("bytesRead != numberOfBytesToRead (%d != %d, with %d)\n", bytesRead, numberOfBytesToRead, numberOfBytesAvailable);
             InternalFailure();
+        }
+        else
+        {
+            numberOfBytesRead   += numberOfBytesToRead;
         }
 
         //
         // If we've got the correct number of bytes for an event, lets indicate success.
         //
-        if(numberOfBytesRead >= sizeof(*event) )
+        if(numberOfBytesRead == sizeof(*event) )
         {
             memcpy( event, &eventData[0], sizeof(*event) );
             success             = true;
             numberOfBytesRead   = 0;
-        }
-        else
-        {
-            numberOfBytesRead   += numberOfBytesToRead;
         }
     }
 
@@ -199,7 +209,7 @@ int main()
         struct timeval timeout = { 1, 0 }; /* 10 seconds */
 
         int ret = select(haloFd+1, &haloFds, NULL, NULL, &timeout);
-        if (ret ==1)
+        if (ret == 1)
         {
             HaloEvent   event;
 
@@ -207,36 +217,50 @@ int main()
             if(HaloPollForEvent( &event ) == true)
             {
                 printf( "<EventReceived %08x %08x %08x>\n", event.timestamp, event.type, event.numberOfPayloadBytes );
+                fflush(stdout);
 
                 switch(event.type)
                 {
                     case HALO_IDENTITY:
                     {
+                        printf("<HALO_IDENTITY>\n");
+
                         static HaloEvent    identityReponseEvent     =
                         {
+                            .timestamp              = 123,
                             .type                   = HALO_IDENTITY,
-                            .numberOfPayloadBytes   = 0,
+                            .numberOfPayloadBytes   = 123456789,
                         };
                         HaloTransmitEvent( &identityReponseEvent );
 
                         break;
                     }
+
                     default:
                     {
+                        printf("<Unknown>\n");
                         HaloTransmitEvent( &event );
                         break;
                     }
                 }
+            }
+            else
+            {
+                printf("%d/%d\n", numberOfBytesRead, sizeof(event) );
             }
 
         }
         else if(ret == 0)
         {
             perror("timeout error ");
+            numberOfBytesRead   = 0;
+            fflush(stdout);
         }
         else if (ret ==-1)
         {
+            numberOfBytesRead   = 0;
             perror("some other error");
+            fflush(stdout);
         }
 
     }
