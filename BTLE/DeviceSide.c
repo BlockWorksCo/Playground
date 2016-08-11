@@ -40,37 +40,37 @@ void ValidatePointerForRW( void* pointer )
 
 
 
-int     fd      = -1;
+int     haloFd      = -1;
 
 //
 //
 //
-typedef struct
+typedef struct __attribute__ ((__packed__))
 {
     uint32_t    timestamp;
     uint32_t    eventType;
     uint32_t    numberOfPayloadBytes;
     uint8_t     payload[1];
 
-} Event;
+} HaloEvent;
 
-typedef void (*EventNotificationHandler)(Event*);
+typedef void (*EventNotificationHandler)(HaloEvent*);
 
 
 
 //
 //
 //
-void TransmitEvent( Event* event )
+void HaloTransmitEvent( HaloEvent* event )
 {
-    write( fd, event, sizeof(*event) );
+    write( haloFd, event, sizeof(*event) );
 }
 
 
 //
 //
 //
-void RequestEventNotification( EventNotificationHandler handler )
+void HaloRequestEventNotification( EventNotificationHandler handler )
 {
 
 }
@@ -78,26 +78,26 @@ void RequestEventNotification( EventNotificationHandler handler )
 //
 //
 //
-bool PollForEvent( Event* event )
+bool HaloPollForEvent( HaloEvent* event )
 {
     bool    success                 = false;
     int     numberOfBytesAvailable  = 0;
-    int     ioctlResult             = ioctl( fd, FIONREAD, &numberOfBytesAvailable );
+    int     ioctlResult             = ioctl( haloFd, FIONREAD, &numberOfBytesAvailable );
 
     ValidatePointerForRW(event);
 
     if( ioctlResult != 0 )
     {
         //
-        // ioctl failed on fd.
+        // ioctl failed on haloFd.
         //
         InternalFailure();
     }
     else
     {
-        if(numberOfBytesAvailable > sizeof(Event) )
+        if(numberOfBytesAvailable > sizeof(*event) )
         {
-            ssize_t bytesRead  = read( fd, event, sizeof(*event) );
+            ssize_t bytesRead  = read( haloFd, event, sizeof(*event) );
             if( bytesRead == sizeof(*event) )
             {
                 success     = true;
@@ -119,10 +119,10 @@ bool PollForEvent( Event* event )
 //
 //
 //
-void AuraInitialise()
+void HaloInitialise()
 {
-    fd  = open("/dev/ttyAMA0", O_RDWR | O_NOCTTY | O_NDELAY );
-    if(fd == -1)
+    haloFd  = open("/dev/ttyAMA0", O_RDWR | O_NOCTTY | O_NDELAY );
+    if(haloFd == -1)
     {
         //
         // Couldn't open serial port.
@@ -136,7 +136,7 @@ void AuraInitialise()
 ////////////////////////////////////////////////////////////////////////////////
 
 
-void EventHandler(Event* event)
+void HaloEventHandler( HaloEvent* event )
 {
     printf( "<Event received>\n" );
 }
@@ -147,34 +147,34 @@ void EventHandler(Event* event)
 //
 int main()
 {
-    printf("Aura DeviceSide demo.\n");
+    printf("Halo DeviceSide demo.\n");
 
-    AuraInitialise();
+    HaloInitialise();
 
-    RequestEventNotification( EventHandler );
+    HaloRequestEventNotification( HaloEventHandler );
 
     //
     //
     //
     while(true)
     {
-        fd_set fds;
-        FD_ZERO(&fds);
-        FD_SET(fd, &fds);
+        fd_set haloFds;
+        FD_ZERO(&haloFds);
+        FD_SET(haloFd, &haloFds);
         struct timeval timeout = { 1, 0 }; /* 10 seconds */
 
-        int ret = select(fd+1, &fds, NULL, NULL, &timeout);
+        int ret = select(haloFd+1, &haloFds, NULL, NULL, &timeout);
         if (ret ==1)
         {
-            Event   event;
+            HaloEvent   event;
 
-            if(PollForEvent( &event ) == true)
+            if(HaloPollForEvent( &event ) == true)
             {
                 printf("<EventReceived>\n");
             }
 
             uint8_t         rxData  = 0;
-            read( fd, &rxData, 1 );
+            read( haloFd, &rxData, 1 );
             printf("%c", rxData);
         }
         else if(ret == 0)
