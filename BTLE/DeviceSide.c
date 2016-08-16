@@ -1,3 +1,9 @@
+//
+// Copyright (C) BlockWorks Consulting Ltd - All Rights Reserved.
+// Unauthorized copying of this file, via any medium is strictly prohibited.
+// Proprietary and confidential.
+// Written by Steve Tickle <Steve@BlockWorks.co>, August 2016.
+//
 
 
 
@@ -12,6 +18,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include <termios.h>
 
 #include "Halo.h"
 
@@ -84,6 +91,22 @@ void HaloTransmitEvent( HaloEvent* event )
         InternalFailure();
     }
 
+    //
+    //
+    //
+    int     ioctlResult     = tcflush( haloFd, TCIOFLUSH );
+    if( ioctlResult != 0 )
+    {
+        //
+        // ioctl failed on haloFd.
+        //
+        printf("tcflush != 0\n");
+        perror("ioctl:");
+        InternalFailure();
+    }
+
+
+
     printf("<%d bytes written>\n", numberOfBytesWritten);
 }
 
@@ -97,7 +120,17 @@ void HaloRequestEventNotification( EventNotificationHandler handler )
 }
 
 //
-//
+// #define TIOCM_LE    0x001
+// #define TIOCM_DTR   0x002
+// #define TIOCM_RTS   0x004
+// #define TIOCM_ST    0x008
+// #define TIOCM_SR    0x010
+// #define TIOCM_CTS   0x020
+// #define TIOCM_CAR   0x040
+// #define TIOCM_RNG   0x080
+// #define TIOCM_DSR   0x100
+// #define TIOCM_CD    TIOCM_CAR
+// #define TIOCM_RI    TIOCM_RNG
 //
 bool HaloPollForEvent( HaloEvent* event )
 {
@@ -107,12 +140,17 @@ bool HaloPollForEvent( HaloEvent* event )
 
     ValidatePointerForRW(event);
 
+    int status  = 0;
+    ioctl(haloFd, TIOCMGET, &status );
+    printf("port status = %08x\n", status);
+
     if( ioctlResult != 0 )
     {
         //
         // ioctl failed on haloFd.
         //
         printf("ioctlResult != 0\n");
+        perror("ioctl:");
         InternalFailure();
     }
     else
@@ -135,10 +173,15 @@ bool HaloPollForEvent( HaloEvent* event )
         ssize_t bytesRead  = read( haloFd, &eventData[numberOfBytesRead], numberOfBytesToRead );
         if(bytesRead != numberOfBytesToRead)
         {
+            int status  = 0;
+            ioctl(haloFd, TIOCMGET, &status );
+            printf("port status = %08x\n", status);
+
             //
             // Couldn't read advertised number of bytes.
             //
             printf("bytesRead != numberOfBytesToRead (%d != %d, with %d)\n", bytesRead, numberOfBytesToRead, numberOfBytesAvailable);
+            perror("read:");
             InternalFailure();
         }
         else
@@ -166,7 +209,7 @@ bool HaloPollForEvent( HaloEvent* event )
 //
 void HaloInitialise()
 {
-    haloFd  = open("/dev/ttyAMA0", O_RDWR | O_NONBLOCK | O_NDELAY );
+    haloFd  = open("/dev/ttyAMA0", O_RDWR | O_NOCTTY  | O_NDELAY );
     if(haloFd == -1)
     {
         //
@@ -206,7 +249,7 @@ int main()
         fd_set haloFds;
         FD_ZERO(&haloFds);
         FD_SET(haloFd, &haloFds);
-        struct timeval timeout = { 1, 0 }; /* 10 seconds */
+        struct timeval timeout = { 1, 0 }; /* 1 seconds */
 
         int ret = select(haloFd+1, &haloFds, NULL, NULL, &timeout);
         if (ret == 1)

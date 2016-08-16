@@ -143,7 +143,7 @@ static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t lengt
     }
     while(app_uart_put('\n') != NRF_SUCCESS);
 #endif
-
+#if 0
     if(length > 0)
     {
         //
@@ -165,6 +165,7 @@ static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t lengt
             ble_nus_string_send(&m_nus, p_data, length);
         }
     }
+#endif
 
 }
 /**@snippet [Handling the data received over BLE] */
@@ -436,12 +437,10 @@ void uart_event_handle(app_uart_evt_t * p_event)
             uint8_t         rxData  = 0;
 
             app_uart_get(&rxData);
-            //rxData  = toupper(rxData);
 
-            index++;
             data_array[index]   = rxData;
-            //app_uart_put(rxData);
-#if 1
+            index   = (index + 1) % sizeof(data_array);
+
             if( index == sizeof(HaloEvent) )
             {
                 uint32_t       err_code;
@@ -453,7 +452,7 @@ void uart_event_handle(app_uart_evt_t * p_event)
 
                 index = 0;
             }
-#endif
+
             break;
         }
 
