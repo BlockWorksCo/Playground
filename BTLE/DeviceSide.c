@@ -171,7 +171,7 @@ bool HaloPollForEvent( HaloEvent* event )
         // Attempt to read the bytes from the pipe.
         //
         ssize_t bytesRead  = read( haloFd, &eventData[numberOfBytesRead], numberOfBytesToRead );
-        if(bytesRead != numberOfBytesToRead)
+        if(bytesRead < 0)
         {
             int status  = 0;
             ioctl(haloFd, TIOCMGET, &status );
@@ -186,7 +186,7 @@ bool HaloPollForEvent( HaloEvent* event )
         }
         else
         {
-            numberOfBytesRead   += numberOfBytesToRead;
+            numberOfBytesRead   += bytesRead;
         }
 
         //
@@ -209,7 +209,7 @@ bool HaloPollForEvent( HaloEvent* event )
 //
 void HaloInitialise()
 {
-    haloFd  = open("/dev/ttyAMA0", O_RDWR | O_NOCTTY  | O_NDELAY );
+    haloFd  = open("/dev/ttyAMA0", O_RDWR | O_NOCTTY );
     if(haloFd == -1)
     {
         //
@@ -217,6 +217,11 @@ void HaloInitialise()
         //
         InternalFailure();
     }
+
+    //
+    //
+    //
+    fcntl( haloFd, F_SETFL, FNDELAY);
 
 }
 
