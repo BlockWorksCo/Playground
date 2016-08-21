@@ -20,11 +20,22 @@ uint32_t        returnAddressStackHead      = 0;
 
 
 
+//
+// - Use MPU to make page writable.
+// - Push address.
+// - Use MPU to make page inaccessible.
+//
 void PushToAddressStack( address_t address )
 {
+    //
+    // Push
+    //
     returnAddressStack[returnAddressStackHead]  = address;
     returnAddressStackHead++;
 
+    //
+    // Check.
+    //
     if( returnAddressStackHead >= NUMBER_OF_ELEMENTS(returnAddressStack) )
     {
         printf("<Underflow of returnStack>\n" );
@@ -32,8 +43,16 @@ void PushToAddressStack( address_t address )
     }
 }
 
+//
+// - Use MPU to make page writable.
+// - Pop address.
+// - Use MPU to make page inaccessible.
+//
 address_t PopFromAddressStack()
 {
+    //
+    // Check.
+    //
     returnAddressStackHead--;
 
     if( returnAddressStackHead < 0 )
@@ -42,10 +61,19 @@ address_t PopFromAddressStack()
         exit(-1);
     }
 
+    //
+    // Pop.
+    //
     address_t   address = returnAddressStack[returnAddressStackHead];
     return address;
 }
 
+
+
+
+//
+// - Push address of caller.
+//
 void __cyg_profile_func_enter (void *func,  void *caller)
 {
     printf("e %p %p %lu\n", func, caller, time(NULL) );
@@ -53,17 +81,23 @@ void __cyg_profile_func_enter (void *func,  void *caller)
     PushToAddressStack( caller );
 }
 
+//
+// - Pop address of caller.
+// - If caller doesn't match saved caller, PANIC.
+//
 void __cyg_profile_func_exit (void *func, void *caller)
 {
     printf("x %p %p %lu\n", func, caller, time(NULL));
 
+    //
+    // Check for match against duplicate.
+    //
     address_t   realAddress     = PopFromAddressStack();
     if(caller != realAddress )
     {
         printf("<Mismatch! %p != %p>\n", caller, realAddress );
-        //exit(-1);
+        exit(-1);
     }
-
 }
 
 
