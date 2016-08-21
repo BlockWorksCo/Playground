@@ -44,12 +44,27 @@ void __cyg_profile_func_exit (void *func, void *caller)
 
 
 
+
+
+
+void FuncBAD()
+{
+    uint32_t    blaa[1];
+
+    printf("BAD\n");
+    blaa[6]    = (address_t)&FuncBAD;
+}
+
+
+
+
+
 void FuncC()
 {
     uint32_t    blaa[1];
 
     printf("C\n");
-    blaa[6]    = 0x0123abcd;
+    blaa[6]    = (address_t)&FuncBAD;
 }
 
 
