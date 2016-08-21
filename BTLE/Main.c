@@ -409,6 +409,8 @@ void bsp_event_handler(bsp_event_t event)
 }
 
 
+static uint8_t  data_array[sizeof(HaloEvent)];
+static uint8_t  dataIndex   = 0;
 
 
 /**@brief   Function for handling app_uart events.
@@ -432,16 +434,14 @@ void uart_event_handle(app_uart_evt_t * p_event)
 
         case APP_UART_DATA_READY:
         {
-            static uint8_t  data_array[sizeof(HaloEvent)];
-            static uint8_t  index   = 0;
             uint8_t         rxData  = 0;
 
             app_uart_get(&rxData);
 
-            data_array[index]   = rxData;
-            index   = (index + 1) % sizeof(data_array);
+            data_array[dataIndex]   = rxData;
+            dataIndex   = (dataIndex + 1) % sizeof(data_array);
 
-            if( index == sizeof(HaloEvent) )
+            if( dataIndex == sizeof(HaloEvent) )
             {
                 uint32_t       err_code;
                 err_code = ble_nus_string_send( &m_nus, data_array, sizeof(HaloEvent) );
@@ -450,7 +450,7 @@ void uart_event_handle(app_uart_evt_t * p_event)
                     APP_ERROR_CHECK(err_code);
                 }
 
-                index = 0;
+                dataIndex = 0;
             }
 
             break;
