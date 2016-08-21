@@ -22,29 +22,34 @@ uint32_t        returnAddressStackHead      = 0;
 
 void __cyg_profile_func_enter (void *func,  void *caller)
 {
+    printf("e %p %p %lu\n", func, caller, time(NULL) );
+
     returnAddressStack[returnAddressStackHead]  = caller;
     returnAddressStackHead++;
 
-    printf("e %p %p %lu\n", func, caller, time(NULL) );
 }
 
 void __cyg_profile_func_exit (void *func, void *caller)
 {
+    printf("x %p %p %lu\n", func, caller, time(NULL));
+
     returnAddressStackHead--;
     if(caller != returnAddressStack[returnAddressStackHead] )
     {
-        printf("<Mismatch!>\n");
+        printf("<Mismatch! %p != %p>\n", caller, returnAddressStack[returnAddressStackHead] );
         exit(-1);
     }
 
-    printf("x %p %p %lu\n", func, caller, time(NULL));
 }
 
 
 
 void FuncC()
 {
+    uint32_t    blaa[1];
+
     printf("C\n");
+    blaa[6]    = 0x0123abcd;
 }
 
 
