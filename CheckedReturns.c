@@ -1,5 +1,5 @@
 //
-// gcc -finstrument-functions  -finstrument-functions-exclude-function-list=__cyg_profile_func_enter,__cyg_profile_func_exit    -o CheckedReturns CheckedReturns.c
+// gcc -finstrument-functions  -finstrument-functions-exclude-function-list=__cyg_profile_func_enter,__cyg_profile_func_exit,PushToAddressStack,PopFromAddressStack    -o CheckedReturns CheckedReturns.c
 //
 
 
@@ -11,6 +11,8 @@
 
 
 
+#define NUMBER_OF_ELEMENTS(a)       (sizeof(a)/sizeof(a[0]))
+
 typedef void*       address_t;
 
 address_t       returnAddressStack[1024]    = {0};
@@ -18,26 +20,48 @@ uint32_t        returnAddressStackHead      = 0;
 
 
 
+void PushToAddressStack( address_t address )
+{
+    returnAddressStack[returnAddressStackHead]  = address;
+    returnAddressStackHead++;
 
+    if( returnAddressStackHead >= NUMBER_OF_ELEMENTS(returnAddressStack) )
+    {
+        printf("<Underflow of returnStack>\n" );
+        exit(-1);
+    }
+}
+
+address_t PopFromAddressStack()
+{
+    returnAddressStackHead--;
+
+    if( returnAddressStackHead < 0 )
+    {
+        printf("<Underflow of returnStack>\n" );
+        exit(-1);
+    }
+
+    address_t   address = returnAddressStack[returnAddressStackHead];
+    return address;
+}
 
 void __cyg_profile_func_enter (void *func,  void *caller)
 {
     printf("e %p %p %lu\n", func, caller, time(NULL) );
 
-    returnAddressStack[returnAddressStackHead]  = caller;
-    returnAddressStackHead++;
-
+    PushToAddressStack( caller );
 }
 
 void __cyg_profile_func_exit (void *func, void *caller)
 {
     printf("x %p %p %lu\n", func, caller, time(NULL));
 
-    returnAddressStackHead--;
-    if(caller != returnAddressStack[returnAddressStackHead] )
+    address_t   realAddress     = PopFromAddressStack();
+    if(caller != realAddress )
     {
-        printf("<Mismatch! %p != %p>\n", caller, returnAddressStack[returnAddressStackHead] );
-        exit(-1);
+        printf("<Mismatch! %p != %p>\n", caller, realAddress );
+        //exit(-1);
     }
 
 }
@@ -49,10 +73,10 @@ void __cyg_profile_func_exit (void *func, void *caller)
 
 void FuncBAD()
 {
-    uint32_t    blaa[1];
+    address_t    blaa[1];
 
     printf("BAD\n");
-    blaa[6]    = (address_t)&FuncBAD;
+    blaa[3]    = (address_t)&FuncBAD;
 }
 
 
@@ -61,10 +85,10 @@ void FuncBAD()
 
 void FuncC()
 {
-    uint32_t    blaa[1];
+    address_t    blaa[1];
 
     printf("C\n");
-    blaa[6]    = (address_t)&FuncBAD;
+    blaa[3]    = (address_t)&FuncBAD;
 }
 
 
