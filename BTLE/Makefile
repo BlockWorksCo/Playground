@@ -19,9 +19,9 @@ CFLAGS 		+= -mcpu=cortex-m0
 CFLAGS 		+= -mthumb
 CFLAGS 		+= -mabi=aapcs
 CFLAGS 		+= --std=gnu99
-CFLAGS 		+= -Wall
+#CFLAGS 		+= -Wall
 CFLAGS 		+= -Werror
-CFLAGS 		+= -O3
+#CFLAGS 		+= -O3
 CFLAGS 		+= -g3
 CFLAGS 		+= -mfloat-abi=soft
 
@@ -75,7 +75,7 @@ OBJECTS 	+= system_nrf51.o
 OBJECTS 	+= app_fifo.o
 OBJECTS 	+= app_trace.o
 OBJECTS 	+= retarget.o
-OBJECTS 	+= app_uart_fifo.o
+OBJECTS 	+= app_uart.o
 OBJECTS 	+= nrf_delay.o
 OBJECTS 	+= nrf_drv_uart.o
 OBJECTS 	+= pstorage.o

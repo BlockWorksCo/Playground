@@ -38,6 +38,7 @@
 #include "bsp.h"
 #include "bsp_btn_ble.h"
 #include <ctype.h>
+#include "nrf_drv_uart.h"
 
 #include "Halo.h"
 
@@ -139,9 +140,15 @@ static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t lengt
 #if 1
     for (uint32_t i = 0; i < length; i++)
     {
-        while(app_uart_put(p_data[i]) != NRF_SUCCESS);
+        //while(app_uart_put(p_data[i]) != NRF_SUCCESS);
+        app_uart_put( p_data[i] );
     }
-    while(app_uart_put('\n') != NRF_SUCCESS);
+    //while(app_uart_put('\n') != NRF_SUCCESS);
+    app_uart_put('\n');
+
+    uint8_t     txData[] = "<blaa>";
+    ble_nus_string_send( &m_nus, &txData[0], sizeof(txData) );
+
 #endif
 #if 0
     if(length > 0)
@@ -409,8 +416,8 @@ void bsp_event_handler(bsp_event_t event)
 }
 
 
-static uint8_t  data_array[sizeof(HaloEvent)];
-static uint8_t  dataIndex   = 0;
+static volatile  uint8_t  data_array[sizeof(HaloEvent)];
+static volatile  uint8_t  dataIndex   = 0;
 
 
 /**@brief   Function for handling app_uart events.
@@ -432,7 +439,7 @@ void uart_event_handle(app_uart_evt_t * p_event)
             break;
         }
 
-        case APP_UART_DATA_READY:
+        case APP_UART_DATA:
         {
             uint8_t         rxData  = 0;
 
@@ -441,23 +448,11 @@ void uart_event_handle(app_uart_evt_t * p_event)
             data_array[dataIndex]   = rxData;
             dataIndex   = (dataIndex + 1) % sizeof(data_array);
 
-            if( dataIndex == sizeof(HaloEvent) )
-            {
-                uint32_t       err_code;
-                err_code = ble_nus_string_send( &m_nus, data_array, sizeof(HaloEvent) );
-                if (err_code != NRF_ERROR_INVALID_STATE)
-                {
-                    APP_ERROR_CHECK(err_code);
-                }
-
-                dataIndex = 0;
-            }
-
             break;
         }
 
         case APP_UART_COMMUNICATION_ERROR:
-            APP_ERROR_HANDLER(p_event->data.error_communication);
+            //APP_ERROR_HANDLER(p_event->data.error_communication);
             break;
 
         case APP_UART_FIFO_ERROR:
@@ -485,12 +480,10 @@ static void uart_init(void)
         CTS_PIN_NUMBER,
         APP_UART_FLOW_CONTROL_DISABLED,
         false,
-        UART_BAUDRATE_BAUDRATE_Baud115200
+        UART_BAUDRATE_BAUDRATE_Baud57600
     };
 
-    APP_UART_FIFO_INIT( &comm_params,
-                       UART_RX_BUF_SIZE,
-                       UART_TX_BUF_SIZE,
+    APP_UART_INIT( &comm_params,
                        uart_event_handle,
                        APP_IRQ_PRIORITY_LOW,
                        err_code);
@@ -595,9 +588,35 @@ int main(void)
     app_uart_put('\r');
     app_uart_put('\n');
 #endif
-    for (;;)
+    dataIndex   = 0;
+    while(true)
     {
-        power_manage();
+        //
+        //
+        //
+        for(uint32_t i=0; i<dataIndex; i++)
+        {
+            uint32_t       err_code;
+            /*
+            err_code = ble_nus_string_send( &m_nus, data_array, sizeof(HaloEvent) );
+            if (err_code != NRF_ERROR_INVALID_STATE)
+            {
+                APP_ERROR_CHECK(err_code);
+            }
+            */
+            while(app_uart_put('<') != NRF_SUCCESS);
+            while(app_uart_put(data_array[i]) != NRF_SUCCESS);
+            while(app_uart_put('>') != NRF_SUCCESS);
+            //uint8_t     data[]  = ".";
+            //nrf_drv_uart_tx(&data[dataIndex], 1);
+
+            dataIndex--;
+        }
+
+        //
+        //
+        //
+        //power_manage();
     }
 }
 
