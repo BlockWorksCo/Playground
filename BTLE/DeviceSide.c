@@ -136,52 +136,68 @@ bool HaloPollForEvent( HaloEvent* event )
 {
     bool    success                 = false;
     int     numberOfBytesAvailable  = 0;
+    int     ioctlResult             = ioctl( haloFd, FIONREAD, &numberOfBytesAvailable );
 
     ValidatePointerForRW(event);
 
-    uint32_t            numberOfBytesToRead         = numberOfBytesAvailable;
-    static uint8_t      eventData[sizeof(*event)];
+    int status  = 0;
+    ioctl(haloFd, TIOCMGET, &status );
+    printf("port status = %08x\n", status);
 
-    //
-    // Decide how many bytes we need to read to complete the event.
-    //
-    numberOfBytesToRead     = sizeof(*event) - numberOfBytesRead;
-    if(numberOfBytesToRead >= numberOfBytesAvailable)
+    if( ioctlResult != 0 )
     {
-        numberOfBytesToRead     = numberOfBytesAvailable;
-    }
-
-    //
-    // Attempt to read the bytes from the pipe.
-    //
-    ssize_t bytesRead  = read( haloFd, &eventData[numberOfBytesRead], numberOfBytesToRead );
-    if(bytesRead < 0)
-    {
-        int status  = 0;
-        ioctl(haloFd, TIOCMGET, &status );
-        printf("port status = %08x\n", status);
-
         //
-        // Couldn't read advertised number of bytes.
+        // ioctl failed on haloFd.
         //
-        printf("bytesRead != numberOfBytesToRead (%d != %d, with %d)\n", bytesRead, numberOfBytesToRead, numberOfBytesAvailable);
-        perror("read:");
+        printf("ioctlResult != 0\n");
+        perror("ioctl:");
         InternalFailure();
     }
     else
     {
-        numberOfBytesRead   += bytesRead;
-    }
+        uint32_t            numberOfBytesToRead         = numberOfBytesAvailable;
+        static uint8_t      eventData[sizeof(*event)];
 
-    //
-    // If we've got the correct number of bytes for an event, lets indicate success.
-    //
-    if(numberOfBytesRead >= sizeof(*event) )
-    printf("Got full event (%d).\n", numberOfBytesRead);
-    {
-        memcpy( event, &eventData[0], sizeof(*event) );
-        success             = true;
-        numberOfBytesRead   = 0;
+        //
+        // Decide how many bytes we need to read to complete the event.
+        //
+        numberOfBytesToRead     = sizeof(*event) - numberOfBytesRead;
+        if(numberOfBytesToRead >= numberOfBytesAvailable)
+        {
+            numberOfBytesToRead     = numberOfBytesAvailable;
+        }
+
+        //
+        // Attempt to read the bytes from the pipe.
+        //
+        ssize_t bytesRead  = read( haloFd, &eventData[numberOfBytesRead], numberOfBytesToRead );
+        if(bytesRead < 0)
+        {
+            int status  = 0;
+            ioctl(haloFd, TIOCMGET, &status );
+            printf("port status = %08x\n", status);
+
+            //
+            // Couldn't read advertised number of bytes.
+            //
+            printf("bytesRead != numberOfBytesToRead (%d != %d, with %d)\n", bytesRead, numberOfBytesToRead, numberOfBytesAvailable);
+            perror("read:");
+            InternalFailure();
+        }
+        else
+        {
+            numberOfBytesRead   += bytesRead;
+        }
+
+        //
+        // If we've got the correct number of bytes for an event, lets indicate success.
+        //
+        if(numberOfBytesRead == sizeof(*event) )
+        {
+            memcpy( event, &eventData[0], sizeof(*event) );
+            success             = true;
+            numberOfBytesRead   = 0;
+        }
     }
 
     return success;
