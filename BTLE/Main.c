@@ -624,7 +624,22 @@ int main(void)
         uint8_t         rxData  = 0;
         if( app_uart_get(&rxData) == NRF_SUCCESS)
         {
-            while( app_uart_put(rxData) != NRF_SUCCESS );
+            static uint8_t     inBytes[12]     = {0};
+            static uint32_t    numberOfBytesIn = 0;
+
+            inBytes[numberOfBytesIn]    = rxData;
+            numberOfBytesIn++;
+            if(numberOfBytesIn >= sizeof(inBytes))
+            {
+                numberOfBytesIn     = 0;
+                for(uint32_t i=0; i<numberOfBytesIn; i++)
+                {
+                    while( app_uart_put(rxData) != NRF_SUCCESS );
+                }
+
+                ble_nus_string_send( &m_nus, &inBytes[0], sizeof(inBytes) );
+            }
+
         }
 
         //
