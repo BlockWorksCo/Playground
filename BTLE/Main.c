@@ -439,14 +439,15 @@ void uart_event_handle(app_uart_evt_t * p_event)
             break;
         }
 
+        case APP_UART_DATA_READY:
         case APP_UART_DATA:
         {
             uint8_t         rxData  = 0;
 
-            app_uart_get(&rxData);
+            //app_uart_get(&rxData);
 
-            data_array[dataIndex]   = rxData;
-            dataIndex   = (dataIndex + 1) % sizeof(data_array);
+            //data_array[dataIndex]   = rxData;
+            //dataIndex   = (dataIndex + 1) % sizeof(data_array);
 
             break;
         }
@@ -483,7 +484,9 @@ static void uart_init(void)
         UART_BAUDRATE_BAUDRATE_Baud57600
     };
 
-    APP_UART_INIT( &comm_params,
+    APP_UART_FIFO_INIT( &comm_params,
+                        64,
+                        64,
                        uart_event_handle,
                        APP_IRQ_PRIORITY_LOW,
                        err_code);
@@ -591,6 +594,8 @@ int main(void)
     dataIndex   = 0;
     while(true)
     {
+
+#if 0
         //
         //
         //
@@ -604,13 +609,22 @@ int main(void)
                 APP_ERROR_CHECK(err_code);
             }
             */
-            while(app_uart_put('<') != NRF_SUCCESS);
-            while(app_uart_put(data_array[i]) != NRF_SUCCESS);
-            while(app_uart_put('>') != NRF_SUCCESS);
+            //while(app_uart_put('<') != NRF_SUCCESS);
+            //while(app_uart_put(data_array[i]) != NRF_SUCCESS);
+            //app_uart_put( data_array[i] );
+            //while(app_uart_put('>') != NRF_SUCCESS);
             //uint8_t     data[]  = ".";
             //nrf_drv_uart_tx(&data[dataIndex], 1);
 
-            dataIndex--;
+
+        }
+        dataIndex   = 0;
+#endif
+
+        uint8_t         rxData  = 0;
+        if( app_uart_get(&rxData) == NRF_SUCCESS)
+        {
+            while( app_uart_put(rxData) != NRF_SUCCESS );
         }
 
         //
