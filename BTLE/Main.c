@@ -135,19 +135,30 @@ static void gap_params_init(void)
  * @param[in] length   Length of the data.
  */
 /**@snippet [Handling the data received over BLE] */
+
+uint8_t     receivedEventData[sizeof(HaloEvent)]    = {0};
+uint32_t    numberOfReceivedEvents                  = 0;
+
 static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t length)
 {
 #if 1
-    for (uint32_t i = 0; i < length; i++)
-    {
-        //while(app_uart_put(p_data[i]) != NRF_SUCCESS);
-        app_uart_put( p_data[i] );
-    }
-    //while(app_uart_put('\n') != NRF_SUCCESS);
-    app_uart_put('\n');
 
-    uint8_t     txData[] = "<blaa>";
-    ble_nus_string_send( &m_nus, &txData[0], sizeof(txData) );
+    if(length == sizeof(HaloEvent))
+    {
+        memcpy( &receivedEventData[0], p_data, sizeof(HaloEvent) );
+        numberOfReceivedEvents++;
+    }
+
+    //for (uint32_t i = 0; i < length; i++)
+    //{
+        //while(app_uart_put(p_data[i]) != NRF_SUCCESS);
+        //app_uart_put( p_data[i] );
+    //}
+    //while(app_uart_put('\n') != NRF_SUCCESS);
+    //app_uart_put('\n');
+
+    //uint8_t     txData[] = "<blaa>";
+    //ble_nus_string_send( &m_nus, &txData[0], sizeof(txData) );
 
 #endif
 #if 0
@@ -621,25 +632,36 @@ int main(void)
         dataIndex   = 0;
 #endif
 
+        //
+        //
+        //
         uint8_t         rxData  = 0;
         if( app_uart_get(&rxData) == NRF_SUCCESS)
         {
-            static uint8_t     inBytes[12]     = {0};
+            static uint8_t     inBytes[sizeof(HaloEvent)]     = {0};
             static uint32_t    numberOfBytesIn = 0;
 
             inBytes[numberOfBytesIn]    = rxData;
             numberOfBytesIn++;
             if(numberOfBytesIn >= sizeof(inBytes))
             {
+                ble_nus_string_send( &m_nus, &inBytes[0], numberOfBytesIn );
                 numberOfBytesIn     = 0;
-                for(uint32_t i=0; i<numberOfBytesIn; i++)
-                {
-                    while( app_uart_put(rxData) != NRF_SUCCESS );
-                }
-
-                ble_nus_string_send( &m_nus, &inBytes[0], sizeof(inBytes) );
             }
 
+        }
+
+        //
+        //
+        //
+        while(numberOfReceivedEvents > 0)
+        {
+            for(uint32_t i=0; i<sizeof(receivedEventData); i++)
+            {
+                while(app_uart_put( receivedEventData[i] ) != NRF_SUCCESS);
+            }
+
+            numberOfReceivedEvents--;
         }
 
         //
