@@ -74,6 +74,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
     private BluetoothAdapter mBtAdapter = null;
     private Intent uiIntent;
     private DeviceServer    deviceServer    = null;
+    private boolean         connected       = false;
 
     private BluetoothLeScanner mLEScanner;
     //private ScanSettings settings;
@@ -139,7 +140,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
             // Check the proximity to the target device.
             // If we're close enough, connect and interrogate it.
             //
-            if( (rssi >= -60) && (mService != null))
+            if( (rssi >= -60) && (mService != null) && (connected == false) )
             {
                 //
                 // Stop the scan.
@@ -163,6 +164,11 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                         mService.connect( device.getAddress() );
                     }
                 });
+
+                //
+                // Mark ourselves as connected.
+                //
+                connected    = true;
 
             }
         }
@@ -269,6 +275,11 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 finishActivity(123);
 
                 Log.d(TAG, "UART_DISCONNECT_MSG");
+
+                //
+                // Mar ourselves as disconnected.
+                //
+                connected   = false;
 
                 //
                 // Start the scan.
