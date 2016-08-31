@@ -211,43 +211,6 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
         }
     };
 
-
-    int     timestamp   = 0;
-
-    //
-    //
-    //
-    private final void TransmitHaloEvent( int type, byte[] payload)
-    {
-        try
-        {
-            //
-            // Get the timestamp;
-            //
-            timestamp++;
-
-            //
-            // form the HaloEvent data.
-            //
-            int[]  event   = {timestamp, type, 987654321};
-            ByteBuffer  byteBuffer  = ByteBuffer.allocate( event.length * 4 );
-            byteBuffer.order( ByteOrder.LITTLE_ENDIAN );
-            IntBuffer   intBuffer   = byteBuffer.asIntBuffer();
-            intBuffer.put(event);
-            byte[]  eventData   = byteBuffer.array();
-
-            //
-            // Send the HaloEvent.
-            //
-            mService.writeRXCharacteristic(eventData);
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-
-    }
-
     //
     //
     //
@@ -340,7 +303,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                         */
 
                         byte[]  payload     = {};
-                        TransmitHaloEvent(0x00000001, payload);
+                        mService.TransmitHaloEvent(0x00000001, payload);
                     }
                 });
 

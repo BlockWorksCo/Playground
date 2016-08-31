@@ -41,6 +41,9 @@ import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -236,6 +239,43 @@ public class UartService extends Service
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
+
+
+    int     timestamp   = 0;
+
+    //
+    //
+    //
+    void TransmitHaloEvent( int type, byte[] payload)
+    {
+        try
+        {
+            //
+            // Get the timestamp;
+            //
+            timestamp++;
+
+            //
+            // form the HaloEvent data.
+            //
+            int[]  event   = {timestamp, type, 987654321};
+            ByteBuffer byteBuffer  = ByteBuffer.allocate( event.length * 4 );
+            byteBuffer.order( ByteOrder.LITTLE_ENDIAN );
+            IntBuffer intBuffer   = byteBuffer.asIntBuffer();
+            intBuffer.put(event);
+            byte[]  eventData   = byteBuffer.array();
+
+            //
+            // Send the HaloEvent.
+            //
+            writeRXCharacteristic(eventData);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+    }
 
 
     //
