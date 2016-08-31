@@ -380,7 +380,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                              //
                              uiIntent = new Intent(MainActivity.this, DeviceUIActivity.class);
                              Bundle b = new Bundle();
-                             b.putString("Identity", text);
+                             b.putInt("Identity", bytesInPayload);
                              uiIntent .putExtras(b);
                              startActivityForResult(uiIntent , 123);
                          }

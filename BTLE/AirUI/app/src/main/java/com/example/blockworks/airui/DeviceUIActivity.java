@@ -7,10 +7,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import java.util.Locale;
 
 
 /**
@@ -110,7 +113,7 @@ public class DeviceUIActivity extends Activity
         //
         // Form the URL for the device UI.
         //
-        String  url     = "http://ZooKoo.com/DeviceUI/" + b.getString("Identity");
+        String  url     = String.format( Locale.UK, "http://ZooKoo.com/DeviceUI/%08d", b.getInt("Identity") );
         Log.i("DeviceUI","loading URL: "+url);
 
 

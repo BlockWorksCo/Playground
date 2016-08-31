@@ -277,7 +277,7 @@ int main()
                         {
                             .timestamp              = 123,
                             .type                   = HALO_IDENTITY,
-                            .numberOfPayloadBytes   = 123456789,
+                            .numberOfPayloadBytes   = 0x00000000,
                         };
                         HaloTransmitEvent( &identityReponseEvent );
 
