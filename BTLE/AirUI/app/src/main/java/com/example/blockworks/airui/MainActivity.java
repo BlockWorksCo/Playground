@@ -93,12 +93,11 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
 
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        service_init();
 
         //
         //
         //
-        deviceServer    = new DeviceServer();
+        service_init();
 
         //
         // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
@@ -203,6 +202,12 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                     Log.e(TAG, "Unable to initialize Bluetooth");
                     finish();
                 }
+
+                //
+                // Now create the DeviceServer that can see the UartService.
+                //
+                deviceServer    = new DeviceServer( mService );
+
         }
 
         public void onServiceDisconnected(ComponentName classname)

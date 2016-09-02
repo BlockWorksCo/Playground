@@ -3,16 +3,19 @@ package com.example.blockworks.airui;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
-import android.text.format.Formatter;
 import android.util.Log;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
 import java.util.Locale;
 
 
@@ -22,6 +25,7 @@ import java.util.Locale;
  */
 public class DeviceUIActivity extends Activity
 {
+
     /**
      * Some older devices needs a small delay between UI widget updates
      * and a change of the status and navigation bar.
@@ -215,5 +219,8 @@ public class DeviceUIActivity extends Activity
         setResult(Activity.RESULT_CANCELED, null);
         finish();
     }
+
+
+
 
 }

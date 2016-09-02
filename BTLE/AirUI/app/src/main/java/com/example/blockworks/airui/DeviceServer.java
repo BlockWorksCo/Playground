@@ -1,8 +1,12 @@
 package com.example.blockworks.airui;
 
 import android.app.IntentService;
+import android.bluetooth.BluetoothClass;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.Context;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -33,19 +37,74 @@ public class DeviceServer extends IntentService
     private static final String EXTRA_PARAM1 = "com.example.blockworks.airui.extra.PARAM1";
     private static final String EXTRA_PARAM2 = "com.example.blockworks.airui.extra.PARAM2";
 
+
+
+
+    private  UartService mService = null;
+    boolean mBound         = false;
+
+
+
+
+    //
+    // UART service connected/disconnected
+    //
+    private ServiceConnection mServiceConnection = new ServiceConnection()
+    {
+        public void onServiceConnected(ComponentName className, IBinder rawBinder)
+        {
+            mService = ((UartService.LocalBinder) rawBinder).getService();
+            //Log.d(TAG, "onServiceConnected mService= " + mService);
+            if (!mService.initialize())
+            {
+                //Log.e(TAG, "Unable to initialize Bluetooth");
+                //finish();
+            }
+        }
+
+        public void onServiceDisconnected(ComponentName classname)
+        {
+            mService = null;
+        }
+    };
+
+
+
     Thread          serverThread    = null;
     private int     readCounter     = 0;
+    private Context context         = null;
 
     //
     //
     //
-    public DeviceServer()
+    public DeviceServer(UartService _uartService)
     {
         super("DeviceServer");
-        this.serverThread = new Thread(new ServerThread());
-        this.serverThread.start();
 
+        //
+        //
+        //
+        mService    = _uartService;
+
+        ServerThread t = new ServerThread();
+        this.serverThread = new Thread(t);
+        this.serverThread.start();
     }
+
+    //
+    //
+    //
+    public void initialise()
+    {
+        //
+        //
+        //
+        Intent intent = new Intent(context, UartService.class);
+        bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+        //bindService(intent, mServiceConnection, 0 );
+    }
+
+
 
     /**
      * Starts this service to perform action Foo with the given parameters. If
@@ -112,8 +171,12 @@ public class DeviceServer extends IntentService
     }
 
 
-
-
+    @Override
+    public void onCreate()
+    {
+        initialise();
+        //bindService(this);
+    }
 
 
     //
@@ -123,12 +186,15 @@ public class DeviceServer extends IntentService
     {
         private InputStream input;
 
+
         //
         //
         //
         public ServerThread()
         {
         }
+
+
 
         //
         //
@@ -188,6 +254,11 @@ public class DeviceServer extends IntentService
                     output.flush();
                     socket.close();
 
+                    //
+                    //
+                    //
+                    byte[]  payload     = {};
+                    mService.TransmitHaloEvent(0x00000001, payload);
                 }
                 catch (IOException e)
                 {
