@@ -75,6 +75,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
     private Intent uiIntent;
     private DeviceServer    deviceServer    = null;
     private boolean         connected       = false;
+    private boolean         displayActiveFlag   = false;
 
     private BluetoothLeScanner mLEScanner;
     //private ScanSettings settings;
@@ -248,6 +249,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 // Mar ourselves as disconnected.
                 //
                 connected   = false;
+                displayActiveFlag   = false;
 
                 //
                 // Start the scan.
@@ -328,30 +330,37 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                      {
                          try
                          {
-                            String text = new String(txValue, "UTF-8");
+                             if(displayActiveFlag == false)
+                             {
+                                 displayActiveFlag   = true;
+                                 String text = new String(txValue, "UTF-8");
 
-                             //
-                             // Parse the data into a HaloEvent.
-                             //
-                             ByteBuffer  byteBuffer  = ByteBuffer.allocate( txValue.length );
-                             byteBuffer.put(txValue);
-                             byteBuffer.order( ByteOrder.LITTLE_ENDIAN );
-                             int    timestamp       = byteBuffer.getInt(0);
-                             int    type            = byteBuffer.getInt(4);
-                             int    bytesInPayload  = byteBuffer.getInt(8);
+                                 //
+                                 // Parse the data into a HaloEvent.
+                                 //
+                                 ByteBuffer  byteBuffer  = ByteBuffer.allocate( txValue.length );
+                                 byteBuffer.put(txValue);
+                                 byteBuffer.order( ByteOrder.LITTLE_ENDIAN );
+                                 int    timestamp       = byteBuffer.getInt(0);
+                                 int    type            = byteBuffer.getInt(4);
+                                 int    bytesInPayload  = byteBuffer.getInt(8);
 
-                             Log.i("Halo", "Received HaloEvent: "+timestamp+" "+type+" "+bytesInPayload );
+                                 Log.i("Halo", "Received HaloEvent: "+timestamp+" "+type+" "+bytesInPayload );
 
+                                 //
+                                 // Start the DeviceUIActivity intent.
+                                 //
+                                 uiIntent = new Intent(MainActivity.this, DeviceUIActivity.class);
+                                 Bundle b = new Bundle();
+                                 b.putInt("Identity", bytesInPayload);
+                                 uiIntent.putExtras(b);
+                                 startActivityForResult(uiIntent , 123);
+                             }
+                             else
+                             {
 
-                             //
-                             // Start the DeviceUIActivity intent.
-                             //
-                             uiIntent = new Intent(MainActivity.this, DeviceUIActivity.class);
-                             Bundle b = new Bundle();
-                             b.putInt("Identity", bytesInPayload);
-                             uiIntent .putExtras(b);
-                             startActivityForResult(uiIntent , 123);
-                         }
+                             }
+                                                     }
                          catch (Exception e)
                          {
                              Log.e(TAG, e.toString());
