@@ -79,6 +79,18 @@ public class DeviceUIActivity extends Activity
     private PowerManager.WakeLock   wakeLock    = null;
 
 
+    @Override
+    protected void onStop()
+    {
+        super.onStop();  // Always call the superclass method first
+
+        //
+        //
+        //
+        WebView webView     = (WebView)findViewById(R.id.webview);
+        webView.destroy();
+
+    }
 
     //
     //
