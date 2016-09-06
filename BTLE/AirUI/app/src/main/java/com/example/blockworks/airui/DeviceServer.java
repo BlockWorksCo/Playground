@@ -188,12 +188,20 @@ public class DeviceServer extends IntentService
     }
 
 
+    private int     typeRecevedFromDevice           = 0;
+    private int     payloadReceivedFromDevice       = 0;
+    private int     timestampReceivedFromDevice     = 0;
+
     //
     //
     //
     public void ProcessEventReceivedFromDevice(int timestamp, int type, int payload)
     {
         Log.i("Halo", "Received HaloEvent: "+timestamp+" "+type+" "+payload);
+
+        typeRecevedFromDevice           = type;
+        payloadReceivedFromDevice       = payload;
+        timestampReceivedFromDevice     = timestamp;
 
         semaphore.release();
     }
@@ -288,11 +296,8 @@ public class DeviceServer extends IntentService
                                     "Pragma: no-cache\n" +
                                     "Expires: 0"+
                                     "Connection: Closed.\n\n"+
-                                    "<html>\n" +
-                                    "<body>\n" +
-                                    "<h1>Hello, World("+receivedData+")!</h1>\n" +
-                                    "</body>\n" +
-                                    "</html>\n\n");
+                                    "{\"timestamp\":"+timestampReceivedFromDevice+",\"type\":"+typeRecevedFromDevice+",\"payload\":"+payloadReceivedFromDevice+"}\n"
+                                    );
                     output.flush();
                     socket.close();
 
