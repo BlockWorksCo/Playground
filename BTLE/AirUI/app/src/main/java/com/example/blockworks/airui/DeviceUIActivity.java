@@ -3,20 +3,26 @@ package com.example.blockworks.airui;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Locale;
 
 
@@ -168,6 +174,12 @@ public class DeviceUIActivity extends Activity
             actionBar.hide();
         }
 
+        //
+        //
+        //
+        LocalBroadcastManager.getInstance(this).registerReceiver(UARTStatusChangeReceiver, makeGattUpdateIntentFilter());
+
+
 
         //
         // Show the webview with the UI on it.
@@ -175,6 +187,22 @@ public class DeviceUIActivity extends Activity
         webView.loadUrl(url);
     }
 
+
+
+
+    //
+    //
+    //
+    private static IntentFilter makeGattUpdateIntentFilter()
+    {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(UartService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(UartService.ACTION_GATT_DISCONNECTED);
+        intentFilter.addAction(UartService.ACTION_GATT_SERVICES_DISCOVERED);
+        intentFilter.addAction(UartService.ACTION_DATA_AVAILABLE);
+        intentFilter.addAction(UartService.DEVICE_DOES_NOT_SUPPORT_UART);
+        return intentFilter;
+    }
 
 
 
@@ -240,6 +268,59 @@ public class DeviceUIActivity extends Activity
     }
 
 
+
+    //
+    //
+    //
+    private final BroadcastReceiver UARTStatusChangeReceiver = new BroadcastReceiver()
+    {
+        public void onReceive(Context context, Intent intent)
+        {
+            String action = intent.getAction();
+
+            final Intent mIntent = intent;
+            if (action.equals(UartService.ACTION_GATT_CONNECTED))
+            {
+
+                //
+                //
+                //
+            }
+
+            if (action.equals(UartService.ACTION_GATT_DISCONNECTED))
+            {
+            }
+
+
+            if (action.equals(UartService.ACTION_GATT_SERVICES_DISCOVERED))
+            {
+            }
+
+
+            if (action.equals(UartService.ACTION_DATA_AVAILABLE))
+            {
+                //
+                // Parse the data into a HaloEvent.
+                //
+                final byte[] txValue = intent.getByteArrayExtra(UartService.EXTRA_DATA);
+                ByteBuffer  byteBuffer  = ByteBuffer.allocate( txValue.length );
+                byteBuffer.put(txValue);
+                byteBuffer.order( ByteOrder.LITTLE_ENDIAN );
+                int    timestamp       = byteBuffer.getInt(0);
+                int    type            = byteBuffer.getInt(4);
+                int    payload         = byteBuffer.getInt(8);
+
+                Log.i("Halo", "Received HaloEvent: "+timestamp+" "+type+" "+payload);
+            }
+
+
+            if (action.equals(UartService.DEVICE_DOES_NOT_SUPPORT_UART))
+            {
+            }
+
+
+        }
+    };
 
 
 }

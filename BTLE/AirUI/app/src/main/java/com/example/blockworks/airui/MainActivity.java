@@ -360,7 +360,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                              {
 
                              }
-                                                     }
+                         }
                          catch (Exception e)
                          {
                              Log.e(TAG, e.toString());
@@ -389,7 +389,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
     {
         Intent bindIntent = new Intent(this, UartService.class);
         bindService(bindIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
-  
+
         LocalBroadcastManager.getInstance(this).registerReceiver(UARTStatusChangeReceiver, makeGattUpdateIntentFilter());
     }
 
