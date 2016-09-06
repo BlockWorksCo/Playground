@@ -2,11 +2,14 @@ package com.example.blockworks.airui;
 
 import android.app.IntentService;
 import android.bluetooth.BluetoothClass;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -18,6 +21,9 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.concurrent.Semaphore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -75,6 +81,7 @@ public class DeviceServer extends IntentService
     Thread          serverThread    = null;
     private int     readCounter     = 0;
     private Context context         = null;
+    private Semaphore semaphore = new Semaphore(0, true);
 
     //
     //
@@ -184,16 +191,30 @@ public class DeviceServer extends IntentService
     //
     //
     //
+    public void ProcessEventReceivedFromDevice(int timestamp, int type, int payload)
+    {
+        Log.i("Halo", "Received HaloEvent: "+timestamp+" "+type+" "+payload);
+
+        semaphore.release();
+    }
+
+
+    //
+    //
+    //
     class ServerThread implements Runnable
     {
         private InputStream input;
-
 
         //
         //
         //
         public ServerThread()
         {
+            //
+            // Register ourselves to listen to device events.
+            //
+            //LocalBroadcastManager.getInstance(this).registerReceiver(UARTStatusChangeReceiver, makeGattUpdateIntentFilter());
         }
 
 
@@ -230,7 +251,27 @@ public class DeviceServer extends IntentService
                     //
                     input = socket.getInputStream();
 
+                    //
+                    // Read and parse the URL.
+                    //
                     reader();
+
+                    //
+                    // Pass the request onto the remote device.
+                    //
+                    mService.TransmitHaloEvent(receivedType, receivedData);
+
+                    //
+                    // Wait for the response from the remote device.
+                    //
+                    try
+                    {
+                        semaphore.acquire();
+                    }
+                    catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
 
                     //
                     // Write the output.
@@ -249,18 +290,12 @@ public class DeviceServer extends IntentService
                                     "Connection: Closed.\n\n"+
                                     "<html>\n" +
                                     "<body>\n" +
-                                    "<h1>Hello, World("+readCounter+")!</h1>\n" +
+                                    "<h1>Hello, World("+receivedData+")!</h1>\n" +
                                     "</body>\n" +
                                     "</html>\n\n");
-                    readCounter++;
                     output.flush();
                     socket.close();
 
-                    //
-                    //
-                    //
-                    //byte[]  payload     = {};
-                    mService.TransmitHaloEvent(receivedType, receivedData);
                 }
                 catch (IOException e)
                 {

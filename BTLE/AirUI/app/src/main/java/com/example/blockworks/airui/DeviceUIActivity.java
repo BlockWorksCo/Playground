@@ -175,7 +175,7 @@ public class DeviceUIActivity extends Activity
         }
 
         //
-        //
+        // Register ourselves to listen to device events.
         //
         LocalBroadcastManager.getInstance(this).registerReceiver(UARTStatusChangeReceiver, makeGattUpdateIntentFilter());
 

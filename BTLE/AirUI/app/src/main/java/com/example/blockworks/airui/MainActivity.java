@@ -58,6 +58,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+import com.example.blockworks.airui.DeviceServer;
 
 
 
@@ -208,7 +209,6 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 // Now create the DeviceServer that can see the UartService.
                 //
                 deviceServer    = new DeviceServer( mService );
-
         }
 
         public void onServiceDisconnected(ComponentName classname)
@@ -309,6 +309,9 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                         }
                         */
 
+                        //
+                        // Send the Identity event to find out what device we're talking to.
+                        //
                         byte[]  payload     = {};
                         mService.TransmitHaloEvent(0x00000001, payload);
                     }
@@ -358,7 +361,17 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                              }
                              else
                              {
+                                 //
+                                 // Parse the data into a HaloEvent.
+                                 //
+                                 ByteBuffer  byteBuffer  = ByteBuffer.allocate( txValue.length );
+                                 byteBuffer.put(txValue);
+                                 byteBuffer.order( ByteOrder.LITTLE_ENDIAN );
+                                 int    timestamp       = byteBuffer.getInt(0);
+                                 int    type            = byteBuffer.getInt(4);
+                                 int    payload         = byteBuffer.getInt(8);
 
+                                 deviceServer.ProcessEventReceivedFromDevice(timestamp, type, payload);
                              }
                          }
                          catch (Exception e)
