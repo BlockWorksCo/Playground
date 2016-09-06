@@ -23,9 +23,11 @@ function Request(fn)
 //
 //
 //
-function ProcessMessage(fn)
+function ProcessMessage(dataAsJSON)
 {
-    $("#div1").html(fn);
+    data    = JSON.parse(dataAsJSON);
+    text    = "Timestamp is: " + data.timestamp + ", type is: " + data.type + ", payload is: " + data.payload
+    $("#div1").html(text);
 }
 
 //
