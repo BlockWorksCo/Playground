@@ -18,6 +18,8 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -300,7 +302,32 @@ public class DeviceServer extends IntentService
                 e.printStackTrace();
             }
 
+            //
+            // Parse the request
+            //
             Log.i("Reader",request);
+
+            Pattern p = Pattern.compile("GET (.*)&(.*) HTTP");
+            Matcher m = p.matcher(request);
+            if (m.find() == true)
+            {
+                String url = m.group(1);
+                String params = m.group(2);
+
+                Pattern p2 = Pattern.compile("type=(\\d+)\\?data=(\\d+)");
+                Matcher m2 = p2.matcher(params);
+                if( m2.find() == true )
+                {
+                    String type = m2.group(1);
+                    String data = m2.group(2);
+
+                    Log.i("URL = ", url);
+                    Log.i("params=", params);
+                    Log.i("type=", type);
+                    Log.i("data=", data);
+                }
+
+            }
         }
 
     }

@@ -275,7 +275,7 @@ int main()
 
                         static HaloEvent    identityReponseEvent     =
                         {
-                            .timestamp              = 123,
+                            .timestamp              = GetCurrentTimestamp(),
                             .type                   = HALO_IDENTITY,
                             .numberOfPayloadBytes   = 0x00000000,
                         };
@@ -289,7 +289,7 @@ int main()
                         printf("<Unknown>\n");
                         static HaloEvent    reponseEvent     =
                         {
-                            .timestamp              = 321,
+                            .timestamp              = GetCurrentTimestamp(),
                             .type                   = 456,
                             .numberOfPayloadBytes   = 123456789,
                         };

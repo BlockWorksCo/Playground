@@ -33,13 +33,13 @@ function ProcessMessage(fn)
 //
 (function poll()
 {
-   $.ajax({ url: "http://localhost:8080/Ping", success: function(data)
+   $.ajax({ url: "http://localhost:8080/Ping&type=314159265?data=919212313", success: function(data)
        {
            ProcessMessage(data);
 
        }, complete: function(jqXHR,status)
        {
-           poll();
+           setTimeout( function() {poll();} , 1000);
        }
    });
 

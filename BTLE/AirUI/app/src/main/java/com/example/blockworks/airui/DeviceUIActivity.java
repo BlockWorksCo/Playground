@@ -14,6 +14,7 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.util.Log;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import java.util.Locale;
@@ -105,6 +106,12 @@ public class DeviceUIActivity extends Activity
         WebView webView     = (WebView)findViewById(R.id.webview);
         webView.setWebChromeClient(new WebChromeClient());
         webView.getSettings().setJavaScriptEnabled(true);
+
+        //
+        // Disable caching.
+        //
+        webView.getSettings().setAppCacheEnabled(false);
+        webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
 
         //
         //
