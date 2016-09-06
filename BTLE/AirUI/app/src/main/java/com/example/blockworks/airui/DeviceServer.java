@@ -259,8 +259,8 @@ public class DeviceServer extends IntentService
                     //
                     //
                     //
-                    byte[]  payload     = {};
-                    mService.TransmitHaloEvent(0x00000001, payload);
+                    //byte[]  payload     = {};
+                    mService.TransmitHaloEvent(receivedType, receivedData);
                 }
                 catch (IOException e)
                 {
@@ -268,6 +268,9 @@ public class DeviceServer extends IntentService
                 }
             }
         }
+
+        private int     receivedType    = 0;
+        private int     receivedData    = 0;
 
 
         //
@@ -325,6 +328,9 @@ public class DeviceServer extends IntentService
                     Log.i("params=", params);
                     Log.i("type=", type);
                     Log.i("data=", data);
+
+                    receivedData    = Integer.parseInt(data);
+                    receivedType    = Integer.parseInt(type);
                 }
 
             }

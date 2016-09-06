@@ -278,6 +278,38 @@ public class UartService extends Service
     }
 
 
+    void TransmitHaloEvent( int type, int payload)
+    {
+        try
+        {
+            //
+            // Get the timestamp;
+            //
+            timestamp++;
+
+            //
+            // form the HaloEvent data.
+            //
+            int[]  event   = {timestamp, type, payload};
+            ByteBuffer byteBuffer  = ByteBuffer.allocate( event.length * 4 );
+            byteBuffer.order( ByteOrder.LITTLE_ENDIAN );
+            IntBuffer intBuffer   = byteBuffer.asIntBuffer();
+            intBuffer.put(event);
+            byte[]  eventData   = byteBuffer.array();
+
+            //
+            // Send the HaloEvent.
+            //
+            writeRXCharacteristic(eventData);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+
+
     //
     //
     //
