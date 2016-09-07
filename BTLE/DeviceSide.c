@@ -11,10 +11,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
-
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
+#include <sys/time.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
@@ -235,6 +236,27 @@ void HaloEventHandler( HaloEvent* event )
 }
 
 
+
+
+void timer_handler (int signum)
+{
+    static int count = 0;
+    printf ("--------  timer expired %d times -----------\n", ++count);
+
+
+
+    HaloEvent    identityReponseEvent     =
+    {
+        .timestamp              = GetCurrentTimestamp(),
+        .type                   = 345,
+        .numberOfPayloadBytes   = 0xa500a500,
+    };
+    HaloTransmitEvent( &identityReponseEvent );
+
+
+}
+
+
 //
 //
 //
@@ -245,6 +267,13 @@ int main()
     HaloInitialise();
 
     HaloRequestEventNotification( HaloEventHandler );
+
+
+    /* Install timer_handler as the signal handler for SIGVTALRM. */
+    struct sigaction sa;
+    memset (&sa, 0, sizeof (sa));
+    sa.sa_handler = &timer_handler;
+    sigaction (SIGALRM, &sa, NULL);
 
     //
     //
@@ -273,7 +302,7 @@ int main()
                     {
                         printf("<HALO_IDENTITY>\n");
 
-                        static HaloEvent    identityReponseEvent     =
+                        HaloEvent    identityReponseEvent     =
                         {
                             .timestamp              = GetCurrentTimestamp(),
                             .type                   = HALO_IDENTITY,
@@ -284,10 +313,29 @@ int main()
                         break;
                     }
 
+                    case 2:
+                    {
+                        printf("<HALO_MSG 2>\n");
+
+
+                        /* Configure the timer to expire after 250 msec... */
+                        static struct itimerval timer;
+                        timer.it_value.tv_sec = 5;
+                        timer.it_value.tv_usec = 0;
+                        /* ... and every 250 msec after that. */
+                        timer.it_interval.tv_sec = 0;
+                        timer.it_interval.tv_usec = 0;
+                        /* Start a virtual timer. It counts down whenever this process is
+                        executing. */
+                        setitimer (ITIMER_REAL, &timer, NULL);
+
+                        break;
+                    }
+
                     default:
                     {
                         printf("<Unknown>\n");
-                        static HaloEvent    reponseEvent     =
+                        HaloEvent    reponseEvent     =
                         {
                             .timestamp              = GetCurrentTimestamp(),
                             .type                   = 456,
