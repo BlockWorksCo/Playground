@@ -63,6 +63,7 @@ function BlockingSend(fn)
 // Repeatedly long-poll for events. This is how the remote device can communicate
 // asynchronously with the js world.
 //
+/*
 (function PollForAsyncEvents()
 {
    $.ajax({ url: "http://localhost:8080/AsyncPoll&type=314159265?data=919212313",
@@ -77,13 +78,14 @@ function BlockingSend(fn)
    });
 
 })();
+*/
 
 
 //
 // Send a request, block until response is received.
 // (repeat every second).
 //
-(function RepeatedSynchronousEventTest()
+function RepeatedSynchronousEventTest()
 {
    $.ajax({ url: "http://localhost:8080/SendAndReceive&type=314159265?data=919212313",
         success: function(data)
@@ -96,7 +98,7 @@ function BlockingSend(fn)
         }
    });
 
-})();
+};
 
 
 
@@ -105,11 +107,7 @@ function BlockingSend(fn)
 //
 //
 //
-setInterval(function()
-    {
-        Request('Blaa');
-    }
-    , 100);
+RepeatedSynchronousEventTest();
 
 
 </script>
