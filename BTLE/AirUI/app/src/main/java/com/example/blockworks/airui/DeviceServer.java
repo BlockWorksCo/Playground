@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -21,6 +22,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.Semaphore;
@@ -78,7 +80,8 @@ public class DeviceServer extends IntentService
 
 
 
-    Thread          serverThread    = null;
+    Thread          thread    = null;
+    ServerThread    serverThread    = null;
     private int     readCounter     = 0;
     private Context context         = null;
     private Semaphore semaphore = new Semaphore(0, true);
@@ -95,9 +98,9 @@ public class DeviceServer extends IntentService
         //
         mService    = _uartService;
 
-        ServerThread t = new ServerThread();
-        this.serverThread = new Thread(t);
-        this.serverThread.start();
+        serverThread = new ServerThread();
+        this.thread = new Thread(serverThread);
+        this.thread.start();
     }
 
     //
@@ -204,7 +207,7 @@ public class DeviceServer extends IntentService
         payloadReceivedFromDevice       = payload;
         timestampReceivedFromDevice     = timestamp;
 
-        semaphore.release();
+        serverThread.CompleteAsyncPollRequest( timestampReceivedFromDevice, typeRecevedFromDevice, payloadReceivedFromDevice );
     }
 
     //
@@ -226,12 +229,44 @@ public class DeviceServer extends IntentService
         }
 
 
+        public Socket  asyncPollSocket     = null;
+        public int asyncTimestamp     = 0;
+        public int asyncType          = 0;
+        public int asyncPayload       = 0;
+
+        public Socket AsyncPollSocket() {return asyncPollSocket;}
+
+        //
+        //
+        //
+        public void CompleteAsyncPollRequest(int timestamp, int type, int payload)
+        {
+            asyncTimestamp  = timestamp;
+            asyncType       = type;
+            asyncPayload    = payload;
+
+            new CompleteAsyncRequestTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
+        }
+
         //
         //
         //
         void ProcessURL(int timestamp, int type, int payload, String url, Socket socket)
         {
+            //
+            //
+            //
+            if(url.equals("/AsyncPoll") == true)
+            {
+                //
+                // Keep the socket open until we have a response to send back.
+                //
+                asyncPollSocket     = socket;
+            }
 
+            //
+            //
+            //
             if(url.equals("/SendAndReceive") == true)
             {
                 //
@@ -271,6 +306,8 @@ public class DeviceServer extends IntentService
                             "{\"timestamp\":"+timestamp+",\"type\":"+type+",\"payload\":"+payload+"}\n"
                     );
                     output.flush();
+
+                    socket.close();
                 }
                 catch (IOException e)
                 {
@@ -309,6 +346,8 @@ public class DeviceServer extends IntentService
                             "{\"timestamp\":"+timestamp+",\"type\":"+type+",\"payload\":"+payload+"}\n"
                     );
                     output.flush();
+
+                    socket.close();
                 }
                 catch (IOException e)
                 {
@@ -357,9 +396,6 @@ public class DeviceServer extends IntentService
                     reader();
 
                     ProcessURL(timestampReceivedFromDevice , receivedType, receivedData, receivedURL, socket);
-
-                    socket.close();
-
                 }
                 catch (IOException e)
                 {
@@ -439,6 +475,65 @@ public class DeviceServer extends IntentService
     }
 
 
+
+
+
+    //
+    // Needed to get the network activity off the main thread.
+    //
+    class CompleteAsyncRequestTask extends AsyncTask<Void, Void, Void>
+    {
+        @Override
+        protected void onPreExecute()
+        {
+
+        }
+
+
+        @Override
+        protected Void doInBackground(Void... p )
+        {
+            //
+            // Write the output.
+            //
+            try
+            {
+                if(serverThread.asyncPollSocket != null)
+                {
+                    OutputStreamWriter output = new OutputStreamWriter(serverThread.asyncPollSocket.getOutputStream());
+                    output.write(   "HTTP/1.1 200 OK\n" +
+                            "Date: Mon, 27 Jul 2009 12:28:53 GMT\n" +
+                            "Server: Apache/2.2.14 (Win32)\n" +
+                            "Last-Modified: Wed, 22 Jul 2009 19:15:56 GMT\n" +
+                            //"Content-Length: 88\n" +
+                            "Content-Type: text/html\n" +
+                            "Access-Control-Allow-Origin: *\n"+
+                            "Cache-Control: no-cache, no-store, must-revalidate\n" +
+                            "Pragma: no-cache\n" +
+                            "Expires: 0"+
+                            "Connection: Closed.\n\n"+
+                            "{\"timestamp\":"+serverThread.asyncTimestamp+",\"type\":"+serverThread.asyncType+",\"payload\":"+serverThread.asyncPayload+"}\n"
+                    );
+                    output.flush();
+
+                    serverThread.asyncPollSocket.close();
+                    serverThread.asyncPollSocket    = null;
+
+                }
+                else
+                {
+
+                }
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+    }
 
 
 
