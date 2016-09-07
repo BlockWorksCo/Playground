@@ -8,11 +8,50 @@ count = 0;
 
 
 //
+// Perform a non-blocking send of an event to the remote device.
 //
-//
-function Request(fn)
+function NonBlockingSend(fn)
 {
-    $.ajax({ url: "http://localhost:8081/Pong", success: function(data)
+    $.ajax({ url: "http://localhost:8080/SendAndReceive&type=314159265?data=919212313",
+        success: function(data)
+        {
+            $("#div2").html('sddfsdf '+data);
+        }
+    });
+}
+
+
+
+//
+// Perform a blocking receive for an event from the remote device.
+//
+function BlockingReceive(fn)
+{
+    //
+    // Wait until ProcessReceivedEvent() has received our event-type.
+    //
+}
+
+
+//
+// All events received from the remote device end up here to be transformed
+// into js events.
+//
+function ProcessReceivedEvent(dataAsJSON)
+{
+    data    = JSON.parse(dataAsJSON);
+    text    = "Timestamp is: " + data.timestamp + ", type is: " + data.type + ", payload is: " + data.payload
+    $("#div1").html(text);
+}
+
+
+//
+// Perform a blocking send of an event to the remote device.
+//
+function BlockingSend(fn)
+{
+    $.ajax({ url: "http://localhost:8080/SendAndReceive&type=314159265?data=919212313",
+        success: function(data)
         {
             $("#div2").html('sddfsdf '+data);
         }
@@ -21,28 +60,40 @@ function Request(fn)
 
 
 //
+// Repeatedly long-poll for events. This is how the remote device can communicate
+// asynchronously with the js world.
 //
-//
-function ProcessMessage(dataAsJSON)
+(function PollForAsyncEvents()
 {
-    data    = JSON.parse(dataAsJSON);
-    text    = "Timestamp is: " + data.timestamp + ", type is: " + data.type + ", payload is: " + data.payload
-    $("#div1").html(text);
-}
+   $.ajax({ url: "http://localhost:8080/AsyncPoll&type=314159265?data=919212313",
+        success: function(data)
+        {
+           ProcessReceivedEvent(data);
+        },
+        complete: function(jqXHR,status)
+        {
+           PollForAsyncEvents();
+        }
+   });
+
+})();
+
 
 //
+// Send a request, block until response is received.
+// (repeat every second).
 //
-//
-(function poll()
+(function RepeatedSynchronousEventTest()
 {
-   $.ajax({ url: "http://localhost:8080/Ping&type=314159265?data=919212313", success: function(data)
-       {
-           ProcessMessage(data);
-
-       }, complete: function(jqXHR,status)
-       {
-           setTimeout( function() {poll();} , 1000);
-       }
+   $.ajax({ url: "http://localhost:8080/SendAndReceive&type=314159265?data=919212313",
+        success: function(data)
+        {
+           ProcessReceivedEvent(data);
+        },
+        complete: function(jqXHR,status)
+        {
+           setTimeout( function() {RepeatedSynchronousEventTest();} , 1000);
+        }
    });
 
 })();
