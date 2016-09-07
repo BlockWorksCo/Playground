@@ -12,7 +12,7 @@ count = 0;
 //
 function NonBlockingSend(fn)
 {
-    $.ajax({ url: "http://localhost:8080/SendAndReceive&type=314159265?data=919212313",
+    $.ajax({ url: "http://localhost:8080/Send&type=314159265?data=919212313",
         success: function(data)
         {
             $("#div2").html('sddfsdf '+data);

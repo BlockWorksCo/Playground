@@ -191,6 +191,7 @@ public class DeviceServer extends IntentService
     private int     typeRecevedFromDevice           = 0;
     private int     payloadReceivedFromDevice       = 0;
     private int     timestampReceivedFromDevice     = 0;
+    private String  receivedURL                     = "";
 
     //
     //
@@ -205,7 +206,6 @@ public class DeviceServer extends IntentService
 
         semaphore.release();
     }
-
 
     //
     //
@@ -225,6 +225,98 @@ public class DeviceServer extends IntentService
             //LocalBroadcastManager.getInstance(this).registerReceiver(UARTStatusChangeReceiver, makeGattUpdateIntentFilter());
         }
 
+
+        //
+        //
+        //
+        void ProcessURL(int timestamp, int type, int payload, String url, Socket socket)
+        {
+
+            if(url.equals("/SendAndReceive") == true)
+            {
+                //
+                // Pass the request onto the remote device.
+                //
+                mService.TransmitHaloEvent(type, payload);
+
+                //
+                // Wait for the response from the remote device.
+                //
+                try
+                {
+                    semaphore.acquire();
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+
+                //
+                // Write the output.
+                //
+                try
+                {
+                    OutputStreamWriter output = new OutputStreamWriter(socket.getOutputStream());
+                    output.write(   "HTTP/1.1 200 OK\n" +
+                            "Date: Mon, 27 Jul 2009 12:28:53 GMT\n" +
+                            "Server: Apache/2.2.14 (Win32)\n" +
+                            "Last-Modified: Wed, 22 Jul 2009 19:15:56 GMT\n" +
+                            //"Content-Length: 88\n" +
+                            "Content-Type: text/html\n" +
+                            "Access-Control-Allow-Origin: *\n"+
+                            "Cache-Control: no-cache, no-store, must-revalidate\n" +
+                            "Pragma: no-cache\n" +
+                            "Expires: 0"+
+                            "Connection: Closed.\n\n"+
+                            "{\"timestamp\":"+timestamp+",\"type\":"+type+",\"payload\":"+payload+"}\n"
+                    );
+                    output.flush();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+
+
+            //
+            //
+            //
+            if(url.equals("/Send") == true)
+            {
+                //
+                // Pass the request onto the remote device.
+                //
+                mService.TransmitHaloEvent(type, payload);
+
+                //
+                // Write the output.
+                //
+                try
+                {
+                    OutputStreamWriter output = new OutputStreamWriter(socket.getOutputStream());
+                    output.write(   "HTTP/1.1 200 OK\n" +
+                            "Date: Mon, 27 Jul 2009 12:28:53 GMT\n" +
+                            "Server: Apache/2.2.14 (Win32)\n" +
+                            "Last-Modified: Wed, 22 Jul 2009 19:15:56 GMT\n" +
+                            //"Content-Length: 88\n" +
+                            "Content-Type: text/html\n" +
+                            "Access-Control-Allow-Origin: *\n"+
+                            "Cache-Control: no-cache, no-store, must-revalidate\n" +
+                            "Pragma: no-cache\n" +
+                            "Expires: 0"+
+                            "Connection: Closed.\n\n"+
+                            "{\"timestamp\":"+timestamp+",\"type\":"+type+",\"payload\":"+payload+"}\n"
+                    );
+                    output.flush();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+
+        }
 
 
         //
@@ -264,41 +356,8 @@ public class DeviceServer extends IntentService
                     //
                     reader();
 
-                    //
-                    // Pass the request onto the remote device.
-                    //
-                    mService.TransmitHaloEvent(receivedType, receivedData);
+                    ProcessURL(timestampReceivedFromDevice , receivedType, receivedData, receivedURL, socket);
 
-                    //
-                    // Wait for the response from the remote device.
-                    //
-                    try
-                    {
-                        semaphore.acquire();
-                    }
-                    catch (InterruptedException e)
-                    {
-                        e.printStackTrace();
-                    }
-
-                    //
-                    // Write the output.
-                    //
-                    OutputStreamWriter output = new OutputStreamWriter(socket.getOutputStream());
-                    output.write(   "HTTP/1.1 200 OK\n" +
-                                    "Date: Mon, 27 Jul 2009 12:28:53 GMT\n" +
-                                    "Server: Apache/2.2.14 (Win32)\n" +
-                                    "Last-Modified: Wed, 22 Jul 2009 19:15:56 GMT\n" +
-                                    //"Content-Length: 88\n" +
-                                    "Content-Type: text/html\n" +
-                                    "Access-Control-Allow-Origin: *\n"+
-                                    "Cache-Control: no-cache, no-store, must-revalidate\n" +
-                                    "Pragma: no-cache\n" +
-                                    "Expires: 0"+
-                                    "Connection: Closed.\n\n"+
-                                    "{\"timestamp\":"+timestampReceivedFromDevice+",\"type\":"+typeRecevedFromDevice+",\"payload\":"+payloadReceivedFromDevice+"}\n"
-                                    );
-                    output.flush();
                     socket.close();
 
                 }
@@ -369,6 +428,7 @@ public class DeviceServer extends IntentService
                     Log.i("type=", type);
                     Log.i("data=", data);
 
+                    receivedURL     = url;
                     receivedData    = Integer.parseInt(data);
                     receivedType    = Integer.parseInt(type);
                 }
