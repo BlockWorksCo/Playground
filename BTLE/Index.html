@@ -10,9 +10,9 @@ count = 0;
 //
 // Perform a non-blocking send of an event to the remote device.
 //
-function NonBlockingSend(fn)
+function NonBlockingSend( type, payload )
 {
-    $.ajax({ url: "http://localhost:8080/Send&type=314159265?data=919212313",
+    $.ajax({ url: "http://localhost:8080/Send&type="+type+"?data="+payload,
         success: function(data)
         {
             $("#div2").html('sddfsdf '+data);
@@ -37,9 +37,8 @@ function BlockingReceive(fn)
 // All events received from the remote device end up here to be transformed
 // into js events.
 //
-function ProcessReceivedEvent(dataAsJSON)
+function ProcessReceivedEvent( data )
 {
-    data    = JSON.parse(dataAsJSON);
     text    = "Timestamp is: " + data.timestamp + ", type is: " + data.type + ", payload is: " + data.payload
     $("#div1").html(text);
 }
@@ -48,12 +47,13 @@ function ProcessReceivedEvent(dataAsJSON)
 //
 // Perform a blocking send of an event to the remote device.
 //
-function BlockingSend(fn)
+function BlockingSend( type, payload, completion )
 {
-    $.ajax({ url: "http://localhost:8080/SendAndReceive&type=314159265?data=919212313",
-        success: function(data)
+    $.ajax({ url: "http://localhost:8080/SendAndReceive&type="+type+"?data="+payload,
+        success: function(dataAsJSON)
         {
-            $("#div2").html('sddfsdf '+data);
+            data    = JSON.parse(dataAsJSON);
+            completion(data);
         }
     });
 }
@@ -87,18 +87,14 @@ function BlockingSend(fn)
 //
 function RepeatedSynchronousEventTest()
 {
-   $.ajax({ url: "http://localhost:8080/SendAndReceive&type=314159265?data=919212313",
-        success: function(data)
-        {
-           ProcessReceivedEvent(data);
-        },
-        complete: function(jqXHR,status)
-        {
-           setTimeout( function() {RepeatedSynchronousEventTest();} , 1000);
-        }
-   });
 
-};
+    BlockingSend( 314159265, 919212313, function(data)
+                                        {
+                                            ProcessReceivedEvent(data);
+                                            setTimeout( function() {RepeatedSynchronousEventTest();} , 1000);
+                                        }
+                );
+}
 
 
 
@@ -115,7 +111,7 @@ RepeatedSynchronousEventTest();
 //
 function myFunction()
 {
-    NonBlockingSend();
+    NonBlockingSend( 2, 9090909 );
 }
 
 
