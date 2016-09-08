@@ -1,7 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.indigo-pink.min.css">
+
+<script defer src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+
 <script>
 
 count = 0;
@@ -106,6 +113,18 @@ function myFunction()
 <div id="div2"><h2>Let jQuery AJAX Change This Text</h2></div>
 
 <button onclick="myFunction()">Click me</button>
+
+<!-- Accent-colored raised button with ripple -->
+<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"  onclick="alert('button one')">
+  Button
+</button>
+
+
+<!-- Colored FAB button -->
+<button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored" onclick="alert('FAB one')">
+  <i class="material-icons">add</i>
+</button>
+
 
 </body>
 </html>
