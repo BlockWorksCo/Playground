@@ -90,6 +90,20 @@
 
 
 
+    //
+    //
+    //
+    setInterval( function()
+                {
+                    count = count+5;
+                    $('#pie1').attr('transform','rotate('+count+', 0.5, 0.5)');
+                    $('#pie2').attr('transform','rotate('+(count+90)+', 0.5, 0.5)');
+                    $('#pie3').attr('transform','rotate('+(count+180)+', 0.5, 0.5)');
+                    $('#pie4').attr('transform','rotate('+(count+270)+', 0.5, 0.5)');
+                } , 100);
+
+
+
 
     //
     //
@@ -211,19 +225,19 @@
         <div class="mdl-grid demo-content">
           <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
             <svg fill="currentColor" width="200px" height="200px" viewBox="0 0 1 1" class="demo-chart mdl-cell mdl-cell--4-col mdl-cell--3-col-desktop">
-              <use xlink:href="#piechart" mask="url(#piemask)"  transform="rotate(90 0.5 0.5)"  />
+              <use xlink:href="#piechart" mask="url(#piemask)" id="pie1"  transform="rotate(90 0.5 0.5)"  />
               <text x="0.5" y="0.5" font-family="Roboto" font-size="0.3" fill="#888" text-anchor="middle" dy="0.1">82<tspan font-size="0.2" dy="-0.07">%</tspan></text>
             </svg>
             <svg fill="currentColor" width="200px" height="200px" viewBox="0 0 1 1" class="demo-chart mdl-cell mdl-cell--4-col mdl-cell--3-col-desktop">
-              <use xlink:href="#piechart" mask="url(#piemask)"  transform="rotate(0 0.5 0.5)"  />
+              <use xlink:href="#piechart" mask="url(#piemask)" id="pie2"  transform="rotate(0 0.5 0.5)"  />
               <text x="0.5" y="0.5" font-family="Roboto" font-size="0.3" fill="#888" text-anchor="middle" dy="0.1">82<tspan dy="-0.07" font-size="0.2">%</tspan></text>
             </svg>
             <svg fill="currentColor" width="200px" height="200px" viewBox="0 0 1 1" class="demo-chart mdl-cell mdl-cell--4-col mdl-cell--3-col-desktop">
-              <use xlink:href="#piechart" mask="url(#piemask)"  transform="rotate(30 0.5 0.5)"  />
+              <use xlink:href="#piechart" mask="url(#piemask)" id="pie3"  transform="rotate(30 0.5 0.5)"  />
               <text x="0.5" y="0.5" font-family="Roboto" font-size="0.3" fill="#888" text-anchor="middle" dy="0.1">82<tspan dy="-0.07" font-size="0.2">%</tspan></text>
             </svg>
             <svg fill="currentColor" width="200px" height="200px" viewBox="0 0 1 1" class="demo-chart mdl-cell mdl-cell--4-col mdl-cell--3-col-desktop">
-              <use xlink:href="#piechart" mask="url(#piemask)"  transform="rotate(170 0.5 0.5)" />
+              <use xlink:href="#piechart" mask="url(#piemask)" id="pie4"  transform="rotate(170 0.5 0.5)" />
               <text x="0.5" y="0.5" font-family="Roboto" font-size="0.3" fill="#888" text-anchor="middle" dy="0.1">82<tspan dy="-0.07" font-size="0.2">%</tspan></text>
             </svg>
           </div>
