@@ -100,6 +100,11 @@
                     $('#pie2').attr('transform','rotate('+(count+90)+', 0.5, 0.5)');
                     $('#pie3').attr('transform','rotate('+(count+180)+', 0.5, 0.5)');
                     $('#pie4').attr('transform','rotate('+(count+270)+', 0.5, 0.5)');
+
+                    p = RotatePoint( 0.4,0.9, 0.5,0.616, count );
+                    $('#test1').attr('cx',p.x);
+                    $('#test1').attr('cy',p.y);
+                    $('#test2').attr('d',"M 0.4,0.9 A 0.3,0.3  0 1 1  "+p.x+","+p.y);
                 } , 100);
 
 
@@ -117,6 +122,19 @@
     function myFunction()
     {
         NonBlockingSend( 2, 9090909 );
+    }
+
+
+    //
+    //
+    //
+    function RotatePoint(pointX, pointY, originX, originY, angle)
+    {
+        angle = angle * Math.PI / 180.0;
+        nx = Math.cos(angle) * (pointX-originX) - Math.sin(angle) * (pointY-originY) + originX;
+        ny = Math.sin(angle) * (pointX-originX) + Math.cos(angle) * (pointY-originY) + originY;
+
+        return {'x':nx,'y':ny};
     }
 
 
@@ -266,12 +284,9 @@
                     </g>
 
                     <g stroke-width=0.1 stroke="grey" fill="none">
-                    <path d="
-                    M 0.4,0.9
-                    A 0.3,0.3  0 1 1  0.8,0.6
-                    "/>
+                    <path id="test2" d="M 0.4,0.9 A 0.3,0.3  0 1 1  0.8,0.6 "/>
                     <circle cx="0.4" cy="0.9" r="0.05" fill="grey" stroke="none" />
-                    <circle cx="0.8" cy="0.6" r="0.05" fill="grey" stroke="none" />
+                    <circle id="test1" cx="0.8" cy="0.6" r="0.05" fill="red" stroke="none" />
                     </g>
                 </svg>
             </div>
