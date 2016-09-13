@@ -257,6 +257,15 @@ void timer_handler (int signum)
 }
 
 
+
+
+//
+//
+//
+uint32_t    angle   = 0;
+
+
+
 //
 //
 //
@@ -339,9 +348,11 @@ int main()
                         {
                             .timestamp              = GetCurrentTimestamp(),
                             .type                   = 456,
-                            .numberOfPayloadBytes   = 123456789,
+                            .numberOfPayloadBytes   = angle,
                         };
                         HaloTransmitEvent( &reponseEvent );
+
+                        angle   += 10;
 
                         break;
                     }
