@@ -12,6 +12,7 @@
     <script>
 
     count = 0;
+    angle = 0;
 
 
     //
@@ -68,7 +69,6 @@
     // Repeatedly long-poll for events. This is how the remote device can communicate
     // asynchronously with the js world.
     //
-    /*
     (function PollForAsyncEvents()
     {
        $.ajax({ url: "http://localhost:8080/AsyncPoll&type=314159265?data=919212313",
@@ -84,8 +84,7 @@
        });
 
     })();
-    */
-
+    
 
 
 
@@ -101,10 +100,11 @@
                     $('#pie3').attr('transform','rotate('+(count+180)+', 0.5, 0.5)');
                     $('#pie4').attr('transform','rotate('+(count+270)+', 0.5, 0.5)');
 
-                    p = RotatePoint( 0.4,0.9, 0.5,0.616, count );
-                    $('#test1').attr('cx',p.x);
-                    $('#test1').attr('cy',p.y);
-                    $('#test2').attr('d',"M 0.4,0.9 A 0.3,0.3  0 1 1  "+p.x+","+p.y);
+                    p = RotatePoint( 0.4,0.9, 0.5,0.616, angle );
+                    $('#test2').attr('d',"M 0.4,0.9 A 0.3,0.3  0 0 1  "+p.x+","+p.y);
+
+                    angle = angle+1;
+
                 } , 100);
 
 
@@ -274,19 +274,12 @@
 
             <div>
                 <svg viewBox="0 0 1 1" class="svg-content" xmlns="http://www.w3.org/2000/svg">
-                    <g stroke-width=0.1 stroke="black" fill="none">
-                    <path d="
-                    M 0.4,0.9
-                    A 0.3,0.3  0 1 1  0.6,0.9
-                    "/>
-                    <circle cx="0.4" cy="0.9" r="0.05" fill="black" stroke="none" />
-                    <circle cx="0.6" cy="0.9" r="0.05" fill="black" stroke="none" />
+                    <g stroke-width=0.1 stroke="black" fill="none"  stroke-linecap="round">
+                    <path d="M 0.4,0.9   A 0.3,0.3  0 1 1  0.6,0.9 "/>
                     </g>
 
-                    <g stroke-width=0.1 stroke="grey" fill="none">
+                    <g stroke-width=0.1 stroke="grey" fill="none" stroke-linecap="round">
                     <path id="test2" d="M 0.4,0.9 A 0.3,0.3  0 1 1  0.8,0.6 "/>
-                    <circle cx="0.4" cy="0.9" r="0.05" fill="grey" stroke="none" />
-                    <circle id="test1" cx="0.8" cy="0.6" r="0.05" fill="red" stroke="none" />
                     </g>
                 </svg>
             </div>

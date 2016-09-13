@@ -143,11 +143,6 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
             //
             if( (rssi >= -60) && (mService != null) && (connected == false) )
             {
-                //
-                // Stop the scan.
-                //
-                mLEScanner.stopScan(mScanCallback);
-
                 Log.i( "Main", "Device within range! "+rssi);
 
                 //
@@ -246,7 +241,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 Log.d(TAG, "UART_DISCONNECT_MSG");
 
                 //
-                // Mar ourselves as disconnected.
+                // Mark ourselves as disconnected.
                 //
                 connected   = false;
                 displayActiveFlag   = false;
@@ -349,6 +344,12 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                                  int    bytesInPayload  = byteBuffer.getInt(8);
 
                                  Log.i("Halo", "Received HaloEvent: "+timestamp+" "+type+" "+bytesInPayload );
+
+                                 //
+                                 // We got a good response from the device, Stop the scan.
+                                 //
+                                 mLEScanner.stopScan(mScanCallback);
+
 
                                  //
                                  // Start the DeviceUIActivity intent.
