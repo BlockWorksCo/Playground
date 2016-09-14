@@ -16,6 +16,21 @@
 
 
 
+
+
+
+.centered
+{
+    align-content: center;
+    display: inline-block;
+    text-align: center;
+}
+
+#GoButton
+{
+    margin:20px;
+}
+
 #Pace
 {
     width:  100%;
@@ -30,6 +45,13 @@
 }
 
 #Time
+{
+    display:block;
+    line-height: normal;
+}
+
+
+#Distance
 {
     display:block;
     line-height: normal;

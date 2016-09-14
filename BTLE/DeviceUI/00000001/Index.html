@@ -240,31 +240,26 @@
       <main class="mdl-layout__content mdl-color--grey-100">
         <div class="mdl-grid">
 
-              <div class="mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--8-col-tablet mdl-cell--4-col-phone  mdl-cell--12-col-desktop mdl-grid">
+              <div class="mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--8-col-tablet mdl-cell--4-col-phone  mdl-cell--12-col-desktop mdl-grid" onclick="alert('Enter time for workout');">
                     <div id="Time"> <div class="SmallDigits">1:15:00.0</div>  </div>
               </div>
 
               <div class="mdl-cell--8-col-tablet mdl-cell--4-col-phone  mdl-cell--12-col-desktop  mdl-grid">
-                  <div class="mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--4-col-tablet mdl-cell--4-col-phone  mdl-cell--6-col-desktop  mdl-grid">
+                  <div class="mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--4-col-tablet mdl-cell--4-col-phone  mdl-cell--6-col-desktop  mdl-grid" onclick="alert('Enter average pace');">
                     <div id="Pace"> <div class="Digits">1:45</div> <div class="Units">/500m</div> </div>
                   </div>
-                  <div class="mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--4-col-tablet mdl-cell--4-col-phone  mdl-cell--6-col-desktop  mdl-grid">
+                  <div class="mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--4-col-tablet mdl-cell--4-col-phone  mdl-cell--6-col-desktop  mdl-grid" onclick="alert('Enter average stroke rate');">
                     <div id="SPM"> <div class="Digits">24</div> <div class="Units">spm</div> </div>
                   </div>
               </div>
 
-          <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col">
-            <button onclick="myFunction()">Timed workout</button>
+              <div class="mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--8-col-tablet mdl-cell--4-col-phone  mdl-cell--12-col-desktop mdl-grid" onclick="alert('Enter distance for workout');">
+                    <div id="Distance"> <div class="SmallDigits">2000</div> <div class="Units">metres</div> </div>
+              </div>
 
-            <button onclick="myFunction()">Distance workout</button>
 
-            <!-- Accent-colored raised button with ripple -->
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"  onclick="alert('Start workout')">
-            Start workout.
-            </button>
-
-            <!-- Colored FAB button -->
-            <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored" onclick="alert('FAB one')">
+          <div class="centered mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col">
+            <button id="GoButton" class="centered mdl-button mdl-js-button mdl-button--fab mdl-button--colored" onclick="alert('FAB one')">
               <i class="material-icons">add</i>
             </button>
           </div>
