@@ -14,6 +14,51 @@
  * limitations under the License.
  */
 
+
+
+#Pace
+{
+    width:  100%;
+    display:block;
+    line-height: normal;
+}
+
+#SPM
+{
+    display:block;
+    line-height: normal;
+}
+
+#Time
+{
+    display:block;
+    line-height: normal;
+}
+
+
+.Digits
+{
+    font-size: 6.0em;
+    display:inline;
+}
+
+.SmallDigits
+{
+    font-size: 4.0em;
+    display:inline;
+}
+
+.Units
+{
+    font-size: 2.0em;
+    display:inline;
+}
+
+
+
+
+
+
 html, body {
   font-family: 'Roboto', 'Helvetica', sans-serif;
 }
