@@ -142,17 +142,37 @@
     //
     //
     //
-    function StartEditingPace()
+    function StartEditingPaceMins()
     {
-        $("#LivePace").addClass('hidden')
-        $("#EditPace").removeClass('hidden');
+        $("#LivePaceMins").addClass('hidden')
+        $("#EditPaceMins").removeClass('hidden');
 
-        $("#EditPace").keyup(function (e)
+        $("#EditPaceMins").keyup(function (e)
                                 {
                                     if (e.keyCode == 13)
                                     {
-                                        $("#LivePace").removeClass('hidden')
-                                        $("#EditPace").addClass('hidden');
+                                        $("#LivePaceMins").removeClass('hidden')
+                                        $("#EditPaceMins").addClass('hidden');
+                                    }
+                                });
+
+    }
+
+
+    //
+    //
+    //
+    function StartEditingPaceSecs()
+    {
+        $("#LivePaceSecs").addClass('hidden')
+        $("#EditPaceSecs").removeClass('hidden');
+
+        $("#EditPaceSecs").keyup(function (e)
+                                {
+                                    if (e.keyCode == 13)
+                                    {
+                                        $("#LivePaceSecs").removeClass('hidden')
+                                        $("#EditPaceSecs").addClass('hidden');
                                     }
                                 });
 
@@ -260,9 +280,18 @@
               </div>
 
               <div class="mdl-cell--8-col-tablet mdl-cell--4-col-phone  mdl-cell--12-col-desktop  mdl-grid">
-                  <div id="PaceBox" class="mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--4-col-tablet mdl-cell--4-col-phone  mdl-cell--6-col-desktop  mdl-grid" onclick="StartEditingPace();">
-                    <div id="LivePace"> <div class="Digits">1:45</div> <div class="Units">/500m</div> </div>
-                    <div id="EditPace" class="hidden"> <input class="Digits input" type="text" size=4 maxlength="4"> </div>
+                  <div id="PaceBox" class="mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--4-col-tablet mdl-cell--4-col-phone  mdl-cell--6-col-desktop  mdl-grid">
+                    
+                    <div id="LivePaceMins" class="Digits" onclick="StartEditingPaceMins();">1</div>  
+                    <div id="EditPaceMins" class="hidden"> <input class="Digits input" type="text" size="1" maxlength="1"> </div>
+
+                    <div class="Digits">:</div> 
+
+                    <div id="LivePaceSecs" class="Digits" onclick="StartEditingPaceSecs();">45</div>
+                    <div id="EditPaceSecs" class="hidden"> <input class="Digits input" type="text" size="2" maxlength="2"> </div>
+
+                    <div class="Units">/500m</div>
+
                   </div>
 
                   <div id="LiveSPMBox" class="mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--4-col-tablet mdl-cell--4-col-phone  mdl-cell--6-col-desktop  mdl-grid" onclick="alert('Enter average stroke rate');">
