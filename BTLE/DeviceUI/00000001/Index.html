@@ -101,11 +101,6 @@
     setInterval( function()
                 {
                     count = count+5;
-                    //$('#pie1').attr('transform','rotate('+count+', 0.5, 0.5)');
-                    //$('#pie2').attr('transform','rotate('+(count+90)+', 0.5, 0.5)');
-                    //$('#pie3').attr('transform','rotate('+(count+180)+', 0.5, 0.5)');
-                    //$('#pie4').attr('transform','rotate('+(count+270)+', 0.5, 0.5)');
-
                     p = RotatePoint( 0.4,0.9, 0.5,0.616, angle );
                     $('#test2').attr('d',"M 0.4,0.9 A 0.3,0.3  0 0 1  "+p.x+","+p.y);
 
@@ -144,6 +139,26 @@
     }
 
 
+    //
+    //
+    //
+    function StartEditingPace()
+    {
+        $("#LivePace").addClass('hidden')
+        $("#EditPace").removeClass('hidden');
+
+        $("#EditPace").keyup(function (e)
+                                {
+                                    if (e.keyCode == 13)
+                                    {
+                                        $("#LivePace").removeClass('hidden')
+                                        $("#EditPace").addClass('hidden');
+                                    }
+                                });
+
+    }
+
+
     </script>
 
 
@@ -151,7 +166,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <title>Halo Demo One</title>
+    <title>Rowing Machine</title>
 
     <!-- Add to homescreen for Chrome on Android -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -245,10 +260,12 @@
               </div>
 
               <div class="mdl-cell--8-col-tablet mdl-cell--4-col-phone  mdl-cell--12-col-desktop  mdl-grid">
-                  <div class="mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--4-col-tablet mdl-cell--4-col-phone  mdl-cell--6-col-desktop  mdl-grid" onclick="alert('Enter average pace');">
-                    <div id="Pace"> <div class="Digits">1:45</div> <div class="Units">/500m</div> </div>
+                  <div id="PaceBox" class="mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--4-col-tablet mdl-cell--4-col-phone  mdl-cell--6-col-desktop  mdl-grid" onclick="StartEditingPace();">
+                    <div id="LivePace"> <div class="Digits">1:45</div> <div class="Units">/500m</div> </div>
+                    <div id="EditPace" class="hidden"> <input class="Digits input" type="text" size=4 maxlength="4"> </div>
                   </div>
-                  <div class="mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--4-col-tablet mdl-cell--4-col-phone  mdl-cell--6-col-desktop  mdl-grid" onclick="alert('Enter average stroke rate');">
+
+                  <div id="LiveSPMBox" class="mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--4-col-tablet mdl-cell--4-col-phone  mdl-cell--6-col-desktop  mdl-grid" onclick="alert('Enter average stroke rate');">
                     <div id="SPM"> <div class="Digits">24</div> <div class="Units">spm</div> </div>
                   </div>
               </div>
@@ -260,7 +277,7 @@
 
           <div class="centered mdl-shadow--2dp mdl-color--white mdl-cell  mdl-cell--8-col-tablet mdl-cell--4-col-phone  mdl-cell--12-col-desktop ">
             <button id="GoButton" class="centered mdl-button mdl-js-button mdl-button--fab mdl-button--colored" onclick="alert('FAB one')">
-              <i class="material-icons">add</i>
+              <i class="material-icons">rowing</i>
             </button>
           </div>
 

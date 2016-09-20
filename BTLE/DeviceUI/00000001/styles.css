@@ -17,7 +17,10 @@
 
 
 
-
+.hidden
+{
+    display:none;
+}
 
 .centered
 {
@@ -73,6 +76,7 @@
 {
     font-size: 6.0em;
     display:inline;
+    line-height: normal;
 }
 
 .SmallDigits
@@ -89,7 +93,11 @@
 
 
 
-
+input
+{
+    padding: 0px;
+    border: 0px;
+}
 
 
 html, body {
