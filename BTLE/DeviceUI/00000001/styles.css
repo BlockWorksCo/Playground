@@ -77,18 +77,27 @@
     font-size: 6.0em;
     display:inline;
     line-height: normal;
+    border-width:0;    
+    padding: 0px;
+    border: 0px;
 }
 
 .SmallDigits
 {
     font-size: 4.0em;
     display:inline;
+    border-width:0;    
+    padding: 0px;
+    border: 0px;
 }
 
 .Units
 {
     font-size: 2.0em;
     display:inline;
+    border-width:0;    
+    padding: 0px;
+    border: 0px;
 }
 
 
@@ -107,6 +116,13 @@
     border-width:0;    
     padding: 0px;
     border: 0px;
+}
+
+
+#LivePaceSecs
+{
+    display: block;
+    width:2ch;
 }
 
 
