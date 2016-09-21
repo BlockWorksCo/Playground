@@ -138,13 +138,19 @@
         return {'x':nx,'y':ny};
     }
 
+    //
+    //
+    //
+    window.values   = {};
 
     //
     //
     //
     function UpdateValue( name, value )
     {
-        console.log(name+"=="+value);
+        window.values[name]   = value;
+        //console.log(name+"=="+value);
+        console.log(window.values);
     }
 
 
