@@ -158,6 +158,12 @@
 
         $("#EditPaceMinsInput").val('');
         $("#EditPaceMinsInput").focus();
+        $("#EditPaceMinsInput").blur( function (e)
+                                      {
+                                          console.log("taken");
+                                          $("#LivePaceMins").removeClass('hidden')
+                                          $("#EditPaceMins").addClass('hidden');
+                                      });
     }
 
 
@@ -180,6 +186,12 @@
 
         $("#EditPaceSecsInput").val('');
         $("#EditPaceSecsInput").focus();
+        $("#EditPaceSecsInput").blur( function (e)
+                                      {
+                                          console.log("taken");
+                                          $("#LivePaceSecs").removeClass('hidden')
+                                          $("#EditPaceSecs").addClass('hidden');
+                                      });
     }
 
 
