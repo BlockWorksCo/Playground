@@ -139,6 +139,133 @@
     }
 
 
+
+    //
+    //
+    //
+    function StartEditingTimeHours()
+    {
+        $("#LiveTimeHours").addClass('hidden')
+        $("#EditTimeHours").removeClass('hidden');
+
+        $("#EditTimeHours").keyup(function (e)
+                                {
+                                    if (e.keyCode == 13)
+                                    {
+                                        $("#LiveTimeHours").removeClass('hidden')
+                                        $("#EditTimeHours").addClass('hidden');
+                                    }
+                                });
+
+        $("#EditTimeHoursInput").val('');
+        $("#EditTimeHoursInput").focus();
+        $("#EditTimeHoursInput").blur( function (e)
+                                      {
+                                          console.log("hours taken");
+                                          $("#LiveTimeHours").removeClass('hidden')
+                                          $("#EditTimeHours").addClass('hidden');
+                                      });
+    }
+
+
+
+    //
+    //
+    //
+    function StartEditingTimeMins()
+    {
+        $("#LiveTimeMins").addClass('hidden')
+        $("#EditTimeMins").removeClass('hidden');
+
+        $("#EditTimeMins").keyup(function (e)
+                                {
+                                    if (e.keyCode == 13)
+                                    {
+                                        $("#LiveTimeMins").removeClass('hidden')
+                                        $("#EditTimeMins").addClass('hidden');
+                                    }
+                                });
+
+        $("#EditTimeMinsInput").val('');
+        $("#EditTimeMinsInput").focus();
+        $("#EditTimeMinsInput").blur( function (e)
+                                      {
+                                          console.log("mins taken");
+                                          $("#LiveTimeMins").removeClass('hidden')
+                                          $("#EditTimeMins").addClass('hidden');
+                                      });
+    }
+
+
+
+
+
+    //
+    //
+    //
+    function StartEditingTimeSecs()
+    {
+        $("#LiveTimeSecs").addClass('hidden')
+        $("#EditTimeSecs").removeClass('hidden');
+
+        $("#EditTimeSecs").keyup(function (e)
+                                {
+                                    if (e.keyCode == 13)
+                                    {
+                                        $("#LiveTimeSecs").removeClass('hidden')
+                                        $("#EditTimeSecs").addClass('hidden');
+                                    }
+                                });
+
+        $("#EditTimeSecsInput").val('');
+        $("#EditTimeSecsInput").focus();
+        $("#EditTimeSecsInput").blur( function (e)
+                                      {
+                                          console.log("secs taken");
+                                          $("#LiveTimeSecs").removeClass('hidden')
+                                          $("#EditTimeSecs").addClass('hidden');
+                                      });
+    }
+
+
+
+
+
+
+
+    //
+    //
+    //
+    function StartEditingDistance()
+    {
+        $("#LiveDistance").addClass('hidden')
+        $("#EditDistance").removeClass('hidden');
+
+        $("#EditDistance").keyup(function (e)
+                                {
+                                    if (e.keyCode == 13)
+                                    {
+                                        $("#LiveDistance").removeClass('hidden')
+                                        $("#EditDistance").addClass('hidden');
+                                    }
+                                });
+
+        $("#EditDistanceInput").val('');
+        $("#EditDistanceInput").focus();
+        $("#EditDistanceInput").blur( function (e)
+                                      {
+                                          console.log("distance taken");
+                                          $("#LiveDistance").removeClass('hidden')
+                                          $("#EditDistance").addClass('hidden');
+                                      });
+    }
+
+
+
+
+
+
+
     //
     //
     //
@@ -291,8 +418,21 @@
       <main class="mdl-layout__content mdl-color--grey-100">
         <div class="mdl-grid">
 
-              <div class="mdl-color--red mdl-shadow--2dp mdl-cell mdl-cell--8-col-tablet mdl-cell--4-col-phone  mdl-cell--12-col-desktop mdl-grid" onclick="alert('Enter time for workout');">
-                    <div id="Time"> <div class="fixedValue SmallDigits">1:15:00.0</div>  </div>
+              <div class="mdl-color--red mdl-shadow--2dp mdl-cell mdl-cell--8-col-tablet mdl-cell--4-col-phone  mdl-cell--12-col-desktop mdl-grid">
+
+                    <div id="LiveTimeHours" class="Digits" onclick="StartEditingTimeHours();">0</div>  
+                    <div id="EditTimeHours" class="hidden"> <input id="EditTimeHoursInput" class="Digits input" type="text" size="1" maxlength="1"> </div>
+
+                    <div class="Digits">:</div> 
+
+                    <div id="LiveTimeMins" class="Digits" onclick="StartEditingTimeMins();">00</div>  
+                    <div id="EditTimeMins" class="hidden"> <input id="EditTimeMinsInput" class="Digits input" type="text" size="2" maxlength="2"> </div>
+
+                    <div class="Digits">:</div> 
+
+                    <div id="LiveTimeSecs" class="Digits" onclick="StartEditingTimeSecs();">00</div>  
+                    <div id="EditTimeSecs" class="hidden"> <input id="EditTimeSecsInput" class="Digits input" type="text" size="2" maxlength="2"> </div>
+
               </div>
 
               <div class="mdl-cell--8-col-tablet mdl-cell--4-col-phone  mdl-cell--12-col-desktop  mdl-grid">
@@ -316,8 +456,11 @@
                   </div>
               </div>
 
-              <div class="mdl-color--green mdl-shadow--2dp mdl-cell mdl-cell--8-col-tablet mdl-cell--4-col-phone  mdl-cell--12-col-desktop mdl-grid" onclick="alert('Enter distance for workout');">
-                    <div id="Distance"> <div class="SmallDigits">2000</div> <div class="Units">metres</div> </div>
+              <div class="mdl-color--green mdl-shadow--2dp mdl-cell mdl-cell--8-col-tablet mdl-cell--4-col-phone  mdl-cell--12-col-desktop mdl-grid">
+
+                    <div id="LiveDistance" class="Digits" onclick="StartEditingDistance();">00000</div>  
+                    <div id="EditDistance" class="hidden"> <input id="EditDistanceInput" class="Digits input" type="text" size="5" maxlength="5"> </div>
+
               </div>
 
 
