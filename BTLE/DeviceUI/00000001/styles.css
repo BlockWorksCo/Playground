@@ -98,6 +98,7 @@
     border-width:0;    
     padding: 0px;
     border: 0px;
+    padding-top:2.0em;
 }
 
 
@@ -116,6 +117,7 @@
     border-width:0;    
     padding: 0px;
     border: 0px;
+    display:block;
 }
 
 
