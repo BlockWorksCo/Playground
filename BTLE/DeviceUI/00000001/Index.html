@@ -169,6 +169,7 @@
                                         UpdateValue( 'EditTimeHoursInput' , $("#EditTimeHoursInput").val() );
                                         $("#LiveTimeHours").removeClass('hidden')
                                         $("#EditTimeHours").addClass('hidden');
+                                        $("#LiveTimeHours").html(window.values['EditTimeHoursInput']);
                                     }
                                 });
 
@@ -180,6 +181,7 @@
                                           console.log("hours taken");
                                           $("#LiveTimeHours").removeClass('hidden')
                                           $("#EditTimeHours").addClass('hidden');
+                                          $("#LiveTimeHours").html(window.values['EditTimeHoursInput']);
                                       });
     }
 
@@ -200,6 +202,7 @@
                                         UpdateValue( 'EditTimeMinsInput' , $("#EditTimeMinsInput").val() );
                                         $("#LiveTimeMins").removeClass('hidden')
                                         $("#EditTimeMins").addClass('hidden');
+                                        $("#LiveTimeMins").html(window.values['EditTimeMinsInput']);
                                     }
                                 });
 
@@ -211,6 +214,7 @@
                                           console.log("mins taken");
                                           $("#LiveTimeMins").removeClass('hidden')
                                           $("#EditTimeMins").addClass('hidden');
+                                          $("#LiveTimeMins").html(window.values['EditTimeMinsInput']);
                                       });
     }
 
@@ -233,6 +237,7 @@
                                         UpdateValue( 'EditTimeSecsInput' , $("#EditTimeSecsInput").val() );
                                         $("#LiveTimeSecs").removeClass('hidden')
                                         $("#EditTimeSecs").addClass('hidden');
+                                        $("#LiveTimeSecs").html(window.values['EditTimeSecsInput']);
                                     }
                                 });
 
@@ -244,6 +249,7 @@
                                           console.log("secs taken");
                                           $("#LiveTimeSecs").removeClass('hidden')
                                           $("#EditTimeSecs").addClass('hidden');
+                                          $("#LiveTimeSecs").html(window.values['EditTimeSecsInput']);
                                       });
     }
 
@@ -268,7 +274,8 @@
                                         UpdateValue( 'EditDistanceInput' , $("#EditDistanceInput").val() );
                                         $("#LiveDistance").removeClass('hidden')
                                         $("#EditDistance").addClass('hidden');
-                                    }
+                                        $("#LiveDistance").html(window.values['EditDistanceInput']);
+                                  }
                                 });
 
         $("#EditDistanceInput").val('');
@@ -279,6 +286,7 @@
                                           console.log("distance taken");
                                           $("#LiveDistance").removeClass('hidden')
                                           $("#EditDistance").addClass('hidden');
+                                          $("#LiveDistance").html(window.values['EditDistanceInput']);
                                       });
     }
 
@@ -303,6 +311,7 @@
                                         UpdateValue( 'EditPaceMinsInput' , $("#EditPaceMinsInput").val() );
                                         $("#LivePaceMins").removeClass('hidden')
                                         $("#EditPaceMins").addClass('hidden');
+                                        $("#LivePaceMins").html(window.values['EditPaceMinsInput']);
                                     }
                                 });
 
@@ -314,7 +323,8 @@
                                           console.log("taken");
                                           $("#LivePaceMins").removeClass('hidden')
                                           $("#EditPaceMins").addClass('hidden');
-                                      });
+                                          $("#LivePaceMins").html(window.values['EditPaceMinsInput']);
+                                    });
     }
 
 
@@ -333,7 +343,8 @@
                                         UpdateValue( 'EditPaceSecsInput' , $("#EditPaceSecsInput").val() );
                                         $("#LivePaceSecs").removeClass('hidden')
                                         $("#EditPaceSecs").addClass('hidden');
-                                    }
+                                        $("#LivePaceSecs").html(window.values['EditPaceSecsInput']);
+                                  }
                                 });
 
         $("#EditPaceSecsInput").val('');
@@ -344,6 +355,7 @@
                                           console.log("taken"+$("#EditPaceSecsInput").val());
                                           $("#LivePaceSecs").removeClass('hidden')
                                           $("#EditPaceSecs").addClass('hidden');
+                                          $("#LivePaceSecs").html(window.values['EditPaceSecsInput']);
                                       });
     }
 
