@@ -103,12 +103,57 @@
 
 
 
+
+
+#EditTimeHours input
+{
+    width:1ch;
+    border-width:0;    
+    padding: 0px;
+    border: 0px;
+    background: none;
+}
+
+#EditTimeMins input
+{
+    width:2ch;
+    border-width:0;    
+    padding: 0px;
+    border: 0px;
+    background: none;
+}
+
+#EditTimeSecs input
+{
+    width:2ch;
+    border-width:0;    
+    padding: 0px;
+    border: 0px;
+    background: none;
+}
+
+
+
+#EditDistance input
+{
+    width:5ch;
+    border-width:0;    
+    padding: 0px;
+    border: 0px;
+    background: none;
+}
+
+
+
+
+
 #EditPaceMins input
 {
     width:1ch;
     border-width:0;    
     padding: 0px;
     border: 0px;
+    background: none;
 }
 
 #EditPaceSecs input
@@ -117,7 +162,7 @@
     border-width:0;    
     padding: 0px;
     border: 0px;
-    display:block;
+    background: none;
 }
 
 
