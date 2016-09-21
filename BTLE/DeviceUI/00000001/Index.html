@@ -139,6 +139,14 @@
     }
 
 
+    //
+    //
+    //
+    function UpdateValue( name, value )
+    {
+        console.log(name+"=="+value);
+    }
+
 
     //
     //
@@ -152,6 +160,7 @@
                                 {
                                     if (e.keyCode == 13)
                                     {
+                                        UpdateValue( 'EditTimeHoursInput' , $("#EditTimeHoursInput").val() );
                                         $("#LiveTimeHours").removeClass('hidden')
                                         $("#EditTimeHours").addClass('hidden');
                                     }
@@ -161,6 +170,7 @@
         $("#EditTimeHoursInput").focus();
         $("#EditTimeHoursInput").blur( function (e)
                                       {
+                                          UpdateValue( 'EditTimeHoursInput' , $("#EditTimeHoursInput").val() );
                                           console.log("hours taken");
                                           $("#LiveTimeHours").removeClass('hidden')
                                           $("#EditTimeHours").addClass('hidden');
@@ -181,6 +191,7 @@
                                 {
                                     if (e.keyCode == 13)
                                     {
+                                        UpdateValue( 'EditTimeMinsInput' , $("#EditTimeMinsInput").val() );
                                         $("#LiveTimeMins").removeClass('hidden')
                                         $("#EditTimeMins").addClass('hidden');
                                     }
@@ -190,6 +201,7 @@
         $("#EditTimeMinsInput").focus();
         $("#EditTimeMinsInput").blur( function (e)
                                       {
+                                          UpdateValue( 'EditTimeMinsInput' , $("#EditTimeMinsInput").val() );
                                           console.log("mins taken");
                                           $("#LiveTimeMins").removeClass('hidden')
                                           $("#EditTimeMins").addClass('hidden');
@@ -212,6 +224,7 @@
                                 {
                                     if (e.keyCode == 13)
                                     {
+                                        UpdateValue( 'EditTimeSecsInput' , $("#EditTimeSecsInput").val() );
                                         $("#LiveTimeSecs").removeClass('hidden')
                                         $("#EditTimeSecs").addClass('hidden');
                                     }
@@ -221,6 +234,7 @@
         $("#EditTimeSecsInput").focus();
         $("#EditTimeSecsInput").blur( function (e)
                                       {
+                                          UpdateValue( 'EditTimeSecsInput' , $("#EditTimeSecsInput").val() );
                                           console.log("secs taken");
                                           $("#LiveTimeSecs").removeClass('hidden')
                                           $("#EditTimeSecs").addClass('hidden');
@@ -245,6 +259,7 @@
                                 {
                                     if (e.keyCode == 13)
                                     {
+                                        UpdateValue( 'EditDistanceInput' , $("#EditDistanceInput").val() );
                                         $("#LiveDistance").removeClass('hidden')
                                         $("#EditDistance").addClass('hidden');
                                     }
@@ -254,6 +269,7 @@
         $("#EditDistanceInput").focus();
         $("#EditDistanceInput").blur( function (e)
                                       {
+                                          UpdateValue( 'EditDistanceInput' , $("#EditDistanceInput").val() );
                                           console.log("distance taken");
                                           $("#LiveDistance").removeClass('hidden')
                                           $("#EditDistance").addClass('hidden');
@@ -278,6 +294,7 @@
                                 {
                                     if (e.keyCode == 13)
                                     {
+                                        UpdateValue( 'EditPaceMinsInput' , $("#EditPaceMinsInput").val() );
                                         $("#LivePaceMins").removeClass('hidden')
                                         $("#EditPaceMins").addClass('hidden');
                                     }
@@ -287,6 +304,7 @@
         $("#EditPaceMinsInput").focus();
         $("#EditPaceMinsInput").blur( function (e)
                                       {
+                                          UpdateValue( 'EditPaceMinsInput' , $("#EditPaceMinsInput").val() );
                                           console.log("taken");
                                           $("#LivePaceMins").removeClass('hidden')
                                           $("#EditPaceMins").addClass('hidden');
@@ -306,6 +324,7 @@
                                 {
                                     if (e.keyCode == 13)
                                     {
+                                        UpdateValue( 'EditPaceSecsInput' , $("#EditPaceSecsInput").val() );
                                         $("#LivePaceSecs").removeClass('hidden')
                                         $("#EditPaceSecs").addClass('hidden');
                                     }
@@ -315,7 +334,8 @@
         $("#EditPaceSecsInput").focus();
         $("#EditPaceSecsInput").blur( function (e)
                                       {
-                                          console.log("taken");
+                                          UpdateValue( 'EditPaceSecsInput' , $("#EditPaceSecsInput").val() );
+                                          console.log("taken"+$("#EditPaceSecsInput").val());
                                           $("#LivePaceSecs").removeClass('hidden')
                                           $("#EditPaceSecs").addClass('hidden');
                                       });
