@@ -73,6 +73,7 @@
     // Repeatedly long-poll for events. This is how the remote device can communicate
     // asynchronously with the js world.
     //
+    /*
     (function PollForAsyncEvents()
     {
        $.ajax({ url: "http://localhost:8080/AsyncPoll&type=314159265?data=919212313",
@@ -88,6 +89,7 @@
        });
 
     })();
+    */
 
 
 
@@ -99,11 +101,6 @@
     setInterval( function()
                 {
                     count = count+5;
-                    //$('#pie1').attr('transform','rotate('+count+', 0.5, 0.5)');
-                    //$('#pie2').attr('transform','rotate('+(count+90)+', 0.5, 0.5)');
-                    //$('#pie3').attr('transform','rotate('+(count+180)+', 0.5, 0.5)');
-                    //$('#pie4').attr('transform','rotate('+(count+270)+', 0.5, 0.5)');
-
                     p = RotatePoint( 0.4,0.9, 0.5,0.616, angle );
                     $('#test2').attr('d',"M 0.4,0.9 A 0.3,0.3  0 0 1  "+p.x+","+p.y);
 
@@ -117,7 +114,7 @@
     //
     //
     //
-    setInterval( function() {NonBlockingSend( 314159265, 919212313 );} , 100);
+    //setInterval( function() {NonBlockingSend( 314159265, 919212313 );} , 100);
 
 
     //
@@ -141,6 +138,227 @@
         return {'x':nx,'y':ny};
     }
 
+    //
+    //
+    //
+    window.values   = {};
+
+    //
+    //
+    //
+    function UpdateValue( name, value )
+    {
+        window.values[name]   = value;
+        //console.log(name+"=="+value);
+        console.log(window.values);
+    }
+
+
+    //
+    //
+    //
+    function StartEditingTimeHours()
+    {
+        $("#LiveTimeHours").addClass('hidden')
+        $("#EditTimeHours").removeClass('hidden');
+
+        $("#EditTimeHours").keyup(function (e)
+                                {
+                                    if (e.keyCode == 13)
+                                    {
+                                        UpdateValue( 'EditTimeHoursInput' , $("#EditTimeHoursInput").val() );
+                                        $("#LiveTimeHours").removeClass('hidden')
+                                        $("#EditTimeHours").addClass('hidden');
+                                        $("#LiveTimeHours").html(window.values['EditTimeHoursInput']);
+                                    }
+                                });
+
+        $("#EditTimeHoursInput").val('');
+        $("#EditTimeHoursInput").focus();
+        $("#EditTimeHoursInput").blur( function (e)
+                                      {
+                                          UpdateValue( 'EditTimeHoursInput' , $("#EditTimeHoursInput").val() );
+                                          console.log("hours taken");
+                                          $("#LiveTimeHours").removeClass('hidden')
+                                          $("#EditTimeHours").addClass('hidden');
+                                          $("#LiveTimeHours").html(window.values['EditTimeHoursInput']);
+                                      });
+    }
+
+
+
+    //
+    //
+    //
+    function StartEditingTimeMins()
+    {
+        $("#LiveTimeMins").addClass('hidden')
+        $("#EditTimeMins").removeClass('hidden');
+
+        $("#EditTimeMins").keyup(function (e)
+                                {
+                                    if (e.keyCode == 13)
+                                    {
+                                        UpdateValue( 'EditTimeMinsInput' , $("#EditTimeMinsInput").val() );
+                                        $("#LiveTimeMins").removeClass('hidden')
+                                        $("#EditTimeMins").addClass('hidden');
+                                        $("#LiveTimeMins").html(window.values['EditTimeMinsInput']);
+                                    }
+                                });
+
+        $("#EditTimeMinsInput").val('');
+        $("#EditTimeMinsInput").focus();
+        $("#EditTimeMinsInput").blur( function (e)
+                                      {
+                                          UpdateValue( 'EditTimeMinsInput' , $("#EditTimeMinsInput").val() );
+                                          console.log("mins taken");
+                                          $("#LiveTimeMins").removeClass('hidden')
+                                          $("#EditTimeMins").addClass('hidden');
+                                          $("#LiveTimeMins").html(window.values['EditTimeMinsInput']);
+                                      });
+    }
+
+
+
+
+
+    //
+    //
+    //
+    function StartEditingTimeSecs()
+    {
+        $("#LiveTimeSecs").addClass('hidden')
+        $("#EditTimeSecs").removeClass('hidden');
+
+        $("#EditTimeSecs").keyup(function (e)
+                                {
+                                    if (e.keyCode == 13)
+                                    {
+                                        UpdateValue( 'EditTimeSecsInput' , $("#EditTimeSecsInput").val() );
+                                        $("#LiveTimeSecs").removeClass('hidden')
+                                        $("#EditTimeSecs").addClass('hidden');
+                                        $("#LiveTimeSecs").html(window.values['EditTimeSecsInput']);
+                                    }
+                                });
+
+        $("#EditTimeSecsInput").val('');
+        $("#EditTimeSecsInput").focus();
+        $("#EditTimeSecsInput").blur( function (e)
+                                      {
+                                          UpdateValue( 'EditTimeSecsInput' , $("#EditTimeSecsInput").val() );
+                                          console.log("secs taken");
+                                          $("#LiveTimeSecs").removeClass('hidden')
+                                          $("#EditTimeSecs").addClass('hidden');
+                                          $("#LiveTimeSecs").html(window.values['EditTimeSecsInput']);
+                                      });
+    }
+
+
+
+
+
+
+
+    //
+    //
+    //
+    function StartEditingDistance()
+    {
+        $("#LiveDistance").addClass('hidden')
+        $("#EditDistance").removeClass('hidden');
+
+        $("#EditDistance").keyup(function (e)
+                                {
+                                    if (e.keyCode == 13)
+                                    {
+                                        UpdateValue( 'EditDistanceInput' , $("#EditDistanceInput").val() );
+                                        $("#LiveDistance").removeClass('hidden')
+                                        $("#EditDistance").addClass('hidden');
+                                        $("#LiveDistance").html(window.values['EditDistanceInput']);
+                                  }
+                                });
+
+        $("#EditDistanceInput").val('');
+        $("#EditDistanceInput").focus();
+        $("#EditDistanceInput").blur( function (e)
+                                      {
+                                          UpdateValue( 'EditDistanceInput' , $("#EditDistanceInput").val() );
+                                          console.log("distance taken");
+                                          $("#LiveDistance").removeClass('hidden')
+                                          $("#EditDistance").addClass('hidden');
+                                          $("#LiveDistance").html(window.values['EditDistanceInput']);
+                                      });
+    }
+
+
+
+
+
+
+
+    //
+    //
+    //
+    function StartEditingPaceMins()
+    {
+        $("#LivePaceMins").addClass('hidden')
+        $("#EditPaceMins").removeClass('hidden');
+
+        $("#EditPaceMins").keyup(function (e)
+                                {
+                                    if (e.keyCode == 13)
+                                    {
+                                        UpdateValue( 'EditPaceMinsInput' , $("#EditPaceMinsInput").val() );
+                                        $("#LivePaceMins").removeClass('hidden')
+                                        $("#EditPaceMins").addClass('hidden');
+                                        $("#LivePaceMins").html(window.values['EditPaceMinsInput']);
+                                    }
+                                });
+
+        $("#EditPaceMinsInput").val('');
+        $("#EditPaceMinsInput").focus();
+        $("#EditPaceMinsInput").blur( function (e)
+                                      {
+                                          UpdateValue( 'EditPaceMinsInput' , $("#EditPaceMinsInput").val() );
+                                          console.log("taken");
+                                          $("#LivePaceMins").removeClass('hidden')
+                                          $("#EditPaceMins").addClass('hidden');
+                                          $("#LivePaceMins").html(window.values['EditPaceMinsInput']);
+                                    });
+    }
+
+
+    //
+    //
+    //
+    function StartEditingPaceSecs()
+    {
+        $("#LivePaceSecs").addClass('hidden')
+        $("#EditPaceSecs").removeClass('hidden');
+
+        $("#EditPaceSecs").keyup(function (e)
+                                {
+                                    if (e.keyCode == 13)
+                                    {
+                                        UpdateValue( 'EditPaceSecsInput' , $("#EditPaceSecsInput").val() );
+                                        $("#LivePaceSecs").removeClass('hidden')
+                                        $("#EditPaceSecs").addClass('hidden');
+                                        $("#LivePaceSecs").html(window.values['EditPaceSecsInput']);
+                                  }
+                                });
+
+        $("#EditPaceSecsInput").val('');
+        $("#EditPaceSecsInput").focus();
+        $("#EditPaceSecsInput").blur( function (e)
+                                      {
+                                          UpdateValue( 'EditPaceSecsInput' , $("#EditPaceSecsInput").val() );
+                                          console.log("taken"+$("#EditPaceSecsInput").val());
+                                          $("#LivePaceSecs").removeClass('hidden')
+                                          $("#EditPaceSecs").addClass('hidden');
+                                          $("#LivePaceSecs").html(window.values['EditPaceSecsInput']);
+                                      });
+    }
+
 
     </script>
 
@@ -149,7 +367,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <title>Halo Demo One</title>
+    <title>Rowing Machine</title>
 
     <!-- Add to homescreen for Chrome on Android -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -183,36 +401,25 @@
     }
     </style>
 
+    <link href="base.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+
 
 </head>
 <body>
 
 
     <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+
       <header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
         <div class="mdl-layout__header-row">
-          <span class="mdl-layout-title">Home</span>
+          <span class="mdl-layout-title"><img src="images/C2logo.png"></img></span>
           <div class="mdl-layout-spacer"></div>
-          <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
-            <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
-              <i class="material-icons">search</i>
-            </label>
-            <div class="mdl-textfield__expandable-holder">
-              <input class="mdl-textfield__input" type="text" id="search">
-              <label class="mdl-textfield__label" for="search">Enter your query...</label>
-            </div>
-          </div>
-          <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
-            <i class="material-icons">more_vert</i>
-          </button>
-          <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
-            <li class="mdl-menu__item">About</li>
-            <li class="mdl-menu__item">Contact</li>
-            <li class="mdl-menu__item">Legal information</li>
-          </ul>
         </div>
       </header>
+
       <div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
+
         <header class="demo-drawer-header">
           <img src="images/user.jpg" class="demo-avatar">
           <div class="demo-avatar-dropdown">
@@ -229,135 +436,50 @@
             </ul>
           </div>
         </header>
+
+
         <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
-          <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home</a>
-          <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">inbox</i>Inbox</a>
-          <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>Trash</a>
-          <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">report</i>Spam</a>
-          <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">forum</i>Forums</a>
+          <a class="mdl-navigation__link" href="http://Concept2.com"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home</a>
+          <a class="mdl-navigation__link" href="http://log.concept2.com/log"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">inbox</i>Logbook</a>
+          <a class="mdl-navigation__link" href="http://www.c2forum.com/"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">forum</i>Forums</a>
+          <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">people</i>Calculators</a>
           <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">flag</i>Updates</a>
           <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">local_offer</i>Promos</a>
-          <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">shopping_cart</i>Purchases</a>
+          <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">shopping_cart</i>C2 Shop</a>
           <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">people</i>Social</a>
           <div class="mdl-layout-spacer"></div>
           <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">help_outline</i><span class="visuallyhidden">Help</span></a>
         </nav>
+
       </div>
+
+
+
+
       <main class="mdl-layout__content mdl-color--grey-100">
-        <div class="mdl-grid demo-content">
-          <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
-            <svg fill="currentColor" width="200px" height="200px" viewBox="0 0 1 1" class="demo-chart mdl-cell mdl-cell--4-col mdl-cell--3-col-desktop">
-              <use xlink:href="#piechart" mask="url(#piemask)" id="pie1"  transform="rotate(90 0.5 0.5)"  />
-              <text x="0.5" y="0.5" font-family="Roboto" font-size="0.3" fill="#888" text-anchor="middle" dy="0.1">82<tspan font-size="0.2" dy="-0.07">%</tspan></text>
-            </svg>
-            <svg fill="currentColor" width="200px" height="200px" viewBox="0 0 1 1" class="demo-chart mdl-cell mdl-cell--4-col mdl-cell--3-col-desktop">
-              <use xlink:href="#piechart" mask="url(#piemask)" id="pie2"  transform="rotate(0 0.5 0.5)"  />
-              <text x="0.5" y="0.5" font-family="Roboto" font-size="0.3" fill="#888" text-anchor="middle" dy="0.1">82<tspan dy="-0.07" font-size="0.2">%</tspan></text>
-            </svg>
-            <svg fill="currentColor" width="200px" height="200px" viewBox="0 0 1 1" class="demo-chart mdl-cell mdl-cell--4-col mdl-cell--3-col-desktop">
-              <use xlink:href="#piechart" mask="url(#piemask)" id="pie3"  transform="rotate(30 0.5 0.5)"  />
-              <text x="0.5" y="0.5" font-family="Roboto" font-size="0.3" fill="#888" text-anchor="middle" dy="0.1">82<tspan dy="-0.07" font-size="0.2">%</tspan></text>
-            </svg>
-            <svg fill="currentColor" width="200px" height="200px" viewBox="0 0 1 1" class="demo-chart mdl-cell mdl-cell--4-col mdl-cell--3-col-desktop">
-              <use xlink:href="#piechart" mask="url(#piemask)" id="pie4"  transform="rotate(170 0.5 0.5)" />
-              <text x="0.5" y="0.5" font-family="Roboto" font-size="0.3" fill="#888" text-anchor="middle" dy="0.1">82<tspan dy="-0.07" font-size="0.2">%</tspan></text>
-            </svg>
-          </div>
-          <div class="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col">
+        <div class="mdl-grid">
 
+              <div class="mdl-color--red mdl-shadow--2dp mdl-cell mdl-cell--8-col-tablet mdl-cell--4-col-phone  mdl-cell--12-col-desktop mdl-grid">
 
-            <div id="div1"><h2>Let jQuery AJAX Change This Text</h2></div>
-            <div id="div2"><h2>Let jQuery AJAX Change This Text</h2></div>
+                <div class="switch">
+                  <input id="cmn-toggle-1" class="cmn-toggle cmn-toggle-round" type="checkbox">
+                  <label for="cmn-toggle-1"></label>
+                </div>
 
-            <button onclick="myFunction()">Click me</button>
-
-            <!-- Accent-colored raised button with ripple -->
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"  onclick="alert('button one')">
-              Button
-            </button>
-
-            <div>
-                <svg viewBox="0 0 1 1" class="svg-content" xmlns="http://www.w3.org/2000/svg">
-                    <g stroke-width=0.1 stroke="black" fill="none"  stroke-linecap="round">
-                    <path d="M 0.4,0.9   A 0.3,0.3  0 1 1  0.6,0.9 "/>
-                    </g>
-
-                    <g stroke-width=0.1 stroke="grey" fill="none" stroke-linecap="round">
-                    <path id="test2" d="M 0.4,0.9 A 0.3,0.3  0 1 1  0.8,0.6 "/>
-                    </g>
-                </svg>
-            </div>
-
-
-            <!-- Colored FAB button -->
-            <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored" onclick="alert('FAB one')">
-              <i class="material-icons">add</i>
-            </button>
-
-          </div>
-          <div class="demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
-            <div class="demo-separator mdl-cell--1-col"></div>
-            <div class="demo-options mdl-card mdl-color--deep-purple-500 mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--3-col-tablet mdl-cell--12-col-desktop">
-              <div class="mdl-card__supporting-text mdl-color-text--blue-grey-50">
-                <h3>View options</h3>
-                <ul>
-                  <li>
-                    <label for="chkbox1" class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
-                      <input type="checkbox" id="chkbox1" class="mdl-checkbox__input">
-                      <span class="mdl-checkbox__label">Click per object</span>
-                    </label>
-                  </li>
-                  <li>
-                    <label for="chkbox2" class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
-                      <input type="checkbox" id="chkbox2" class="mdl-checkbox__input">
-                      <span class="mdl-checkbox__label">Views per object</span>
-                    </label>
-                  </li>
-                  <li>
-                    <label for="chkbox3" class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
-                      <input type="checkbox" id="chkbox3" class="mdl-checkbox__input">
-                      <span class="mdl-checkbox__label">Objects selected</span>
-                    </label>
-                  </li>
-                  <li>
-                    <label for="chkbox4" class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
-                      <input type="checkbox" id="chkbox4" class="mdl-checkbox__input">
-                      <span class="mdl-checkbox__label">Objects viewed</span>
-                    </label>
-                  </li>
-                </ul>
               </div>
-              <div class="mdl-card__actions mdl-card--border">
-                <a href="#" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--blue-grey-50">Change location</a>
-                <div class="mdl-layout-spacer"></div>
-                <i class="material-icons">location_on</i>
+
+              <div class="mdl-cell--8-col-tablet mdl-cell--4-col-phone  mdl-cell--12-col-desktop  mdl-grid">
+
               </div>
-            </div>
-          </div>
+
+
         </div>
       </main>
+
+
     </div>
 
-
-      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" style="position: fixed; left: -1000px; height: -1000px;">
-        <defs>
-          <mask id="piemask" maskContentUnits="objectBoundingBox">
-            <circle cx=0.5 cy=0.5 r=0.49 fill="white" />
-            <circle cx=0.5 cy=0.5 r=0.40 fill="black" />
-          </mask>
-          <g id="piechart">
-            <circle cx=0.5 cy=0.5 r=0.5 />
-            <path d="M 0.5 0.5 0.5 0 A 0.5 0.5 0 0 1 0.95 0.28 z" stroke="none" fill="rgba(255, 255, 255, 0.75)" />
-          </g>
-        </defs>
-      </svg>
-
-
-      <button id="view-source" class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored" onclick="alert('FAB!');">
-          <i class="material-icons">add</i>
-      </button>
     <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
-
 
 </body>
 </html>
