@@ -264,6 +264,23 @@ void timer_handler (int signum)
 //
 uint32_t    angle   = 0;
 
+uint32_t    EditTimeHoursInput  = 0;
+uint32_t    EditTimeMinsInput   = 0;
+uint32_t    EditTimeSecsInput   = 0;
+uint32_t    EditDistanceInput   = 0;
+uint32_t    EditPaceMinsInput   = 0;
+uint32_t    EditPaceSecsInput   = 0;
+
+bool        timeModifiedFlag        = false;
+bool        paceModifiedFlag        = false;
+bool        distanceModifiedFlag    = false;
+
+
+void Go()
+{
+    uint32_t    pace    = (EditPaceMinsInput*60) + EditPaceSecsInput;
+    uint32_t    time    = (EditTimeHoursInput*3600) + (EditTimeMinsInput*60) + EditTimeSecsInput;
+}
 
 
 //
@@ -338,6 +355,60 @@ int main()
                         executing. */
                         setitimer (ITIMER_REAL, &timer, NULL);
 
+                        break;
+                    }
+
+                    case 3:
+                    {
+                        printf("EditTimeHoursInput : %08x\n", event.numberOfPayloadBytes);
+                        EditTimeHoursInput  = event.numberOfPayloadBytes;
+                        timeModifiedFlag    = true;
+                        break;
+                    }
+
+                    case 4:
+                    {
+                        printf("EditTimeMinsInput : %08x\n", event.numberOfPayloadBytes);
+                        EditTimeMinsInput  = event.numberOfPayloadBytes;
+                        timeModifiedFlag    = true;
+                        break;
+                    }
+
+                    case 5:
+                    {
+                        printf("EditTimeSecsInput : %08x\n", event.numberOfPayloadBytes);
+                        EditTimeSecsInput  = event.numberOfPayloadBytes;
+                        timeModifiedFlag    = true;
+                        break;
+                    }
+
+                    case 6:
+                    {
+                        printf("EditDistanceInput : %08x\n", event.numberOfPayloadBytes);
+                        EditDistanceInput  = event.numberOfPayloadBytes;
+                        distanceModifiedFlag    = true;
+                        break;
+                    }
+
+                    case 7:
+                    {
+                        printf("EditPaceMinsInput : %08x\n", event.numberOfPayloadBytes);
+                        EditPaceMinsInput  = event.numberOfPayloadBytes;
+                        paceModifiedFlag    = true;
+                        break;
+                    }
+
+                    case 8:
+                    {
+                        printf("EditPaceSecsInput : %08x\n", event.numberOfPayloadBytes);
+                        EditPaceSecsInput  = event.numberOfPayloadBytes;
+                        paceModifiedFlag    = true;
+                        break;
+                    }
+
+                    case 9:
+                    {
+                        printf("\nGO!\n");
                         break;
                     }
 

@@ -148,9 +148,51 @@
     //
     function UpdateValue( name, value )
     {
+        //
+        // Store the values in the dict.
+        //
         window.values[name]   = value;
         //console.log(name+"=="+value);
         console.log(window.values);
+
+        //
+        // Work out the msgId and value.
+        //
+        if(name == 'EditTimeHoursInput')
+        {
+            msgId   = 3;
+            value   = Number(value);
+        }
+        else if(name == 'EditTimeMinsInput')
+        {
+            msgId   = 4;
+            value   = Number(value);
+        }
+        else if(name == 'EditTimeSecsInput')
+        {
+            msgId   = 5;
+            value   = Number(value);
+        }
+        else if(name == 'EditDistanceInput')
+        {
+            msgIdmsgId   = 6;
+            value   = Number(value);
+        }
+        else if(name == 'EditPaceMinsInput')
+        {
+            msgId   = 7;
+            value   = Number(value);
+        }
+        else if(name == 'EditPaceSecsInput')
+        {
+            msgId   = 8;
+            value   = Number(value);
+        }
+
+        //
+        // Send the data to the device.
+        //
+        NonBlockingSend( msgId, value );
     }
 
 
@@ -360,6 +402,20 @@
     }
 
 
+
+
+    //
+    // Called when the Go button is pressed.
+    //
+    function GoPressed()
+    {
+        //
+        // Send the data to the device.
+        //
+        NonBlockingSend( 9, 0 );
+    }
+
+
     </script>
 
 
@@ -505,7 +561,7 @@
 
 
           <div class="centered mdl-shadow--2dp mdl-color--white mdl-cell  mdl-cell--8-col-tablet mdl-cell--4-col-phone  mdl-cell--12-col-desktop ">
-            <button id="GoButton" class="centered mdl-button mdl-js-button mdl-button--fab mdl-button--colored" onclick="alert('FAB one')">
+            <button id="GoButton" class="centered mdl-button mdl-js-button mdl-button--fab mdl-button--colored" onclick="GoPressed();">
               <i class="material-icons">rowing</i>
             </button>
           </div>
