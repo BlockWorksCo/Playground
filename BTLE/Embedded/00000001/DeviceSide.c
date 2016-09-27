@@ -275,11 +275,93 @@ bool        timeModifiedFlag        = false;
 bool        paceModifiedFlag        = false;
 bool        distanceModifiedFlag    = false;
 
+uint32_t    currentDistance         = 0;
+uint32_t    currentTime             = 0;
+uint32_t    currentPace             = (1*60) + 45;
+uint32_t    currentSPM              = 30;
+uint32_t    secondsIntoRun          = 0;
+
+uint32_t    targetTime              = 0;
+uint32_t    targetPace              = 0;
+uint32_t    targetDistance          = 0;
+
 
 void Go()
 {
-    uint32_t    pace    = (EditPaceMinsInput*60) + EditPaceSecsInput;
-    uint32_t    time    = (EditTimeHoursInput*3600) + (EditTimeMinsInput*60) + EditTimeSecsInput;
+    if(timeModifiedFlag == true)
+    {
+        targetTime      = (EditTimeHoursInput*3600) + (EditTimeMinsInput*60) + EditTimeSecsInput;
+    }
+    else if(paceModifiedFlag == true)
+    {
+        targetPace      = (EditPaceMinsInput*60) + EditPaceSecsInput;
+    }
+    else if(distanceModifiedFlag == true)
+    {
+        targetDistance  = EditDistanceInput;
+    }
+
+    currentTime     = 0;
+}
+
+
+
+void UpdateSimulation()
+{
+    //
+    //
+    //
+    uint32_t    metresPerStroke     = currentTime;
+
+
+    currentTime++;
+
+    //
+    //
+    //
+    {
+        HaloEvent    reponseEvent     =
+        {
+            .timestamp              = GetCurrentTimestamp(),
+            .type                   = 11,
+            .numberOfPayloadBytes   = currentDistance,
+        };
+
+        HaloTransmitEvent( &reponseEvent );            
+    }
+
+    {
+        HaloEvent    reponseEvent     =
+        {
+            .timestamp              = GetCurrentTimestamp(),
+            .type                   = 12,
+            .numberOfPayloadBytes   = currentTime,
+        };
+
+        HaloTransmitEvent( &reponseEvent );            
+    }
+
+    {
+        HaloEvent    reponseEvent     =
+        {
+            .timestamp              = GetCurrentTimestamp(),
+            .type                   = 13,
+            .numberOfPayloadBytes   = currentPace,
+        };
+
+        HaloTransmitEvent( &reponseEvent );            
+    }
+
+    {
+        HaloEvent    reponseEvent     =
+        {
+            .timestamp              = GetCurrentTimestamp(),
+            .type                   = 14,
+            .numberOfPayloadBytes   = currentSPM,
+        };
+
+        HaloTransmitEvent( &reponseEvent );            
+    }
 }
 
 
@@ -437,6 +519,8 @@ int main()
         }
         else if(ret == 0)
         {
+            UpdateSimulation();
+
             perror("timeout error ");
             numberOfBytesRead   = 0;
             fflush(stdout);
