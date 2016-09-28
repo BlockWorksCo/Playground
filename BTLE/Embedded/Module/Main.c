@@ -563,6 +563,21 @@ static void power_manage(void)
 }
 
 
+
+
+//
+//
+//
+APP_TIMER_DEF(timerID);
+uint32_t    numberOfBytesIn = 0;
+
+
+void TimeoutOnUARTInput(void* p)
+{
+    numberOfBytesIn     = 0;
+}
+
+
 /**@brief Application main function.
  */
 int main(void)
@@ -603,6 +618,18 @@ int main(void)
     app_uart_put('\n');
 #endif
     dataIndex   = 0;
+
+
+    //
+    //
+    //
+    err_code = app_timer_create( &timerID, APP_TIMER_MODE_REPEATED, TimeoutOnUARTInput );
+    APP_ERROR_CHECK(err_code);
+
+
+    err_code = app_timer_start( timerID, APP_TIMER_TICKS(100, APP_TIMER_PRESCALER), TimeoutOnUARTInput );
+    APP_ERROR_CHECK(err_code);
+
     while(true)
     {
 
@@ -639,7 +666,13 @@ int main(void)
         if( app_uart_get(&rxData) == NRF_SUCCESS)
         {
             static uint8_t     inBytes[sizeof(HaloEvent)]     = {0};
-            static uint32_t    numberOfBytesIn = 0;
+
+
+            err_code = app_timer_stop( timerID );
+            APP_ERROR_CHECK(err_code);
+            err_code = app_timer_start( timerID, APP_TIMER_TICKS(100, APP_TIMER_PRESCALER), TimeoutOnUARTInput );
+            APP_ERROR_CHECK(err_code);
+
 
             inBytes[numberOfBytesIn]    = rxData;
             numberOfBytesIn++;

@@ -414,9 +414,11 @@ int main()
                         {
                             .timestamp              = GetCurrentTimestamp(),
                             .type                   = HALO_IDENTITY,
-                            .numberOfPayloadBytes   = 0x00000000,
+                            .numberOfPayloadBytes   = 0x00000001,
                         };
                         HaloTransmitEvent( &identityReponseEvent );
+
+                        printf("\n<Sending identity 00000001>\n");
 
                         break;
                     }
