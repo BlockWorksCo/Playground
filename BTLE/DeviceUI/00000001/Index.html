@@ -83,8 +83,16 @@
             },
             complete: function(jqXHR,status)
             {
-               PollForAsyncEvents();
-            }
+                if(status == 'error')
+                {
+                    alert('blaa');
+                    setTimeout( function() {PollForAsyncEvents();}, 1000 );
+                }
+                else
+                {
+                    PollForAsyncEvents();
+                }
+            },
        });
 
     })();
