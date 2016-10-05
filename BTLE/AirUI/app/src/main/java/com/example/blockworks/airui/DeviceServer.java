@@ -245,7 +245,7 @@ public class DeviceServer extends IntentService
             asyncType       = type;
             asyncPayload    = payload;
 
-            new CompleteAsyncRequestTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
+            new CompleteAsyncRequestTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[])null);
         }
 
         //

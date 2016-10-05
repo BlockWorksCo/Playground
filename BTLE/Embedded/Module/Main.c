@@ -570,11 +570,13 @@ static void power_manage(void)
 //
 APP_TIMER_DEF(timerID);
 uint32_t    numberOfBytesIn = 0;
+uint32_t    tickCount       = 0;
 
 
 void TimeoutOnUARTInput(void* p)
 {
     numberOfBytesIn     = 0;
+    tickCount++;
 }
 
 

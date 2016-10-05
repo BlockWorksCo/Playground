@@ -160,8 +160,8 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
         //
         // Start the scan.
         //
-        //mLEScanner.startScan(mScanCallback);
-        mLEScanner.startScan( filters, settings,  mScanCallback);
+        mLEScanner.startScan(mScanCallback);
+        //mLEScanner.startScan( filters, settings,  mScanCallback);
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -310,7 +310,7 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                     public void run() {
                         mLEScanner.startScan(mScanCallback);
                     }
-                }, 2000);
+                }, 200);
 
             }
 
