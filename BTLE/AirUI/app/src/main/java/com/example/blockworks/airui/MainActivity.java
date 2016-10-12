@@ -316,9 +316,13 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
 
 
             if (action.equals(UartService.ACTION_GATT_SERVICES_DISCOVERED)) {
+
+                Log.d(TAG, "UART_DISCOVERED_MSG");
+
                 //
                 //
                 //
+                displayActiveFlag   = false;
                 mService.enableTXNotification();
 
 
@@ -337,29 +341,12 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                         }
 
                         //
-                        // Send the request.
-                        //
-                        /*
-                        String message     = "<Identify>";
-                        try
-                        {
-                            byte[] value = message.getBytes("UTF-8");
-                            mService.writeRXCharacteristic(value);
-                        }
-                        catch(UnsupportedEncodingException e)
-                        {
-                            e.printStackTrace();
-                        }
-                        */
-
-                        //
                         // Send the Identity event to find out what device we're talking to.
                         //
                         byte[] payload = {};
                         mService.TransmitHaloEvent(0x00000001, payload);
                     }
                 });
-
 
             }
 
@@ -372,21 +359,22 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                 runOnUiThread(new Runnable() {
                     public void run() {
                         try {
-                            if (displayActiveFlag == false) {
+                            //
+                            // Parse the data into a HaloEvent.
+                            //
+                            ByteBuffer byteBuffer = ByteBuffer.allocate(txValue.length);
+                            byteBuffer.put(txValue);
+                            byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+                            int timestamp = byteBuffer.getInt(0);
+                            int type = byteBuffer.getInt(4);
+                            int bytesInPayload = byteBuffer.getInt(8);
+
+                            Log.i("Halo", "Received HaloEvent: " + timestamp + " " + type + " " + bytesInPayload);
+
+                            if ((displayActiveFlag == false) && (type == 1))
+                            {
                                 displayActiveFlag = true;
                                 String text = new String(txValue, "UTF-8");
-
-                                //
-                                // Parse the data into a HaloEvent.
-                                //
-                                ByteBuffer byteBuffer = ByteBuffer.allocate(txValue.length);
-                                byteBuffer.put(txValue);
-                                byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-                                int timestamp = byteBuffer.getInt(0);
-                                int type = byteBuffer.getInt(4);
-                                int bytesInPayload = byteBuffer.getInt(8);
-
-                                Log.i("Halo", "Received HaloEvent: " + timestamp + " " + type + " " + bytesInPayload);
 
                                 //
                                 // We got a good response from the device, Stop the scan.
@@ -402,18 +390,23 @@ public class MainActivity extends Activity implements RadioGroup.OnCheckedChange
                                 b.putInt("Identity", bytesInPayload);
                                 uiIntent.putExtras(b);
                                 startActivityForResult(uiIntent, 123);
-                            } else {
-                                //
-                                // Parse the data into a HaloEvent.
-                                //
-                                ByteBuffer byteBuffer = ByteBuffer.allocate(txValue.length);
-                                byteBuffer.put(txValue);
-                                byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-                                int timestamp = byteBuffer.getInt(0);
-                                int type = byteBuffer.getInt(4);
-                                int payload = byteBuffer.getInt(8);
-
-                                deviceServer.ProcessEventReceivedFromDevice(timestamp, type, payload);
+                            }
+                            else
+                            {
+                                if(displayActiveFlag == true)
+                                {
+                                    //
+                                    // Forward the message to the display.
+                                    //
+                                    deviceServer.ProcessEventReceivedFromDevice(timestamp, type, bytesInPayload);
+                                }
+                                else
+                                {
+                                    //
+                                    // Ignore the message.
+                                    //
+                                    Log.i("Blaa", "message received while display not active... ignoring.");
+                                }
                             }
                         } catch (Exception e) {
                             Log.e(TAG, e.toString());

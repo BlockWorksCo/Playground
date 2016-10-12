@@ -443,7 +443,7 @@ public class DeviceServer extends IntentService
             //
             // Parse the request
             //
-            Log.i("Reader",request);
+            //Log.i("Reader",request);
 
             Pattern p = Pattern.compile("GET (.*)&(.*) HTTP");
             Matcher m = p.matcher(request);
