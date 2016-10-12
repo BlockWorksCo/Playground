@@ -9,6 +9,9 @@
 #include <sys/stat.h>
 
 
+#define MAX_PIECES      (1024)
+
+
 //
 //
 //
@@ -18,6 +21,94 @@ typedef struct
     uint32_t    length;
 
 } Piece;
+
+
+
+Piece       pieces[MAX_PIECES]  = {0};
+uint32_t    numberOfPieces      = 0;
+
+
+
+//
+//
+//
+void AddPiece( char* start, uint32_t length )
+{
+    for(uint32_t i=0; i<numberOfPieces; i++)
+    {
+        if(pieces[i].length == 0)
+        {
+            pieces[i].start    = start;
+            pieces[i].length   = length;
+            return;
+        }
+    }
+
+    pieces[numberOfPieces].start    = start;
+    pieces[numberOfPieces].length   = length;
+    numberOfPieces++;
+}
+
+
+
+//
+//
+//
+void RemovePiece( uint32_t i )
+{
+    pieces[i].length   = 0;
+}
+
+
+//
+//
+//
+void Insert( char* start, uint32_t length )
+{
+    for(uint32_t i=0; i<numberOfPieces; i++)
+    {
+        uint32_t    startA  = (uint64_t)start;
+        uint32_t    endA    = startA + length;
+        uint32_t    startB  = (uint64_t)pieces[i].start;
+        uint32_t    endB    = startB + length;
+
+        //
+        // A:  <------------->
+        // B:         <--------------->
+        //
+        if( (startA < startB) && (endA >= startB) && (endA <= endB) )
+        {
+
+        }
+
+        //
+        // A:                 <------------->
+        // B:        <--------------->
+        //
+        if( (startA >= startB) && (startA <= endB) && (endA >= endB) )
+        {
+
+        }
+
+        //
+        // A:                 <----->
+        // B:         <--------------->
+        //
+        if( (startA >= startB) && (endA <= endB) )
+        {
+
+        }
+
+        //
+        // A:     <------------------------>
+        // B:         <--------------->
+        //
+        if( (startA <= startB) && (endA >= endB) )
+        {
+
+        }
+    }
+}
 
 
 //
@@ -55,7 +146,7 @@ void OpenFile(char* fileName)
         perror ("mmap");
         return;
     }
-
+#if 0
     if(close (fd) == -1) 
     {
         perror ("close");
@@ -72,6 +163,22 @@ void OpenFile(char* fileName)
         perror ("munmap");
         return;
     }
+#endif
+
+    //
+    // Add the initial piece as the whole file.
+    //
+    AddPiece( p, sb.st_size );
+}
+
+
+
+//
+//
+//
+void DumpFile()
+{
+
 }
 
 
