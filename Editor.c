@@ -28,6 +28,16 @@ Piece       pieces[MAX_PIECES]  = {0};
 uint32_t    numberOfPieces      = 0;
 
 
+//
+//
+//
+void ModifyPiece( uint32_t i, char* start, uint32_t length )
+{
+    pieces[i].start    = start;
+    pieces[i].length   = length;
+}
+
+
 
 //
 //
@@ -38,14 +48,12 @@ void AddPiece( char* start, uint32_t length )
     {
         if(pieces[i].length == 0)
         {
-            pieces[i].start    = start;
-            pieces[i].length   = length;
+            ModifyPiece( i, start,length );
             return;
         }
     }
 
-    pieces[numberOfPieces].start    = start;
-    pieces[numberOfPieces].length   = length;
+    ModifyPiece( numberOfPieces, start,length );
     numberOfPieces++;
 }
 
@@ -63,14 +71,14 @@ void RemovePiece( uint32_t i )
 //
 //
 //
-void Insert( char* start, uint32_t length )
+void InsertPiece( char* start, uint32_t length )
 {
     for(uint32_t i=0; i<numberOfPieces; i++)
     {
-        uint32_t    startA  = (uint64_t)start;
-        uint32_t    endA    = startA + length;
-        uint32_t    startB  = (uint64_t)pieces[i].start;
-        uint32_t    endB    = startB + length;
+        uint64_t    startA  = (uint64_t)start;
+        uint64_t    endA    = startA + length;
+        uint64_t    startB  = (uint64_t)pieces[i].start;
+        uint64_t    endB    = startB + length;
 
         //
         // A:  <------------->
@@ -78,7 +86,8 @@ void Insert( char* start, uint32_t length )
         //
         if( (startA < startB) && (endA >= startB) && (endA <= endB) )
         {
-
+            ModifyPiece( i, (char*)startA,endA );
+            AddPiece( (char*)(endA+1),endB );
         }
 
         //
@@ -87,7 +96,8 @@ void Insert( char* start, uint32_t length )
         //
         if( (startA >= startB) && (startA <= endB) && (endA >= endB) )
         {
-
+            ModifyPiece( i, (char*)startA,endA );
+            AddPiece( (char*)(endA+1),endB );
         }
 
         //
@@ -121,6 +131,10 @@ void OpenFile(char* fileName)
     char*           p;
     int             fd;
 
+
+    //
+    // Open and map the file.
+    //
     fd = open ( fileName, O_RDONLY);
     if(fd == -1) 
     {
@@ -146,7 +160,18 @@ void OpenFile(char* fileName)
         perror ("mmap");
         return;
     }
+
+    //
+    // Add the initial piece as the whole file.
+    //
+    AddPiece( p, sb.st_size );
+
+
+
 #if 0
+    //
+    // Unmap and coe the file.
+    //
     if(close (fd) == -1) 
     {
         perror ("close");
@@ -165,10 +190,6 @@ void OpenFile(char* fileName)
     }
 #endif
 
-    //
-    // Add the initial piece as the whole file.
-    //
-    AddPiece( p, sb.st_size );
 }
 
 
