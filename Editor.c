@@ -7,7 +7,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <memory.h>
 
+
+#define NUMBER_OF_ELEMENTS(a)       (sizeof(a)/sizeof(a[0]))
 
 #define MAX_PIECES      (1024)
 
@@ -17,13 +20,39 @@
 //
 typedef struct
 {
-    char*       start;
+    const char* text;
+    uint32_t    position;
     uint32_t    length;
 
 } Piece;
 
 
-
+//
+// Pieces is an array of Piece structures that together make up a continuous, seamless coverage of the total 
+// buffer with no gaps:
+//      0 <-----><--------------><-><-------><-----------><----------------> NumLines
+// 
+// The array is unsorted, each piece may be immutable.
+// Possible insertion scenarios:
+//
+// A:
+//           <----->
+//        <------------------->
+//               becomes:
+//        <-><-----><--------->
+//
+// B:
+//        <-------->
+//            <--------------->
+//               becomes:
+//        <--------><--------->
+//
+// C:
+//                   <-------->
+//        <-------------->
+//               becomes:
+//        <---------><-------->
+//
 Piece       pieces[MAX_PIECES]  = {0};
 uint32_t    numberOfPieces      = 0;
 
@@ -31,93 +60,107 @@ uint32_t    numberOfPieces      = 0;
 //
 //
 //
-void ModifyPiece( uint32_t i, char* start, uint32_t length )
+uint32_t FindPieceContainingPosition( const uint32_t position )
 {
-    pieces[i].start    = start;
-    pieces[i].length   = length;
-}
-
-
-
-//
-//
-//
-void AddPiece( char* start, uint32_t length )
-{
-    for(uint32_t i=0; i<numberOfPieces; i++)
+    for(uint32_t i=0; i<NUMBER_OF_ELEMENTS(pieces); i++)
     {
-        if(pieces[i].length == 0)
+        uint32_t    start   = pieces[i].position;
+        uint32_t    end     = start + pieces[i].length;
+
+        if( (position >= start) && (position < end) )
         {
-            ModifyPiece( i, start,length );
-            return;
+            return i;
         }
     }
 
-    ModifyPiece( numberOfPieces, start,length );
-    numberOfPieces++;
-}
-
-
-
-//
-//
-//
-void RemovePiece( uint32_t i )
-{
-    pieces[i].length   = 0;
+    return -1;
 }
 
 
 //
 //
 //
-void InsertPiece( char* start, uint32_t length )
+uint32_t FindUnusedPiece()
 {
-    for(uint32_t i=0; i<numberOfPieces; i++)
+    for(uint32_t i=0; i<NUMBER_OF_ELEMENTS(pieces); i++)
     {
-        uint64_t    startA  = (uint64_t)start;
-        uint64_t    endA    = startA + length;
-        uint64_t    startB  = (uint64_t)pieces[i].start;
-        uint64_t    endB    = startB + length;
-
-        //
-        // A:  <------------->
-        // B:         <--------------->
-        //
-        if( (startA < startB) && (endA >= startB) && (endA <= endB) )
+        if( pieces[i].length == 0 )
         {
-            ModifyPiece( i, (char*)startA,endA );
-            AddPiece( (char*)(endA+1),endB );
-        }
-
-        //
-        // A:                 <------------->
-        // B:        <--------------->
-        //
-        if( (startA >= startB) && (startA <= endB) && (endA >= endB) )
-        {
-            ModifyPiece( i, (char*)startA,endA );
-            AddPiece( (char*)(endA+1),endB );
-        }
-
-        //
-        // A:                 <----->
-        // B:         <--------------->
-        //
-        if( (startA >= startB) && (endA <= endB) )
-        {
-
-        }
-
-        //
-        // A:     <------------------------>
-        // B:         <--------------->
-        //
-        if( (startA <= startB) && (endA >= endB) )
-        {
-
+            return i;
         }
     }
+
+    return -1;
+}
+
+
+//
+//
+//
+void Replace( const char* text, const uint32_t rangeStart, const uint32_t rangeEnd )
+{
+    uint32_t    i   = FindPieceContainingPosition( rangeStart );
+}
+
+
+//
+//
+//
+void Insert( const char* text, const uint32_t position, const uint32_t length )
+{
+    uint32_t    pieceToSplit    = FindPieceContainingPosition( position );
+    uint32_t    pieceToOverlay  = FindUnusedPiece();
+
+    //
+    // Always need the new piece to overlay.
+    //
+    pieces[pieceToOverlay].text    = text;
+    pieces[pieceToOverlay].length  = length;
+    pieces[pieceToOverlay].position= position;
+
+    //
+    // Work out the modifications needed.
+    //
+    uint32_t    lengthBefore        = position - pieces[pieceToSplit].position;
+    uint32_t    lengthAfter         = (pieces[pieceToSplit].position + pieces[pieceToSplit].length) - (position + length);
+
+    //
+    // Nothing before it, so we need to move this one up.
+    //
+    if(lengthBefore == 0)
+    {
+        pieces[pieceToSplit].text      = &pieces[pieceToSplit].text[length];
+        pieces[pieceToSplit].length    = lengthAfter;
+        pieces[pieceToSplit].position  += length;
+    }
+    
+    //
+    // Nothing after it, so just truncate this one.
+    //
+    if(lengthAfter == 0)
+    {
+        pieces[pieceToSplit].length    = lengthBefore;
+    }
+
+    //
+    // We have text before and after the new piece
+    //
+    if( (lengthAfter > 0) && (lengthBefore > 0) )
+    {
+        //
+        // Truncate the 'before' piece.
+        //
+        pieces[pieceToSplit].length    = lengthBefore;
+
+        //
+        // Add a new piece with the 'after' data.
+        //
+        uint32_t    newPiece  = FindUnusedPiece();
+        pieces[newPiece].text    = &pieces[pieceToSplit].text[position - pieces[pieceToSplit].position + length];
+        pieces[newPiece].length  = lengthAfter;
+        pieces[newPiece].position= position+length;
+    }
+
 }
 
 
@@ -164,7 +207,9 @@ void OpenFile(char* fileName)
     //
     // Add the initial piece as the whole file.
     //
-    AddPiece( p, sb.st_size );
+    pieces[0].text      = p;
+    pieces[0].length    = sb.st_size;
+    pieces[0].position  = 0;
 
 
 
@@ -197,11 +242,26 @@ void OpenFile(char* fileName)
 //
 //
 //
-void DumpFile()
+void Show()
 {
+    uint32_t    position    = 0;
+    uint32_t    piece       = (uint32_t)-1;
 
+    do 
+    {
+        piece = FindPieceContainingPosition( position );
+        if( piece != (uint32_t)-1 )
+        {
+            for(uint32_t i=0; i<pieces[piece].length; i++)
+            {
+                printf( "%c",pieces[piece].text[i] );
+            }
+
+            position    += pieces[piece].length;
+        }
+
+    } while(piece != (uint32_t)-1);
 }
-
 
 
 //
@@ -215,7 +275,15 @@ int main(int argc, char* argv[])
     }
     else
     {
-        OpenFile( argv[1] );
+        //OpenFile( argv[1] );
+        pieces[0].text      = "One two three four five six seven eight nine ten.";
+        pieces[0].length    = strlen(pieces[0].text);
+        pieces[0].position  = 0;
+
+        Insert( "[Hello World]", 10, 13 );
+        //Replace( "[Hello World]", 10, 20 );
+
+        Show();
     }
 }
 
