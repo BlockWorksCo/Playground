@@ -97,26 +97,9 @@ uint32_t FindUnusedPiece()
 //
 //
 //
-void Replace( const char* text, const uint32_t rangeStart, const uint32_t rangeEnd )
-{
-    uint32_t    i   = FindPieceContainingPosition( rangeStart );
-}
-
-
-//
-//
-//
-void Insert( const char* text, const uint32_t position, const uint32_t length )
+void Remove( const uint32_t position, const uint32_t length )
 {
     uint32_t    pieceToSplit    = FindPieceContainingPosition( position );
-    uint32_t    pieceToOverlay  = FindUnusedPiece();
-
-    //
-    // Always need the new piece to overlay.
-    //
-    pieces[pieceToOverlay].text    = text;
-    pieces[pieceToOverlay].length  = length;
-    pieces[pieceToOverlay].position= position;
 
     //
     // Work out the modifications needed.
@@ -160,8 +143,83 @@ void Insert( const char* text, const uint32_t position, const uint32_t length )
         pieces[newPiece].length  = lengthAfter;
         pieces[newPiece].position= position+length;
     }
+}
+
+
+
+//
+//
+//
+void Insert( const char* text, const uint32_t position, const uint32_t length )
+{
+    uint32_t    pieceToSplit    = FindPieceContainingPosition( position );
+    uint32_t    pieceToOverlay  = FindUnusedPiece();
+
+    //
+    // Always need the new piece to overlay.
+    //
+    pieces[pieceToOverlay].text    = text;
+    pieces[pieceToOverlay].length  = length;
+    pieces[pieceToOverlay].position= position;
+
+    //
+    // Work out the modifications needed.
+    //
+    uint32_t    lengthBefore        = position - pieces[pieceToSplit].position;
+    uint32_t    lengthAfter         = (pieces[pieceToSplit].position + pieces[pieceToSplit].length) - position;
+
+    //
+    // Nothing before it, so we need to move this one up.
+    //
+    if(lengthBefore == 0)
+    {
+        pieces[pieceToSplit].text      = &pieces[pieceToSplit].text[length];
+        pieces[pieceToSplit].length    = lengthAfter;
+        pieces[pieceToSplit].position  += length;
+    }
+    
+    //
+    // Nothing after it, so just truncate this one.
+    //
+    if(lengthAfter == 0)
+    {
+        pieces[pieceToSplit].length    = lengthBefore;
+    }
+
+    //
+    // We have text before and after the new piece
+    //
+    if( (lengthAfter > 0) && (lengthBefore > 0) )
+    {
+        //
+        // Truncate the 'before' piece.
+        //
+        pieces[pieceToSplit].length    = lengthBefore;
+
+        //
+        // Add a new piece with the 'after' data.
+        //
+        uint32_t    newPiece  = FindUnusedPiece();
+        pieces[newPiece].text    = &pieces[pieceToSplit].text[position - pieces[pieceToSplit].position];
+        pieces[newPiece].length  = lengthAfter;
+        pieces[newPiece].position= position+length;
+    }
 
 }
+
+
+
+
+//
+//
+//
+void Replace( const char* text,  const uint32_t position, const uint32_t length )
+{
+    Remove( position, length );
+    Insert( text, position, length );
+}
+
+
 
 
 //
@@ -247,6 +305,7 @@ void Show()
     uint32_t    position    = 0;
     uint32_t    piece       = (uint32_t)-1;
 
+    printf("\n");
     do 
     {
         piece = FindPieceContainingPosition( position );
@@ -276,14 +335,28 @@ int main(int argc, char* argv[])
     else
     {
         //OpenFile( argv[1] );
+
+        //
+        //
+        //
         pieces[0].text      = "One two three four five six seven eight nine ten.";
         pieces[0].length    = strlen(pieces[0].text);
         pieces[0].position  = 0;
-
-        Insert( "[Hello World]", 10, 13 );
-        //Replace( "[Hello World]", 10, 20 );
-
         Show();
+
+        //
+        //
+        //
+        Insert( "[Hello World]", 10, 13 );
+        Show();
+
+        //
+        //
+        //
+        //Replace( "[Hello World]", 10, 20 );
+        //Show();
+
+        printf("\n\n");
     }
 }
 
