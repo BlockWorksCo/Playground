@@ -90,6 +90,23 @@ void Remove( const uint32_t pieceToSplit, const uint32_t position, const uint32_
     uint32_t    lengthAfter         = (pieces[pieceToSplit].length - position) - length;
 
     //
+    // 
+    //
+    if( lengthBefore == 0 )
+    {
+        pieces[pieceToSplit].text   = &pieces[pieceToSplit].text[length];
+        pieces[pieceToSplit].length -= length; 
+    }
+
+    //
+    // 
+    //
+    if( lengthAfter == 0 )
+    {
+        pieces[pieceToSplit].length -= length; 
+    }
+
+    //
     // We have text before and after the new piece
     //
     if( (lengthAfter > 0) && (lengthBefore > 0) )
@@ -449,6 +466,32 @@ int main(int argc, char* argv[])
         pieces[0].last  = (uint32_t)-1;
         Show();
         Remove( FindFirstPiece(), 10, 13 );
+        Show();
+        printf("\n");
+
+        //
+        //
+        //
+        memset( &pieces[0], 0, sizeof(pieces) );
+        pieces[0].text      = "One two three four five six seven eight nine ten.";
+        pieces[0].length    = strlen(pieces[0].text);
+        pieces[0].next  = (uint32_t)-1;
+        pieces[0].last  = (uint32_t)-1;
+        Show();
+        Remove( FindFirstPiece(), 0, 13 );
+        Show();
+        printf("\n");
+
+        //
+        //
+        //
+        memset( &pieces[0], 0, sizeof(pieces) );
+        pieces[0].text      = "One two three four five six seven eight nine ten.";
+        pieces[0].length    = strlen(pieces[0].text);
+        pieces[0].next  = (uint32_t)-1;
+        pieces[0].last  = (uint32_t)-1;
+        Show();
+        Remove( FindFirstPiece(), strlen(pieces[0].text)-13, 13 );
         Show();
         printf("\n");
 
