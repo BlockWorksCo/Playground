@@ -173,7 +173,7 @@ void Insert( const char* text, const uint32_t position, const uint32_t length )
     //
     if(lengthBefore == 0)
     {
-        pieces[pieceToSplit].text      = &pieces[pieceToSplit].text[length];
+        pieces[pieceToSplit].text      = &pieces[pieceToSplit].text[0];
         pieces[pieceToSplit].length    = lengthAfter;
         pieces[pieceToSplit].position  += length;
     }
@@ -339,22 +339,38 @@ int main(int argc, char* argv[])
         //
         //
         //
+        memset( &pieces[0], 0, sizeof(pieces) );
         pieces[0].text      = "One two three four five six seven eight nine ten.";
         pieces[0].length    = strlen(pieces[0].text);
         pieces[0].position  = 0;
         Show();
-
-        //
-        //
-        //
         Insert( "[Hello World]", 10, 13 );
         Show();
+        printf("\n");
 
         //
         //
         //
+        memset( &pieces[0], 0, sizeof(pieces) );
+        pieces[0].text      = "One two three four five six seven eight nine ten.";
+        pieces[0].length    = strlen(pieces[0].text);
+        pieces[0].position  = 0;
+        Show();
+        Insert( "[Hello World]", 0, 13 );
+        Show();
+        printf("\n");
+
+        //
+        //
+        //
+        memset( &pieces[0], 0, sizeof(pieces) );
+        pieces[0].text      = "One two three four five six seven eight nine ten.";
+        pieces[0].length    = strlen(pieces[0].text);
+        pieces[0].position  = 0;
+        Show();
         //Replace( "[Hello World]", 10, 20 );
-        //Show();
+        Show();
+        printf("\n");
 
         printf("\n\n");
     }
