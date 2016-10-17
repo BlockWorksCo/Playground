@@ -105,7 +105,6 @@ void Insert( const uint32_t pieceToSplit, const char* text, const uint32_t posit
     {
         //
         // Always need the new piece to overlay.
-        // <-----><++++++><------->
         //
         uint32_t    newPiece  = FindUnusedPiece();
         pieces[newPiece].text    = text;
@@ -132,9 +131,27 @@ void Insert( const uint32_t pieceToSplit, const char* text, const uint32_t posit
     //
     if(lengthAfter == 0)
     {
+        //
+        // Always need the new piece to overlay.
+        //
         uint32_t    newPiece  = FindUnusedPiece();
         pieces[newPiece].text    = text;
         pieces[newPiece].length  = length;
+
+        pieces[pieceToSplit].text      = &pieces[pieceToSplit].text[0];
+        pieces[pieceToSplit].length    = lengthBefore;
+
+        //
+        // Links
+        //
+        uint32_t    nextPiece       = pieces[pieceToSplit].next;
+        pieces[newPiece].next       = nextPiece;
+        pieces[newPiece].last       = pieceToSplit;
+        pieces[pieceToSplit].next   = newPiece;
+        if(nextPiece != (uint32_t)-1 )
+        {
+            pieces[nextPiece].last  = newPiece;
+        }
     }
 
     //
@@ -357,7 +374,7 @@ int main(int argc, char* argv[])
         pieces[0].next  = (uint32_t)-1;
         pieces[0].last  = (uint32_t)-1;
         Show();
-        Insert( 0, "[Hello World]", 10, 13 );
+        Insert( FindFirstPiece(), "[Hello World]", 10, 13 );
         Show();
         printf("\n");
 
@@ -370,7 +387,7 @@ int main(int argc, char* argv[])
         pieces[0].next  = (uint32_t)-1;
         pieces[0].last  = (uint32_t)-1;
         Show();
-        Insert( 0, "[Hello World]", 0, 13 );
+        Insert( FindFirstPiece(), "[Hello World]", 0, 13 );
         Show();
         printf("\n");
 
@@ -383,7 +400,7 @@ int main(int argc, char* argv[])
         pieces[0].next  = (uint32_t)-1;
         pieces[0].last  = (uint32_t)-1;
         Show();
-        //Insert( 0, "[Hello World]", strlen(pieces[0].text), 13 );
+        Insert( FindFirstPiece(), "[Hello World]", strlen(pieces[0].text), 13 );
         Show();
         printf("\n");
 
