@@ -120,8 +120,11 @@ void Insert( const uint32_t pieceToSplit, const char* text, const uint32_t posit
         uint32_t    previousPiece   = pieces[pieceToSplit].last;
         pieces[newPiece].next       = pieceToSplit;
         pieces[newPiece].last       = previousPiece;
-        pieces[pieceToSplit].last   = pieceToSplit;
-        pieces[previousPiece].next  = newPiece;
+        pieces[pieceToSplit].last   = newPiece;
+        if(previousPiece != (uint32_t)-1 )
+        {
+            pieces[previousPiece].next  = newPiece;
+        }
     }
     
     //
@@ -273,12 +276,31 @@ void InitialiseEditor()
 }
 
 
+
+
+//
+//
+//
+uint32_t FindFirstPiece()
+{
+    uint32_t    firstPiece  = 0;
+
+    while(pieces[firstPiece].last != (uint32_t)-1 )
+    {
+        firstPiece  = pieces[firstPiece].last;
+    }
+
+    return firstPiece;
+}
+
+
+
 //
 //
 //
 void Show()
 {
-    uint32_t    piece       = 0;
+    uint32_t    piece       = FindFirstPiece();
     uint32_t    i           = 0;
 
     printf("\n");
@@ -348,7 +370,7 @@ int main(int argc, char* argv[])
         pieces[0].next  = (uint32_t)-1;
         pieces[0].last  = (uint32_t)-1;
         Show();
-        //Insert( 0, "[Hello World]", 0, 13 );
+        Insert( 0, "[Hello World]", 0, 13 );
         Show();
         printf("\n");
 
