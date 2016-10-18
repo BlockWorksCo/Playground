@@ -79,9 +79,9 @@ uint32_t FindUnusedPiece()
 
 
 //
+// 
 //
-//
-void Remove( const uint32_t pieceToSplit, const uint32_t position, const uint32_t length )
+void RemoveFromSinglePiece( const uint32_t pieceToSplit, const uint32_t position, const uint32_t length )
 {
     //
     // Work out the modifications needed.
@@ -142,7 +142,7 @@ void Remove( const uint32_t pieceToSplit, const uint32_t position, const uint32_
 //
 //
 //
-void Insert( const uint32_t pieceToSplit, const char* text, const uint32_t position, const uint32_t length )
+void InsertFromSinglePiece( const uint32_t pieceToSplit, const char* text, const uint32_t position, const uint32_t length )
 {
     //
     // Work out the modifications needed.
@@ -426,7 +426,7 @@ int main(int argc, char* argv[])
         pieces[0].next  = (uint32_t)-1;
         pieces[0].last  = (uint32_t)-1;
         Show();
-        Insert( FindFirstPiece(), "[Hello World]", 10, 13 );
+        InsertFromSinglePiece( FindFirstPiece(), "[Hello World]", 10, 13 );
         Show();
         printf("\n");
 
@@ -439,7 +439,7 @@ int main(int argc, char* argv[])
         pieces[0].next  = (uint32_t)-1;
         pieces[0].last  = (uint32_t)-1;
         Show();
-        Insert( FindFirstPiece(), "[Hello World]", 0, 13 );
+        InsertFromSinglePiece( FindFirstPiece(), "[Hello World]", 0, 13 );
         Show();
         printf("\n");
 
@@ -452,7 +452,7 @@ int main(int argc, char* argv[])
         pieces[0].next  = (uint32_t)-1;
         pieces[0].last  = (uint32_t)-1;
         Show();
-        Insert( FindFirstPiece(), "[Hello World]", strlen(pieces[0].text), 13 );
+        InsertFromSinglePiece( FindFirstPiece(), "[Hello World]", strlen(pieces[0].text), 13 );
         Show();
         printf("\n");
 
@@ -465,7 +465,7 @@ int main(int argc, char* argv[])
         pieces[0].next  = (uint32_t)-1;
         pieces[0].last  = (uint32_t)-1;
         Show();
-        Remove( FindFirstPiece(), 10, 13 );
+        RemoveFromSinglePiece( FindFirstPiece(), 10, 13 );
         Show();
         printf("\n");
 
@@ -478,7 +478,7 @@ int main(int argc, char* argv[])
         pieces[0].next  = (uint32_t)-1;
         pieces[0].last  = (uint32_t)-1;
         Show();
-        Remove( FindFirstPiece(), 0, 13 );
+        RemoveFromSinglePiece( FindFirstPiece(), 0, 13 );
         Show();
         printf("\n");
 
@@ -491,7 +491,7 @@ int main(int argc, char* argv[])
         pieces[0].next  = (uint32_t)-1;
         pieces[0].last  = (uint32_t)-1;
         Show();
-        Remove( FindFirstPiece(), strlen(pieces[0].text)-13, 13 );
+        RemoveFromSinglePiece( FindFirstPiece(), strlen(pieces[0].text)-13, 13 );
         Show();
         printf("\n");
 
