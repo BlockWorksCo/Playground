@@ -20,28 +20,33 @@
 #include "armpmu_lib.h"
 
 
-void SetupGPIO()
+
+//
+//
+//
+uint32_t* SetupGPIO()
 {
-	const unsigned long	GPIO_BASE 	= 0x01C20000;
+	const unsigned long	GPIO_BASE 		= 0x01C20800;
+	const unsigned long 	PAGE_SIZE 		= 4096;
+	const unsigned long	GPIO_BASEPage 		= GPIO_BASE & ~(PAGE_SIZE-1);
+	uint32_t 		GPIO_BASEOffsetIntoPage	= GPIO_BASE - GPIO_BASEPage;
+  	int			mem_fd			= 0;
+  	void*			regAddrMap 		= MAP_FAILED;
 
-  	int		mem_fd		= 0;
-  	void*		regAddrMap 	= MAP_FAILED;
 
-    		if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) 
-		{
-     			perror("can't open /dev/mem");
-      			exit (1);
-    		}
+	if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) 
+	{
+		perror("can't open /dev/mem");
+		exit (1);
+	}
 
-   	/* mmap IO */
   	regAddrMap = mmap(
-      		NULL,             		//Any adddress in our space will do
-      		8192,       			//Map length
-      		PROT_READ|PROT_WRITE,	// Enable reading & writting to mapped memory
-      		MAP_PRIVATE,       	//Shared with other processes
-      		mem_fd,           	//File to map
-      		GPIO_BASE         	//Offset to base address
-  		);
+      		NULL,          
+      		8192,       	
+      		PROT_READ|PROT_WRITE,
+      		MAP_PRIVATE,     
+      		mem_fd,           
+		GPIO_BASEPage);
 
   	if (regAddrMap == MAP_FAILED) 
 	{
@@ -51,10 +56,15 @@ void SetupGPIO()
   	}
 
 	printf("gpio mapped to %p\n", regAddrMap);
+
+	return (uint32_t*)(regAddrMap + GPIO_BASEOffsetIntoPage);
 }
 
 
 
+//
+//
+//
 int main()
 {
 	uint32_t 	start;
