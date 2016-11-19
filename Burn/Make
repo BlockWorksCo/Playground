@@ -1,0 +1,6 @@
+
+
+gcc -std=c99 -O2 -o InputMain InputMain.c 
+
+
+
