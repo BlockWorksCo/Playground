@@ -2,5 +2,7 @@
 
 gcc -std=c99 -O2 -o InputMain InputMain.c 
 
+gcc -std=c99 -O2 -o OutputMain OutputMain.c 
+
 
 
