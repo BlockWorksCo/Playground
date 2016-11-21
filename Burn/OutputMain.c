@@ -74,7 +74,7 @@ uint32_t* SetupGPIO()
           	exit (1);
   	}
 
-	printf("gpio mapped to %p\n", regAddrMap);
+	printf("gpio mapped to %p = %08x\n", regAddrMap, (uint32_t)GPIO_BASEPage);
 
 	return (uint32_t*)(regAddrMap + GPIO_BASEOffsetIntoPage);
 }
@@ -90,24 +90,33 @@ int main()
 	uint32_t	end;
 	GPIOPort* 	gpio 	= (GPIOPort*)SetupGPIO();
 	GPIOPort*	portA	= &gpio[0];
-	GPIOPort*	portB	= &gpio[1];
-	GPIOPort*	portC	= &gpio[2];
-	GPIOPort*	portD	= &gpio[3];
-	GPIOPort*	portE	= &gpio[4];
-	GPIOPort*	portF	= &gpio[5];
+	GPIOPort*	portC	= &gpio[1];
+	GPIOPort*	portD	= &gpio[2];
+	GPIOPort*	portE	= &gpio[3];
+	GPIOPort*	portF	= &gpio[4];
+	GPIOPort*	portG	= &gpio[5];
+	GPIOPort*	portL	= &gpio[6];
 
-	printf("%08x\n",portA->CFG1);
+	printf("BASE = %08x\n",(uint32_t)gpio);
+	printf("&CFG1 = %08x\n",(uint32_t)&portA->CFG1);
+	printf("CFG1=%08x\n",portA->CFG1);
 	portA->CFG1 	&= ~(0xf0000000);
 	portA->CFG1 	|= 0x10000000;
-	printf("%08x\n",portA->CFG1);
+	printf("CFG1=%08x\n",portA->CFG1);
+
+	printf("DRV0=%08x\n",portA->DRV0);
+	portA->DRV0 	&= ~(0xA0000000);
+	portA->DRV0 	|= 0x10000000;
+	printf("DRV0=%08x\n",portA->DRV0);
+
 	while(true)
 	{
-		portA->DAT 	|= 1<<15;
-		//portA->DAT 	= 0xffffffff;
+		//portA->DAT 	|= 1<<16;
+		portA->DAT 	= 0xffffffff;
 		printf("%08x\n", portA->DAT);
 		sleep(1);
-		portA->DAT 	&= ~(1<<15);
-		//portA->DAT 	= 0;
+		//portA->DAT 	&= ~(1<<16);
+		portA->DAT 	= 0;
 		printf("%08x\n", portA->DAT);
 		sleep(1);
 
