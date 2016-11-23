@@ -98,13 +98,6 @@ int main()
 	volatile GPIOPort*	portL	= &gpio[6];
 
 
-	for(uint32_t i=0; i<9; i++)
-	{
-		printf("%02d) %08x\n",i, ((uint32_t*)gpio)[i]  );
-	}
-
-
-
 	printf("CFG1=%08x\n",portL->CFG1);
 	//portL->CFG1 	&= ~(0x0000f000);
 	//portL->CFG1 	|=   0x00001000;
@@ -119,23 +112,18 @@ int main()
 	portA->PUL1 	= 0x00000000;
 	printf("CFG1=%08x\n",portL->CFG1);
 
-	for(uint32_t i=0; i<9; i++)
-	{
-		printf("%02d) %08x\n",i, ((uint32_t*)gpio)[i]  );
-	}
-
 
 	while(true)
 	{
-		//portL->DAT 	|= 1<<10;
-		portA->DAT 	= 0xffffffff;
-		printf("%08x\n", portL->DAT);
-		msync( (void*)gpio, 9*4*6, MS_SYNC|MS_INVALIDATE);
+		portA->DAT 	|= 1<<17;
+		//portA->DAT 	= 0xffffffff;
+		printf("%08x\n", portA->DAT);
+		//msync( (void*)gpio, 9*4*6, MS_SYNC|MS_INVALIDATE);
 		sleep(1);
-		//portL->DAT 	&= ~(1<<10);
-		portA->DAT 	= 0;
-		printf("%08x\n", portL->DAT);
-		msync( (void*)gpio, 9*4*6, MS_SYNC|MS_INVALIDATE);
+		portA->DAT 	&= ~(1<<17);
+		//portA->DAT 	= 0;
+		printf("%08x\n", portA->DAT);
+		//msync( (void*)gpio, 9*4*6, MS_SYNC|MS_INVALIDATE);
 		sleep(1);
 
 #if 0
