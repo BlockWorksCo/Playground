@@ -25,17 +25,17 @@
 //
 typedef struct
 {
-	uint32_t	CFG0;
-	uint32_t	CFG1;
-	uint32_t	CFG2;
-	uint32_t	CFG3;
+	volatile uint32_t	CFG0;
+	volatile uint32_t	CFG1;
+	volatile uint32_t	CFG2;
+	volatile uint32_t	CFG3;
 
-	uint32_t	DAT;
-	uint32_t	DRV0;
-	uint32_t	DRV1;
+	volatile uint32_t	DAT;
+	volatile uint32_t	DRV0;
+	volatile uint32_t	DRV1;
 
-	uint32_t	PUL0;
-	uint32_t	PUL1;
+	volatile uint32_t	PUL0;
+	volatile uint32_t	PUL1;
 
 } GPIOPort;
 
@@ -62,8 +62,8 @@ uint32_t* SetupGPIO()
   	regAddrMap = mmap(
       		NULL,          
       		8192,       	
-      		PROT_READ|PROT_WRITE,
-      		MAP_PRIVATE,     
+			PROT_READ|PROT_WRITE|PROT_EXEC,// Enable reading & writting to mapped memory
+			MAP_SHARED,       //Shared with other processes
       		mem_fd,           
 		GPIO_BASEPage);
 
@@ -88,36 +88,54 @@ int main()
 {
 	uint32_t 	start;
 	uint32_t	end;
-	GPIOPort* 	gpio 	= (GPIOPort*)SetupGPIO();
-	GPIOPort*	portA	= &gpio[0];
-	GPIOPort*	portC	= &gpio[1];
-	GPIOPort*	portD	= &gpio[2];
-	GPIOPort*	portE	= &gpio[3];
-	GPIOPort*	portF	= &gpio[4];
-	GPIOPort*	portG	= &gpio[5];
-	GPIOPort*	portL	= &gpio[6];
+	volatile GPIOPort* 	gpio 	= (GPIOPort*)SetupGPIO();
+	volatile GPIOPort*	portA	= &gpio[0];
+	volatile GPIOPort*	portC	= &gpio[1];
+	volatile GPIOPort*	portD	= &gpio[2];
+	volatile GPIOPort*	portE	= &gpio[3];
+	volatile GPIOPort*	portF	= &gpio[4];
+	volatile GPIOPort*	portG	= &gpio[5];
+	volatile GPIOPort*	portL	= &gpio[6];
 
-	printf("BASE = %08x\n",(uint32_t)gpio);
-	printf("&CFG1 = %08x\n",(uint32_t)&portA->CFG1);
-	printf("CFG1=%08x\n",portA->CFG1);
-	portA->CFG1 	&= ~(0xf0000000);
-	portA->CFG1 	|= 0x10000000;
-	printf("CFG1=%08x\n",portA->CFG1);
 
-	printf("DRV0=%08x\n",portA->DRV0);
-	portA->DRV0 	&= ~(0xA0000000);
-	portA->DRV0 	|= 0x10000000;
-	printf("DRV0=%08x\n",portA->DRV0);
+	for(uint32_t i=0; i<9; i++)
+	{
+		printf("%02d) %08x\n",i, ((uint32_t*)gpio)[i]  );
+	}
+
+
+
+	printf("CFG1=%08x\n",portL->CFG1);
+	//portL->CFG1 	&= ~(0x0000f000);
+	//portL->CFG1 	|=   0x00001000;
+	portA->CFG0 	= 0x11111111;
+	portA->CFG1 	= 0x11111111;
+	portA->CFG2 	= 0x11111111;
+	portA->CFG3 	= 0x11111111;
+	portA->DAT  	= 0xffffffff;
+	portA->DRV0 	= 0x33333333;
+	portA->DRV1 	= 0x33333333;
+	portA->PUL0 	= 0x00000000;
+	portA->PUL1 	= 0x00000000;
+	printf("CFG1=%08x\n",portL->CFG1);
+
+	for(uint32_t i=0; i<9; i++)
+	{
+		printf("%02d) %08x\n",i, ((uint32_t*)gpio)[i]  );
+	}
+
 
 	while(true)
 	{
-		//portA->DAT 	|= 1<<16;
+		//portL->DAT 	|= 1<<10;
 		portA->DAT 	= 0xffffffff;
-		printf("%08x\n", portA->DAT);
+		printf("%08x\n", portL->DAT);
+		msync( (void*)gpio, 9*4*6, MS_SYNC|MS_INVALIDATE);
 		sleep(1);
-		//portA->DAT 	&= ~(1<<16);
+		//portL->DAT 	&= ~(1<<10);
 		portA->DAT 	= 0;
-		printf("%08x\n", portA->DAT);
+		printf("%08x\n", portL->DAT);
+		msync( (void*)gpio, 9*4*6, MS_SYNC|MS_INVALIDATE);
 		sleep(1);
 
 #if 0

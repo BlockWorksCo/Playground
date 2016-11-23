@@ -26,6 +26,8 @@ typedef struct
     uint32_t    next;
     uint32_t    last;
 
+    uint32_t    age;
+
 } Piece;
 
 
@@ -57,6 +59,7 @@ typedef struct
 //
 Piece       pieces[MAX_PIECES]  = {0};
 uint32_t    numberOfPieces      = 0;
+uint32_t    currentAge          = 0;
 
 
 
@@ -70,6 +73,9 @@ uint32_t FindUnusedPiece()
     {
         if( pieces[i].length == 0 )
         {
+            pieces[i].age   = currentAge;
+            currentAge++;
+
             return i;
         }
     }
@@ -247,15 +253,43 @@ void InsertFromSinglePiece( const uint32_t pieceToSplit, const char* text, const
 
 
 
+
 //
 //
 //
-void Replace( const char* text,  const uint32_t position, const uint32_t length )
+void Insert( const uint32_t pieceToSplit, const char* text, const uint32_t position, const uint32_t length )
 {
-    //Remove( position, length );
-    //Insert( text, position, length );
+    uint32_t    totalLength     = length;
+    uint32_t    thisLength      = totalLength;
+    uint32_t    thisPosition    = position;
+    uint32_t    currentPiece    = pieceToSplit;
+    char*       thisText        = (char*)text;
+    uint32_t    ageAtStart      = currentAge;
+
+    do 
+    {
+        if( (thisLength+position) > pieces[currentPiece].length )
+        {
+            thisLength  = pieces[currentPiece].length - (thisLength+position);
+        }
+        InsertFromSinglePiece( currentPiece, thisText, thisPosition, thisLength );
+
+        currentPiece    = pieces[currentPiece].next;
+        totalLength     -= thisLength;
+        thisText        += thisLength;
+        thisPosition    = 0;
+
+    } while((totalLength > 0) && (currentPiece != (uint32_t)-1) && (pieces[currentPiece].age < ageAtStart) );
 }
 
+
+
+//
+// 
+//
+void Remove( const uint32_t pieceToSplit, const uint32_t position, const uint32_t length )
+{
+}
 
 
 
@@ -492,6 +526,19 @@ int main(int argc, char* argv[])
         pieces[0].last  = (uint32_t)-1;
         Show();
         RemoveFromSinglePiece( FindFirstPiece(), strlen(pieces[0].text)-13, 13 );
+        Show();
+        printf("\n");
+
+        //
+        //
+        //
+        memset( &pieces[0], 0, sizeof(pieces) );
+        pieces[0].text      = "One two three four five six seven eight nine ten.";
+        pieces[0].length    = strlen(pieces[0].text);
+        pieces[0].next  = (uint32_t)-1;
+        pieces[0].last  = (uint32_t)-1;
+        Show();
+        Insert( FindFirstPiece(), " eleven twelve thirteen", strlen(pieces[0].text)-3, 23 );
         Show();
         printf("\n");
 
