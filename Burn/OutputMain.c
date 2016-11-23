@@ -99,8 +99,6 @@ int main()
 
 
 	printf("CFG1=%08x\n",portL->CFG1);
-	//portL->CFG1 	&= ~(0x0000f000);
-	//portL->CFG1 	|=   0x00001000;
 	portA->CFG0 	= 0x11111111;
 	portA->CFG1 	= 0x11111111;
 	portA->CFG2 	= 0x11111111;
@@ -116,14 +114,11 @@ int main()
 	while(true)
 	{
 		portA->DAT 	|= 1<<17;
-		//portA->DAT 	= 0xffffffff;
 		printf("%08x\n", portA->DAT);
-		//msync( (void*)gpio, 9*4*6, MS_SYNC|MS_INVALIDATE);
 		sleep(1);
+
 		portA->DAT 	&= ~(1<<17);
-		//portA->DAT 	= 0;
 		printf("%08x\n", portA->DAT);
-		//msync( (void*)gpio, 9*4*6, MS_SYNC|MS_INVALIDATE);
 		sleep(1);
 
 #if 0
