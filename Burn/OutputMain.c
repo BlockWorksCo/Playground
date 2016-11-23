@@ -113,11 +113,13 @@ int main()
 
 	while(true)
 	{
-		portA->DAT 	|= 1<<17;
+		//portA->DAT 	|= 1<<17;
+		portA->DAT 	= 0xffffffff;
 		printf("%08x\n", portA->DAT);
 		sleep(1);
 
-		portA->DAT 	&= ~(1<<17);
+		//portA->DAT 	&= ~(1<<17);
+		portA->DAT 	= 0;
 		printf("%08x\n", portA->DAT);
 		sleep(1);
 
