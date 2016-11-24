@@ -20,6 +20,71 @@
 #include "armpmu_lib.h"
 
 
+
+
+
+//
+//
+//
+typedef struct
+{
+	volatile uint32_t	CFG0;
+	volatile uint32_t	CFG1;
+	volatile uint32_t	CFG2;
+	volatile uint32_t	CFG3;
+
+	volatile uint32_t	DAT;
+	volatile uint32_t	DRV0;
+	volatile uint32_t	DRV1;
+
+	volatile uint32_t	PUL0;
+	volatile uint32_t	PUL1;
+
+} GPIOPort;
+
+
+//
+//
+//
+uint32_t* SetupGPIO()
+{
+	const unsigned long	GPIO_BASE 		= 0x01C20800;
+	const unsigned long 	PAGE_SIZE 		= 4096;
+	const unsigned long	GPIO_BASEPage 		= GPIO_BASE & ~(PAGE_SIZE-1);
+	uint32_t 		GPIO_BASEOffsetIntoPage	= GPIO_BASE - GPIO_BASEPage;
+  	int			mem_fd			= 0;
+  	void*			regAddrMap 		= MAP_FAILED;
+
+
+	if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) 
+	{
+		perror("can't open /dev/mem");
+		exit (1);
+	}
+
+  	regAddrMap = mmap(
+      		NULL,          
+      		8192,       	
+			PROT_READ|PROT_WRITE|PROT_EXEC,// Enable reading & writting to mapped memory
+			MAP_SHARED,       //Shared with other processes
+      		mem_fd,           
+		GPIO_BASEPage);
+
+  	if (regAddrMap == MAP_FAILED) 
+	{
+          	perror("mmap error");
+          	close(mem_fd);
+          	exit (1);
+  	}
+
+	printf("gpio mapped to %p = %08x\n", regAddrMap, (uint32_t)GPIO_BASEPage);
+
+	return (uint32_t*)(regAddrMap + GPIO_BASEOffsetIntoPage);
+}
+
+
+
+
 //
 //
 //
@@ -62,11 +127,11 @@ typedef struct
 //
 uint32_t* SetupSPI()
 {
-	const unsigned long	BASE 					= 0x01C68000;	// SPI0
-	//const unsigned long	BASE 					= 0x01C69000; 	// SPI1
+	//const unsigned long	BASE 					= 0x01C68000;	// SPI0
+	const unsigned long	BASE 					= 0x01C69000; 	// SPI1
 	const unsigned long PAGE_SIZE 				= 4096;
 	const unsigned long	BASEPage 				= BASE & ~(PAGE_SIZE-1);
-	uint32_t 			BASEOffsetIntoPage	= BASE - BASEPage;
+	uint32_t 			BASEOffsetIntoPage		= BASE - BASEPage;
   	int					mem_fd					= 0;
   	void*				regAddrMap 				= MAP_FAILED;
 
@@ -99,6 +164,19 @@ uint32_t* SetupSPI()
 
 
 
+
+
+volatile GPIOPort* 	gpio 	= 0;
+volatile SPIPort* 	spi 	= 0;
+volatile GPIOPort*	portA	= 0;
+volatile GPIOPort*	portC	= 0;
+volatile GPIOPort*	portD	= 0;
+volatile GPIOPort*	portE	= 0;
+volatile GPIOPort*	portF	= 0;
+volatile GPIOPort*	portG	= 0;
+volatile GPIOPort*	portL	= 0;
+
+
 //
 //
 //
@@ -106,7 +184,23 @@ int main()
 {
 	uint32_t 			start;
 	uint32_t			end;
-	volatile SPIPort* 	spi 	= (SPIPort*)SetupSPI();
+
+	gpio 	= (GPIOPort*)SetupGPIO();
+	spi 	= (SPIPort*)SetupSPI();
+
+	portA	= &gpio[0];
+	portC	= &gpio[1];
+	portD	= &gpio[2];
+	portE	= &gpio[3];
+	portF	= &gpio[4];
+	portG	= &gpio[5];
+	portL	= &gpio[6];
+
+	portA->CFG1 	&= ~0xfff00000;
+	portA->CFG1 	|=  0x22200000;
+
+	portA->CFG2 	&= ~0x0000000f;
+	portA->CFG2 	|=  0x00000002;
 
 	spi->CTL 	|= 0x80000000;
 	while( (spi->CTL&0x80000000)  != 0);
