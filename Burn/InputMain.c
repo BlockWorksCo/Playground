@@ -108,6 +108,10 @@ int main()
 	uint32_t			end;
 	volatile SPIPort* 	spi 	= (SPIPort*)SetupSPI();
 
+	spi->CTL 	|= 0x80000000;
+	while( (spi->CTL&0x80000000)  != 0);
+
+	spi->CTL 	|= 0x00000003;
 
 	printf("CTL=%08x\n", spi->CTL);
 	printf("INTCTL=%08x\n", spi->INTCTL);
@@ -117,17 +121,13 @@ int main()
 	printf("FSR=%08x\n", spi->FSR);
 	printf("CCTL=%08x\n", spi->CCTL);
 
-
+	uint32_t 	i 	= 0;
 	while(true)
 	{
-		//portA->DAT 	|= 1<<17;
-		//portA->DAT 	= 0xffffffff;
-		//printf("%08x\n", portA->DAT);
-		sleep(1);
-
-		//portA->DAT 	&= ~(1<<17);
-		//portA->DAT 	= 0;
-		printf("CTL %08x\n", spi->RXD);
+		printf("FSR=%08x\n", spi->FSR);
+		printf("INT_STA=%08x\n", spi->INT_STA);
+		spi->TXD 	= i;
+		i++;
 		sleep(1);
 
 #if 0
