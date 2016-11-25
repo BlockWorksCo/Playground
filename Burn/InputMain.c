@@ -125,11 +125,10 @@ typedef struct
 //
 //
 //
-uint32_t* SetupSPI()
+SPIPort* SetupSPI()
 {
-    //const uint32_t	BASE 					= 0x01C68000;	// SPI0
-    const uint32_t 		BASE 					= 0x01C69000; 	// SPI1
-    const uint32_t  	PAGE_SIZE 				= 4096*16;
+    const uint32_t	    BASE 					= 0x01C68000;	// SPI0
+    const uint32_t  	PAGE_SIZE 				= 4096;
     const uint32_t		BASEPage 				= BASE & ~(PAGE_SIZE-1);
     uint32_t 			BASEOffsetIntoPage		= BASE - BASEPage;
     int					mem_fd					= 0;
@@ -148,23 +147,23 @@ uint32_t* SetupSPI()
     }
 
       regAddrMap = mmap(
-              NULL,          
-              BASEOffsetIntoPage+PAGE_SIZE,       	
-            PROT_READ|PROT_WRITE|PROT_EXEC,// Enable reading & writting to mapped memory
-            MAP_SHARED,       //Shared with other processes
-              mem_fd,           
-            BASEPage);
+                        NULL,          
+                        BASEOffsetIntoPage+(PAGE_SIZE*2),       	
+                        PROT_READ|PROT_WRITE|PROT_EXEC,// Enable reading & writting to mapped memory
+                        MAP_SHARED,       //Shared with other processes
+                        mem_fd,           
+                        BASEPage);
 
-      if (regAddrMap == MAP_FAILED) 
-    {
+        if (regAddrMap == MAP_FAILED) 
+        {
               perror("mmap error");
               close(mem_fd);
               exit (1);
-      }
+        }
 
     printf("spi mapped to %p = %08x (+%08x)\n", regAddrMap, (uint32_t)BASEPage, BASEOffsetIntoPage);
 
-    return (uint32_t*)(regAddrMap + BASEOffsetIntoPage);
+    return (SPIPort*)(regAddrMap + BASEOffsetIntoPage);
 }
 
 
@@ -173,6 +172,8 @@ uint32_t* SetupSPI()
 
 volatile GPIOPort* 	gpio 	= 0;
 volatile SPIPort* 	spi 	= 0;
+volatile SPIPort*   spi0    = 0;
+volatile SPIPort*   spi1    = 0;
 volatile GPIOPort*	portA	= 0;
 volatile GPIOPort*	portC	= 0;
 volatile GPIOPort*	portD	= 0;
@@ -191,8 +192,6 @@ int main()
     uint32_t			end;
 
     gpio 	= (GPIOPort*)SetupGPIO();
-    spi 	= (SPIPort*)SetupSPI();
-
     portA	= &gpio[0];
     portC	= &gpio[1];
     portD	= &gpio[2];
@@ -200,6 +199,11 @@ int main()
     portF	= &gpio[4];
     portG	= &gpio[5];
     portL	= &gpio[6];
+
+    spi 	= (SPIPort*)SetupSPI();
+    spi0    = &spi[0];
+    spi1    = &spi[1];
+
 
     //
     // Pin setup.
@@ -211,40 +215,41 @@ int main()
     portA->CFG2 	|=  0x00000002;
 
     //
-    // SPI port setup.
+    // spiX port setup.
     //
-    spi->CTL 	= 0x00000083;
-    spi->INTCTL = 0x000001c4;
-    spi->IER 	= 0x00000000;
-    spi->INT_STA= 0x00000032;
-    spi->FCR 	= 0x00200020;
-    spi->FSR 	= 0x00000000;
-    spi->WAIT 	= 0x00000000;
-    spi->CCTL 	= 0x00001004;
-    spi->BC 	= 0x00000000;
-    spi->TC 	= 0x00000000;
-    spi->BCC 	= 0x00000000;
-    //msync( (void*)spi, 4096, MS_SYNC|MS_INVALIDATE);
+    volatile SPIPort* spiX    = spi1;
+    spiX->CTL 	= 0x00000083;
+    spiX->INTCTL = 0x000001c4;
+    spiX->IER 	= 0x00000000;
+    spiX->INT_STA= 0x00000032;
+    spiX->FCR 	= 0x00200020;
+    spiX->FSR 	= 0x00000000;
+    spiX->WAIT 	= 0x00000000;
+    spiX->CCTL 	= 0x00001004;
+    spiX->BC 	= 0x00000000;
+    spiX->TC 	= 0x00000000;
+    spiX->BCC 	= 0x00000000;
+    //msync( (void*)spiX, 4096, MS_SYNC|MS_INVALIDATE);
 
 
-    printf("CTL=%08x\n", spi->CTL);
-    printf("INTCTL=%08x\n", spi->INTCTL);
-    printf("IER=%08x\n", spi->IER);
-    printf("INT_STA=%08x\n", spi->INT_STA);
-    printf("FCR=%08x\n", spi->FCR);
-    printf("FSR=%08x\n", spi->FSR);
-    printf("WAIT=%08x\n", spi->WAIT);
-    printf("CCTL=%08x\n", spi->CCTL);
-    printf("BC=%08x\n", spi->BC);
-    printf("TC=%08x\n", spi->TC);
-    printf("BCC=%08x\n", spi->BCC);
+    printf("CTL=%08x\n", spiX->CTL);
+    printf("INTCTL=%08x\n", spiX->INTCTL);
+    printf("IER=%08x\n", spiX->IER);
+    printf("INT_STA=%08x\n", spiX->INT_STA);
+    printf("FCR=%08x\n", spiX->FCR);
+    printf("FSR=%08x\n", spiX->FSR);
+    printf("WAIT=%08x\n", spiX->WAIT);
+    printf("CCTL=%08x\n", spiX->CCTL);
+    printf("BC=%08x\n", spiX->BC);
+    printf("TC=%08x\n", spiX->TC);
+    printf("BCC=%08x\n", spiX->BCC);
 
     uint32_t 	i 	= 0;
     while(true)
     {
-        printf("FSR=%08x\n", spi->FSR);
-        printf("INT_STA=%08x\n", spi->INT_STA);
-        spi->TXD 	= i;
+        printf("FSR=%08x\n", spiX->FSR);
+        printf("INT_STA=%08x\n", spiX->INT_STA);
+        spiX->TXD 	= i;
         i++;
         sleep(1);
 
