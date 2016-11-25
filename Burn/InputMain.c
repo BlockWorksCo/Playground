@@ -127,14 +127,19 @@ typedef struct
 //
 uint32_t* SetupSPI()
 {
-	//const unsigned long	BASE 					= 0x01C68000;	// SPI0
-	const unsigned long	BASE 					= 0x01C69000; 	// SPI1
-	const unsigned long PAGE_SIZE 				= 4096;
-	const unsigned long	BASEPage 				= BASE & ~(PAGE_SIZE-1);
+	//const uint32_t	BASE 					= 0x01C68000;	// SPI0
+	const uint32_t 		BASE 					= 0x01C69000; 	// SPI1
+	const uint32_t  	PAGE_SIZE 				= 4096*16;
+	const uint32_t		BASEPage 				= BASE & ~(PAGE_SIZE-1);
 	uint32_t 			BASEOffsetIntoPage		= BASE - BASEPage;
   	int					mem_fd					= 0;
   	void*				regAddrMap 				= MAP_FAILED;
 
+
+	printf("BASE 						= %08x\n", BASE);
+	printf("BASEPage 					= %08x\n", BASEPage);
+	printf("BASEOffsetIntoPage 			= %08x\n", BASEOffsetIntoPage);
+	printf("BASE+BASEOffsetIntoPage 	= %08x\n", BASEPage+BASEOffsetIntoPage);
 
 	if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) 
 	{
@@ -144,7 +149,7 @@ uint32_t* SetupSPI()
 
   	regAddrMap = mmap(
       		NULL,          
-      		8192,       	
+      		BASEOffsetIntoPage+PAGE_SIZE,       	
 			PROT_READ|PROT_WRITE|PROT_EXEC,// Enable reading & writting to mapped memory
 			MAP_SHARED,       //Shared with other processes
       		mem_fd,           
@@ -157,7 +162,7 @@ uint32_t* SetupSPI()
           	exit (1);
   	}
 
-	printf("mapped to %p = %08x\n", regAddrMap, (uint32_t)BASEPage);
+	printf("spi mapped to %p = %08x (+%08x)\n", regAddrMap, (uint32_t)BASEPage, BASEOffsetIntoPage);
 
 	return (uint32_t*)(regAddrMap + BASEOffsetIntoPage);
 }
@@ -196,16 +201,26 @@ int main()
 	portG	= &gpio[5];
 	portL	= &gpio[6];
 
+	//
+	// Pin setup.
+	//
 	portA->CFG1 	&= ~0xfff00000;
 	portA->CFG1 	|=  0x22200000;
 
 	portA->CFG2 	&= ~0x0000000f;
 	portA->CFG2 	|=  0x00000002;
 
-	spi->CTL 	|= 0x80000000;
+	//
+	// SPI port setup.
+	//
+	spi->CTL 	= 0x80000083;
+
+	//spi->CTL 	|= 0x80000000;
 	while( (spi->CTL&0x80000000)  != 0);
 
-	spi->CTL 	|= 0x00000003;
+	spi->CCTL 	= 0x00001004;
+	spi->CTL 	= 0x00000083;
+
 
 	printf("CTL=%08x\n", spi->CTL);
 	printf("INTCTL=%08x\n", spi->INTCTL);
@@ -214,6 +229,7 @@ int main()
 	printf("FCR=%08x\n", spi->FCR);
 	printf("FSR=%08x\n", spi->FSR);
 	printf("CCTL=%08x\n", spi->CCTL);
+	printf("TC=%08x\n", spi->TC);
 
 	uint32_t 	i 	= 0;
 	while(true)
