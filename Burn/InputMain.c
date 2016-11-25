@@ -150,7 +150,7 @@ SPIPort* SetupSPI()
                         NULL,          
                         BASEOffsetIntoPage+(PAGE_SIZE*2),       	
                         PROT_READ|PROT_WRITE|PROT_EXEC,// Enable reading & writting to mapped memory
-                        MAP_SHARED,       //Shared with other processes
+                        MAP_PRIVATE,       //Shared with other processes
                         mem_fd,           
                         BASEPage);
 
@@ -217,19 +217,21 @@ int main()
     //
     // spiX port setup.
     //
+    spi1->CTL   = 0x81;
+    spi0->CTL   = 0x83;
     volatile SPIPort* spiX    = spi1;
-    spiX->CTL 	= 0x00000083;
+    spiX->CTL 	= 0x00000081;
     spiX->INTCTL = 0x000001c4;
     spiX->IER 	= 0x00000000;
     spiX->INT_STA= 0x00000032;
-    spiX->FCR 	= 0x00200020;
+    spiX->FCR 	= 0x00100010;
     spiX->FSR 	= 0x00000000;
     spiX->WAIT 	= 0x00000000;
     spiX->CCTL 	= 0x00001004;
     spiX->BC 	= 0x00000000;
     spiX->TC 	= 0x00000000;
     spiX->BCC 	= 0x00000000;
-    //msync( (void*)spiX, 4096, MS_SYNC|MS_INVALIDATE);
+    msync( (void*)spiX, 4096, MS_SYNC|MS_INVALIDATE);
 
 
     printf("CTL=%08x\n", spiX->CTL);
@@ -251,6 +253,7 @@ int main()
         printf("INT_STA=%08x\n", spiX->INT_STA);
         spiX->TXD 	= i;
         i++;
+        msync( (void*)spi, 8192, MS_SYNC );
         sleep(1);
 
 #if 0
