@@ -16,7 +16,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
+#include <stddef.h>
 #include "armpmu_lib.h"
 
 
@@ -111,7 +111,7 @@ typedef struct
     volatile uint32_t	TC;				// 0x3c transmit counter
     volatile uint32_t	BCC;			//  0x38 Burst control
 
-    volatile uint8_t	reserved4[0x1c0];// 0x40
+    volatile uint8_t	reserved4[0x1c4];// 0x40
 
     volatile uint32_t	TXD;			// 0x200
 
@@ -162,6 +162,9 @@ SPIPort* SetupSPI()
         }
 
     printf("spi mapped to %p = %08x (+%08x)\n", regAddrMap, (uint32_t)BASEPage, BASEOffsetIntoPage);
+    printf("TXD = %x\n", offsetof(SPIPort, TXD) );
+    printf("RXD = %x\n", offsetof(SPIPort, RXD) );
+    printf("BCC = %x\n", offsetof(SPIPort, BCC) );
 
     return (SPIPort*)(regAddrMap + BASEOffsetIntoPage);
 }
