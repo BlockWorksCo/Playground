@@ -84,6 +84,82 @@ uint32_t* SetupGPIO()
 
 
 
+void writel(uint32_t offset, uint32_t value)
+{
+    const uint32_t	    BASE 					= offset;
+    const uint32_t  	PAGE_SIZE 				= 4096;
+    const uint32_t		BASEPage 				= BASE & ~(PAGE_SIZE-1);
+    uint32_t 			BASEOffsetIntoPage		= BASE - BASEPage;
+    int					mem_fd					= 0;
+    void*				regAddrMap 				= MAP_FAILED;
+
+
+    if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) 
+    {
+        perror("can't open /dev/mem");
+        exit (1);
+    }
+
+      regAddrMap = mmap(
+                        NULL,          
+                        BASEOffsetIntoPage+(PAGE_SIZE*1),       	
+                        PROT_READ|PROT_WRITE|PROT_EXEC,// Enable reading & writting to mapped memory
+                        MAP_PRIVATE,       //Shared with other processes
+                        mem_fd,           
+                        BASEPage);
+
+        if (regAddrMap == MAP_FAILED) 
+        {
+              perror("mmap error");
+              close(mem_fd);
+              exit (1);
+        }
+
+    uint32_t*   pvalue = (uint32_t*)(regAddrMap + BASEOffsetIntoPage);
+    printf("value @%08x = %08x\n", offset, *pvalue );
+    *pvalue  = value; 
+    printf("value @%08x = %08x\n", offset, *pvalue );
+}
+
+
+uint32_t readl(uint32_t offset)
+{
+    const uint32_t	    BASE 					= offset;
+    const uint32_t  	PAGE_SIZE 				= 4096;
+    const uint32_t		BASEPage 				= BASE & ~(PAGE_SIZE-1);
+    uint32_t 			BASEOffsetIntoPage		= BASE - BASEPage;
+    int					mem_fd					= 0;
+    void*				regAddrMap 				= MAP_FAILED;
+
+
+    if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) 
+    {
+        perror("can't open /dev/mem");
+        exit (1);
+    }
+
+      regAddrMap = mmap(
+                        NULL,          
+                        BASEOffsetIntoPage+(PAGE_SIZE*1),       	
+                        PROT_READ|PROT_WRITE|PROT_EXEC,// Enable reading & writting to mapped memory
+                        MAP_PRIVATE,       //Shared with other processes
+                        mem_fd,           
+                        BASEPage);
+
+        if (regAddrMap == MAP_FAILED) 
+        {
+              perror("mmap error");
+              close(mem_fd);
+              exit (1);
+        }
+
+    uint32_t*   pvalue = (uint32_t*)(regAddrMap + BASEOffsetIntoPage);
+    printf("value @%08x = %08x\n", offset, *pvalue );
+
+    return *pvalue;
+}
+
+
 
 //
 //
@@ -170,6 +246,45 @@ SPIPort* SetupSPI()
 }
 
 
+//
+//
+//
+void spi_set_clk(SPIPort* spi, uint32_t spi_clk, uint32_t ahb_clk)
+{
+/* SPI Clock Control Register Bit Fields & Masks,default:0x0000_0002 */
+#define SPI_CLK_CTL_CDR2		(0xFF <<  0)	/* Clock Divide Rate 2,master mode only : SPI_CLK = AHB_CLK/(2*(n+1)) */
+#define SPI_CLK_CTL_CDR1		(0xF  <<  8)	/* Clock Divide Rate 1,master mode only : SPI_CLK = AHB_CLK/2^n */
+#define SPI_CLK_CTL_DRS			(0x1  << 12)	/* Divide rate select,default,0:rate 1;1:rate 2 */
+#define SPI_CLK_SCOPE			(SPI_CLK_CTL_CDR2+1)
+
+
+    uint32_t    reg_val = 0;
+    uint32_t    div_clk = ahb_clk / (spi_clk << 1);
+
+    printf("set spi clock %d, mclk %d\n", spi_clk, ahb_clk);
+    reg_val = spi->CCTL; // readl(base_addr + SPI_CLK_CTL_REG);
+
+    /* CDR2 */
+    if(div_clk <= SPI_CLK_SCOPE) {
+        if (div_clk != 0) {
+            div_clk--;
+        }
+        reg_val &= ~SPI_CLK_CTL_CDR2;
+        reg_val |= (div_clk | SPI_CLK_CTL_DRS);
+        printf("CDR2 - n = %d \n", div_clk);
+    }/* CDR1 */
+    else {
+		div_clk = 0;
+		while(ahb_clk > spi_clk){
+			div_clk++;
+			ahb_clk >>= 1;
+		}
+        reg_val &= ~(SPI_CLK_CTL_CDR1 | SPI_CLK_CTL_DRS);
+        reg_val |= (div_clk << 8);
+        printf("CDR1 - n = %d \n", div_clk);
+    }
+    spi->CCTL   = reg_val;  //writel(reg_val, base_addr + SPI_CLK_CTL_REG);
+}
 
 
 
@@ -207,6 +322,13 @@ int main()
     spi0    = &spi[0];
     spi1    = &spi[1];
 
+    //
+    // SPI1 clock setup
+    //
+    //uint32_t    clkRegValue     = readl(0x01C20000+0x00A0);
+    writel( 0x01C20000+0x00A4, 0x80000000 );    // 24MHz, no divider.
+
+
 
     //
     // Pin setup.
@@ -234,7 +356,7 @@ int main()
     spiX->BC 	= 0x00000000;
     spiX->TC 	= 0x00000000;
     spiX->BCC 	= 0x00000000;
-    msync( (void*)spiX, 4096, MS_SYNC|MS_INVALIDATE);
+    spi_set_clk( (SPIPort*)spiX, 10000000, 40000000);
 
 
     printf("CTL=%08x\n", spiX->CTL);
@@ -256,7 +378,6 @@ int main()
         printf("INT_STA=%08x\n", spiX->INT_STA);
         spiX->TXD 	= i;
         i++;
-        msync( (void*)spi, 8192, MS_SYNC );
         sleep(1);
 
 #if 0
