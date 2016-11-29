@@ -196,6 +196,8 @@ typedef struct
 
     volatile uint32_t	RXD;			// 0x300
 
+    volatile uint8_t	reserved6[0xcfc];// 0x204
+
 } SPIPort;
 
 
@@ -353,7 +355,7 @@ int main()
     // spiX port setup.
     //
     printf("sizeof(SPIPort) = %d\n", sizeof(SPIPort) );
-    volatile SPIPort* spiX    = (SPIPort*)(((uint8_t*)spi0)+4096);
+    volatile SPIPort* spiX    = spi1;
     spiX->CTL 	= 0x00000083;
     spiX->INTCTL = 0x000001c4;
     spiX->IER 	= 0x00000000;
