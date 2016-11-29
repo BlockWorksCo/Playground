@@ -104,7 +104,7 @@ void writel(uint32_t offset, uint32_t value)
                         NULL,          
                         BASEOffsetIntoPage+(PAGE_SIZE*1),       	
                         PROT_READ|PROT_WRITE|PROT_EXEC,// Enable reading & writting to mapped memory
-                        MAP_PRIVATE,       //Shared with other processes
+                        MAP_SHARED,       //Shared with other processes
                         mem_fd,           
                         BASEPage);
 
@@ -116,9 +116,10 @@ void writel(uint32_t offset, uint32_t value)
         }
 
     uint32_t*   pvalue = (uint32_t*)(regAddrMap + BASEOffsetIntoPage);
-    printf("value @%08x = %08x\n", offset, *pvalue );
-    *pvalue  = value; 
-    printf("value @%08x = %08x\n", offset, *pvalue );
+    printf("(writel 1) value @%08x = %08x\n", offset, *pvalue );
+    *pvalue  = value;
+    msync( pvalue, 4, MS_SYNC|MS_INVALIDATE ); 
+    printf("(writel 2) value @%08x = %08x\n", offset, *pvalue );
 }
 
 
@@ -142,7 +143,7 @@ uint32_t readl(uint32_t offset)
                         NULL,          
                         BASEOffsetIntoPage+(PAGE_SIZE*1),       	
                         PROT_READ|PROT_WRITE|PROT_EXEC,// Enable reading & writting to mapped memory
-                        MAP_PRIVATE,       //Shared with other processes
+                        MAP_SHARED,       //Shared with other processes
                         mem_fd,           
                         BASEPage);
 
@@ -154,7 +155,7 @@ uint32_t readl(uint32_t offset)
         }
 
     uint32_t*   pvalue = (uint32_t*)(regAddrMap + BASEOffsetIntoPage);
-    printf("value @%08x = %08x\n", offset, *pvalue );
+    printf("(readl) value @%08x = %08x\n", offset, *pvalue );
 
     return *pvalue;
 }
@@ -211,11 +212,6 @@ SPIPort* SetupSPI()
     void*				regAddrMap 				= MAP_FAILED;
 
 
-    printf("BASE 						= %08x\n", BASE);
-    printf("BASEPage 					= %08x\n", BASEPage);
-    printf("BASEOffsetIntoPage 			= %08x\n", BASEOffsetIntoPage);
-    printf("BASE+BASEOffsetIntoPage 	= %08x\n", BASEPage+BASEOffsetIntoPage);
-
     if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) 
     {
         perror("can't open /dev/mem");
@@ -226,7 +222,7 @@ SPIPort* SetupSPI()
                         NULL,          
                         BASEOffsetIntoPage+(PAGE_SIZE*2),       	
                         PROT_READ|PROT_WRITE|PROT_EXEC,// Enable reading & writting to mapped memory
-                        MAP_PRIVATE,       //Shared with other processes
+                        MAP_SHARED,       //Shared with other processes
                         mem_fd,           
                         BASEPage);
 
@@ -237,12 +233,9 @@ SPIPort* SetupSPI()
               exit (1);
         }
 
-    printf("spi mapped to %p = %08x (+%08x)\n", regAddrMap, (uint32_t)BASEPage, BASEOffsetIntoPage);
-    printf("TXD = %x\n", offsetof(SPIPort, TXD) );
-    printf("RXD = %x\n", offsetof(SPIPort, RXD) );
-    printf("BCC = %x\n", offsetof(SPIPort, BCC) );
+    uint32_t*   pvalue = (uint32_t*)(regAddrMap + BASEOffsetIntoPage);
 
-    return (SPIPort*)(regAddrMap + BASEOffsetIntoPage);
+    return (SPIPort*)pvalue;
 }
 
 
@@ -322,13 +315,30 @@ int main()
     spi0    = &spi[0];
     spi1    = &spi[1];
 
+    uint32_t    clkGating     = readl(0x01C20000+0x0060);
+    printf("clk gating = %08x\n", clkGating);
+    //writel( 0x01C20000+0x0060, 0xFF324140 ); 
+    writel( 0x01C20000+0x0060, clkGating | (1<<21) ); 
+    printf("clk gating = %08x\n", readl(0x01C20000+0x0060));
+
+    //sleep(2);
+
     //
     // SPI1 clock setup
     //
     //uint32_t    clkRegValue     = readl(0x01C20000+0x00A0);
-    writel( 0x01C20000+0x00A4, 0x80000000 );    // 24MHz, no divider.
-
-
+    writel( 0x01C20000+0x00A4, 0x80000000 );    // 24MHz, no divider
+    
+    //
+    //
+    //
+    printf("\n\n");
+    printf("GCR = %08x\n", readl(0x01C69000+0x04));
+    printf("TCR = %08x\n", readl(0x01C69000+0x8));
+    printf("IER = %08x\n", readl(0x01C69000+0x10));
+    printf("ISR = %08x\n", readl(0x01C69000+0x14));
+    printf("\n\n");
+    
 
     //
     // Pin setup.
@@ -342,23 +352,22 @@ int main()
     //
     // spiX port setup.
     //
-    spi1->CTL   = 0x81;
-    spi0->CTL   = 0x83;
-    volatile SPIPort* spiX    = spi1;
-    spiX->CTL 	= 0x00000081;
+    volatile SPIPort* spiX    = spi0;
+    spiX->CTL 	= 0x00000083;
     spiX->INTCTL = 0x000001c4;
     spiX->IER 	= 0x00000000;
-    spiX->INT_STA= 0x00000032;
+    spiX->INT_STA= 0x00000642;
     spiX->FCR 	= 0x00100010;
-    spiX->FSR 	= 0x00000000;
+    spiX->FSR 	= 0x00400000;
     spiX->WAIT 	= 0x00000000;
     spiX->CCTL 	= 0x00001004;
     spiX->BC 	= 0x00000000;
     spiX->TC 	= 0x00000000;
     spiX->BCC 	= 0x00000000;
-    spi_set_clk( (SPIPort*)spiX, 10000000, 40000000);
+    //spi_set_clk( (SPIPort*)spiX, 10000000, 40000000);
 
 
+    printf("\n\n");
     printf("CTL=%08x\n", spiX->CTL);
     printf("INTCTL=%08x\n", spiX->INTCTL);
     printf("IER=%08x\n", spiX->IER);
@@ -370,6 +379,9 @@ int main()
     printf("BC=%08x\n", spiX->BC);
     printf("TC=%08x\n", spiX->TC);
     printf("BCC=%08x\n", spiX->BCC);
+    printf("\n\n");
+
+    spiX->FCR   = spiX->FCR | 0x80000000;
 
     uint32_t 	i 	= 0;
     while(true)
