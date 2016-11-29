@@ -352,7 +352,8 @@ int main()
     //
     // spiX port setup.
     //
-    volatile SPIPort* spiX    = spi0;
+    printf("sizeof(SPIPort) = %d\n", sizeof(SPIPort) );
+    volatile SPIPort* spiX    = (SPIPort*)(((uint8_t*)spi0)+4096);
     spiX->CTL 	= 0x00000083;
     spiX->INTCTL = 0x000001c4;
     spiX->IER 	= 0x00000000;
