@@ -185,8 +185,8 @@ typedef struct
     volatile uint32_t	reserved3;		// 0x2c
 
     volatile uint32_t	BC;				// 0x30 burst counter
-    volatile uint32_t	TC;				// 0x3c transmit counter
-    volatile uint32_t	BCC;			//  0x38 Burst control
+    volatile uint32_t	TC;				// 0x34 transmit counter
+    volatile uint32_t	BCC;			// 0x38 Burst control
 
     volatile uint8_t	reserved4[0x1c4];// 0x40
 
@@ -330,7 +330,7 @@ int main()
     //
     // CCU:SPI1_CLK_REG clock setup
     //
-    writel( 0x01C20000+0x00A4, 0x8100000e );    // 24MHz, no divider
+    writel( 0x01C20000+0x00A4, 0x8203000e );    // 24MHz, no divider
     printf("SPI1_CLK_REG = %08x\n", readl(0x01C20000+0x00A4));
     
     //
@@ -377,8 +377,8 @@ int main()
     //
     // Setup burst mode.
     //
-    spiX->BC 	    = 0x00000001;
-    spiX->BCC 	    = 0x00000001;
+    spiX->BC 	    = 0x0000000e;
+    spiX->BCC 	    = 0x0000000e;
 
     printf("\n\n");
     printf("CTL=%08x\n", spiX->CTL);
@@ -404,13 +404,19 @@ int main()
         //
         // Write the data into the FIFO.
         //
-        spiX->TXD 	= i;
+        spiX->TXD 	= 0xa5;
 
         //
         // Set XCHG and wait for it to complete.
         //
+        spiX->INT_STA   = 0xffffffff;
+        spiX->BC 	    = 0x0000000e;
+        spiX->TC 	    = 0x0000000e;
+        spiX->BCC 	    = 0x00001001;
+        printf("BCC=%08x\n", spiX->BCC);
+
         spiX->INTCTL = 0x80000000;
-        while( (spiX->CTL&0x80000000) != 0);
+        while( (spiX->INTCTL&0x80000000) != 0);
 
 
         i++;
