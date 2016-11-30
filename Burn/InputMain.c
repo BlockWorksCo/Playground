@@ -324,27 +324,15 @@ int main()
     // CCU:BUS_CLK_GATING_REG0:SPI1     = PASS.
     //
     uint32_t    clkGating     = readl(0x01C20000+0x0060); 
-    printf("clk gating = %08x\n", clkGating);
     writel( 0x01C20000+0x0060, clkGating | (1<<21) ); 
-    printf("clk gating = %08x\n", readl(0x01C20000+0x0060));
+    printf("BUS_CLK_GATING_REG0:SPI1 = %08x\n", readl(0x01C20000+0x0060));
 
     //
     // CCU:SPI1_CLK_REG clock setup
     //
-    //uint32_t    clkRegValue     = readl(0x01C20000+0x00A0);
-    writel( 0x01C20000+0x00A4, 0x80000000 );    // 24MHz, no divider
+    writel( 0x01C20000+0x00A4, 0x8100000e );    // 24MHz, no divider
+    printf("SPI1_CLK_REG = %08x\n", readl(0x01C20000+0x00A4));
     
-    //
-    //
-    //
-    printf("\n\n");
-    printf("GCR = %08x\n", readl(0x01C69000+0x04));
-    printf("TCR = %08x\n", readl(0x01C69000+0x8));
-    printf("IER = %08x\n", readl(0x01C69000+0x10));
-    printf("ISR = %08x\n", readl(0x01C69000+0x14));
-    printf("\n\n");
-    
-
     //
     // Pin setup.
     //
@@ -357,7 +345,6 @@ int main()
     //
     // spiX port setup.
     //
-    printf("sizeof(SPIPort) = %d\n", sizeof(SPIPort) );
     volatile SPIPort* spiX    = spi1;
     spiX->CTL 	= 0x00000083;
     spiX->INTCTL = 0x000001c4;
@@ -370,7 +357,6 @@ int main()
     spiX->BC 	= 0x00000004;
     spiX->TC 	= 0x00000000;
     spiX->BCC 	= 0x00000000;
-    //spi_set_clk( (SPIPort*)spiX, 10000000, 40000000);
 
     //
     // Reset and wait for reset to complete.
