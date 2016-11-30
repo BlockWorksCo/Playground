@@ -304,6 +304,9 @@ int main()
     uint32_t 			start;
     uint32_t			end;
 
+    //
+    //
+    //
     gpio 	= (GPIOPort*)SetupGPIO();
     portA	= &gpio[0];
     portC	= &gpio[1];
@@ -317,16 +320,16 @@ int main()
     spi0    = &spi[0];
     spi1    = &spi[1];
 
-    uint32_t    clkGating     = readl(0x01C20000+0x0060);
+    //
+    // CCU:BUS_CLK_GATING_REG0:SPI1     = PASS.
+    //
+    uint32_t    clkGating     = readl(0x01C20000+0x0060); 
     printf("clk gating = %08x\n", clkGating);
-    //writel( 0x01C20000+0x0060, 0xFF324140 ); 
     writel( 0x01C20000+0x0060, clkGating | (1<<21) ); 
     printf("clk gating = %08x\n", readl(0x01C20000+0x0060));
 
-    //sleep(2);
-
     //
-    // SPI1 clock setup
+    // CCU:SPI1_CLK_REG clock setup
     //
     //uint32_t    clkRegValue     = readl(0x01C20000+0x00A0);
     writel( 0x01C20000+0x00A4, 0x80000000 );    // 24MHz, no divider
@@ -364,11 +367,32 @@ int main()
     spiX->FSR 	= 0x00400000;
     spiX->WAIT 	= 0x00000000;
     spiX->CCTL 	= 0x00001004;
-    spiX->BC 	= 0x00000000;
+    spiX->BC 	= 0x00000004;
     spiX->TC 	= 0x00000000;
     spiX->BCC 	= 0x00000000;
     //spi_set_clk( (SPIPort*)spiX, 10000000, 40000000);
 
+    //
+    // Reset and wait for reset to complete.
+    //
+    spiX->CTL 	    = 0x80000000;
+    while( (spiX->CTL&0x80000000) != 0);
+
+    //
+    // Reset the TX fifo.
+    //
+    spiX->FCR       = spiX->FCR | 0x80000000;
+
+    //
+    // Clear all conditions.
+    //
+    spiX->INT_STA   = 0xffffffff;
+
+    //
+    // Setup burst mode.
+    //
+    spiX->BC 	    = 0x00000001;
+    spiX->BCC 	    = 0x00000001;
 
     printf("\n\n");
     printf("CTL=%08x\n", spiX->CTL);
@@ -384,14 +408,25 @@ int main()
     printf("BCC=%08x\n", spiX->BCC);
     printf("\n\n");
 
-    spiX->FCR   = spiX->FCR | 0x80000000;
 
     uint32_t 	i 	= 0;
     while(true)
     {
         printf("FSR=%08x\n", spiX->FSR);
         printf("INT_STA=%08x\n", spiX->INT_STA);
+
+        //
+        // Write the data into the FIFO.
+        //
         spiX->TXD 	= i;
+
+        //
+        // Set XCHG and wait for it to complete.
+        //
+        spiX->INTCTL = 0x80000000;
+        while( (spiX->CTL&0x80000000) != 0);
+
+
         i++;
         sleep(1);
 
