@@ -345,7 +345,7 @@ int main()
     //
     // spiX port setup.
     //
-    volatile SPIPort* spiX    = spi1;
+    volatile SPIPort* spiX    = spi0;
     spiX->CTL 	= 0x00000083;
     spiX->INTCTL = 0x000001c4;
     spiX->IER 	= 0x00000000;
@@ -394,6 +394,22 @@ int main()
     printf("BCC=%08x\n", spiX->BCC);
     printf("\n\n");
 
+    printf("\n\n");
+    printf("CTL=%08x\n",    offsetof(SPIPort, CTL));
+    printf("INTCTL=%08x\n", offsetof(SPIPort, INTCTL));
+    printf("IER=%08x\n",    offsetof(SPIPort, IER));
+    printf("INT_STA=%08x\n",offsetof(SPIPort, INT_STA));
+    printf("FCR=%08x\n",    offsetof(SPIPort, FCR));
+    printf("FSR=%08x\n",    offsetof(SPIPort, FSR));
+    printf("WAIT=%08x\n",   offsetof(SPIPort, WAIT));
+    printf("CCTL=%08x\n",   offsetof(SPIPort, CCTL));
+    printf("BC=%08x\n",     offsetof(SPIPort, BC));
+    printf("TC=%08x\n",     offsetof(SPIPort, TC));
+    printf("BCC=%08x\n",    offsetof(SPIPort, BCC));
+    printf("TXD=%08x\n",    offsetof(SPIPort, TXD));
+    printf("RXD=%08x\n",    offsetof(SPIPort, RXD));
+    printf("\n\n");
+
 
     uint32_t 	i 	= 0;
     while(true)
@@ -402,21 +418,37 @@ int main()
         printf("INT_STA=%08x\n", spiX->INT_STA);
 
         //
+        // clear down all status flags.
+        //
+        spiX->INT_STA   = 0xffffffff;
+
+        //
         // Write the data into the FIFO.
         //
-        spiX->TXD 	= 0xa5;
+        //spiX->FCR       = 0x80008000;
+        uint32_t*       txFIFO  = (uint32_t*)&spiX->TXD;
+        spiX->TXD 	= 0x01234567;
+        spiX->TXD 	= 0x01234567;
+
+        //
+        //
+        //
+        spiX->BC 	    = 0x00000001;
+        spiX->TC 	    = 0x00000001;
+        spiX->BCC 	    = 0x01000001;
+        spiX->CTL 	    = 0x00000003;
 
         //
         // Set XCHG and wait for it to complete.
         //
-        spiX->INT_STA   = 0xffffffff;
-        spiX->BC 	    = 0x0000000e;
-        spiX->TC 	    = 0x0000000e;
-        spiX->BCC 	    = 0x00001001;
-        printf("BCC=%08x\n", spiX->BCC);
-
         spiX->INTCTL = 0x80000000;
-        while( (spiX->INTCTL&0x80000000) != 0);
+        while( (spiX->INT_STA&0x00001000) != 0)
+        {
+            printf("  FSR=%08x\n", spiX->FSR);
+            printf("  CTL=%08x\n", spiX->CTL);
+            printf("  INT_STA=%08x\n", spiX->INT_STA);
+            sleep(1);        
+        }
 
 
         i++;
