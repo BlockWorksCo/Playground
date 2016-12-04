@@ -330,12 +330,24 @@ int main()
     //
     // CCU:SPI1_CLK_REG clock setup
     //
-    writel( 0x01C20000+0x00A4, 0x8203000e );    // 24MHz, no divider
+    writel( 0x01C20000+0x00A4, 0x80000000 );    // 24MHz, no divider
     printf("SPI1_CLK_REG = %08x\n", readl(0x01C20000+0x00A4));
     
     //
     // Pin setup.
     //
+	printf("CFG1=%08x\n",portL->CFG1);
+	portA->CFG0 	= 0x11111111;
+	portA->CFG1 	= 0x11111111;
+	portA->CFG2 	= 0x11111111;
+	portA->CFG3 	= 0x11111111;
+	portA->DAT  	= 0xffffffff;
+	portA->DRV0 	= 0x33333333;
+	portA->DRV1 	= 0x33333333;
+	portA->PUL0 	= 0x00000000;
+	portA->PUL1 	= 0x00000000;
+	printf("CFG1=%08x\n",portL->CFG1);
+
     portA->CFG1 	&= ~0xfff00000;
     portA->CFG1 	|=  0x22200000;
 
@@ -345,7 +357,7 @@ int main()
     //
     // spiX port setup.
     //
-    volatile SPIPort* spiX    = spi0;
+    volatile SPIPort* spiX    = spi1;
     spiX->CTL 	= 0x00000083;
     spiX->INTCTL = 0x000001c4;
     spiX->IER 	= 0x00000000;
@@ -361,8 +373,10 @@ int main()
     //
     // Reset and wait for reset to complete.
     //
+    portA->DAT 	= 0xffffffff;
     spiX->CTL 	    = 0x80000000;
     while( (spiX->CTL&0x80000000) != 0);
+    portA->DAT 	= 0x00000000;
 
     //
     // Reset the TX fifo.
@@ -377,8 +391,8 @@ int main()
     //
     // Setup burst mode.
     //
-    spiX->BC 	    = 0x0000000e;
-    spiX->BCC 	    = 0x0000000e;
+    spiX->BC 	    = 0x00000001;
+    spiX->BCC 	    = 0x00000001;
 
     printf("\n\n");
     printf("CTL=%08x\n", spiX->CTL);
@@ -417,6 +431,8 @@ int main()
         printf("FSR=%08x\n", spiX->FSR);
         printf("INT_STA=%08x\n", spiX->INT_STA);
 
+        portA->DAT      = 0xffffffff;
+
         //
         // clear down all status flags.
         //
@@ -428,14 +444,14 @@ int main()
         //spiX->FCR       = 0x80008000;
         uint32_t*       txFIFO  = (uint32_t*)&spiX->TXD;
         spiX->TXD 	= 0x01234567;
-        spiX->TXD 	= 0x01234567;
+        //spiX->TXD 	= 0x01234567;
 
         //
         //
         //
-        spiX->BC 	    = 0x00000001;
-        spiX->TC 	    = 0x00000001;
-        spiX->BCC 	    = 0x01000001;
+        spiX->BC 	    = 0x00000004;
+        spiX->TC 	    = 0x00000004;
+        spiX->BCC 	    = 0x01000004;
         spiX->CTL 	    = 0x00000003;
 
         //
@@ -449,10 +465,11 @@ int main()
             printf("  INT_STA=%08x\n", spiX->INT_STA);
             sleep(1);        
         }
+        portA->DAT      = 0x00000000;
 
 
         i++;
-        sleep(1);
+        //sleep(1);
 
 #if 0
         start 	= rdtsc32();
