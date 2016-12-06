@@ -332,7 +332,7 @@ int main()
     //
     //writel( 0x01C20000+0x00A4, 0x80000000 );    // 2.4MHz, OSC24M
     //writel( 0x01C20000+0x00A4, 0x81000000 );    // 12MHz, PLL_PERIPH0
-    writel( 0x01C20000+0x00A4, 0x82000000 );    // 12MHz, PLL_PERIPH1
+    writel( 0x01C20000+0x00A4, 0x82030003 );    // 12MHz, PLL_PERIPH1
     printf("SPI1_CLK_REG = %08x\n", readl(0x01C20000+0x00A4));
     
     //
@@ -445,13 +445,16 @@ int main()
         //
         //spiX->FCR       = 0x80008000;
         uint32_t*       txFIFO  = (uint32_t*)&spiX->TXD;
-        spiX->TXD 	= 0x01234567;
+        spiX->TXD 	= 0x1;
+        spiX->TXD 	= 0x2;
+        spiX->TXD 	= 0x3;
+        spiX->TXD 	= 0x4;
         //spiX->TXD 	= 0x01234567;
 
         //
         //
         //
-        spiX->BC 	    = 0x00000004;
+        spiX->BC 	    = 0x00000100;
         spiX->TC 	    = 0x00000004;
         spiX->BCC 	    = 0x01000004;
         spiX->CTL 	    = 0x00000003;
