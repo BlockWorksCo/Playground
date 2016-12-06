@@ -448,23 +448,24 @@ int main()
         spiX->INT_STA   = 0xffffffff;
 
         //
-        // Write the data into the FIFO.
+        // reset the FIFOs and write the data into the FIFO.
         //
-        //spiX->FCR       = 0x80008000;
-        uint32_t*       txFIFO  = (uint32_t*)&spiX->TXD;
+        spiX->FCR       = 0x80008000;
+        //uint32_t*       txFIFO  = (uint32_t*)&spiX->TXD;
         spiX->TXD 	= 0xff;
         spiX->TXD 	= 0x2;
-        //spiX->TXD 	= 0xee;
-        //spiX->TXD 	= 0x4;
+        spiX->TXD 	= 0xee;
+        spiX->TXD 	= 0x4;
         //spiX->TXD 	= 0x01234567;
 
         //
         //
         //
-        spiX->BC 	    = 0x00000002;
-        spiX->TC 	    = 0x00000001;
-        spiX->BCC 	    = 0x01000004;
+        spiX->BC 	    = 0x00000001;
+        spiX->TC 	    = 0x00000000;
+        spiX->BCC 	    = 0x00000000;
         spiX->CTL 	    = 0x00000003;
+        spiX->WAIT 	    = 0x00000000;
 
         //
         // Set XCHG and wait for it to complete.
@@ -475,7 +476,7 @@ int main()
         {
             //printf("  FSR=%08x\n", spiX->FSR);
             //printf("  CTL=%08x\n", spiX->CTL);
-            //printf("  INT_STA=%08x\n", spiX->INT_STA);
+            //printf("2  INT_STA=%08x\n", spiX->INT_STA);
             //sleep(1);        
         }
         //portA->DAT      = 0x00000000;
@@ -483,27 +484,24 @@ int main()
         //
         // Read from the Rx FIFO while it isn't empty.
         //
-        while( (spiX->INT_STA&0x00000002) == 0 )
+        
+        //while( (spiX->FSR&0x0000000f) >= 0 )
+
+        do
         {
-            //printf("  INT_STA=%08x\n", spiX->INT_STA);
-            uint32_t    rxValue     = spiX->RXD;
-        }
+            //printf("3  INT_STA=%08x\n", spiX->INT_STA);
+            volatile uint32_t    rxValue     = spiX->RXD;
+            //printf("FSR=%08x\n", spiX->FSR);
+        } while( (spiX->INT_STA&0x00000002) == 0 );
 
 
         i++;
         //sleep(1);
 
-#if 0
-        start 	= rdtsc32();
-        for(uint32_t i=0; i<1000; i++)
-        {
-            static volatile 	uint32_t i 	= 0;
-            i++;
-        }
-        end 	= rdtsc32();
-        
-        printf("diff = %d\n", end-start);
-#endif
+        //
+        // Get the current timestamp.
+        //
+        //uint32_t    timestamp 	= rdtsc32();
     }
 
 }

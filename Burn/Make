@@ -1,8 +1,8 @@
 
 
-arm-linux-gnueabihf-gcc -std=c99 -O2 -o InputMain InputMain.c 
+arm-linux-gnueabihf-gcc -std=c99 -O2 -g -o InputMain InputMain.c 
 
-arm-linux-gnueabihf-gcc -std=c99 -O2 -o OutputMain OutputMain.c 
+arm-linux-gnueabihf-gcc -std=c99 -O2 -g -o OutputMain OutputMain.c 
 
 
 
