@@ -427,6 +427,13 @@ int main()
     printf("\n\n");
 
 
+    //
+    // CLK = 6
+    // MISO = 4
+    // MOSI = 2
+    // = 0
+    //
+
     uint32_t 	i 	= 0;
     while(true)
     {
@@ -445,24 +452,25 @@ int main()
         //
         //spiX->FCR       = 0x80008000;
         uint32_t*       txFIFO  = (uint32_t*)&spiX->TXD;
-        spiX->TXD 	= 0x1;
+        spiX->TXD 	= 0xff;
         spiX->TXD 	= 0x2;
-        spiX->TXD 	= 0x3;
-        spiX->TXD 	= 0x4;
+        //spiX->TXD 	= 0xee;
+        //spiX->TXD 	= 0x4;
         //spiX->TXD 	= 0x01234567;
 
         //
         //
         //
-        spiX->BC 	    = 0x00000100;
-        spiX->TC 	    = 0x00000004;
+        spiX->BC 	    = 0x00000002;
+        spiX->TC 	    = 0x00000001;
         spiX->BCC 	    = 0x01000004;
         spiX->CTL 	    = 0x00000003;
 
         //
         // Set XCHG and wait for it to complete.
+        // also set chip-select polarity to generate a pulse prior to the clks to act as a parallel-load pulse for the shift register.
         //
-        spiX->INTCTL = 0x80000000;
+        spiX->INTCTL = 0x80000004;
         while( (spiX->INT_STA&0x00001000) == 0)
         {
             //printf("  FSR=%08x\n", spiX->FSR);
