@@ -330,7 +330,9 @@ int main()
     //
     // CCU:SPI1_CLK_REG clock setup
     //
-    writel( 0x01C20000+0x00A4, 0x80000000 );    // 24MHz, no divider
+    //writel( 0x01C20000+0x00A4, 0x80000000 );    // 2.4MHz, OSC24M
+    //writel( 0x01C20000+0x00A4, 0x81000000 );    // 12MHz, PLL_PERIPH0
+    writel( 0x01C20000+0x00A4, 0x82000000 );    // 12MHz, PLL_PERIPH1
     printf("SPI1_CLK_REG = %08x\n", readl(0x01C20000+0x00A4));
     
     //
@@ -428,10 +430,10 @@ int main()
     uint32_t 	i 	= 0;
     while(true)
     {
-        printf("FSR=%08x\n", spiX->FSR);
-        printf("INT_STA=%08x\n", spiX->INT_STA);
+        //printf("FSR=%08x\n", spiX->FSR);
+        //printf("INT_STA=%08x\n", spiX->INT_STA);
 
-        portA->DAT      = 0xffffffff;
+        //portA->DAT      = 0xffffffff;
 
         //
         // clear down all status flags.
@@ -458,14 +460,23 @@ int main()
         // Set XCHG and wait for it to complete.
         //
         spiX->INTCTL = 0x80000000;
-        while( (spiX->INT_STA&0x00001000) != 0)
+        while( (spiX->INT_STA&0x00001000) == 0)
         {
-            printf("  FSR=%08x\n", spiX->FSR);
-            printf("  CTL=%08x\n", spiX->CTL);
-            printf("  INT_STA=%08x\n", spiX->INT_STA);
-            sleep(1);        
+            //printf("  FSR=%08x\n", spiX->FSR);
+            //printf("  CTL=%08x\n", spiX->CTL);
+            //printf("  INT_STA=%08x\n", spiX->INT_STA);
+            //sleep(1);        
         }
-        portA->DAT      = 0x00000000;
+        //portA->DAT      = 0x00000000;
+
+        //
+        // Read from the Rx FIFO while it isn't empty.
+        //
+        while( (spiX->INT_STA&0x00000002) == 0 )
+        {
+            //printf("  INT_STA=%08x\n", spiX->INT_STA);
+            uint32_t    rxValue     = spiX->RXD;
+        }
 
 
         i++;
