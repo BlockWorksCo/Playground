@@ -427,6 +427,10 @@ int main()
     printf("RXD=%08x\n",    offsetof(SPIPort, RXD));
     printf("\n\n");
 
+        spiX->TC 	    = 0x00000000;
+        spiX->BCC 	    = 0x00000000;
+        spiX->WAIT 	    = 0x00000000;
+        spiX->FCR       = 0x80008000;
 
     //
     // CLK = 6
@@ -463,10 +467,7 @@ int main()
         //
         //
         spiX->BC 	    = 0x00000001;
-        spiX->TC 	    = 0x00000000;
-        spiX->BCC 	    = 0x00000000;
         spiX->CTL 	    = 0x00000003;
-        spiX->WAIT 	    = 0x00000000;
 
         //
         // Set XCHG and wait for it to complete.
