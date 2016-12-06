@@ -332,7 +332,8 @@ int main()
     //
     //writel( 0x01C20000+0x00A4, 0x80000000 );    // 2.4MHz, OSC24M
     //writel( 0x01C20000+0x00A4, 0x81000000 );    // 12MHz, PLL_PERIPH0
-    writel( 0x01C20000+0x00A4, 0x82030003 );    // 12MHz, PLL_PERIPH1
+    writel( 0x01C20000+0x00A4, 0x82000000 );    // 12MHz, PLL_PERIPH1
+    //writel( 0x01C20000+0x00A4, 0x82030003 );    // 2MHz, PLL_PERIPH1
     printf("SPI1_CLK_REG = %08x\n", readl(0x01C20000+0x00A4));
     
     //
@@ -453,9 +454,9 @@ int main()
         spiX->FCR       = 0x80008000;
         //uint32_t*       txFIFO  = (uint32_t*)&spiX->TXD;
         spiX->TXD 	= 0xff;
-        spiX->TXD 	= 0x2;
-        spiX->TXD 	= 0xee;
-        spiX->TXD 	= 0x4;
+        //spiX->TXD 	= 0x2;
+        //spiX->TXD 	= 0xee;
+        //spiX->TXD 	= 0x4;
         //spiX->TXD 	= 0x01234567;
 
         //
@@ -492,10 +493,11 @@ int main()
             //printf("3  INT_STA=%08x\n", spiX->INT_STA);
             volatile uint32_t    rxValue     = spiX->RXD;
             //printf("FSR=%08x\n", spiX->FSR);
+            //printf("RXD=%08x\n", rxValue);
         } while( (spiX->INT_STA&0x00000002) == 0 );
 
 
-        i++;
+        //i++;
         //sleep(1);
 
         //
