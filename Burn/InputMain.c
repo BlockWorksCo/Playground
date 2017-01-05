@@ -330,9 +330,9 @@ int main()
     //
     // CCU:SPI1_CLK_REG clock setup
     //
-    //writel( 0x01C20000+0x00A4, 0x80000000 );    // 2.4MHz, OSC24M
+    writel( 0x01C20000+0x00A4, 0x80000000 );    // 2.4MHz, OSC24M
     //writel( 0x01C20000+0x00A4, 0x81000000 );    // 12MHz, PLL_PERIPH0
-    writel( 0x01C20000+0x00A4, 0x82000000 );    // 12MHz, PLL_PERIPH1
+    //writel( 0x01C20000+0x00A4, 0x82000000 );    // 12MHz, PLL_PERIPH1
     //writel( 0x01C20000+0x00A4, 0x82030003 );    // 2MHz, PLL_PERIPH1
     printf("SPI1_CLK_REG = %08x\n", readl(0x01C20000+0x00A4));
     
@@ -473,7 +473,7 @@ int main()
         // Set XCHG and wait for it to complete.
         // also set chip-select polarity to generate a pulse prior to the clks to act as a parallel-load pulse for the shift register.
         //
-        spiX->INTCTL = 0x80000004;
+        spiX->INTCTL = 0x80000000;
         while( (spiX->INT_STA&0x00001000) == 0)
         {
             //printf("  FSR=%08x\n", spiX->FSR);
