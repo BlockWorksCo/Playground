@@ -129,6 +129,7 @@ public:
         firstElement    = (firstElement + 1) % NumberOfElements;
     }
 
+
     void Read( ContainedType& data )
     {
         blockDevice.Read( &data, BlockNumberFromElementNumber(cursorPosition) );
@@ -139,6 +140,7 @@ public:
         blockDevice.Write( &data, BlockNumberFromElementNumber(cursorPosition) );
     }
 
+
     void ReadPartial( void* data, const size_t offset, const size_t dataLength )
     {
         blockDevice.ReadPartial( data, BlockNumberFromElementNumber(cursorPosition), offset, dataLength );
@@ -148,6 +150,7 @@ public:
     {
         blockDevice.WritePartial( data, BlockNumberFromElementNumber(cursorPosition), offset, dataLength );
     }
+
 
     template <typename FieldType> void ReadField( FieldType& data, const size_t offset )
     {
@@ -296,10 +299,10 @@ private:
 //
 int main()
 {
-    //
-    //
-    //
     {
+        //
+        // Direct write access to the data using type-safe methods. 
+        //
         uint32_t    a   = 123;
         uint64_t    b   = 321;
         bool        c   = true;
@@ -310,11 +313,10 @@ int main()
         circularBuffer.WriteField<bool>( c, offsetof(MyData, fieldC) ); 
     }
 
-    //
-    //
-    //
-
     {
+        //
+        // Direct read access to the circular buffer by reading whole structure.
+        //
         MyData  data    = {0};
         circularBuffer.Read( data );
 
@@ -324,6 +326,9 @@ int main()
     }
 
     {
+        //
+        // Direct read access to the circular buffer using 'partial' accessors to avoid reading whole struct.
+        //
         uint32_t    a;
         uint64_t    b;
         bool        c;
@@ -338,6 +343,9 @@ int main()
     }
 
     {
+        //
+        // Direct read access to the circular buffer using more type-safe methods.
+        //
         uint32_t    a;
         uint64_t    b;
         bool        c;
@@ -353,6 +361,10 @@ int main()
 
 
     {
+        //
+        // DataModel accessors.
+        // DataModel can be created with read-only or read-write BlockDevices as necessary.
+        //
         uint32_t    a;
         uint64_t    b;
         bool        c;
