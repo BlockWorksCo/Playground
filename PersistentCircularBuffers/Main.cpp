@@ -95,6 +95,11 @@ public:
         lastElement(0),
         cursorPosition(0)
     {
+        //
+        // Perform search for last-good-position if not supplied.
+        // If the integrity check succeeds here then we have a BlockDevice with pre-existing data 
+        // which is handy in the case of a watchdog reset.
+        //
     }
 
 
@@ -227,6 +232,17 @@ typedef struct
     bool        fieldC;
 
 } MyData;
+
+
+typedef struct 
+{
+    uint32_t    lastKnownGoodPositionOfDemoCircularBuffer;
+    uint32_t    lastKnownGoodPositionOfConsumptionCircularBuffer;
+    uint32_t    lastKnownGoodPositionOfBillingCircularBuffer;
+    uint32_t    lastKnownGoodPositionOfSecurityLogCircularBuffer;
+    uint32_t    lastKnownGoodPositionOfEventLogCircularBuffer;
+
+} MyCheckpointData;
 
 
 typedef RAMBlockDevice<4096, 16>     DemoBlockDeviceType; 
