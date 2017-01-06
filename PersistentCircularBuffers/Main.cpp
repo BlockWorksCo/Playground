@@ -78,6 +78,16 @@ private:
 // PersistentCircularBuffer stores a number of elements in a specified BlockDevice. The type of 
 // the elements is also specified.
 //
+// Key points here:
+// - Naturally wear-levelling, with deterministic over-allocation.
+// - Elements are integrity checked.
+// - Integrity checking leads to atomic-write property.
+// - Integrity checking leads to easy bad-block management (skip the block).
+// - Pre-erasing means quick, deterministic writing of data in shutdown case.
+// - Easy extension to add encryption.
+// - Sanitisation is just a flush&clear of the circular buffer.
+// - Caching of latest block gives optimal performance, power usage and minimal-erase-cycles (read on startup, write on shutdown).
+//
 template <typename BlockDeviceType, typename ContainedType, uint32_t NumberOfElements>
 class PersistentCircularBuffer
 {
@@ -96,9 +106,8 @@ public:
         cursorPosition(0)
     {
         //
-        // Perform search for last-good-position if not supplied.
-        // If the integrity check succeeds here then we have a BlockDevice with pre-existing data 
-        // which is handy in the case of a watchdog reset.
+        // - Perform search for last-good-position if not supplied from checkpoint data.
+        // - Perform a integrity check of the cache. If we have good contents, use it.
         //
     }
 
@@ -167,12 +176,18 @@ public:
         blockDevice.WritePartial( &data, BlockNumberFromElementNumber(cursorPosition), offset, sizeof(data) );
     }
 
+
+    void WriteSetComplete()
+    {
+        lastUpdatedCache    = (lastUpdatedCache+1) & 0x01;  // simply flip-flop between 0 and 1.
+    }
+
 private:
 
     typedef struct
     {
-        uint32_t        sequenceNumber;
-        uint32_t        integrityCheckValue;
+        uint32_t        sequenceNumber;         // always incrementing and identifies latest data. This value gets stored in checkpoint CB.
+        uint32_t        integrityCheckValue;    // CRC32/SHA of the element contents. Used for bad-block management and reset cases.
 
         ContainedType   data;
 
@@ -186,9 +201,17 @@ private:
     }
 
     BlockDeviceType&    blockDevice;
-    uint32_t            lastElement;
-    uint32_t            firstElement;
-    uint32_t            cursorPosition;
+    uint32_t            lastElement;        // 
+    uint32_t            firstElement;       // index of last-written element in the buffer.
+    uint32_t            cursorPosition;     // Current position for read/write.
+    
+    //
+    // These elements form the cache. For reset-robustness, they must be placed into a non-initialised region.
+    // This data gets flushed to FLASH on shutdown.
+    //
+    Element             cache[2];           // Cache of latest element. This is an array of 2 in order to provide reset-robustness (double buffer).
+    uint32_t            cachedElement;      // Index of cached element.
+    uint32_t            lastUpdatedCache;   // index into 'cache' of last written element.
 };
 
 
@@ -246,19 +269,29 @@ typedef struct
 
 
 typedef RAMBlockDevice<4096, 16>     DemoBlockDeviceType; 
-typedef PersistentCircularBuffer<DemoBlockDeviceType, MyData, 32>  DemoCircularBufferType; 
+typedef RAMBlockDevice<4096, 4>      CheckpointBlockDeviceType; 
+
+typedef PersistentCircularBuffer<DemoBlockDeviceType, MyData, 32>                   DemoCircularBufferType; 
+typedef PersistentCircularBuffer<CheckpointBlockDeviceType, MyCheckpointData, 8>    CheckpointCircularBufferType; 
+
 
 //
 // Instantiation of types.
 //
-static DemoBlockDeviceType      blockDevice;
-static DemoCircularBufferType   circularBuffer(blockDevice);
+static DemoBlockDeviceType          demoBlockDevice;
+static CheckpointBlockDeviceType    checkpointBlockDevice;
+
+static DemoCircularBufferType       demoCircularBuffer(demoBlockDevice);
+static CheckpointCircularBufferType checkpointCircularBuffer(checkpointBlockDevice);
 
 
 
 
 //
-//
+// DataModel interface. Key points here:
+// - Can be auto-generated to a large extent using pycparser and a struct definition (not similarity of accessors).
+// - All data in the system passes through this class.
+// - 
 //
 template <typename CircularBufferType>
 class DataModel
@@ -323,10 +356,10 @@ int main()
         uint64_t    b   = 321;
         bool        c   = true;
 
-        circularBuffer.Append();
-        circularBuffer.WriteField<uint32_t>( a, offsetof(MyData, fieldA) ); 
-        circularBuffer.WriteField<uint64_t>( b, offsetof(MyData, fieldB) ); 
-        circularBuffer.WriteField<bool>( c, offsetof(MyData, fieldC) ); 
+        demoCircularBuffer.Append();
+        demoCircularBuffer.WriteField<uint32_t>( a, offsetof(MyData, fieldA) ); 
+        demoCircularBuffer.WriteField<uint64_t>( b, offsetof(MyData, fieldB) ); 
+        demoCircularBuffer.WriteField<bool>( c, offsetof(MyData, fieldC) ); 
     }
 
     {
@@ -334,7 +367,7 @@ int main()
         // Direct read access to the circular buffer by reading whole structure.
         //
         MyData  data    = {0};
-        circularBuffer.Read( data );
+        demoCircularBuffer.Read( data );
 
         printf("a = %d\n",  data.fieldA );
         printf("b = %ld\n", data.fieldB );
@@ -349,9 +382,9 @@ int main()
         uint64_t    b;
         bool        c;
 
-        circularBuffer.ReadPartial( &a, offsetof(MyData, fieldA), sizeof(a) ); 
-        circularBuffer.ReadPartial( &b, offsetof(MyData, fieldB), sizeof(b) ); 
-        circularBuffer.ReadPartial( &c, offsetof(MyData, fieldC), sizeof(c) ); 
+        demoCircularBuffer.ReadPartial( &a, offsetof(MyData, fieldA), sizeof(a) ); 
+        demoCircularBuffer.ReadPartial( &b, offsetof(MyData, fieldB), sizeof(b) ); 
+        demoCircularBuffer.ReadPartial( &c, offsetof(MyData, fieldC), sizeof(c) ); 
 
         printf("a = %d\n", a);
         printf("b = %ld\n", b);
@@ -366,9 +399,9 @@ int main()
         uint64_t    b;
         bool        c;
 
-        circularBuffer.ReadField<uint32_t>( a, offsetof(MyData, fieldA) ); 
-        circularBuffer.ReadField<uint64_t>( b, offsetof(MyData, fieldB) ); 
-        circularBuffer.ReadField<bool>( c, offsetof(MyData, fieldC) ); 
+        demoCircularBuffer.ReadField<uint32_t>( a, offsetof(MyData, fieldA) ); 
+        demoCircularBuffer.ReadField<uint64_t>( b, offsetof(MyData, fieldB) ); 
+        demoCircularBuffer.ReadField<bool>( c, offsetof(MyData, fieldC) ); 
 
         printf("a = %d\n", a);
         printf("b = %ld\n", b);
@@ -385,7 +418,7 @@ int main()
         uint64_t    b;
         bool        c;
 
-        static DataModel<DemoCircularBufferType>   dataModel(circularBuffer);
+        static DataModel<DemoCircularBufferType>   dataModel(demoCircularBuffer);
         dataModel.GetFieldA(a);
         dataModel.GetFieldB(b);
         dataModel.GetFieldC(c);
