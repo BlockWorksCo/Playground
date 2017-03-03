@@ -81,10 +81,91 @@ public:
     {
         if(timestamp > nextSampleTimestamp)
         {
-            switch( sampleNumber )
+            uint8_t     state   = inputValue & rxMask;
+
+            if(startDetected == false)
             {
-                case 0:
-                    break;
+                if(state == 0)
+                {
+                    //
+                    // line has gone low, so start bit detected.
+                    //
+                    startDetected           = true;
+                    timestampOfStartBit     = timestamp;
+                    highCount               = 0;
+                }
+            }
+            else
+            {                
+                //
+                // Samples within the bit & byte.
+                //
+                uint8_t     highIncrememnt     = 0;
+                if(state == 0)
+                {
+                    highIncrememnt     = 0;
+                }   
+                else
+                {
+                    highIncrememnt     = 1;
+                }             
+
+                //
+                //
+                //
+                switch( sampleNumber )
+                {
+                    case 0:
+                    case 1:
+                    case 2:
+                        highCount     += highIncrememnt;
+                        break;
+
+                    case 3:
+                        highCount     += highIncrememnt;
+                        if(highCount >= 3)
+                        {
+                            currentByte     = 0x01;
+                        }
+                        else
+                        {
+                            currentByte     = 0x00;
+                        }
+                        highCount     = 0;
+                        break;
+
+                    case 4:
+                    case 5:
+                    case 6:
+                        highCount     += highIncrememnt;
+                        break;
+
+                    case 7:
+                        highCount     += highIncrememnt;
+                        if(highCount >= 3)
+                        {
+                            currentByte     |= 0x02;
+                        }
+                        highCount     = 0;
+                        break;
+
+                    case 8:
+                    case 9:
+                    case 10:
+                        highCount     += highIncrememnt;
+                        break;
+
+                    case 11:
+                        highCount     += highIncrememnt;
+                        if(highCount >= 3)
+                        {
+                            currentByte     |= 0x04;
+                        }
+                        highCount     = 0;
+                        break;
+
+                }
+
 
             }
 
@@ -97,6 +178,10 @@ public:
     uint32_t    ticksPerSample          = ticksPerBit / 4;
     uint32_t    nextSampleTimestamp     = 0;
     uint32_t    timestampOfStartBit     = 0;
+    bool        startDetected           = false;
+    uint8_t     previousState           = 1;
+    uint8_t     highCount               = 0;
+    uint8_t     currentByte             = 0;
 };
 
 
@@ -258,6 +343,7 @@ public:
     }
 
     uint32_t    nextBitTimestamp    = 0;
+    uint32_t    bitNumber           = 0;
 };
 
 
