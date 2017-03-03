@@ -11,7 +11,13 @@
 //
 template <  uint32_t iterationDuration, 
             typename Schedulee1Type,
-            typename Schedulee2Type
+            typename Schedulee2Type,
+            typename Schedulee3Type,
+            typename Schedulee4Type,
+            typename Schedulee5Type,
+            typename Schedulee6Type,
+            typename Schedulee7Type,
+            typename Schedulee8Type
             >
 class Scheduler
 {
@@ -19,9 +25,22 @@ class Scheduler
 public:
 
     Scheduler(  Schedulee1Type& _schedulee1,
-                Schedulee2Type& _schedulee2) :
+                Schedulee2Type& _schedulee2,
+                Schedulee3Type& _schedulee3,
+                Schedulee4Type& _schedulee4,
+                Schedulee5Type& _schedulee5,
+                Schedulee6Type& _schedulee6,
+                Schedulee7Type& _schedulee7,
+                Schedulee8Type& _schedulee8
+                ) :
             schedulee1(_schedulee1),
-            schedulee2(_schedulee2)
+            schedulee2(_schedulee2),
+            schedulee3(_schedulee3),
+            schedulee4(_schedulee4),
+            schedulee5(_schedulee5),
+            schedulee6(_schedulee6),
+            schedulee7(_schedulee7),
+            schedulee8(_schedulee8)
     {
 
     }
@@ -30,12 +49,24 @@ public:
     {
         schedulee1.Iterate( timestamp, inputValue, outputValue );
         schedulee2.Iterate( timestamp, inputValue, outputValue );
+        schedulee3.Iterate( timestamp, inputValue, outputValue );
+        schedulee4.Iterate( timestamp, inputValue, outputValue );
+        schedulee5.Iterate( timestamp, inputValue, outputValue );
+        schedulee6.Iterate( timestamp, inputValue, outputValue );
+        schedulee7.Iterate( timestamp, inputValue, outputValue );
+        schedulee8.Iterate( timestamp, inputValue, outputValue );
     }
 
 private:
 
     Schedulee1Type&     schedulee1;
     Schedulee2Type&     schedulee2;
+    Schedulee3Type&     schedulee3;
+    Schedulee4Type&     schedulee4;
+    Schedulee5Type&     schedulee5;
+    Schedulee6Type&     schedulee6;
+    Schedulee7Type&     schedulee7;
+    Schedulee8Type&     schedulee8;
 
 };
 
@@ -200,7 +231,7 @@ public:
                     break;
             }
 
-            bitNumber           = (bitNumber+1) & 0x2;
+            bitNumber           = (bitNumber+1) & 0x1;
         }
     }
 
@@ -227,7 +258,18 @@ public:
     }
 
     uint32_t    nextBitTimestamp    = 0;
-    uint32_t    bitNumber           = 0;
+};
+
+
+
+
+
+class NoOperation
+{
+public:
+    void Iterate( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
+    {
+    }
 };
 
 
@@ -241,9 +283,20 @@ int main()
 {
     typedef UARTTransmitter8N1<100000,3, 0x01, 1024>    TxType;
     typedef UARTReceiver8N1<100000,3, 0x02, 1024>       RxType;
-    TxType   one;
-    RxType   two;
-    Scheduler<100, TxType, RxType >  scheduler(one,two);
+    typedef PWM<100000,30, 0x4>                         PWMType;
+    TxType          one;
+    RxType          two;
+    NoOperation     nop;
+    PWMType         pwm;
+    Scheduler<  100, 
+                TxType, 
+                RxType,
+                NoOperation,
+                PWMType,
+                NoOperation,
+                NoOperation,
+                NoOperation,
+                NoOperation >  scheduler(one,two, nop, pwm, nop,nop, nop, nop);
 
 
     while(true)
