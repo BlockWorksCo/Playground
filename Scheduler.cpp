@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <stdio.h>
-
+#include <arm_neon.h>
 
 
 //
@@ -389,9 +389,38 @@ int main()
     {
         uint32_t    timestamp       = 0;
         uint8_t     outputValue     = 0;
+        uint8_t     inputValue      = 0x55;
         scheduler.Iterate( timestamp, 0xab, outputValue );
 
         printf("%02x\n", outputValue);
+
+#if 0
+        uint8_t     streams[8];
+        streams[0]  <<= 1;        
+        streams[1]  <<= 1;        
+        streams[2]  <<= 1;        
+        streams[3]  <<= 1;        
+        streams[4]  <<= 1;        
+        streams[5]  <<= 1;        
+        streams[6]  <<= 1;        
+        streams[7]  <<= 1;        
+
+        streams[0]  |= (inputValue & 0x01);
+        streams[1]  |= (inputValue & 0x02)>>1;
+        streams[2]  |= (inputValue & 0x04)>>2;
+        streams[3]  |= (inputValue & 0x08)>>3;
+        streams[4]  |= (inputValue & 0x10)>>4;
+        streams[5]  |= (inputValue & 0x20)>>5;
+        streams[6]  |= (inputValue & 0x40)>>6;
+        streams[7]  |= (inputValue & 0x80)>>7;
+#else
+        uint8x8_t   streams     = vshl_n_u8(streams,1);
+#endif        
+/*
+        uint8x8_t  vcnt_u8(uint8x8_t a); 
+        uint8x8_t vtbl1_u8(uint8x8_t a, uint8x8_t b); 
+        int8x8_t   vshl_n_s8(int8x8_t a, __constrange(0,7) int b);
+*/
 
         timestamp++;
     }
