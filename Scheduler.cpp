@@ -48,22 +48,23 @@ public:
 
     }
 
-    void ProcessEdge( uint8_t bit )
-    {
-    }
-
     void ProcessSample( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
     {
         static uint8x8_t    bits;
         static uint8x8_t    previousBits;
-        
+
 #define PROCESS_SCHEDULEE(bitNumber, s)                                         \
         bits[bitNumber]     = (inputValue & (1<<bitNumber)) >> bitNumber;       \
-        if(bits[bitNumber] != previousBits[bitNumber])                          \
+        if( (bits[bitNumber] == 0) && (previousBits[bitNumber == 1]) )          \
         {                                                                       \
-            s.ProcessEdge( bits[bitNumber] );                                   \
+            s.ProcessNegativeEdge(timestamp);                                   \
         }                                                                       \
-        s.ProcessSample( timestamp, inputValue, outputValue );
+        if( (bits[bitNumber] == 1) && (previousBits[bitNumber == 0]) )          \
+        {                                                                       \
+            s.ProcessPositiveEdge(timestamp);                                   \
+        }                                                                       \
+        s.ProcessSample( timestamp, inputValue, outputValue );                  \
+        previousBits[bitNumber]     = bits[bitNumber];
 
         PROCESS_SCHEDULEE(0, schedulee1);
         PROCESS_SCHEDULEE(1, schedulee2);
@@ -96,109 +97,36 @@ class UARTReceiver8N1
 {
 public:
 
-    void ProcessEdge( uint8_t bit )
+    void ProcessNegativeEdge( uint32_t timestamp )
     {
+        if(startDetected == false)
+        {
+            //
+            // Start of byte.
+            //
+            startDetected   = true;
+            timestampOfStartBit     = timestamp;
+        }
+        else
+        {
+            //
+            // Within byte.
+            //
+        }
+
+        currentLevel    = 0;
+    }
+
+    void ProcessPositiveEdge( uint32_t timestamp )
+    {
+        currentLevel    = 1;
     }
 
 
     void ProcessSample( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
     {
-        if(timestamp > nextSampleTimestamp)
-        {
-            uint8_t     state   = inputValue & rxMask;
-
-            if(startDetected == false)
-            {
-                if(state == 0)
-                {
-                    //
-                    // line has gone low, so start bit detected.
-                    //
-                    startDetected           = true;
-                    timestampOfStartBit     = timestamp;
-                    highCount               = 0;
-                }
-            }
-            else
-            {                
-                //
-                // Samples within the bit & byte.
-                //
-                uint8_t     highIncrememnt     = 0;
-                if(state == 0)
-                {
-                    highIncrememnt     = 0;
-                }   
-                else
-                {
-                    highIncrememnt     = 1;
-                }             
-
-                //
-                //
-                //
-                switch( sampleNumber )
-                {
-                    case 0:
-                    case 1:
-                    case 2:
-                        highCount     += highIncrememnt;
-                        break;
-
-                    case 3:
-                        highCount     += highIncrememnt;
-                        if(highCount >= 3)
-                        {
-                            currentByte     = 0x01;
-                        }
-                        else
-                        {
-                            currentByte     = 0x00;
-                        }
-                        highCount     = 0;
-                        break;
-
-                    case 4:
-                    case 5:
-                    case 6:
-                        highCount     += highIncrememnt;
-                        break;
-
-                    case 7:
-                        highCount     += highIncrememnt;
-                        if(highCount >= 3)
-                        {
-                            currentByte     |= 0x02;
-                        }
-                        highCount     = 0;
-                        break;
-
-                    case 8:
-                    case 9:
-                    case 10:
-                        highCount     += highIncrememnt;
-                        break;
-
-                    case 11:
-                        highCount     += highIncrememnt;
-                        if(highCount >= 3)
-                        {
-                            currentByte     |= 0x04;
-                        }
-                        highCount     = 0;
-                        break;
-
-                }
-
-
-            }
-
-            sampleNumber            = (sampleNumber + 1) % 10;
-            nextSampleTimestamp     = timestampOfStartBit + (sampleNumber * ticksPerSample);
-        }
     }
 
-    uint32_t    sampleNumber            = 0;
     uint32_t    ticksPerSample          = ticksPerBit / 4;
     uint32_t    nextSampleTimestamp     = 0;
     uint32_t    timestampOfStartBit     = 0;
@@ -206,6 +134,7 @@ public:
     uint8_t     previousState           = 1;
     uint8_t     highCount               = 0;
     uint8_t     currentByte             = 0;
+    uint8_t     currentLevel            = 0;
 };
 
 
@@ -214,9 +143,14 @@ class UARTTransmitter8N1
 {
 public:
 
-    void ProcessEdge( uint8_t bit )
+    void ProcessNegativeEdge( uint32_t timestamp )
     {
     }
+
+    void ProcessPositiveEdge( uint32_t timestamp )
+    {
+    }
+
 
 
     void ProcessSample( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
@@ -330,9 +264,14 @@ class PWM
 {
 public:
 
-    void ProcessEdge( uint8_t bit )
+    void ProcessNegativeEdge( uint32_t timestamp )
     {
     }
+
+    void ProcessPositiveEdge( uint32_t timestamp )
+    {
+    }
+
 
     void ProcessSample( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
     {
@@ -389,7 +328,11 @@ class NoOperation
 {
 public:
 
-    void ProcessEdge( uint8_t bit )
+    void ProcessNegativeEdge( uint32_t timestamp )
+    {
+    }
+
+    void ProcessPositiveEdge( uint32_t timestamp )
     {
     }
 
