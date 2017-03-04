@@ -3,7 +3,10 @@
 
 #include <cstdint>
 #include <stdio.h>
-#include <arm_neon.h>
+
+
+typedef uint8_t     uint8x8_t[8];
+
 
 
 //
@@ -45,16 +48,31 @@ public:
 
     }
 
-    void Iterate( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
+    void ProcessEdge( uint8_t bit )
     {
-        schedulee1.Iterate( timestamp, inputValue, outputValue );
-        schedulee2.Iterate( timestamp, inputValue, outputValue );
-        schedulee3.Iterate( timestamp, inputValue, outputValue );
-        schedulee4.Iterate( timestamp, inputValue, outputValue );
-        schedulee5.Iterate( timestamp, inputValue, outputValue );
-        schedulee6.Iterate( timestamp, inputValue, outputValue );
-        schedulee7.Iterate( timestamp, inputValue, outputValue );
-        schedulee8.Iterate( timestamp, inputValue, outputValue );
+    }
+
+    void ProcessSample( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
+    {
+        static uint8x8_t    bits;
+        static uint8x8_t    previousBits;
+        
+#define PROCESS_SCHEDULEE(bitNumber, s)                                         \
+        bits[bitNumber]     = (inputValue & (1<<bitNumber)) >> bitNumber;       \
+        if(bits[bitNumber] != previousBits[bitNumber])                          \
+        {                                                                       \
+            s.ProcessEdge( bits[bitNumber] );                                   \
+        }                                                                       \
+        s.ProcessSample( timestamp, inputValue, outputValue );
+
+        PROCESS_SCHEDULEE(0, schedulee1);
+        PROCESS_SCHEDULEE(1, schedulee2);
+        PROCESS_SCHEDULEE(2, schedulee3);
+        PROCESS_SCHEDULEE(3, schedulee4);
+        PROCESS_SCHEDULEE(4, schedulee5);
+        PROCESS_SCHEDULEE(5, schedulee6);
+        PROCESS_SCHEDULEE(6, schedulee7);
+        PROCESS_SCHEDULEE(7, schedulee8);
     }
 
 private:
@@ -77,7 +95,13 @@ template <uint32_t ticksPerSecond, uint32_t ticksPerBit, uint8_t rxMask, uint32_
 class UARTReceiver8N1
 {
 public:
-    void Iterate( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
+
+    void ProcessEdge( uint8_t bit )
+    {
+    }
+
+
+    void ProcessSample( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
     {
         if(timestamp > nextSampleTimestamp)
         {
@@ -189,7 +213,13 @@ template <uint32_t ticksPerSecond, uint32_t ticksPerBit, uint8_t txMask, uint32_
 class UARTTransmitter8N1
 {
 public:
-    void Iterate( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
+
+    void ProcessEdge( uint8_t bit )
+    {
+    }
+
+
+    void ProcessSample( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
     {
         if(timestamp > nextBitTimestamp)
         {
@@ -299,7 +329,12 @@ template <uint32_t ticksPerSecond, uint32_t ticksPerBit, uint8_t txMask>
 class PWM
 {
 public:
-    void Iterate( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
+
+    void ProcessEdge( uint8_t bit )
+    {
+    }
+
+    void ProcessSample( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
     {
         if(timestamp > nextBitTimestamp)
         {
@@ -353,7 +388,12 @@ public:
 class NoOperation
 {
 public:
-    void Iterate( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
+
+    void ProcessEdge( uint8_t bit )
+    {
+    }
+
+    void ProcessSample( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
     {
     }
 };
@@ -385,16 +425,20 @@ int main()
                 NoOperation >  scheduler(one,two, nop, pwm, nop,nop, nop, nop);
 
 
+    uint8x8_t   bits            = {0};
+    uint8x8_t   previousBits    = {0};
+
     while(true)
     {
         uint32_t    timestamp       = 0;
         uint8_t     outputValue     = 0;
         uint8_t     inputValue      = 0x55;
-        scheduler.Iterate( timestamp, 0xab, outputValue );
 
-        printf("%02x\n", outputValue);
+        scheduler.ProcessSample( timestamp, 0xab, outputValue );
 
 #if 0
+        printf("%02x\n", outputValue);
+
         uint8_t     streams[8];
         streams[0]  <<= 1;        
         streams[1]  <<= 1;        
@@ -413,15 +457,7 @@ int main()
         streams[5]  |= (inputValue & 0x20)>>5;
         streams[6]  |= (inputValue & 0x40)>>6;
         streams[7]  |= (inputValue & 0x80)>>7;
-#else
-        uint8x8_t   streams     = vshl_n_u8(streams,1);
-#endif        
-/*
-        uint8x8_t  vcnt_u8(uint8x8_t a); 
-        uint8x8_t vtbl1_u8(uint8x8_t a, uint8x8_t b); 
-        int8x8_t   vshl_n_s8(int8x8_t a, __constrange(0,7) int b);
-*/
-
+#endif
         timestamp++;
     }
 }
