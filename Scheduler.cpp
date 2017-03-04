@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <stdio.h>
+#include <stdint.h>
 
 
 typedef uint8_t     uint8x8_t[8];
@@ -48,7 +49,7 @@ public:
 
     }
 
-    void ProcessSample( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
+    void PeriodicProcessing( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
     {
         static uint8x8_t    bits;
         static uint8x8_t    previousBits;
@@ -63,7 +64,7 @@ public:
         {                                                                       \
             s.ProcessPositiveEdge(timestamp);                                   \
         }                                                                       \
-        s.ProcessSample( timestamp, inputValue, outputValue );                  \
+        s.PeriodicProcessing( timestamp, inputValue, outputValue );                  \
         previousBits[bitNumber]     = bits[bitNumber];
 
         PROCESS_SCHEDULEE(0, schedulee1);
@@ -104,8 +105,10 @@ public:
             //
             // Start of byte.
             //
-            startDetected   = true;
-            timestampOfStartBit     = timestamp;
+            startDetected       = true;
+            timestampOfStartBit = timestamp;
+            bitNumber 	        = 0;
+            currentByte         = 0;
         }
         else
         {
@@ -123,18 +126,23 @@ public:
     }
 
 
-    void ProcessSample( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
+    void PeriodicProcessing( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
     {
+        currentByte <<= 1;
+        currentByte |= currentLevel;
+
+        bitNumber++;
+        if(bitNumber >= 10)
+        {
+	        startDetected 	= false;
+        }
     }
 
-    uint32_t    ticksPerSample          = ticksPerBit / 4;
-    uint32_t    nextSampleTimestamp     = 0;
     uint32_t    timestampOfStartBit     = 0;
     bool        startDetected           = false;
-    uint8_t     previousState           = 1;
-    uint8_t     highCount               = 0;
     uint8_t     currentByte             = 0;
     uint8_t     currentLevel            = 0;
+    uint8_t     bitNumber               = 0;
 };
 
 
@@ -153,69 +161,56 @@ public:
 
 
 
-    void ProcessSample( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
+    void PeriodicProcessing( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
     {
-        if(timestamp > nextBitTimestamp)
+        switch(bitNumber)
         {
-            nextBitTimestamp    = byteStartTimestamp + (bitNumber * ticksPerBit);
+            case 0:     // START
+                SetTxLow( outputValue );
+                break;
 
-            switch(bitNumber)
-            {
-                case 0:     // START
-                    SetTxLow( outputValue );
-                    break;
+            case 1:     // D0
+                SetTx( currentByte & 0x01, outputValue );
+                break;
 
-                case 1:     // D0
-                    SetTx( currentByte & 0x01, outputValue );
-                    break;
+            case 2:     // D1
+                SetTx( currentByte & 0x02, outputValue );
+                break;
 
-                case 2:     // D1
-                    SetTx( currentByte & 0x02, outputValue );
-                    break;
+            case 3:     // D2
+                SetTx( currentByte & 0x04, outputValue );
+                break;
 
-                case 3:     // D2
-                    SetTx( currentByte & 0x04, outputValue );
-                    break;
+            case 4:     // D3
+                SetTx( currentByte & 0x08, outputValue );
+                break;
 
-                case 4:     // D3
-                    SetTx( currentByte & 0x08, outputValue );
-                    break;
+            case 5:     // D4
+                SetTx( currentByte & 0x10, outputValue );
+                break;
 
-                case 5:     // D4
-                    SetTx( currentByte & 0x10, outputValue );
-                    break;
+            case 6:     // D5
+                SetTx( currentByte & 0x20, outputValue );
+                break;
 
-                case 6:     // D5
-                    SetTx( currentByte & 0x20, outputValue );
-                    break;
+            case 7:     // D6
+                SetTx( currentByte & 0x40, outputValue );
+                break;
 
-                case 7:     // D6
-                    SetTx( currentByte & 0x40, outputValue );
-                    break;
+            case 8:     // D7
+                SetTx( currentByte & 0x80, outputValue );
+                break;
 
-                case 8:     // D7
-                    SetTx( currentByte & 0x80, outputValue );
-                    break;
-
-                case 9:     // STOP
-                    SetTxHigh( outputValue );
-                    currentByte     = fifo[fifoTail];
-                    fifoTail++;
-                    byteStartTimestamp  = timestamp;
-                    break;
-            }
-
-            bitNumber           = (bitNumber+1) & 0x7;
-
-            if( (currentByte&(1<<bitNumber)) != 0 )
-            {
-                outputValue     |= txMask;
-            }
-            else
-            {
-                outputValue     &= ~txMask;
-            }
+            case 9:     // STOP
+                SetTxHigh( outputValue );
+                currentByte     = fifo[fifoTail];
+                fifoTail++;
+                byteStartTimestamp  = timestamp;
+                break;
         }
+
+        bitNumber           = (bitNumber+1) & 0x7;
+
     }
 
     void SetTxHigh( uint8_t& outputValue )
@@ -273,7 +268,7 @@ public:
     }
 
 
-    void ProcessSample( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
+    void PeriodicProcessing( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
     {
         if(timestamp > nextBitTimestamp)
         {
@@ -336,7 +331,7 @@ public:
     {
     }
 
-    void ProcessSample( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
+    void PeriodicProcessing( uint32_t timestamp, uint8_t inputValue, uint8_t& outputValue )
     {
     }
 };
@@ -358,50 +353,32 @@ int main()
     NoOperation     nop;
     PWMType         pwm;
     Scheduler<  100, 
-                TxType, 
+                RxType, 
                 RxType,
-                NoOperation,
-                PWMType,
-                NoOperation,
-                NoOperation,
-                NoOperation,
-                NoOperation >  scheduler(one,two, nop, pwm, nop,nop, nop, nop);
+                RxType,
+                RxType,
+                RxType,
+                RxType,
+                RxType,
+                RxType >  scheduler(two,two, two, two, two,two, two, two);
 
 
     uint8x8_t   bits            = {0};
     uint8x8_t   previousBits    = {0};
 
-    while(true)
+    for(uint32_t i=0; i<250000000; i++)
     {
+	static uint8_t 	inputValues[]	= {0x08, 0x40,0x41,0x48,0x04,0x81,0x08,0x14,0x18,0x01,0x81,0x80,0x80,0x18,0x40,0x04,0x18,0x04,0x00,0x40};
+	uint32_t 	inputIndex 	= 0;
         uint32_t    timestamp       = 0;
         uint8_t     outputValue     = 0;
-        uint8_t     inputValue      = 0x55;
+        uint8_t     inputValue      = inputValues[inputIndex];
 
-        scheduler.ProcessSample( timestamp, 0xab, outputValue );
+        scheduler.PeriodicProcessing( timestamp, 0xab, outputValue );
+	static volatile uint8_t 	r = outputValue;
 
-#if 0
-        printf("%02x\n", outputValue);
-
-        uint8_t     streams[8];
-        streams[0]  <<= 1;        
-        streams[1]  <<= 1;        
-        streams[2]  <<= 1;        
-        streams[3]  <<= 1;        
-        streams[4]  <<= 1;        
-        streams[5]  <<= 1;        
-        streams[6]  <<= 1;        
-        streams[7]  <<= 1;        
-
-        streams[0]  |= (inputValue & 0x01);
-        streams[1]  |= (inputValue & 0x02)>>1;
-        streams[2]  |= (inputValue & 0x04)>>2;
-        streams[3]  |= (inputValue & 0x08)>>3;
-        streams[4]  |= (inputValue & 0x10)>>4;
-        streams[5]  |= (inputValue & 0x20)>>5;
-        streams[6]  |= (inputValue & 0x40)>>6;
-        streams[7]  |= (inputValue & 0x80)>>7;
-#endif
         timestamp++;
+	inputIndex++;
     }
 }
 
