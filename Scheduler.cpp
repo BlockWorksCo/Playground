@@ -64,7 +64,10 @@ public:
         {                                                                       \
             s.ProcessPositiveEdge(timestamp);                                   \
         }                                                                       \
-        s.PeriodicProcessing( timestamp, inputValue, outputValue );                  \
+        if( (timestamp%s.GetPeriod()) == 0)                                     \
+        {                                                                       \
+            s.PeriodicProcessing( timestamp, inputValue, outputValue );         \
+        }                                                                       \
         previousBits[bitNumber]     = bits[bitNumber];
 
         PROCESS_SCHEDULEE(0, schedulee1);
@@ -93,10 +96,15 @@ private:
 ////////////////////////////////////////////////////////////////////////////
 
 
-template <uint32_t ticksPerSecond, uint32_t ticksPerBit, uint8_t rxMask, uint32_t fifoDepth>
+template <uint32_t period, uint32_t ticksPerBit, uint8_t rxMask, uint32_t fifoDepth>
 class UARTReceiver8N1
 {
 public:
+
+    uint32_t GetPeriod()
+    {
+        return period;
+    }
 
     void ProcessNegativeEdge( uint32_t timestamp )
     {
@@ -134,7 +142,7 @@ public:
         bitNumber++;
         if(bitNumber >= 10)
         {
-	        startDetected 	= false;
+            startDetected 	= false;
         }
     }
 
@@ -146,10 +154,15 @@ public:
 };
 
 
-template <uint32_t ticksPerSecond, uint32_t ticksPerBit, uint8_t txMask, uint32_t fifoDepth>
+template <uint32_t period, uint32_t ticksPerBit, uint8_t txMask, uint32_t fifoDepth>
 class UARTTransmitter8N1
 {
 public:
+
+    uint32_t GetPeriod()
+    {
+        return period;
+    }
 
     void ProcessNegativeEdge( uint32_t timestamp )
     {
@@ -254,10 +267,15 @@ public:
 
 
 
-template <uint32_t ticksPerSecond, uint32_t ticksPerBit, uint8_t txMask>
+template <uint32_t period, uint32_t ticksPerBit, uint8_t txMask>
 class PWM
 {
 public:
+
+    uint32_t GetPeriod()
+    {
+        return period;
+    }
 
     void ProcessNegativeEdge( uint32_t timestamp )
     {
@@ -323,6 +341,11 @@ class NoOperation
 {
 public:
 
+    uint32_t GetPeriod()
+    {
+        return 0xffffffff;
+    }
+
     void ProcessNegativeEdge( uint32_t timestamp )
     {
     }
@@ -345,9 +368,9 @@ public:
 //
 int main()
 {
-    typedef UARTTransmitter8N1<100000,3, 0x01, 1024>    TxType;
-    typedef UARTReceiver8N1<100000,3, 0x02, 1024>       RxType;
-    typedef PWM<100000,30, 0x4>                         PWMType;
+    typedef UARTTransmitter8N1<10,3, 0x01, 1024>    TxType;
+    typedef UARTReceiver8N1<8,3, 0x02, 1024>        RxType;
+    typedef PWM<30,30, 0x4>                         PWMType;
     TxType          one;
     RxType          two;
     NoOperation     nop;
@@ -368,17 +391,17 @@ int main()
 
     for(uint32_t i=0; i<250000000; i++)
     {
-	static uint8_t 	inputValues[]	= {0x08, 0x40,0x41,0x48,0x04,0x81,0x08,0x14,0x18,0x01,0x81,0x80,0x80,0x18,0x40,0x04,0x18,0x04,0x00,0x40};
-	uint32_t 	inputIndex 	= 0;
+        static uint8_t 	inputValues[]	= {0x08, 0x40,0x41,0x48,0x04,0x81,0x08,0x14,0x18,0x01,0x81,0x80,0x80,0x18,0x40,0x04,0x18,0x04,0x00,0x40};
+        uint32_t 	inputIndex 	= 0;
         uint32_t    timestamp       = 0;
         uint8_t     outputValue     = 0;
         uint8_t     inputValue      = inputValues[inputIndex];
 
         scheduler.PeriodicProcessing( timestamp, 0xab, outputValue );
-	static volatile uint8_t 	r = outputValue;
+        static volatile uint8_t 	r = outputValue;
 
         timestamp++;
-	inputIndex++;
+    inputIndex++;
     }
 }
 
