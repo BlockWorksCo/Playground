@@ -251,14 +251,6 @@ int runReadSpeedTest(){
     UCHAR temp;
 
 
-    {
-        printf("\n\nTime check test.\n");
-        startTiming();
-        sleep(5);
-        double elapsedSeconds = stopTiming();
-        printf("5s == %f\n", elapsedSeconds);
-    }
-
     printf("Entered Read Speed Test\n");
 
     //open device for use
