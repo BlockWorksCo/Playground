@@ -125,7 +125,7 @@ public:
       {
          .recipient  = ActorOne,
          .id         = 123,
-         .period     = 100,
+         .period     = 1000,
       };
       this->Send( ActorTimer, Timer<ActorTaskType,DataType>::Register, (DataType)&periodicTimer );
    }

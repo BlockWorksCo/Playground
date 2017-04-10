@@ -10,6 +10,11 @@
 
 #include <stdint.h>
 
+//
+// Up to 255 actors in one ActorTask.
+//
+typedef uint8_t     ActorID;
+
 
 //
 // NOTE: This isn't a *true* actor implementation, its effectively a lightweight concurrency

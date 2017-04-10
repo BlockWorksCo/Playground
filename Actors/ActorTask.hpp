@@ -13,6 +13,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+
+
+
 //
 // https://en.wikipedia.org/wiki/Actor_model
 // "The actor model is characterized by inherent concurrency of computation within and among actors, 
@@ -57,9 +60,9 @@ public:
          // Process a message.
          //
          currentActor   = messages[message].recipient;
-         messages[message].recipient   = (uint32_t)-1;
+         messages[message].recipient   = (ActorID)-1;
          actors[currentActor]->ProcessMessage( messages[message].id, messages[message].data );         
-         currentActor   = (uint32_t)-1;
+         currentActor   = (ActorID)-1;
       }
       else
       {
@@ -71,7 +74,7 @@ public:
    }
 
 
-   void Send(uint32_t recipient, uint32_t id, DataType data)
+   void Send(ActorID recipient, uint32_t id, DataType data)
    {
       //
       // TODO: Make this a true circular buffer.
@@ -88,7 +91,7 @@ public:
       }
    }
 
-   void SendFromISR(uint32_t recipient, uint32_t id, uint32_t data)
+   void SendFromISR(ActorID recipient, uint32_t id, uint32_t data)
    {
       //
       // TODO: Use a separate queue and process them both in the run-loop to avoid blocking or locking.
@@ -99,7 +102,7 @@ public:
    //
    // return the currently executing actor.
    //
-   uint32_t CurrentlyExecutingActor()
+   ActorID CurrentlyExecutingActor()
    {
       return currentActor;
    }
@@ -111,7 +114,7 @@ private:
    //
    typedef struct
    {
-      uint32_t    recipient;
+      ActorID     recipient;
       uint32_t    id;
       DataType    data;
       
@@ -139,10 +142,10 @@ private:
    //
    //
    IActor<DataType>*    actors[maxNumberOfActors];
-   uint32_t             numberOfActors;
+   ActorID              numberOfActors;
    uint32_t             queueHead;
    Message              messages[maxNumberOfMessages];
-   uint32_t             currentActor;
+   ActorID              currentActor;
 
 };
 
