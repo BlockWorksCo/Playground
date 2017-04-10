@@ -47,7 +47,6 @@ public:
       switch(id)
       {
          case Tick:     // increment a tick (send via timer ISR)
-            printf("Tick message.\n");
             tick++;
             break;
 
@@ -58,6 +57,7 @@ public:
                if(periodicTimers[i] == 0)
                {
                   periodicTimers[i]    = (RegisterMessage*)data;
+                  break;
                }
             }            
             break;
@@ -123,7 +123,7 @@ public:
    {      
       static typename Timer<ActorTaskType,DataType>::RegisterMessage    periodicTimer  =
       {
-         .recipient  = this->self(),
+         .recipient  = ActorOne,
          .id         = 123,
          .period     = 100,
       };
@@ -188,7 +188,6 @@ int main()
       i++;
       if( (i%10000) == 0)
       {
-         printf("%ld\n",i);
          actorTask.SendFromISR( ActorTimer, Timer<ActorTaskType,DataType>::Tick, 0 );
       }
    }
