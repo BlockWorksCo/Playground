@@ -96,7 +96,7 @@ public:
    //
    typedef struct
    {
-      uint32_t    recipient;
+      ActorID     recipient;
       uint32_t    id;
       uint32_t    period;
    } RegisterMessage;
@@ -133,9 +133,8 @@ public:
    void ProcessMessage(uint32_t id, DataType data)
    {
       this->Send( ActorTwo, 0xabcd, 100);
-      printf("One\n");
-
-      this->SetState(1);
+      printf("One (%d)\n", this->GetState());
+      this->SetState( this->GetState()+1 );
    }
 };
 

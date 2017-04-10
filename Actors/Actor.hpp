@@ -56,7 +56,7 @@ protected:
    //
    // return the ID of the curerntly executing actor.
    //
-   uint32_t self()
+   ActorID self()
    {
       return this->task.CurrentlyExecutingActor();
    }
