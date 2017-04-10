@@ -491,7 +491,7 @@ int main()
       return 1;
    }
 
-    FTDIDevice_ReadStream( &dev, FTDI_INTERFACE_A, Callback, NULL, 8, 256);
+    FTDIDevice_ReadStream( &dev, FTDI_INTERFACE_A, Callback, NULL, 16, 512);
 
 }
 
