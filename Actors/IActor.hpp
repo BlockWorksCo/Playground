@@ -15,6 +15,11 @@
 //
 typedef uint8_t     ActorID;
 
+//
+// Type for the message identifier.
+//
+typedef uint32_t     MessageID;
+
 
 //
 // NOTE: This isn't a *true* actor implementation, its effectively a lightweight concurrency
@@ -25,7 +30,7 @@ class IActor
 {
 public:
 
-   virtual void ProcessMessage(uint32_t id, DataType data) = 0;
+   virtual void ProcessMessage( MessageID id, DataType data ) = 0;
 };
 
 

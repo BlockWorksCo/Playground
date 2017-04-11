@@ -7,7 +7,7 @@
 
 
 //
-//
+// Global actor address/name list.
 //
 typedef enum
 {
@@ -32,14 +32,14 @@ public:
    {      
       static typename Timer<ActorTaskType,DataType>::RegisterMessage    periodicTimer  =
       {
-         .recipient  = ActorOne,
+         .recipient  = this->self,
          .id         = 123,
          .period     = 1000,
       };
       this->Send( ActorTimer, Timer<ActorTaskType,DataType>::Register, (DataType)&periodicTimer );
    }
 
-   void ProcessMessage(uint32_t id, DataType data)
+   void ProcessMessage( MessageID id, DataType data )
    {
       this->Send( ActorTwo, 0xabcd, 100);
       printf("One (%d)\n", this->GetState());
@@ -61,7 +61,7 @@ public:
    {      
    }
 
-   void ProcessMessage(uint32_t id, DataType data)
+   void ProcessMessage( MessageID id, DataType data )
    {
       //this->Send( ActorOne, 0x0123, 200);
       printf("Two\n");
@@ -74,20 +74,32 @@ public:
 
 
 //
-//
+// Application entry point.
 //
 int main()
 {
+    //
+    // Define a few types to make the code clearer.
+    //
     typedef uint64_t                    DataType;
     typedef ActorTask<3,16,DataType>    ActorTaskType;
 
+    //
+    // Instantiate an actor task and 3 actors that execute using it.
+    //
     ActorTaskType                       actorTask("ActorDemo",1024,1);
     Timer<ActorTaskType,DataType>       timer(actorTask);
     One<ActorTaskType,DataType>         one(actorTask);
     Two<ActorTaskType,DataType>         two(actorTask);
 
-   while(true)
-   {
+
+    //
+    // Enter the main loop.... 
+    // here we would normally just perform actorTask.run() but we have to simulate
+    // a timer interrupt here
+    //
+    while(true)
+    {
       actorTask.run();
 
       //
@@ -99,7 +111,7 @@ int main()
       {
          actorTask.SendFromISR( ActorTimer, Timer<ActorTaskType,DataType>::Tick, 0 );
       }
-   }
+    }
 }
 
 

@@ -39,10 +39,13 @@ public:
    {      
    }
 
-   void Add(IActor<DataType>& actor)
+   ActorID Add(IActor<DataType>& actor)
    {
-      actors[numberOfActors]  = &actor;
+      ActorID   id  = numberOfActors;
+      actors[id]  = &actor;
       numberOfActors++;
+
+      return id;
    }
 
 

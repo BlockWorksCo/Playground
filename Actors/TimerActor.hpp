@@ -30,7 +30,7 @@ public:
       }
    }
 
-   void ProcessMessage(uint32_t id, DataType data)
+   void ProcessMessage( MessageID id, DataType data)
    {
       //
       // The message will be either an 'update-tick' message from an ISR or a 

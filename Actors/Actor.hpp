@@ -27,18 +27,20 @@ public:
 
    Actor(ActorTaskType& _task) :
                task(_task), 
-               state(0)
+               state(0),
+               self( task.Add(*this) )
    {
-      task.Add( *this );
    }
 
 
-   void Send(uint32_t recipient, uint32_t id, DataType data)
+   void Send( ActorID recipient, MessageID id, DataType data)
    {
       task.Send(recipient, id, data);
    }
 
+
 protected:
+
    //
    // State management
    //
@@ -52,13 +54,7 @@ protected:
       return state;
    }
 
-   //
-   // return the ID of the curerntly executing actor.
-   //
-   ActorID self()
-   {
-      return this->task.CurrentlyExecutingActor();
-   }
+   ActorID           self;
 
 private:
 
