@@ -134,7 +134,7 @@ public:
    {
       this->Send( ActorTwo, 0xabcd, 100);
       printf("One (%d)\n", this->GetState());
-      SetState( this->GetState()+1 );
+      this->SetState( this->GetState()+1 );
    }
 };
 
