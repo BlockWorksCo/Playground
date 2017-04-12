@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include "CircularBuffer.hpp"
 
 
 
@@ -149,6 +150,7 @@ private:
    uint32_t             queueHead;
    Message              messages[maxNumberOfMessages];
    ActorID              currentActor;
+   CircularBuffer<uint8_t,uint8_t>      buffer;
 
 };
 

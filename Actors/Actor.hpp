@@ -27,9 +27,9 @@ public:
 
    Actor(ActorTaskType& _task) :
                task(_task), 
-               state(0),
-               self( task.Add(*this) )
+               state(0)
    {
+       self = task.Add(*this);
    }
 
 
