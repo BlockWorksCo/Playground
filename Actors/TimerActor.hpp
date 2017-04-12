@@ -42,7 +42,7 @@ public:
             tick++;
             break;
 
-         case Register:     // register an actor that wishes a delay.
+         case Register:     // register an actor that wishes to perform a timeout/delay.
             printf("Registration message.\n");
             for(uint32_t i=0; i<8; i++)            
             {

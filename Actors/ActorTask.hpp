@@ -23,10 +23,6 @@
 //  dynamic creation of actors, inclusion of actor addresses in messages, and interaction only through 
 //  direct asynchronous message passing with no restriction on message arrival order."
 //
-// (Here, we ignore the "dynamic creation"" part of that statement).
-//
-// Currently this is suitable for bare-metal... i.e. bare-metal-actors.... ooh-err.
-//
 template <uint32_t maxNumberOfActors, uint32_t maxNumberOfMessages, typename DataType>
 class ActorTask
 {
@@ -38,6 +34,12 @@ public:
                numberOfActors(0),
                queueHead(0)
    {      
+       buffer.InitialiseAsReader();
+       buffer.InitialiseAsWriter();
+       for(uint32_t i=0; i<maxNumberOfMessages; i++)
+       {
+           messages[i].recipient    = (ActorID)-1;
+       }
    }
 
    ActorID Add(IActor<DataType>& actor)
@@ -90,6 +92,7 @@ public:
             messages[i].recipient   = recipient;
             messages[i].id          = id;
             messages[i].data        = data;
+            buffer.Put(i);
             break;
          }
       }
@@ -129,14 +132,11 @@ private:
    //
    uint32_t select()
    {
-      for(uint32_t i=0; i<maxNumberOfMessages; i++)
+      bool      dataAvailable   = false;
+      uint8_t   index           = buffer.NonBlockingGet(dataAvailable);
+      if(dataAvailable == true)
       {
-         if(messages[queueHead].recipient < numberOfActors)
-         {
-            return queueHead;
-         }
-
-         queueHead   = (queueHead+1) % maxNumberOfMessages;
+         return index;
       }
       
       return (uint32_t)-1;
@@ -148,7 +148,7 @@ private:
    IActor<DataType>*    actors[maxNumberOfActors];
    ActorID              numberOfActors;
    uint32_t             queueHead;
-   Message              messages[maxNumberOfMessages];
+   Message              messages[256];
    ActorID              currentActor;
    CircularBuffer<uint8_t,uint8_t>      buffer;
 
