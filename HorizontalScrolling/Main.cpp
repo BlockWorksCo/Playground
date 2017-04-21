@@ -1,21 +1,18 @@
-/*
-
-  CURWIN1.C
-  =========
-  (c) Copyright Paul Griffiths 1999
-  Email: mail@paulgriffiths.net
-
-  Moving windows with ncurses.
-
-*/
-
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <curses.h>
+#include <unistd.h>
+#include <string.h>
 
 
-int main(void) {
+
+
+uint8_t         data[256];
+
+
+int main(void) 
+{
     
     WINDOW * mainwin, * childwin;
     int      ch;
@@ -32,9 +29,10 @@ int main(void) {
 
     /*  Initialize ncurses  */
 
-    if ( (mainwin = initscr()) == NULL ) {
-	fprintf(stderr, "Error initialising ncurses.\n");
-	exit(EXIT_FAILURE);
+    if ( (mainwin = initscr()) == NULL ) 
+    {
+	    fprintf(stderr, "Error initialising ncurses.\n");
+	    exit(EXIT_FAILURE);
     }
     
 
@@ -56,46 +54,91 @@ int main(void) {
 
     refresh();
 
+    //
+    //
+    //
+    start_color();
+    init_pair(0, COLOR_RED, COLOR_BLACK);
+    init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);
+    init_pair(3, COLOR_BLUE, COLOR_BLACK);
+    init_pair(4, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(5, COLOR_CYAN, COLOR_BLACK);
+    init_pair(6, COLOR_WHITE, COLOR_BLACK);
+    init_pair(7, COLOR_RED, COLOR_BLACK);
 
     /*  Loop until user hits 'q' to quit  */
 
-    while ( (ch = getch()) != 'q' ) {
+    uint32_t    wx   = 100;
+    int         maxX;
+    int         maxY;
+    while (true)
+    {
+        //
+        // Get some new data.
+        //
+        static uint32_t     iteration   = 0;
+        iteration++;
+        for(uint32_t k=0; k<sizeof(data)-1; k++)
+        {
+            data[k] = data[k+1];
+        }
+        if(iteration%5 == 0)
+        {
+            data[sizeof(data)-1] = rand();
+        }
 
-	switch ( ch ) {
+#if 1
 
-	case KEY_UP:
-	    if ( y > 0 )
-		--y;
-	    break;
+        //
+        // Draw the traces.
+        //
+        wclear(mainwin);
+        getmaxyx(mainwin, maxY,maxX);
 
-	case KEY_DOWN:
-	    if ( y < (rows - height) )
-		++y;
-	    break;
+        uint32_t traceHeight = maxY/8;
+        for(uint32_t i=0; i<8; i++)
+        {
+            attron(COLOR_PAIR(i));
 
-	case KEY_LEFT:
-	    if ( x > 0 )
-		--x;
-	    break;
+            //
+            //
+            //
+            for(uint32_t j=0; j<maxX; j++)
+            {
+                uint32_t     sample  = 0;
+                static uint32_t     previousSample  = sample;
 
-	case KEY_RIGHT:
-	    if ( x < (cols - width) )
-		++x;
-	    break;
+                sample  = (data[j] & (1<<i)) != 0;
 
-	case KEY_HOME:
-	    x = 0;
-	    y = 0;
-	    break;
 
-	case KEY_END:
-	    x = (cols - width);
-	    y = (rows - height);
-	    break;
+                int     ty  = (traceHeight*(i+1)) - 1 - (sample*(traceHeight-2));
+                mvwaddch(mainwin, ty,j, '-');
 
-	}
+                if((previousSample != sample) && (j>0))
+                {
+                    ty  = (traceHeight*(i+1)) - 1;
+                    for(uint32_t k=0; k<traceHeight-2; k++)
+                    {
+                        mvwaddch(mainwin, ty-k-1,j, '|');
+                    }
+                    mvwaddch(mainwin, ty,j, '+');
+                    mvwaddch(mainwin, ty-(traceHeight-2),j, '+');
+                }
 
-	mvwin(childwin, y, x);
+                previousSample  = sample;
+            }
+
+            attroff(COLOR_PAIR(i));
+        }
+
+#endif
+
+        wnoutrefresh(mainwin);
+        wnoutrefresh(childwin);
+        doupdate();
+
+        usleep(10000);
     }
 
 
