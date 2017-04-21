@@ -4,6 +4,7 @@
 #include <curses.h>
 #include <unistd.h>
 #include <string.h>
+#include <panel.h>
 
 
 
@@ -14,7 +15,12 @@ uint8_t         data[256];
 int main(void) 
 {
     
-    WINDOW * mainwin, * childwin;
+    WINDOW*  mainwin;
+    WINDOW*  childwin;
+    WINDOW*  traceWin;
+    PANEL*   mainPanel;
+    PANEL*   childPanel;
+    PANEL*   tracePanel;
     int      ch;
 
 
@@ -45,14 +51,17 @@ int main(void)
     /*  Make our child window, and add
 	a border and some text to it.   */
 
-    childwin = subwin(mainwin, height, width, y, x);
+    int         maxX;
+    int         maxY;
+    getmaxyx(mainwin, maxY,maxX);
+    traceWin = newwin(maxY, maxX, 0, 0);
+
+    childwin = newwin(height, width, 2, maxX-width-2);
     box(childwin, 0, 0);
     mvwaddstr(childwin, 1, 4, "Move the window");
     mvwaddstr(childwin, 2, 2, "with the arrow keys");
     mvwaddstr(childwin, 3, 6, "or HOME/END");
     mvwaddstr(childwin, 5, 3, "Press 'q' to quit");
-
-    refresh();
 
     //
     //
@@ -67,11 +76,12 @@ int main(void)
     init_pair(6, COLOR_WHITE, COLOR_BLACK);
     init_pair(7, COLOR_RED, COLOR_BLACK);
 
-    /*  Loop until user hits 'q' to quit  */
+
+    tracePanel  = new_panel( traceWin );
+    mainPanel   = new_panel( mainwin );
+    childPanel  = new_panel( childwin );
 
     uint32_t    wx   = 100;
-    int         maxX;
-    int         maxY;
     while (true)
     {
         //
@@ -88,13 +98,12 @@ int main(void)
             data[sizeof(data)-1] = rand();
         }
 
-#if 1
 
         //
         // Draw the traces.
         //
-        wclear(mainwin);
-        getmaxyx(mainwin, maxY,maxX);
+        wclear(traceWin);
+        getmaxyx(traceWin, maxY,maxX);
 
         uint32_t traceHeight = maxY/8;
         for(uint32_t i=0; i<8; i++)
@@ -113,17 +122,17 @@ int main(void)
 
 
                 int     ty  = (traceHeight*(i+1)) - 1 - (sample*(traceHeight-2));
-                mvwaddch(mainwin, ty,j, '-');
+                mvwaddch(traceWin, ty,j, '-');
 
                 if((previousSample != sample) && (j>0))
                 {
                     ty  = (traceHeight*(i+1)) - 1;
                     for(uint32_t k=0; k<traceHeight-2; k++)
                     {
-                        mvwaddch(mainwin, ty-k-1,j, '|');
+                        mvwaddch(traceWin, ty-k-1,j, '|');
                     }
-                    mvwaddch(mainwin, ty,j, '+');
-                    mvwaddch(mainwin, ty-(traceHeight-2),j, '+');
+                    mvwaddch(traceWin, ty,j, '+');
+                    mvwaddch(traceWin, ty-(traceHeight-2),j, '+');
                 }
 
                 previousSample  = sample;
@@ -132,13 +141,14 @@ int main(void)
             attroff(COLOR_PAIR(i));
         }
 
-#endif
 
-        wnoutrefresh(mainwin);
-        wnoutrefresh(childwin);
+        //touchwin(childwin);
+        //wnoutrefresh(traceWin);
+        //wnoutrefresh(childwin);
+        update_panels();
         doupdate();
 
-        usleep(10000);
+        usleep(1000000/30);
     }
 
 
