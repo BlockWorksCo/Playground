@@ -120,6 +120,102 @@ public:
     }
 
 
+
+    bool Parse( uint8_t value )
+    {
+        bool                success     = false;
+        static uint32_t     position    = 0;        
+        static uint8_t      requestType[2];
+        static LogicalName  logicalName;
+        static uint8_t      invokeId;
+        static uint8_t      classId[2];
+        static uint8_t      attributeNumber[2];
+
+
+        //
+        // Parse the header bytes.
+        //
+        switch(position)
+        {
+            case 0:
+                requestType[0]      = value;
+                break;
+
+            case 1:
+            {
+                requestType[1]      = value;
+                uint16_t    field   = (requestType[0]<<8) | (requestType[1]);
+                ProcessRequestType( field );
+                break;
+            }
+
+            case 2:
+            {
+                invokeId          = value;
+                ProcessInvokeId( invokeId );
+                break;
+            }
+
+            case 3:
+                classId[0]      = value;
+                break;
+
+            case 4:
+            {
+                classId[1]      = value;
+                uint16_t    field   = (classId[0]<<8) | (classId[1]);
+                ProcessInterfaceClass( field );
+                break;
+            }
+
+            case 5:
+                logicalName.d0      = value;
+                break;
+
+            case 6:
+                logicalName.d1      = value;
+                break;
+
+            case 7:
+                logicalName.d2      = value;
+                break;
+
+            case 8:
+                logicalName.d3      = value;
+                break;
+
+            case 9:
+                logicalName.d4      = value;
+                break;
+
+            case 10:
+            {
+                logicalName.d5      = value;
+                ProcessLogicalName( logicalName );
+                break;
+            }
+
+            case 11:
+                attributeNumber[0]   = value;
+                break;
+
+            case 12:
+            {
+                attributeNumber[1]   = value;
+                uint16_t    field   = (attributeNumber[0]<<8) | (attributeNumber[1]);
+                ProcessAttributeNumber( field );
+                break;
+            }
+
+            default:
+                break;
+        }
+
+        position++;
+
+        return true;
+    }
+
 private:
 
 
@@ -195,11 +291,6 @@ public:
         uint8_t     header[7];
         uint8_t     fcs[2];
         uint8_t     llc[4];
-        uint8_t     requestType[2];
-        LogicalName logicalName;
-        uint8_t     invokeId;
-        uint8_t     classId[2];
-        uint8_t     attributeNumber[2];
 
         do
         {
@@ -256,76 +347,6 @@ public:
                         break;
                     }   
 
-                    case 10:
-                        requestType[0]      = value;
-                        break;
-
-                    case 11:
-                    {
-                        requestType[1]      = value;
-                        uint16_t    field   = (requestType[0]<<8) | (requestType[1]);
-                        upperLayer.ProcessRequestType( field );
-                        break;
-                    }
-
-                    case 12:
-                    {
-                        invokeId          = value;
-                        upperLayer.ProcessInvokeId( invokeId );
-                        break;
-                    }
-
-                    case 13:
-                        classId[0]      = value;
-                        break;
-
-                    case 14:
-                    {
-                        classId[1]      = value;
-                        uint16_t    field   = (classId[0]<<8) | (classId[1]);
-                        upperLayer.ProcessInterfaceClass( field );
-                        break;
-                    }
-
-                    case 15:
-                        logicalName.d0      = value;
-                        break;
-
-                    case 16:
-                        logicalName.d1      = value;
-                        break;
-
-                    case 17:
-                        logicalName.d2      = value;
-                        break;
-
-                    case 18:
-                        logicalName.d3      = value;
-                        break;
-
-                    case 19:
-                        logicalName.d4      = value;
-                        break;
-
-                    case 20:
-                    {
-                        logicalName.d5      = value;
-                        upperLayer.ProcessLogicalName( logicalName );
-                        break;
-                    }
-
-                    case 21:
-                        attributeNumber[0]   = value;
-                        break;
-
-                    case 22:
-                    {
-                        attributeNumber[1]   = value;
-                        uint16_t    field   = (attributeNumber[0]<<8) | (attributeNumber[1]);
-                        upperLayer.ProcessAttributeNumber( field );
-                        break;
-                    }
-
                     case 23:
                         fcs[0]   = value;
                         break;
@@ -346,6 +367,7 @@ public:
                     }
 
                     default:
+                        upperLayer.Parse( value );
                         break;
                 }
 
