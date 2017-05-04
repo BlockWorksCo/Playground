@@ -109,12 +109,12 @@ public:
     //
     // Called if the check-sequence passes.
     //
-    void AbortProcessing()
+    void Abort()
     {
         printf("Abort\n");
     }
 
-    void CompleteProcessing()
+    void Commit()
     {
         printf("Complete\n");
     }
@@ -284,99 +284,91 @@ public:
 
     
     
-    bool Parse()
+    bool Parse( uint8_t value )
     {
-        bool        success     = false;
-        uint32_t    position    = 0;        
-        uint8_t     header[7];
-        uint8_t     fcs[2];
-        uint8_t     llc[4];
+        bool                success     = false;
+        static uint32_t     position    = 0;        
+        static uint8_t      header[7];
+        static uint8_t      fcs[2];
+        static uint8_t      llc[4];
 
-        do
+
+        //
+        // Parse the header bytes.
+        //
+        switch(position)
         {
-            uint8_t     value;
-            success     = Get_UINT8( value );
-            if( success == true )
+            case 0:
+                header[0]   = value;
+                break;
+
+            case 1:
+                header[1]   = value;
+                break;
+
+            case 2:
+                header[2]   = value;
+                break;
+
+            case 3:
+                header[3]   = value;
+                break;
+
+            case 4:
+                header[4]   = value;
+                break;
+
+            case 5:
+                header[5]   = value;
+                break;
+
+            case 6:
+                header[6]   = value;
+                break;
+
+            case 7:
+                llc[0]      = value;
+                break;
+
+            case 8:
+                llc[1]      = value;
+                break;
+
+            case 9:
             {
-                //
-                // Parse the header bytes.
-                //
-                switch(position)
+                llc[2]      = value;
+                uint32_t    field   = (llc[0]<<16) | (llc[1]<<8) | (llc[2]);
+                upperLayer.ProcessLLC( field );
+                break;
+            }   
+
+            case 23:
+                fcs[0]   = value;
+                break;
+
+            case 24:
+            {
+                fcs[1]   = value;
+                uint16_t    field   = (fcs[0]<<8) | (fcs[1]);
+                if(field == 0x0dfd)
                 {
-                    case 0:
-                        header[0]   = value;
-                        break;
-
-                    case 1:
-                        header[1]   = value;
-                        break;
-
-                    case 2:
-                        header[2]   = value;
-                        break;
-
-                    case 3:
-                        header[3]   = value;
-                        break;
-
-                    case 4:
-                        header[4]   = value;
-                        break;
-
-                    case 5:
-                        header[5]   = value;
-                        break;
-
-                    case 6:
-                        header[6]   = value;
-                        break;
-
-                    case 7:
-                        llc[0]      = value;
-                        break;
-
-                    case 8:
-                        llc[1]      = value;
-                        break;
-
-                    case 9:
-                    {
-                        llc[2]      = value;
-                        uint32_t    field   = (llc[0]<<16) | (llc[1]<<8) | (llc[2]);
-                        upperLayer.ProcessLLC( field );
-                        break;
-                    }   
-
-                    case 23:
-                        fcs[0]   = value;
-                        break;
-
-                    case 24:
-                    {
-                        fcs[1]   = value;
-                        uint16_t    field   = (fcs[0]<<8) | (fcs[1]);
-                        if(field == 0x0dfd)
-                        {
-                            upperLayer.CompleteProcessing();
-                        }
-                        else
-                        {
-                            upperLayer.AbortProcessing();
-                        }
-                        break;
-                    }
-
-                    default:
-                        upperLayer.Parse( value );
-                        break;
+                    upperLayer.Commit();
                 }
-
-                position++;
+                else
+                {
+                    upperLayer.Abort();
+                }
+                break;
             }
 
-        } while( success == true );
+            default:
+                upperLayer.Parse( value );
+                break;
+        }
 
-        return false;
+        position++;
+
+        return true;
     }
 
 
@@ -429,7 +421,12 @@ int main()
         //
         do
         {
-            success = requestFrame.Parse();
+            uint8_t     value;
+            success     = requestFrame.Get_UINT8( value );
+            if( success == true)
+            {
+                success = requestFrame.Parse( value );
+            }
 
         } while( success == true );
     }
