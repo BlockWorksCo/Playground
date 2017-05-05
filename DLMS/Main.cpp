@@ -277,6 +277,7 @@ public:
     {
         bool            success     = true;
         static bool     withinFrame = false;
+        static uint8_t  fcs[2];
         
         //
         // Make sure we're within a frame.
@@ -310,8 +311,19 @@ public:
                 //
                 withinFrame     = false;
                 success         = false;
+
+                //
+                // Check the FCS.
+                //
+                printf("FCS = %02x%02x\n", fcs[0],fcs[1]);
             }
         }
+
+        //
+        // Update the FCS (shift along the received FCS and calculate the current one).
+        //
+        fcs[0]  = fcs[1];
+        fcs[1]  = value;
 
         return success;
     }
@@ -323,7 +335,6 @@ public:
         bool                success     = false;
         static uint32_t     position    = 0;        
         static uint8_t      header[7];
-        static uint8_t      fcs[2];
         static uint8_t      hcs[2];
         static uint8_t      type;
         static uint16_t     frameLength;
@@ -420,10 +431,6 @@ public:
 
 
 
-            case 23:
-                fcs[0]   = value;
-                position    = 24;
-                break;
 
             case 24:
             {
