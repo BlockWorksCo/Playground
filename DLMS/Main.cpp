@@ -316,6 +316,16 @@ public:
                 // Check the FCS.
                 //
                 printf("FCS = %02x%02x\n", fcs[0],fcs[1]);
+
+                uint16_t    field   = (fcs[0]<<8) | (fcs[1]);
+                if(field == 0x0dfd)
+                {
+                    upperLayer.Commit();
+                }
+                else
+                {
+                    upperLayer.Abort();
+                }
             }
         }
 
@@ -428,24 +438,6 @@ public:
                 position    = 10;
                 break;
 
-
-
-
-
-            case 24:
-            {
-                fcs[1]   = value;
-                uint16_t    field   = (fcs[0]<<8) | (fcs[1]);
-                if(field == 0x0dfd)
-                {
-                    upperLayer.Commit();
-                }
-                else
-                {
-                    upperLayer.Abort();
-                }
-                break;
-            }
 
             default:
                 upperLayer.Parse( value );
