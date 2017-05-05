@@ -130,6 +130,7 @@ public:
         static uint8_t      invokeId;
         static uint8_t      classId[2];
         static uint8_t      attributeNumber[2];
+        static uint8_t      llc[4];
 
 
         //
@@ -138,80 +139,113 @@ public:
         switch(position)
         {
             case 0:
-                requestType[0]      = value;
+                llc[0]      = value;
+                position    = 1;
                 break;
 
             case 1:
-            {
-                requestType[1]      = value;
-                uint16_t    field   = (requestType[0]<<8) | (requestType[1]);
-                ProcessRequestType( field );
+                llc[1]      = value;
+                position    = 2;
                 break;
-            }
 
             case 2:
             {
-                invokeId          = value;
-                ProcessInvokeId( invokeId );
+                llc[2]      = value;
+                uint32_t    field   = (llc[0]<<16) | (llc[1]<<8) | (llc[2]);
+                ProcessLLC( field );
+                position    = 3;
                 break;
-            }
+            }   
+
+
+
 
             case 3:
-                classId[0]      = value;
+                requestType[0]      = value;
+                position    = 4;
                 break;
 
             case 4:
             {
-                classId[1]      = value;
-                uint16_t    field   = (classId[0]<<8) | (classId[1]);
-                ProcessInterfaceClass( field );
+                requestType[1]      = value;
+                uint16_t    field   = (requestType[0]<<8) | (requestType[1]);
+                ProcessRequestType( field );
+                position    = 5;
                 break;
             }
 
             case 5:
-                logicalName.d0      = value;
-                break;
-
-            case 6:
-                logicalName.d1      = value;
-                break;
-
-            case 7:
-                logicalName.d2      = value;
-                break;
-
-            case 8:
-                logicalName.d3      = value;
-                break;
-
-            case 9:
-                logicalName.d4      = value;
-                break;
-
-            case 10:
             {
-                logicalName.d5      = value;
-                ProcessLogicalName( logicalName );
+                invokeId          = value;
+                ProcessInvokeId( invokeId );
+                position    = 6;
                 break;
             }
 
+            case 6:
+                classId[0]      = value;
+                position    = 7;
+                break;
+
+            case 7:
+            {
+                classId[1]      = value;
+                uint16_t    field   = (classId[0]<<8) | (classId[1]);
+                ProcessInterfaceClass( field );
+                position    = 8;
+                break;
+            }
+
+            case 8:
+                logicalName.d0      = value;
+                position    = 9;
+                break;
+
+            case 9:
+                logicalName.d1      = value;
+                position    = 10;
+                break;
+
+            case 10:
+                logicalName.d2      = value;
+                position    = 11;
+                break;
+
             case 11:
-                attributeNumber[0]   = value;
+                logicalName.d3      = value;
+                position    = 12;
                 break;
 
             case 12:
+                logicalName.d4      = value;
+                position    = 13;
+                break;
+
+            case 13:
+            {
+                logicalName.d5      = value;
+                ProcessLogicalName( logicalName );
+                position    = 14;
+                break;
+            }
+
+            case 14:
+                attributeNumber[0]   = value;
+                position    = 15;
+                break;
+
+            case 15:
             {
                 attributeNumber[1]   = value;
                 uint16_t    field   = (attributeNumber[0]<<8) | (attributeNumber[1]);
                 ProcessAttributeNumber( field );
+                position    = 16;
                 break;
             }
 
             default:
                 break;
         }
-
-        position++;
 
         return true;
     }
@@ -290,7 +324,13 @@ public:
         static uint32_t     position    = 0;        
         static uint8_t      header[7];
         static uint8_t      fcs[2];
-        static uint8_t      llc[4];
+        static uint8_t      hcs[2];
+        static uint8_t      type;
+        static uint16_t     frameLength;
+        static uint8_t      addressField[2];
+        static uint8_t      addressFieldSize;
+        static uint8_t      addressCount;
+        static uint8_t      controlByte;
 
 
         //
@@ -299,51 +339,90 @@ public:
         switch(position)
         {
             case 0:
-                header[0]   = value;
+                type            = value & 0xf0;
+                frameLength     = (value&0x7)<<8;
+                printf("Type=%02x\n", type);
+                addressCount    = 0;
+                position        = 1;
                 break;
+
+
 
             case 1:
-                header[1]   = value;
+                frameLength += value;
+                printf("FrameLength=%04x\n", frameLength);
+                position        = 3;
                 break;
 
-            case 2:
-                header[2]   = value;
-                break;
 
             case 3:
-                header[3]   = value;
+                addressField[0]   = value;
+                if( (value & 0x01) != 0)
+                {
+                    addressFieldSize    = 1;
+                    printf("a1=%02x\n",addressField[0]);
+                    position            = 5;
+                }
+                else
+                {
+                    position        = 4;
+                }
                 break;
 
             case 4:
-                header[4]   = value;
+                addressField[1]     = value;
+                addressFieldSize    = 2;
+                printf("a1=%02x%02x\n",addressField[0],addressField[1]);
+                position        = 5;
                 break;
 
             case 5:
-                header[5]   = value;
+                addressField[0]   = value;
+                if( (value & 0x01) != 0)
+                {
+                    addressFieldSize    = 1;
+                    printf("a2=%02x\n",addressField[0]);
+                    position            = 7;
+                }
+                else
+                {
+                    position        = 6;
+                }
                 break;
 
             case 6:
-                header[6]   = value;
+                addressField[1]   = value;
+                addressFieldSize    = 2;
+                printf("a2=%02x%02x\n",addressField[0],addressField[1]);
+                position            = 7;
                 break;
 
+
+
+
             case 7:
-                llc[0]      = value;
+                controlByte      = value;
+                printf("ControlByte = %02x\n", controlByte);
+                position    = 8;
                 break;
 
             case 8:
-                llc[1]      = value;
+                hcs[0]          = value;
+                position    = 9;
                 break;
 
             case 9:
-            {
-                llc[2]      = value;
-                uint32_t    field   = (llc[0]<<16) | (llc[1]<<8) | (llc[2]);
-                upperLayer.ProcessLLC( field );
+                hcs[1]          = value;
+                printf("HCS = %02x%02x\n", hcs[0],hcs[1]);
+                position    = 10;
                 break;
-            }   
+
+
+
 
             case 23:
                 fcs[0]   = value;
+                position    = 24;
                 break;
 
             case 24:
@@ -363,10 +442,9 @@ public:
 
             default:
                 upperLayer.Parse( value );
+                position++;
                 break;
         }
-
-        position++;
 
         return true;
     }
@@ -395,6 +473,7 @@ int main()
 
     {
         //
+        // HDLC frame start: 7E
         // frame type: A0
         // frame length: 19
         // dest address: 95 
