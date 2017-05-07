@@ -92,9 +92,62 @@ public:
         }
     }
 
-    bool ProcessRequestType(uint16_t value)
+    bool ProcessRequestType(uint8_t tag, uint8_t length)
     {
-        printf("RequestType: %04x\n", value);
+        printf("RequestType: tag %04x, length %02x\n", tag, length);
+        switch(tag)
+        {
+            case 0x06:
+                printf("\tWRITE Request\n");
+                break;
+            
+            case 0x0d:
+                printf("\tWRITE Response\n");
+                break;
+            
+            case 0x05:
+                printf("\tREAD Request\n");
+                break;
+            
+            case 0x0c:
+                printf("\tREAD Response\n");
+                break;
+            
+            case 0xc0:
+                printf("\tGET Request\n");
+                break;
+            
+            case 0xc4:
+                printf("\tGET Response\n");
+                break;
+            
+            case 0xc1:
+                printf("\tSET Request\n");
+                break;
+            
+            case 0xc5:
+                printf("\tSET Response\n");
+                break;
+            
+            case 0x93:
+                printf("\tSNRM Request\n");
+                break;
+            
+            case 0x73:
+                printf("\tUA Response\n");
+                break;
+            
+            case 0x60:
+                printf("\tAARQ Request\n");
+                break;
+            
+            case 0x61:
+                printf("\tAARE Response\n");
+                break;
+            
+            default:
+                break;
+        }
     }
 
     bool ProcessInvokeId(uint8_t value)
@@ -138,7 +191,8 @@ public:
     {
         bool                success     = false;
         static uint32_t     position    = 0;        
-        static uint8_t      requestType[2];
+        static uint8_t      requestTag;
+        static uint8_t      requestLength;
         static LogicalName  logicalName;
         static uint8_t      invokeId;
         static uint8_t      classId[2];
@@ -174,15 +228,14 @@ public:
 
 
             case 3:
-                requestType[0]      = value;
+                requestTag      = value;
                 position    = 4;
                 break;
 
             case 4:
             {
-                requestType[1]      = value;
-                uint16_t    field   = (requestType[0]<<8) | (requestType[1]);
-                ProcessRequestType( field );
+                requestLength      = value;
+                ProcessRequestType( requestTag, requestLength );
                 position    = 5;
                 break;
             }
