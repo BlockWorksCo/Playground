@@ -429,7 +429,7 @@ public:
         static uint8_t      hcs[2];
         static uint8_t      type;
         static uint16_t     frameLength;
-        static uint8_t      addressField[2];
+        static uint8_t      addressField[4];
         static uint8_t      addressFieldSize;
         static uint8_t      addressCount;
         static uint8_t      controlByte;
@@ -463,7 +463,7 @@ public:
                 {
                     addressFieldSize    = 1;
                     printf("a1=%02x\n",addressField[0]);
-                    position            = 5;
+                    position            = 15;
                 }
                 else
                 {
@@ -475,55 +475,56 @@ public:
                 addressField[1]     = value;
                 addressFieldSize    = 2;
                 printf("a1=%02x%02x\n",addressField[0],addressField[1]);
-                position        = 5;
+                position        = 15;
                 break;
 
-            case 5:
+            case 15:
                 addressField[0]   = value;
                 if( (value & 0x01) != 0)
                 {
                     addressFieldSize    = 1;
                     printf("a2=%02x\n",addressField[0]);
-                    position            = 7;
+                    position            = 27;
                 }
                 else
                 {
-                    position        = 6;
+                    position        = 16;
                 }
                 break;
 
-            case 6:
+            case 16:
                 addressField[1]   = value;
                 addressFieldSize    = 2;
                 printf("a2=%02x%02x\n",addressField[0],addressField[1]);
-                position            = 7;
+                position            = 27;
                 break;
 
 
 
 
-            case 7:
+            case 27:
                 controlByte      = value;
                 printf("ControlByte = %02x\n", controlByte);
-                position    = 8;
+                position    = 28;
                 break;
 
-            case 8:
+            case 28:
                 hcs[0]          = value;
-                position    = 9;
+                position    = 29;
                 break;
 
-            case 9:
+            case 29:
                 hcs[1]          = value;
                 printf("HCS = %02x%02x\n", hcs[0],hcs[1]);
-                position    = 20;
+                position    = 30;
                 break;
 
 
 
-            case 20:
+            case 30:
                 upperLayer.Parse( value );
                 break;
+
 
             default:
                 printf("<fault>\n");
