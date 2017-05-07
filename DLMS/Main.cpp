@@ -432,7 +432,7 @@ public:
         static uint8_t      addressField[4];
         static uint8_t      addressFieldSize;
         static uint8_t      addressCount;
-        static uint8_t      controlByte;
+        static uint8_t      frameType;
 
 
         //
@@ -473,10 +473,34 @@ public:
 
             case 4:
                 addressField[1]     = value;
-                addressFieldSize    = 2;
-                printf("a1=%02x%02x\n",addressField[0],addressField[1]);
-                position        = 15;
+                if( (value & 0x01) != 0)
+                {
+                    addressFieldSize    = 2;
+                    printf("a1=%02x%02x\n",addressField[0],addressField[1]);
+                    position            = 15;
+                }
+                else
+                {
+                    position        = 5;
+                }
                 break;
+
+
+            case 5:
+                addressField[2]     = value;
+                addressFieldSize    = 4;
+                position            = 6;
+                break;
+
+            case 6:
+                addressField[3]     = value;
+                addressFieldSize    = 4;
+                printf("a1=%02x%02x%02x%02x\n",addressField[0],addressField[1],addressField[2],addressField[3]);
+                position            = 15;
+                break;
+
+
+
 
             case 15:
                 addressField[0]   = value;
@@ -494,17 +518,40 @@ public:
 
             case 16:
                 addressField[1]   = value;
-                addressFieldSize    = 2;
-                printf("a2=%02x%02x\n",addressField[0],addressField[1]);
+                if( (value & 0x01) != 0)
+                {
+                    addressFieldSize    = 2;
+                    printf("a2=%02x%02x\n",addressField[0],addressField[1]);
+                    position            = 27;
+                }
+                else
+                {
+                    position        = 17;
+                }
+                break;
+
+            case 17:
+                addressField[2]     = value;
+                addressFieldSize    = 4;
+                position            = 18;
+                break;
+
+            case 18:
+                addressField[3]     = value;
+                addressFieldSize    = 4;
+                printf("a2=%02x%02x%02x%02x\n",addressField[0],addressField[1],addressField[2],addressField[3]);
                 position            = 27;
                 break;
 
 
 
 
+
+
+
             case 27:
-                controlByte      = value;
-                printf("ControlByte = %02x\n", controlByte);
+                frameType      = value;
+                printf("FrameType = %02x\n", frameType);
                 position    = 28;
                 break;
 
@@ -612,8 +659,8 @@ int main()
         //
         uint8_t     aarqClockRequest[] = {0x7E,0xA0,0x2E,0x00,0x02,0x00,0x23,0x21,0x10,0x7E,0xCB,0xE6,0xE6,0x00,0x60,0x1D,0xA1,0x09,0x06,0x07,0x60,0x85,0x74,0x05,0x08,0x01,0x01,0xBE,0x10,0x7E,0xA0,0x2E,0x00,0x02,0x00,0x23,0x21,0x10,0x7E,0xCB,0xE6,0xE6,0x00,0x60,0x1D,0xA1,0x09,0x06,0x07,0x60,0x85,0x74,0x05,0x08,0x01,0x01,0xBE,0x10};
         uint8_t     readClockRequest[] = {0x7E,0xA0,0x19,0x95,0x75,0x54,0x68,0x35,0xE6,0xE6,0x00,0xC0,0x01,0x81,0x00,0x08,0x00,0x00,0x01,0x00,0x00,0xFF,0x01,0x00,0x0D,0xFD,0x7E};
-        ByteStream  requestStream( &readClockRequest[0], sizeof(readClockRequest) );
-//        ByteStream  requestStream( &aarqClockRequest[0], sizeof(aarqClockRequest) );
+//        ByteStream  requestStream( &readClockRequest[0], sizeof(readClockRequest) );
+        ByteStream  requestStream( &aarqClockRequest[0], sizeof(aarqClockRequest) );
         DLMSParser  dlmsParser;
         HDLCFrame   requestFrame( requestStream, dlmsParser );
 
