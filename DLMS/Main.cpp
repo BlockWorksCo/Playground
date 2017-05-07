@@ -419,7 +419,43 @@ public:
         return success;
     }
 
+
+    bool IsIFrame(uint8_t frameType)
+    {
+        uint8_t     type    = frameType & 0x03;
+        if( type == 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
     
+
+    bool IsSFrame(uint8_t frameType)
+    {
+        uint8_t     type    = frameType & 0x03;
+        if( type == 1 )
+        {
+            return true;
+        }
+
+        return false;
+    }
+    
+
+    bool IsUFrame(uint8_t frameType)
+    {
+        uint8_t     type    = frameType & 0x03;
+        if( type == 3 )
+        {
+            return true;
+        }
+
+        return false;
+    }
+    
+
     void ProcessFrameType( uint8_t frameType )
     {
         printf("FrameType = %02x\n", frameType);
@@ -584,13 +620,33 @@ public:
             case 29:
                 hcs[1]          = value;
                 printf("HCS = %02x%02x\n", hcs[0],hcs[1]);
-                position    = 30;
+                if( IsIFrame( frameType ) == true)
+                {
+                    position    = 30;
+                }
+                if( IsSFrame( frameType ) == true)
+                {
+                    position    = 40;
+                }
+                if( IsUFrame( frameType ) == true)
+                {
+                    position    = 50;
+                }
                 break;
 
 
 
-            case 30:
+            case 30:        // I-Frame
+                printf("I-Frame.\n");
                 upperLayer.Parse( value );
+                break;
+
+            case 40:        // S-Frame
+                printf("S-Frame.\n");
+                break;
+
+            case 50:        // U-Frame
+                printf("U-Frame.\n");
                 break;
 
 
@@ -683,11 +739,11 @@ int main()
         uint8_t     aarqRequest[]       = {0x7E,0xA0,0x2E,0x00,0x02,0x00,0x23,0x21,0x10,0x7E,0xCB,0xE6,0xE6,0x00,0x60,0x1D,0xA1,0x09,0x06,0x07,0x60,0x85,0x74,0x05,0x08,0x01,0x01,0xBE,0x10,0x7E,0xA0,0x2E,0x00,0x02,0x00,0x23,0x21,0x10,0x7E,0xCB,0xE6,0xE6,0x00,0x60,0x1D,0xA1,0x09,0x06,0x07,0x60,0x85,0x74,0x05,0x08,0x01,0x01,0xBE,0x10};
         uint8_t     readClockRequest[]  = {0x7E,0xA0,0x19,0x95,0x75,0x54,0x68,0x35,0xE6,0xE6,0x00,0xC0,0x01,0x81,0x00,0x08,0x00,0x00,0x01,0x00,0x00,0xFF,0x01,0x00,0x0D,0xFD,0x7E};
         uint8_t     readClockResponse[] = {0x7E,0xA0,0x18,0x75,0x95,0x74,0xE9,0xE8,0xE6,0xE7,0x00,0xC4,0x01,0x81,0x00,0x09,0x06,0x00,0x00,0x01,0x00,0x00,0xFF,0xFD,0x49,0x7E};
-        ByteStream  requestStream( &readClockRequest[0], sizeof(readClockRequest) );
+        //ByteStream  requestStream( &readClockRequest[0], sizeof(readClockRequest) );
         //ByteStream  requestStream( &aarqRequest[0], sizeof(aarqRequest) );
         //ByteStream  requestStream( &uaRequest[0], sizeof(uaRequest) );
         //ByteStream  requestStream( &snrmRequest[0], sizeof(snrmRequest) );
-        //ByteStream  requestStream( &readClockResponse[0], sizeof(readClockResponse) );
+        ByteStream  requestStream( &readClockResponse[0], sizeof(readClockResponse) );
         DLMSParser  dlmsParser;
         HDLCFrame   requestFrame( requestStream, dlmsParser );
 
