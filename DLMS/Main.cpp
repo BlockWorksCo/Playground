@@ -189,6 +189,166 @@ public:
 
 
 
+    bool ParseSETREQUEST( uint8_t value )
+    {
+        static uint32_t     position    = 0;        
+        static uint8_t      classId[2];
+        static uint8_t      attributeNumber[2];
+        static LogicalName  logicalName;
+        static uint8_t      dataType;
+        static uint8_t      dataLength;
+        static uint8_t      responseCode;
+        static uint8_t      currentLength;
+        static uint8_t      data[256];
+
+        switch(position)
+        {
+            case 0:
+                classId[0]      = value;
+                position        = 7;
+                break;
+
+            case 7:
+            {
+                classId[1]      = value;
+                uint16_t    field   = (classId[0]<<8) | (classId[1]);
+                ProcessInterfaceClass( field );
+                position    = 8;
+                break;
+            }
+
+            case 8:
+                logicalName.d0      = value;
+                position    = 9;
+                break;
+
+            case 9:
+                logicalName.d1      = value;
+                position    = 10;
+                break;
+
+            case 10:
+                logicalName.d2      = value;
+                position    = 11;
+                break;
+
+            case 11:
+                logicalName.d3      = value;
+                position    = 12;
+                break;
+
+            case 12:
+                logicalName.d4      = value;
+                position    = 13;
+                break;
+
+            case 13:
+            {
+                logicalName.d5      = value;
+                ProcessLogicalName( logicalName );
+                position    = 14;
+                break;
+            }
+
+            case 14:
+                attributeNumber[0]   = value;
+                position    = 15;
+                break;
+
+            case 15:
+            {
+                attributeNumber[1]   = value;
+                uint16_t    field   = (attributeNumber[0]<<8) | (attributeNumber[1]);
+                ProcessAttributeNumber( field );
+                position    = 20;
+                break;
+            }
+
+
+
+            case 20:
+                dataType        = value;
+                printf("dataType: %02x (%s)\n", dataType, TextOfDataType(dataType) );
+                switch(dataType)
+                {
+                    case 0x09:      // Octet string.
+                        position        = 21;
+                        break;
+
+                    case 0x10:      // int16_t
+                        dataLength      = 2;
+                        position        = 22;
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+
+            case 21:
+            {
+                dataLength      = value;
+                currentLength   = 0;
+                printf("dataLength: %02x\n", dataLength);
+                position        = 22;
+                break;
+            }
+
+            case 22:
+                if( currentLength < dataLength)
+                {
+                    data[currentLength] = value;
+                    currentLength++;
+                    position    = 22;
+                }
+                else
+                {
+                    switch(dataType)
+                    {
+                        case 0x10:
+                        {
+                            uint16_t    field   = (data[0]<<8) | data[1];
+                            printf("%04x,",field);
+                            break;
+                        }
+
+                        case 0x09:
+                        default:
+                            printf("Data <");
+                            for(uint32_t i=0; i<dataLength; i++)
+                            {
+                                printf("%02x,",data[i]);
+                            }
+                            printf(">\n");
+                            break;
+                    }
+
+                    position    = 20;
+                }
+                break;
+
+
+            default:
+                break;
+        }
+    }
+
+
+    bool ParseSETRESPONSE( uint8_t value )
+    {
+        static uint32_t     position    = 0;        
+
+        switch(position)
+        {
+            case 0:
+                break;
+
+            default:
+                break;
+        }
+    }
+
+
     bool ParseGETREQUEST( uint8_t value )
     {
         static uint32_t     position    = 0;        
@@ -286,14 +446,14 @@ public:
         static uint32_t     position    = 0;        
         static uint8_t      dataType;
         static uint8_t      dataLength;
-        static uint8_t      responseType;
+        static uint8_t      responseCode;
         static uint8_t      currentLength;
         static uint8_t      data[256];
 
         switch(position)
         {
             case 0:
-                responseType        = value;    // TODO: what is this exactly? always 00??
+                responseCode        = value;    // TODO: what is this exactly? 0 == success, non-0 == error?
                 printf("responseType: %02x\n", dataType);
                 position        = 1;
                 break;
@@ -437,6 +597,14 @@ public:
 
                     case 0xc0:
                         ParseGETREQUEST( value );
+                        break;
+
+                    case 0xc5:
+                        ParseSETRESPONSE( value );
+                        break;
+
+                    case 0xc1:
+                        ParseSETREQUEST( value );
                         break;
 
                     default:
@@ -777,16 +945,16 @@ public:
 
 
             case 30:        // I-Frame
-                printf("I-Frame.\n");
+                //printf("I-Frame.\n");
                 upperLayer.Parse( value );
                 break;
 
             case 40:        // S-Frame
-                printf("S-Frame.\n");
+                //printf("S-Frame.\n");
                 break;
 
             case 50:        // U-Frame
-                printf("U-Frame.\n");
+                //printf("U-Frame.\n");
                 break;
 
 
@@ -877,17 +1045,21 @@ int main()
         uint8_t     snrmRequest[]       = {0x7E,0xA0,0x0A,0x00,0x02,0x00,0x23,0x21,0x93,0x18,0x71,0x7E};
         uint8_t     uaRequest[]         = {0x7E,0xA0,0x23,0x21,0x00,0x02,0x00,0x23,0x73,0xF6,0xC5,0x81,0x80,0x14,0x05,0x02,0x00,0x80,0x06,0x02,0x00,0x80,0x07,0x04,0x00,0x00,0x00,0x01,0x08,0x04,0x00,0x00,0x00,0x01,0xCE,0x6A,0x7E};
         uint8_t     aarqRequest[]       = {0x7E,0xA0,0x2E,0x00,0x02,0x00,0x23,0x21,0x10,0x7E,0xCB,0xE6,0xE6,0x00,0x60,0x1D,0xA1,0x09,0x06,0x07,0x60,0x85,0x74,0x05,0x08,0x01,0x01,0xBE,0x10,0x7E,0xA0,0x2E,0x00,0x02,0x00,0x23,0x21,0x10,0x7E,0xCB,0xE6,0xE6,0x00,0x60,0x1D,0xA1,0x09,0x06,0x07,0x60,0x85,0x74,0x05,0x08,0x01,0x01,0xBE,0x10};
+        uint8_t     readTimeRequest[]   = {0x7E,0xA0,0x19,0x95,0x75,0x76,0x78,0x37,0xE6,0xE6,0x00,0xC0,0x01,0x81,0x00,0x08,0x00,0x00,0x01,0x00,0x00,0xFF,0x02,0x00,0x65,0xD7,0x7E};
         uint8_t     readClockRequest[]  = {0x7E,0xA0,0x19,0x95,0x75,0x54,0x68,0x35,0xE6,0xE6,0x00,0xC0,0x01,0x81,0x00,0x08,0x00,0x00,0x01,0x00,0x00,0xFF,0x01,0x00,0x0D,0xFD,0x7E};
         uint8_t     readClockResponse[] = {0x7E,0xA0,0x18,0x75,0x95,0x74,0xE9,0xE8,0xE6,0xE7,0x00,0xC4,0x01,0x81,0x00,0x09,0x06,0x00,0x00,0x01,0x00,0x00,0xFF,0xFD,0x49,0x7E};
         uint8_t     readClockResponse2[]= {0x7E,0xA0,0x1E,0x75,0x95,0x96,0x6F,0x67,0xE6,0xE7,0x00,0xC4,0x01,0x81,0x00,0x09,0x0C,0x07,0xD2,0x0C,0x04,0x03,0x0A,0x06,0x0B,0xFF,0x00,0x78,0x00,0xF3,0x30,0x7E};
         uint8_t     readClockResponse3[]= {0x7E,0xA0,0x13,0x75,0x95,0xDA,0x88,0x64,0xE6,0xE7,0x00,0xC4,0x01,0x81,0x00,0x10,0x00,0x78,0x56,0x3A,0x7E};
+        uint8_t     setTimeRequest[]    = {0x7E,0xA0,0x27,0x95,0x75,0x98,0xB8,0xDB,0xE6,0xE6,0x00,0xC1,0x01,0x81,0x00,0x08,0x00,0x00,0x01,0x00,0x00,0xFF,0x02,0x00,0x09,0x0C,0x07,0xD2,0x0C,0x04,0x03,0x0A,0x06,0x0B,0xFF,0x00,0x78,0x00,0x62,0xFB,0x7E};
+        //ByteStream  requestStream( &readTimeRequest[0], sizeof(readTimeRequest) );
         //ByteStream  requestStream( &readClockRequest[0], sizeof(readClockRequest) );
         //ByteStream  requestStream( &aarqRequest[0], sizeof(aarqRequest) );
         //ByteStream  requestStream( &uaRequest[0], sizeof(uaRequest) );
         //ByteStream  requestStream( &snrmRequest[0], sizeof(snrmRequest) );
-        ByteStream  requestStream( &readClockResponse[0], sizeof(readClockResponse) );
+        //ByteStream  requestStream( &readClockResponse[0], sizeof(readClockResponse) );
         //ByteStream  requestStream( &readClockResponse2[0], sizeof(readClockResponse2) );
         //ByteStream  requestStream( &readClockResponse3[0], sizeof(readClockResponse3) );
+        ByteStream  requestStream( &setTimeRequest[0], sizeof(setTimeRequest) );
         DLMSParser  dlmsParser;
         HDLCFrame   requestFrame( requestStream, dlmsParser );
 
