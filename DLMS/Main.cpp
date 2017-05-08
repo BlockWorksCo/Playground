@@ -94,8 +94,10 @@ public:
 
     bool ProcessRequestType(uint8_t tag, uint8_t length)
     {
+        messageTag  = tag;
+
         printf("RequestType: tag %02x, length %02x\n", tag, length);
-        switch(tag)
+        switch( messageTag )
         {
             case 0x06:
                 printf("\tWRITE Request\n");
@@ -187,70 +189,18 @@ public:
 
 
 
-    bool Parse( uint8_t value )
+    bool ParseGETREQUEST( uint8_t value )
     {
-        bool                success     = false;
         static uint32_t     position    = 0;        
-        static uint8_t      requestTag;
-        static uint8_t      requestLength;
-        static LogicalName  logicalName;
-        static uint8_t      invokeId;
         static uint8_t      classId[2];
         static uint8_t      attributeNumber[2];
-        static uint8_t      llc[4];
+        static LogicalName  logicalName;
 
-
-        //
-        // Parse the header bytes.
-        //
         switch(position)
         {
             case 0:
-                llc[0]      = value;
-                position    = 1;
-                break;
-
-            case 1:
-                llc[1]      = value;
-                position    = 2;
-                break;
-
-            case 2:
-            {
-                llc[2]      = value;
-                uint32_t    field   = (llc[0]<<16) | (llc[1]<<8) | (llc[2]);
-                ProcessLLC( field );
-                position    = 3;
-                break;
-            }   
-
-
-
-
-            case 3:
-                requestTag      = value;
-                position    = 4;
-                break;
-
-            case 4:
-            {
-                requestLength      = value;
-                ProcessRequestType( requestTag, requestLength );
-                position    = 5;
-                break;
-            }
-
-            case 5:
-            {
-                invokeId          = value;
-                ProcessInvokeId( invokeId );
-                position    = 6;
-                break;
-            }
-
-            case 6:
                 classId[0]      = value;
-                position    = 7;
+                position        = 7;
                 break;
 
             case 7:
@@ -312,12 +262,169 @@ public:
             default:
                 break;
         }
+    }
+
+
+    const char* TextOfDataType(uint8_t type)
+    {
+        switch(type)
+        {
+            case 0x09:
+                return "<Octet string>";
+
+            default:
+                return "<!>";
+        }
+    }
+
+
+    bool ParseGETRESPONSE( uint8_t value )
+    {
+        static uint32_t     position    = 0;        
+        static uint8_t      dataType;
+        static uint8_t      dataLength;
+        static uint8_t      responseType;
+        static uint8_t      currentLength;
+        static uint8_t      data[256];
+
+        switch(position)
+        {
+            case 0:
+                responseType        = value;    // TODO: what is this exactly? always 00??
+                printf("responseType: %02x\n", dataType);
+                position        = 1;
+                break;
+
+
+            case 1:
+                dataType        = value;
+                printf("dataType: %02x (%s)\n", dataType, TextOfDataType(dataType) );
+                position        = 7;
+                break;
+
+            case 7:
+            {
+                dataLength      = value;
+                currentLength   = 0;
+                printf("dataLength: %02x\n", dataLength);
+                position        = 8;
+                break;
+            }
+
+            case 8:
+                if( currentLength < dataLength)
+                {
+                    data[currentLength] = value;
+                    currentLength++;
+                    position    = 8;
+                }
+                else
+                {
+                    printf("Data <");
+                    for(uint32_t i=0; i<dataLength; i++)
+                    {
+                        printf("%02x,",data[i]);
+                    }
+                    printf(">\n");
+
+                    position    = 1;
+                }
+                break;
+
+
+            default:
+                break;
+        }
+    }
+
+
+    bool Parse( uint8_t value )
+    {
+        bool                success     = false;
+        static uint32_t     position    = 0;        
+        static uint8_t      requestTag;
+        static uint8_t      requestLength;
+        static uint8_t      invokeId;
+        static uint8_t      llc[4];
+
+
+        //
+        // Parse the header bytes.
+        //
+        switch(position)
+        {
+            case 0:
+                llc[0]      = value;
+                position    = 1;
+                break;
+
+            case 1:
+                llc[1]      = value;
+                position    = 2;
+                break;
+
+            case 2:
+            {
+                llc[2]      = value;
+                uint32_t    field   = (llc[0]<<16) | (llc[1]<<8) | (llc[2]);
+                ProcessLLC( field );
+                position    = 3;
+                break;
+            }   
+
+
+
+
+            case 3:
+                requestTag      = value;
+                position    = 4;
+                break;
+
+            case 4:
+            {
+                requestLength      = value;
+                ProcessRequestType( requestTag, requestLength );
+                position    = 5;
+                break;
+            }
+
+            case 5:
+            {
+                invokeId          = value;
+                ProcessInvokeId( invokeId );
+                position    = 6;
+                break;
+            }
+
+
+
+
+            case 6:
+                switch( requestTag )
+                {
+                    case 0xc4:
+                        ParseGETRESPONSE( value );
+                        break;
+
+                    case 0xc0:
+                        ParseGETREQUEST( value );
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+
+            default:
+                break;
+        }
 
         return true;
     }
 
 private:
 
+    uint8_t     messageTag;
 
 };
 
