@@ -272,6 +272,9 @@ public:
             case 0x09:
                 return "<Octet string>";
 
+            case 0x10:
+                return "<int16_t>";
+
             default:
                 return "<!>";
         }
@@ -299,7 +302,20 @@ public:
             case 1:
                 dataType        = value;
                 printf("dataType: %02x (%s)\n", dataType, TextOfDataType(dataType) );
-                position        = 7;
+                switch(dataType)
+                {
+                    case 0x09:      // Octet string.
+                        position        = 7;
+                        break;
+
+                    case 0x10:      // int16_t
+                        dataLength      = 2;
+                        position        = 8;
+                        break;
+
+                    default:
+                        break;
+                }
                 break;
 
             case 7:
@@ -320,12 +336,25 @@ public:
                 }
                 else
                 {
-                    printf("Data <");
-                    for(uint32_t i=0; i<dataLength; i++)
+                    switch(dataType)
                     {
-                        printf("%02x,",data[i]);
+                        case 0x10:
+                        {
+                            uint16_t    field   = (data[0]<<8) | data[1];
+                            printf("%04x,",field);
+                            break;
+                        }
+
+                        case 0x09:
+                        default:
+                            printf("Data <");
+                            for(uint32_t i=0; i<dataLength; i++)
+                            {
+                                printf("%02x,",data[i]);
+                            }
+                            printf(">\n");
+                            break;
                     }
-                    printf(">\n");
 
                     position    = 1;
                 }
@@ -851,12 +880,14 @@ int main()
         uint8_t     readClockRequest[]  = {0x7E,0xA0,0x19,0x95,0x75,0x54,0x68,0x35,0xE6,0xE6,0x00,0xC0,0x01,0x81,0x00,0x08,0x00,0x00,0x01,0x00,0x00,0xFF,0x01,0x00,0x0D,0xFD,0x7E};
         uint8_t     readClockResponse[] = {0x7E,0xA0,0x18,0x75,0x95,0x74,0xE9,0xE8,0xE6,0xE7,0x00,0xC4,0x01,0x81,0x00,0x09,0x06,0x00,0x00,0x01,0x00,0x00,0xFF,0xFD,0x49,0x7E};
         uint8_t     readClockResponse2[]= {0x7E,0xA0,0x1E,0x75,0x95,0x96,0x6F,0x67,0xE6,0xE7,0x00,0xC4,0x01,0x81,0x00,0x09,0x0C,0x07,0xD2,0x0C,0x04,0x03,0x0A,0x06,0x0B,0xFF,0x00,0x78,0x00,0xF3,0x30,0x7E};
+        uint8_t     readClockResponse3[]= {0x7E,0xA0,0x13,0x75,0x95,0xDA,0x88,0x64,0xE6,0xE7,0x00,0xC4,0x01,0x81,0x00,0x10,0x00,0x78,0x56,0x3A,0x7E};
         //ByteStream  requestStream( &readClockRequest[0], sizeof(readClockRequest) );
         //ByteStream  requestStream( &aarqRequest[0], sizeof(aarqRequest) );
         //ByteStream  requestStream( &uaRequest[0], sizeof(uaRequest) );
         //ByteStream  requestStream( &snrmRequest[0], sizeof(snrmRequest) );
-        //ByteStream  requestStream( &readClockResponse[0], sizeof(readClockResponse) );
-        ByteStream  requestStream( &readClockResponse2[0], sizeof(readClockResponse2) );
+        ByteStream  requestStream( &readClockResponse[0], sizeof(readClockResponse) );
+        //ByteStream  requestStream( &readClockResponse2[0], sizeof(readClockResponse2) );
+        //ByteStream  requestStream( &readClockResponse3[0], sizeof(readClockResponse3) );
         DLMSParser  dlmsParser;
         HDLCFrame   requestFrame( requestStream, dlmsParser );
 
