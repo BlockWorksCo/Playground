@@ -258,7 +258,7 @@ public:
             case 15:
             {
                 attributeNumber[1]   = value;
-                uint16_t    field   = (attributeNumber[0]<<8) | (attributeNumber[1]);
+                uint16_t    field   = (attributeNumber[1]<<8) | (attributeNumber[0]);
                 ProcessAttributeNumber( field );
                 position    = 20;
                 break;
@@ -337,11 +337,86 @@ public:
     bool ParseSETRESPONSE( uint8_t value )
     {
         static uint32_t     position    = 0;        
+        static uint8_t      dataType;
+        static uint8_t      dataLength;
+        static uint8_t      responseCode;
+        static uint8_t      currentLength;
+        static uint8_t      data[256];
 
         switch(position)
         {
             case 0:
+                responseCode        = value;    // TODO: what is this exactly? 0 == success, non-0 == error?
+                printf("responseCode: %02x\n", dataType);
+                if( responseCode == 0 )
+                {
+                    printf("\tSUCCESS\n");
+                }
+                position        = 1;
                 break;
+
+
+            case 1:
+                dataType        = value;
+                printf("dataType: %02x (%s)\n", dataType, TextOfDataType(dataType) );
+                switch(dataType)
+                {
+                    case 0x09:      // Octet string.
+                        position        = 7;
+                        break;
+
+                    case 0x10:      // int16_t
+                        dataLength      = 2;
+                        position        = 8;
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+
+            case 7:
+            {
+                dataLength      = value;
+                currentLength   = 0;
+                printf("dataLength: %02x\n", dataLength);
+                position        = 8;
+                break;
+            }
+
+            case 8:
+                if( currentLength < dataLength)
+                {
+                    data[currentLength] = value;
+                    currentLength++;
+                    position    = 8;
+                }
+                else
+                {
+                    switch(dataType)
+                    {
+                        case 0x10:
+                        {
+                            uint16_t    field   = (data[0]<<8) | data[1];
+                            printf("%04x,",field);
+                            break;
+                        }
+
+                        case 0x09:
+                        default:
+                            printf("Data <");
+                            for(uint32_t i=0; i<dataLength; i++)
+                            {
+                                printf("%02x,",data[i]);
+                            }
+                            printf(">\n");
+                            break;
+                    }
+
+                    position    = 1;
+                }
+                break;
+
 
             default:
                 break;
@@ -413,7 +488,7 @@ public:
             case 15:
             {
                 attributeNumber[1]   = value;
-                uint16_t    field   = (attributeNumber[0]<<8) | (attributeNumber[1]);
+                uint16_t    field   = (attributeNumber[1]<<8) | (attributeNumber[0]);
                 ProcessAttributeNumber( field );
                 position    = 16;
                 break;
@@ -454,7 +529,11 @@ public:
         {
             case 0:
                 responseCode        = value;    // TODO: what is this exactly? 0 == success, non-0 == error?
-                printf("responseType: %02x\n", dataType);
+                printf("responseCode: %02x\n", dataType);
+                if( responseCode == 0 )
+                {
+                    printf("\tSUCCESS\n");
+                }
                 position        = 1;
                 break;
 
@@ -1051,6 +1130,8 @@ int main()
         uint8_t     readClockResponse2[]= {0x7E,0xA0,0x1E,0x75,0x95,0x96,0x6F,0x67,0xE6,0xE7,0x00,0xC4,0x01,0x81,0x00,0x09,0x0C,0x07,0xD2,0x0C,0x04,0x03,0x0A,0x06,0x0B,0xFF,0x00,0x78,0x00,0xF3,0x30,0x7E};
         uint8_t     readClockResponse3[]= {0x7E,0xA0,0x13,0x75,0x95,0xDA,0x88,0x64,0xE6,0xE7,0x00,0xC4,0x01,0x81,0x00,0x10,0x00,0x78,0x56,0x3A,0x7E};
         uint8_t     setTimeRequest[]    = {0x7E,0xA0,0x27,0x95,0x75,0x98,0xB8,0xDB,0xE6,0xE6,0x00,0xC1,0x01,0x81,0x00,0x08,0x00,0x00,0x01,0x00,0x00,0xFF,0x02,0x00,0x09,0x0C,0x07,0xD2,0x0C,0x04,0x03,0x0A,0x06,0x0B,0xFF,0x00,0x78,0x00,0x62,0xFB,0x7E};
+        uint8_t     setTimeResponse[]   = {0x7E,0xA0,0x10,0x75,0x95,0xB8,0x51,0x01,0xE6,0xE7,0x00,0xC5,0x01,0x81,0x00,0x36,0xCF,0x7E};
+        uint8_t     setMinutesRequest[] = {0x7E,0xA0,0x1C,0x95,0x75,0xDC,0x7F,0x53,0xE6,0xE6,0x00,0xC1,0x01,0x81,0x00,0x08,0x00,0x00,0x01,0x00,0x00,0xFF,0x03,0x00,0x10,0x00,0x78,0x01,0x17,0x7E};
         //ByteStream  requestStream( &readTimeRequest[0], sizeof(readTimeRequest) );
         //ByteStream  requestStream( &readClockRequest[0], sizeof(readClockRequest) );
         //ByteStream  requestStream( &aarqRequest[0], sizeof(aarqRequest) );
@@ -1059,7 +1140,9 @@ int main()
         //ByteStream  requestStream( &readClockResponse[0], sizeof(readClockResponse) );
         //ByteStream  requestStream( &readClockResponse2[0], sizeof(readClockResponse2) );
         //ByteStream  requestStream( &readClockResponse3[0], sizeof(readClockResponse3) );
-        ByteStream  requestStream( &setTimeRequest[0], sizeof(setTimeRequest) );
+        //ByteStream  requestStream( &setTimeRequest[0], sizeof(setTimeRequest) );
+        //ByteStream  requestStream( &setTimeResponse[0], sizeof(setTimeResponse) );
+        ByteStream  requestStream( &setMinutesRequest[0], sizeof(setMinutesRequest) );
         DLMSParser  dlmsParser;
         HDLCFrame   requestFrame( requestStream, dlmsParser );
 
