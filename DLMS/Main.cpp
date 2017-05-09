@@ -191,7 +191,7 @@ public:
 
     bool ParseSETREQUEST( uint8_t value )
     {
-        static uint32_t     position    = 0;        
+        static uint32_t     state    = 0;        
         static uint8_t      classId[2];
         static uint8_t      attributeNumber[2];
         static LogicalName  logicalName;
@@ -201,11 +201,11 @@ public:
         static uint8_t      currentLength;
         static uint8_t      data[256];
 
-        switch(position)
+        switch(state)
         {
             case 0:
                 classId[0]      = value;
-                position        = 7;
+                state        = 7;
                 break;
 
             case 7:
@@ -213,46 +213,46 @@ public:
                 classId[1]      = value;
                 uint16_t    field   = (classId[0]<<8) | (classId[1]);
                 ProcessInterfaceClass( field );
-                position    = 8;
+                state    = 8;
                 break;
             }
 
             case 8:
                 logicalName.d0      = value;
-                position    = 9;
+                state    = 9;
                 break;
 
             case 9:
                 logicalName.d1      = value;
-                position    = 10;
+                state    = 10;
                 break;
 
             case 10:
                 logicalName.d2      = value;
-                position    = 11;
+                state    = 11;
                 break;
 
             case 11:
                 logicalName.d3      = value;
-                position    = 12;
+                state    = 12;
                 break;
 
             case 12:
                 logicalName.d4      = value;
-                position    = 13;
+                state    = 13;
                 break;
 
             case 13:
             {
                 logicalName.d5      = value;
                 ProcessLogicalName( logicalName );
-                position    = 14;
+                state    = 14;
                 break;
             }
 
             case 14:
                 attributeNumber[0]   = value;
-                position    = 15;
+                state    = 15;
                 break;
 
             case 15:
@@ -260,7 +260,7 @@ public:
                 attributeNumber[1]   = value;
                 uint16_t    field   = (attributeNumber[1]<<8) | (attributeNumber[0]);
                 ProcessAttributeNumber( field );
-                position    = 20;
+                state    = 20;
                 break;
             }
 
@@ -272,12 +272,12 @@ public:
                 switch(dataType)
                 {
                     case 0x09:      // Octet string.
-                        position        = 21;
+                        state        = 21;
                         break;
 
                     case 0x10:      // int16_t
                         dataLength      = 2;
-                        position        = 22;
+                        state        = 22;
                         break;
 
                     default:
@@ -290,7 +290,7 @@ public:
                 dataLength      = value;
                 currentLength   = 0;
                 printf("dataLength: %02x\n", dataLength);
-                position        = 22;
+                state        = 22;
                 break;
             }
 
@@ -299,7 +299,7 @@ public:
                 {
                     data[currentLength] = value;
                     currentLength++;
-                    position    = 22;
+                    state    = 22;
                 }
                 else
                 {
@@ -323,7 +323,7 @@ public:
                             break;
                     }
 
-                    position    = 20;
+                    state    = 20;
                 }
                 break;
 
@@ -336,14 +336,14 @@ public:
 
     bool ParseSETRESPONSE( uint8_t value )
     {
-        static uint32_t     position    = 0;        
+        static uint32_t     state    = 0;        
         static uint8_t      dataType;
         static uint8_t      dataLength;
         static uint8_t      responseCode;
         static uint8_t      currentLength;
         static uint8_t      data[256];
 
-        switch(position)
+        switch(state)
         {
             case 0:
                 responseCode        = value;    // TODO: what is this exactly? 0 == success, non-0 == error?
@@ -352,7 +352,7 @@ public:
                 {
                     printf("\tSUCCESS\n");
                 }
-                position        = 1;
+                state        = 1;
                 break;
 
 
@@ -362,12 +362,12 @@ public:
                 switch(dataType)
                 {
                     case 0x09:      // Octet string.
-                        position        = 7;
+                        state        = 7;
                         break;
 
                     case 0x10:      // int16_t
                         dataLength      = 2;
-                        position        = 8;
+                        state        = 8;
                         break;
 
                     default:
@@ -380,7 +380,7 @@ public:
                 dataLength      = value;
                 currentLength   = 0;
                 printf("dataLength: %02x\n", dataLength);
-                position        = 8;
+                state        = 8;
                 break;
             }
 
@@ -389,7 +389,7 @@ public:
                 {
                     data[currentLength] = value;
                     currentLength++;
-                    position    = 8;
+                    state    = 8;
                 }
                 else
                 {
@@ -413,7 +413,7 @@ public:
                             break;
                     }
 
-                    position    = 1;
+                    state    = 1;
                 }
                 break;
 
@@ -426,16 +426,16 @@ public:
 
     bool ParseGETREQUEST( uint8_t value )
     {
-        static uint32_t     position    = 0;        
+        static uint32_t     state    = 0;        
         static uint8_t      classId[2];
         static uint8_t      attributeNumber[2];
         static LogicalName  logicalName;
 
-        switch(position)
+        switch(state)
         {
             case 0:
                 classId[0]      = value;
-                position        = 7;
+                state        = 7;
                 break;
 
             case 7:
@@ -443,46 +443,46 @@ public:
                 classId[1]      = value;
                 uint16_t    field   = (classId[0]<<8) | (classId[1]);
                 ProcessInterfaceClass( field );
-                position    = 8;
+                state    = 8;
                 break;
             }
 
             case 8:
                 logicalName.d0      = value;
-                position    = 9;
+                state    = 9;
                 break;
 
             case 9:
                 logicalName.d1      = value;
-                position    = 10;
+                state    = 10;
                 break;
 
             case 10:
                 logicalName.d2      = value;
-                position    = 11;
+                state    = 11;
                 break;
 
             case 11:
                 logicalName.d3      = value;
-                position    = 12;
+                state    = 12;
                 break;
 
             case 12:
                 logicalName.d4      = value;
-                position    = 13;
+                state    = 13;
                 break;
 
             case 13:
             {
                 logicalName.d5      = value;
                 ProcessLogicalName( logicalName );
-                position    = 14;
+                state    = 14;
                 break;
             }
 
             case 14:
                 attributeNumber[0]   = value;
-                position    = 15;
+                state    = 15;
                 break;
 
             case 15:
@@ -490,7 +490,7 @@ public:
                 attributeNumber[1]   = value;
                 uint16_t    field   = (attributeNumber[1]<<8) | (attributeNumber[0]);
                 ProcessAttributeNumber( field );
-                position    = 16;
+                state    = 16;
                 break;
             }
 
@@ -518,14 +518,14 @@ public:
 
     bool ParseGETRESPONSE( uint8_t value )
     {
-        static uint32_t     position    = 0;        
+        static uint32_t     state    = 0;        
         static uint8_t      dataType;
         static uint8_t      dataLength;
         static uint8_t      responseCode;
         static uint8_t      currentLength;
         static uint8_t      data[256];
 
-        switch(position)
+        switch(state)
         {
             case 0:
                 responseCode        = value;    // TODO: what is this exactly? 0 == success, non-0 == error?
@@ -534,7 +534,7 @@ public:
                 {
                     printf("\tSUCCESS\n");
                 }
-                position        = 1;
+                state        = 1;
                 break;
 
 
@@ -544,12 +544,12 @@ public:
                 switch(dataType)
                 {
                     case 0x09:      // Octet string.
-                        position        = 7;
+                        state        = 7;
                         break;
 
                     case 0x10:      // int16_t
                         dataLength      = 2;
-                        position        = 8;
+                        state        = 8;
                         break;
 
                     default:
@@ -562,7 +562,7 @@ public:
                 dataLength      = value;
                 currentLength   = 0;
                 printf("dataLength: %02x\n", dataLength);
-                position        = 8;
+                state        = 8;
                 break;
             }
 
@@ -571,7 +571,7 @@ public:
                 {
                     data[currentLength] = value;
                     currentLength++;
-                    position    = 8;
+                    state    = 8;
                 }
                 else
                 {
@@ -595,7 +595,7 @@ public:
                             break;
                     }
 
-                    position    = 1;
+                    state    = 1;
                 }
                 break;
 
@@ -609,7 +609,7 @@ public:
     bool Parse( uint8_t value )
     {
         bool                success     = false;
-        static uint32_t     position    = 0;        
+        static uint32_t     state    = 0;        
         static uint8_t      requestTag;
         static uint8_t      requestLength;
         static uint8_t      invokeId;
@@ -619,16 +619,16 @@ public:
         //
         // Parse the header bytes.
         //
-        switch(position)
+        switch(state)
         {
             case 0:
                 llc[0]      = value;
-                position    = 1;
+                state    = 1;
                 break;
 
             case 1:
                 llc[1]      = value;
-                position    = 2;
+                state    = 2;
                 break;
 
             case 2:
@@ -636,7 +636,7 @@ public:
                 llc[2]      = value;
                 uint32_t    field   = (llc[0]<<16) | (llc[1]<<8) | (llc[2]);
                 ProcessLLC( field );
-                position    = 3;
+                state    = 3;
                 break;
             }   
 
@@ -645,14 +645,14 @@ public:
 
             case 3:
                 requestTag      = value;
-                position    = 4;
+                state    = 4;
                 break;
 
             case 4:
             {
                 requestLength      = value;
                 ProcessRequestType( requestTag, requestLength );
-                position    = 5;
+                state    = 5;
                 break;
             }
 
@@ -660,7 +660,7 @@ public:
             {
                 invokeId          = value;
                 ProcessInvokeId( invokeId );
-                position    = 6;
+                state    = 6;
                 break;
             }
 
@@ -892,7 +892,7 @@ public:
     bool Parse( uint8_t value )
     {
         bool                success     = false;
-        static State        position    = FrameTypeAndLength_0;        
+        static State        state    = FrameTypeAndLength_0;        
         static uint8_t      header[7];
         static uint8_t      hcs[2];
         static uint8_t      type;
@@ -906,14 +906,14 @@ public:
         //
         // Parse the header bytes.
         //
-        switch(position)
+        switch(state)
         {
             case FrameTypeAndLength_0:
                 type            = value & 0xf0;
                 frameLength     = (value&0x7)<<8;
                 printf("Type=%02x\n", type);
                 addressCount    = 0;
-                position        = FrameTypeAndLength_1;
+                state        = FrameTypeAndLength_1;
                 break;
 
 
@@ -921,7 +921,7 @@ public:
             case FrameTypeAndLength_1:
                 frameLength += value;
                 printf("FrameLength=%04x\n", frameLength);
-                position        = Address1_0;
+                state        = Address1_0;
                 break;
 
 
@@ -931,11 +931,11 @@ public:
                 {
                     addressFieldSize    = 1;
                     printf("a1=%02x\n",addressField[0]);
-                    position            = Address2_0;
+                    state            = Address2_0;
                 }
                 else
                 {
-                    position        = Address1_1;
+                    state        = Address1_1;
                 }
                 break;
 
@@ -945,11 +945,11 @@ public:
                 {
                     addressFieldSize    = 2;
                     printf("a1=%02x%02x\n",addressField[0],addressField[1]);
-                    position            = Address2_0;
+                    state            = Address2_0;
                 }
                 else
                 {
-                    position        = Address1_2;
+                    state        = Address1_2;
                 }
                 break;
 
@@ -957,14 +957,14 @@ public:
             case Address1_2:
                 addressField[2]     = value;
                 addressFieldSize    = 4;
-                position            = Address1_3;
+                state            = Address1_3;
                 break;
 
             case Address1_3:
                 addressField[3]     = value;
                 addressFieldSize    = 4;
                 printf("a1=%02x%02x%02x%02x\n",addressField[0],addressField[1],addressField[2],addressField[3]);
-                position            = Address2_0;
+                state            = Address2_0;
                 break;
 
 
@@ -976,11 +976,11 @@ public:
                 {
                     addressFieldSize    = 1;
                     printf("a2=%02x\n",addressField[0]);
-                    position            = FrameType;
+                    state            = FrameType;
                 }
                 else
                 {
-                    position        = Address2_1;
+                    state        = Address2_1;
                 }
                 break;
 
@@ -990,25 +990,25 @@ public:
                 {
                     addressFieldSize    = 2;
                     printf("a2=%02x%02x\n",addressField[0],addressField[1]);
-                    position            = FrameType;
+                    state            = FrameType;
                 }
                 else
                 {
-                    position        = Address2_2;
+                    state        = Address2_2;
                 }
                 break;
 
             case Address2_2:
                 addressField[2]     = value;
                 addressFieldSize    = 4;
-                position            = Address2_3;
+                state            = Address2_3;
                 break;
 
             case Address2_3:
                 addressField[3]     = value;
                 addressFieldSize    = 4;
                 printf("a2=%02x%02x%02x%02x\n",addressField[0],addressField[1],addressField[2],addressField[3]);
-                position            = FrameType;
+                state            = FrameType;
                 break;
 
 
@@ -1018,14 +1018,14 @@ public:
             case FrameType:
                 frameType      = value;
                 ProcessFrameType( frameType );
-                position    = HCS_0;
+                state    = HCS_0;
                 break;
 
 
 
             case HCS_0:
                 hcs[0]          = value;
-                position    = HCS_1;
+                state    = HCS_1;
                 break;
 
             case HCS_1:
@@ -1033,15 +1033,15 @@ public:
                 printf("HCS = %02x%02x\n", hcs[0],hcs[1]);
                 if( IsIFrame( frameType ) == true)
                 {
-                    position    = IFrameContent;
+                    state    = IFrameContent;
                 }
                 if( IsSFrame( frameType ) == true)
                 {
-                    position    = SFrameContent;
+                    state    = SFrameContent;
                 }
                 if( IsUFrame( frameType ) == true)
                 {
-                    position    = UFrameContent;
+                    state    = UFrameContent;
                 }
                 break;
 
