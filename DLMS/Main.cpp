@@ -61,6 +61,251 @@ typedef struct
 } LogicalName;
 
 
+
+class CommonHandlers
+{
+
+public:
+    bool ProcessInvokeId(uint8_t value)
+    {
+        printf("InvokeID: %02x\n", value);
+    }
+
+    bool ProcessInterfaceClass(uint16_t value)
+    {
+        printf("InterfaceClass: %04x\n", value);
+    }
+
+    bool ProcessLogicalName(LogicalName value)
+    {
+        printf("InterfaceClass: %02x.%02x.%02x.%02x.%02x.%02x\n", value.d0, value.d1, value.d2, value.d3, value.d4, value.d5);
+    }
+
+    bool ProcessAttributeNumber(uint16_t value)
+    {
+        printf("AttributeNumber: %04x\n", value);
+    }
+
+};
+
+
+
+
+const char* TextOfDataType(uint8_t type)
+{
+    switch(type)
+    {
+        case 0x09:
+            return "<Octet string>";
+
+        case 0x10:
+            return "<int16_t>";
+
+        default:
+            return "<!>";
+    }
+}
+
+
+
+
+//
+//
+//
+class GetResponseHandler
+{
+public:
+    bool Parse( uint8_t value )
+    {
+        static uint32_t     state    = 0;        
+        static uint8_t      dataType;
+        static uint8_t      dataLength;
+        static uint8_t      responseCode;
+        static uint8_t      currentLength;
+        static uint8_t      data[256];
+
+        switch(state)
+        {
+            case 0:
+                responseCode        = value;    // TODO: what is this exactly? 0 == success, non-0 == error?
+                printf("responseCode: %02x\n", dataType);
+                if( responseCode == 0 )
+                {
+                    printf("\tSUCCESS\n");
+                }
+                state        = 1;
+                break;
+
+
+            case 1:
+                dataType        = value;
+                printf("dataType: %02x (%s)\n", dataType, TextOfDataType(dataType) );
+                switch(dataType)
+                {
+                    case 0x09:      // Octet string.
+                        state        = 7;
+                        break;
+
+                    case 0x10:      // int16_t
+                        dataLength      = 2;
+                        state        = 8;
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+
+            case 7:
+            {
+                dataLength      = value;
+                currentLength   = 0;
+                printf("dataLength: %02x\n", dataLength);
+                state        = 8;
+                break;
+            }
+
+            case 8:
+                if( currentLength < dataLength)
+                {
+                    data[currentLength] = value;
+                    currentLength++;
+                    state    = 8;
+                }
+                else
+                {
+                    switch(dataType)
+                    {
+                        case 0x10:
+                        {
+                            uint16_t    field   = (data[0]<<8) | data[1];
+                            printf("%04x,",field);
+                            break;
+                        }
+
+                        case 0x09:
+                        default:
+                            printf("Data <");
+                            for(uint32_t i=0; i<dataLength; i++)
+                            {
+                                printf("%02x,",data[i]);
+                            }
+                            printf(">\n");
+                            break;
+                    }
+
+                    state    = 1;
+                }
+                break;
+
+
+            default:
+                break;
+        }
+    }
+};
+
+
+
+//
+//
+//
+class GetRequestHandler
+{
+private:
+
+    typedef enum
+    {
+    } State;
+
+
+public:
+
+    GetRequestHandler()
+    {
+    }
+
+    void Parse(uint8_t value)
+    {
+        static uint32_t     state    = 0;        
+        static uint8_t      classId[2];
+        static uint8_t      attributeNumber[2];
+        static LogicalName  logicalName;
+
+        switch(state)
+        {
+            case 0:
+                classId[0]      = value;
+                state        = 7;
+                break;
+
+            case 7:
+            {
+                classId[1]      = value;
+                uint16_t    field   = (classId[0]<<8) | (classId[1]);
+                static CommonHandlers   common;
+                common.ProcessInterfaceClass( field );
+                state    = 8;
+                break;
+            }
+
+            case 8:
+                logicalName.d0      = value;
+                state    = 9;
+                break;
+
+            case 9:
+                logicalName.d1      = value;
+                state    = 10;
+                break;
+
+            case 10:
+                logicalName.d2      = value;
+                state    = 11;
+                break;
+
+            case 11:
+                logicalName.d3      = value;
+                state    = 12;
+                break;
+
+            case 12:
+                logicalName.d4      = value;
+                state    = 13;
+                break;
+
+            case 13:
+            {
+                logicalName.d5      = value;
+                static CommonHandlers   common;
+                common.ProcessLogicalName( logicalName );
+                state    = 14;
+                break;
+            }
+
+            case 14:
+                attributeNumber[0]   = value;
+                state    = 15;
+                break;
+
+            case 15:
+            {
+                attributeNumber[1]   = value;
+                uint16_t    field   = (attributeNumber[1]<<8) | (attributeNumber[0]);
+                static CommonHandlers   common;
+                common.ProcessAttributeNumber( field );
+                state    = 16;
+                break;
+            }
+
+            default:
+                break;
+        }
+    }
+
+};
+
+
 //
 //
 //
@@ -168,27 +413,6 @@ public:
         }
     }
 
-    bool ProcessInvokeId(uint8_t value)
-    {
-        printf("InvokeID: %02x\n", value);
-    }
-
-    bool ProcessInterfaceClass(uint16_t value)
-    {
-        printf("InterfaceClass: %04x\n", value);
-    }
-
-    bool ProcessLogicalName(LogicalName value)
-    {
-        printf("InterfaceClass: %02x.%02x.%02x.%02x.%02x.%02x\n", value.d0, value.d1, value.d2, value.d3, value.d4, value.d5);
-    }
-
-    bool ProcessAttributeNumber(uint16_t value)
-    {
-        printf("AttributeNumber: %04x\n", value);
-    }
-
-
 
     //
     // Called if the check-sequence passes.
@@ -228,7 +452,8 @@ public:
             {
                 classId[1]      = value;
                 uint16_t    field   = (classId[0]<<8) | (classId[1]);
-                ProcessInterfaceClass( field );
+                static CommonHandlers   common;
+                common.ProcessInterfaceClass( field );
                 state    = 8;
                 break;
             }
@@ -261,7 +486,8 @@ public:
             case 13:
             {
                 logicalName.d5      = value;
-                ProcessLogicalName( logicalName );
+                static CommonHandlers   common;
+                common.ProcessLogicalName( logicalName );
                 state    = 14;
                 break;
             }
@@ -275,7 +501,8 @@ public:
             {
                 attributeNumber[1]   = value;
                 uint16_t    field   = (attributeNumber[1]<<8) | (attributeNumber[0]);
-                ProcessAttributeNumber( field );
+                static CommonHandlers   common;
+                common.ProcessAttributeNumber( field );
                 state    = 20;
                 break;
             }
@@ -440,187 +667,6 @@ public:
     }
 
 
-    bool ParseGETREQUEST( uint8_t value )
-    {
-        static uint32_t     state    = 0;        
-        static uint8_t      classId[2];
-        static uint8_t      attributeNumber[2];
-        static LogicalName  logicalName;
-
-        switch(state)
-        {
-            case 0:
-                classId[0]      = value;
-                state        = 7;
-                break;
-
-            case 7:
-            {
-                classId[1]      = value;
-                uint16_t    field   = (classId[0]<<8) | (classId[1]);
-                ProcessInterfaceClass( field );
-                state    = 8;
-                break;
-            }
-
-            case 8:
-                logicalName.d0      = value;
-                state    = 9;
-                break;
-
-            case 9:
-                logicalName.d1      = value;
-                state    = 10;
-                break;
-
-            case 10:
-                logicalName.d2      = value;
-                state    = 11;
-                break;
-
-            case 11:
-                logicalName.d3      = value;
-                state    = 12;
-                break;
-
-            case 12:
-                logicalName.d4      = value;
-                state    = 13;
-                break;
-
-            case 13:
-            {
-                logicalName.d5      = value;
-                ProcessLogicalName( logicalName );
-                state    = 14;
-                break;
-            }
-
-            case 14:
-                attributeNumber[0]   = value;
-                state    = 15;
-                break;
-
-            case 15:
-            {
-                attributeNumber[1]   = value;
-                uint16_t    field   = (attributeNumber[1]<<8) | (attributeNumber[0]);
-                ProcessAttributeNumber( field );
-                state    = 16;
-                break;
-            }
-
-            default:
-                break;
-        }
-    }
-
-
-    const char* TextOfDataType(uint8_t type)
-    {
-        switch(type)
-        {
-            case 0x09:
-                return "<Octet string>";
-
-            case 0x10:
-                return "<int16_t>";
-
-            default:
-                return "<!>";
-        }
-    }
-
-
-    bool ParseGETRESPONSE( uint8_t value )
-    {
-        static uint32_t     state    = 0;        
-        static uint8_t      dataType;
-        static uint8_t      dataLength;
-        static uint8_t      responseCode;
-        static uint8_t      currentLength;
-        static uint8_t      data[256];
-
-        switch(state)
-        {
-            case 0:
-                responseCode        = value;    // TODO: what is this exactly? 0 == success, non-0 == error?
-                printf("responseCode: %02x\n", dataType);
-                if( responseCode == 0 )
-                {
-                    printf("\tSUCCESS\n");
-                }
-                state        = 1;
-                break;
-
-
-            case 1:
-                dataType        = value;
-                printf("dataType: %02x (%s)\n", dataType, TextOfDataType(dataType) );
-                switch(dataType)
-                {
-                    case 0x09:      // Octet string.
-                        state        = 7;
-                        break;
-
-                    case 0x10:      // int16_t
-                        dataLength      = 2;
-                        state        = 8;
-                        break;
-
-                    default:
-                        break;
-                }
-                break;
-
-            case 7:
-            {
-                dataLength      = value;
-                currentLength   = 0;
-                printf("dataLength: %02x\n", dataLength);
-                state        = 8;
-                break;
-            }
-
-            case 8:
-                if( currentLength < dataLength)
-                {
-                    data[currentLength] = value;
-                    currentLength++;
-                    state    = 8;
-                }
-                else
-                {
-                    switch(dataType)
-                    {
-                        case 0x10:
-                        {
-                            uint16_t    field   = (data[0]<<8) | data[1];
-                            printf("%04x,",field);
-                            break;
-                        }
-
-                        case 0x09:
-                        default:
-                            printf("Data <");
-                            for(uint32_t i=0; i<dataLength; i++)
-                            {
-                                printf("%02x,",data[i]);
-                            }
-                            printf(">\n");
-                            break;
-                    }
-
-                    state    = 1;
-                }
-                break;
-
-
-            default:
-                break;
-        }
-    }
-
 
     bool Parse( uint8_t value )
     {
@@ -675,7 +721,8 @@ public:
             case InvokeId:
             {
                 invokeId          = value;
-                ProcessInvokeId( invokeId );
+                static CommonHandlers   common;
+                common.ProcessInvokeId( invokeId );
                 switch( requestTag )
                 {
                     case 0xc4:
@@ -703,12 +750,18 @@ public:
 
 
             case GetResponse:
-                ParseGETRESPONSE( value );
+            {
+                static GetResponseHandler   handler;
+                handler.Parse( value );
                 break;
+            }
 
             case GetRequest:
-                ParseGETREQUEST( value );
+            {
+                static GetRequestHandler    handler;
+                handler.Parse( value );
                 break;
+            }
 
             case SetResponse:
                 ParseSETRESPONSE( value );
