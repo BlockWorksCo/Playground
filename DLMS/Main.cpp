@@ -118,9 +118,14 @@ class SetResponseHandler
 private:
     typedef enum
     {
+        ResponseCode,
+        DataType,
+        DataLength,
+        Data,
+
     } State;
 
-    uint32_t     state    = 0;        
+    State     state    = ResponseCode;        
 
 public:
     bool Parse( uint8_t value )
@@ -133,29 +138,29 @@ public:
 
         switch(state)
         {
-            case 0:
+            case ResponseCode:
                 responseCode        = value;    // TODO: what is this exactly? 0 == success, non-0 == error?
                 printf("responseCode: %02x\n", dataType);
                 if( responseCode == 0 )
                 {
                     printf("\tSUCCESS\n");
                 }
-                state        = 1;
+                state        = DataType;
                 break;
 
 
-            case 1:
+            case DataType:
                 dataType        = value;
                 printf("dataType: %02x (%s)\n", dataType, TextOfDataType(dataType) );
                 switch(dataType)
                 {
                     case 0x09:      // Octet string.
-                        state        = 7;
+                        state        = DataLength;
                         break;
 
                     case 0x10:      // int16_t
                         dataLength      = 2;
-                        state        = 8;
+                        state        = Data;
                         break;
 
                     default:
@@ -163,21 +168,21 @@ public:
                 }
                 break;
 
-            case 7:
+            case DataLength:
             {
                 dataLength      = value;
                 currentLength   = 0;
                 printf("dataLength: %02x\n", dataLength);
-                state        = 8;
+                state        = Data;
                 break;
             }
 
-            case 8:
+            case Data:
                 if( currentLength < dataLength)
                 {
                     data[currentLength] = value;
                     currentLength++;
-                    state    = 8;
+                    state    = Data;
                 }
                 else
                 {
@@ -201,7 +206,7 @@ public:
                             break;
                     }
 
-                    state    = 1;
+                    state    = DataType;
                 }
                 break;
 
@@ -240,7 +245,7 @@ private:
 
     } State;
 
-    uint32_t     state    = 0;        
+    State     state    = ClassId0;        
 
 public:
     bool Parse( uint8_t value )
