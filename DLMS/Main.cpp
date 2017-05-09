@@ -67,6 +67,22 @@ typedef struct
 class DLMSParser
 {
 
+private:
+
+    typedef enum
+    {
+        LLC0,
+        LLC1,
+        LLC2,
+        RequestTag,
+        RequestLength,
+        InvokeId,
+        GetRequest,
+        GetResponse,
+        SetRequest,
+        SetResponse,
+    } State;
+
 public:
 
     DLMSParser()
@@ -609,7 +625,7 @@ public:
     bool Parse( uint8_t value )
     {
         bool                success     = false;
-        static uint32_t     state    = 0;        
+        static uint32_t     state       = LLC0;        
         static uint8_t      requestTag;
         static uint8_t      requestLength;
         static uint8_t      invokeId;
@@ -621,75 +637,87 @@ public:
         //
         switch(state)
         {
-            case 0:
+            case LLC0:
                 llc[0]      = value;
-                state    = 1;
+                state    = LLC1;
                 break;
 
-            case 1:
+            case LLC1:
                 llc[1]      = value;
-                state    = 2;
+                state    = LLC2;
                 break;
 
-            case 2:
+            case LLC2:
             {
                 llc[2]      = value;
                 uint32_t    field   = (llc[0]<<16) | (llc[1]<<8) | (llc[2]);
                 ProcessLLC( field );
-                state    = 3;
+                state    = RequestTag;
                 break;
             }   
 
 
 
 
-            case 3:
+            case RequestTag:
                 requestTag      = value;
-                state    = 4;
+                state    = RequestLength;
                 break;
 
-            case 4:
+            case RequestLength:
             {
                 requestLength      = value;
                 ProcessRequestType( requestTag, requestLength );
-                state    = 5;
+                state    = InvokeId;
                 break;
             }
 
-            case 5:
+            case InvokeId:
             {
                 invokeId          = value;
                 ProcessInvokeId( invokeId );
-                state    = 6;
-                break;
-            }
-
-
-
-
-            case 6:
                 switch( requestTag )
                 {
                     case 0xc4:
-                        ParseGETRESPONSE( value );
+                        state   = GetResponse;
                         break;
 
                     case 0xc0:
-                        ParseGETREQUEST( value );
+                        state   = GetRequest;
                         break;
 
                     case 0xc5:
-                        ParseSETRESPONSE( value );
+                        state   = SetResponse;
                         break;
 
                     case 0xc1:
-                        ParseSETREQUEST( value );
+                        state   = SetRequest;
                         break;
 
                     default:
                         break;
                 }
                 break;
+            }
+
+
+
+            case GetResponse:
+                ParseGETRESPONSE( value );
+                break;
+
+            case GetRequest:
+                ParseGETREQUEST( value );
+                break;
+
+            case SetResponse:
+                ParseSETRESPONSE( value );
+                break;
+
+            case SetRequest:
+                ParseSETREQUEST( value );
+                break;
+
 
             default:
                 break;
