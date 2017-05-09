@@ -713,6 +713,30 @@ private:
 class HDLCFrame
 {
 
+
+private:
+
+    typedef enum
+    {
+        OutOfFrame,
+        FrameTypeAndLength_0,
+        FrameTypeAndLength_1,
+        Address1_0,
+        Address1_1,
+        Address1_2,
+        Address1_3,
+        Address2_0,
+        Address2_1,
+        Address2_2,
+        Address2_3,
+        FrameType,
+        HCS_0,
+        HCS_1,
+        IFrameContent,
+        SFrameContent,
+        UFrameContent,
+    } State;
+
 public:
 
     HDLCFrame( ByteStream& _stream, DLMSParser& _upperLayer ) :
@@ -868,7 +892,7 @@ public:
     bool Parse( uint8_t value )
     {
         bool                success     = false;
-        static uint32_t     position    = 0;        
+        static State        position    = FrameTypeAndLength_0;        
         static uint8_t      header[7];
         static uint8_t      hcs[2];
         static uint8_t      type;
@@ -884,155 +908,155 @@ public:
         //
         switch(position)
         {
-            case 0:
+            case FrameTypeAndLength_0:
                 type            = value & 0xf0;
                 frameLength     = (value&0x7)<<8;
                 printf("Type=%02x\n", type);
                 addressCount    = 0;
-                position        = 1;
+                position        = FrameTypeAndLength_1;
                 break;
 
 
 
-            case 1:
+            case FrameTypeAndLength_1:
                 frameLength += value;
                 printf("FrameLength=%04x\n", frameLength);
-                position        = 3;
+                position        = Address1_0;
                 break;
 
 
-            case 3:
+            case Address1_0:
                 addressField[0]   = value;
                 if( (value & 0x01) != 0)
                 {
                     addressFieldSize    = 1;
                     printf("a1=%02x\n",addressField[0]);
-                    position            = 15;
+                    position            = Address2_0;
                 }
                 else
                 {
-                    position        = 4;
+                    position        = Address1_1;
                 }
                 break;
 
-            case 4:
+            case Address1_1:
                 addressField[1]     = value;
                 if( (value & 0x01) != 0)
                 {
                     addressFieldSize    = 2;
                     printf("a1=%02x%02x\n",addressField[0],addressField[1]);
-                    position            = 15;
+                    position            = Address2_0;
                 }
                 else
                 {
-                    position        = 5;
+                    position        = Address1_2;
                 }
                 break;
 
 
-            case 5:
+            case Address1_2:
                 addressField[2]     = value;
                 addressFieldSize    = 4;
-                position            = 6;
+                position            = Address1_3;
                 break;
 
-            case 6:
+            case Address1_3:
                 addressField[3]     = value;
                 addressFieldSize    = 4;
                 printf("a1=%02x%02x%02x%02x\n",addressField[0],addressField[1],addressField[2],addressField[3]);
-                position            = 15;
+                position            = Address2_0;
                 break;
 
 
 
 
-            case 15:
+            case Address2_0:
                 addressField[0]   = value;
                 if( (value & 0x01) != 0)
                 {
                     addressFieldSize    = 1;
                     printf("a2=%02x\n",addressField[0]);
-                    position            = 27;
+                    position            = FrameType;
                 }
                 else
                 {
-                    position        = 16;
+                    position        = Address2_1;
                 }
                 break;
 
-            case 16:
+            case Address2_1:
                 addressField[1]   = value;
                 if( (value & 0x01) != 0)
                 {
                     addressFieldSize    = 2;
                     printf("a2=%02x%02x\n",addressField[0],addressField[1]);
-                    position            = 27;
+                    position            = FrameType;
                 }
                 else
                 {
-                    position        = 17;
+                    position        = Address2_2;
                 }
                 break;
 
-            case 17:
+            case Address2_2:
                 addressField[2]     = value;
                 addressFieldSize    = 4;
-                position            = 18;
+                position            = Address2_3;
                 break;
 
-            case 18:
+            case Address2_3:
                 addressField[3]     = value;
                 addressFieldSize    = 4;
                 printf("a2=%02x%02x%02x%02x\n",addressField[0],addressField[1],addressField[2],addressField[3]);
-                position            = 27;
+                position            = FrameType;
                 break;
 
 
 
 
 
-
-
-            case 27:
+            case FrameType:
                 frameType      = value;
                 ProcessFrameType( frameType );
-                position    = 28;
+                position    = HCS_0;
                 break;
 
-            case 28:
+
+
+            case HCS_0:
                 hcs[0]          = value;
-                position    = 29;
+                position    = HCS_1;
                 break;
 
-            case 29:
+            case HCS_1:
                 hcs[1]          = value;
                 printf("HCS = %02x%02x\n", hcs[0],hcs[1]);
                 if( IsIFrame( frameType ) == true)
                 {
-                    position    = 30;
+                    position    = IFrameContent;
                 }
                 if( IsSFrame( frameType ) == true)
                 {
-                    position    = 40;
+                    position    = SFrameContent;
                 }
                 if( IsUFrame( frameType ) == true)
                 {
-                    position    = 50;
+                    position    = UFrameContent;
                 }
                 break;
 
 
 
-            case 30:        // I-Frame
+            case IFrameContent:        // I-Frame
                 //printf("I-Frame.\n");
                 upperLayer.Parse( value );
                 break;
 
-            case 40:        // S-Frame
+            case SFrameContent:        // S-Frame
                 //printf("S-Frame.\n");
                 break;
 
-            case 50:        // U-Frame
+            case UFrameContent:        // U-Frame
                 //printf("U-Frame.\n");
                 break;
 
