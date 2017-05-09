@@ -115,6 +115,11 @@ const char* TextOfDataType(uint8_t type)
 //
 class SetResponseHandler
 {
+private:
+    typedef enum
+    {
+    } State;
+
     uint32_t     state    = 0;        
 
 public:
@@ -215,6 +220,11 @@ public:
 //
 class SetRequestHandler
 {
+private:
+    typedef enum
+    {
+    } State;
+
     uint32_t     state    = 0;        
 
 public:
@@ -373,7 +383,17 @@ public:
 //
 class GetResponseHandler
 {
-    uint32_t     state    = 0;        
+private:
+    typedef enum
+    {
+        ResponseCode,
+        DataType,
+        DataLength,
+        Data,
+
+    } State;
+
+    uint32_t     state    = ResponseCode;        
 
 public:
     bool Parse( uint8_t value )
@@ -386,29 +406,29 @@ public:
 
         switch(state)
         {
-            case 0:
+            case ResponseCode:
                 responseCode        = value;    // TODO: what is this exactly? 0 == success, non-0 == error?
                 printf("responseCode: %02x\n", dataType);
                 if( responseCode == 0 )
                 {
                     printf("\tSUCCESS\n");
                 }
-                state        = 1;
+                state        = DataType;
                 break;
 
 
-            case 1:
+            case DataType:
                 dataType        = value;
                 printf("dataType: %02x (%s)\n", dataType, TextOfDataType(dataType) );
                 switch(dataType)
                 {
                     case 0x09:      // Octet string.
-                        state        = 7;
+                        state        = DataLength;
                         break;
 
                     case 0x10:      // int16_t
                         dataLength      = 2;
-                        state        = 8;
+                        state        = Data;
                         break;
 
                     default:
@@ -416,21 +436,21 @@ public:
                 }
                 break;
 
-            case 7:
+            case DataLength:
             {
                 dataLength      = value;
                 currentLength   = 0;
                 printf("dataLength: %02x\n", dataLength);
-                state        = 8;
+                state        = Data;
                 break;
             }
 
-            case 8:
+            case Data:
                 if( currentLength < dataLength)
                 {
                     data[currentLength] = value;
                     currentLength++;
-                    state    = 8;
+                    state    = Data;
                 }
                 else
                 {
@@ -454,7 +474,7 @@ public:
                             break;
                     }
 
-                    state    = 1;
+                    state    = DataType;
                 }
                 break;
 
@@ -476,9 +496,21 @@ private:
 
     typedef enum
     {
+        ClassId0,
+        ClassId1,
+        LogicalName0,
+        LogicalName1,
+        LogicalName2,
+        LogicalName3,
+        LogicalName4,
+        LogicalName5,
+        AttributeNumber0,
+        AttributeNumber1,
+        Done,
+
     } State;
 
-    uint32_t     state    = 0;        
+    State     state    = ClassId0;        
 
 public:
 
@@ -490,67 +522,68 @@ public:
 
         switch(state)
         {
-            case 0:
+            case ClassId0:
                 classId[0]      = value;
-                state        = 7;
+                state        = ClassId1;
                 break;
 
-            case 7:
+            case ClassId1:
             {
                 classId[1]      = value;
                 uint16_t    field   = (classId[0]<<8) | (classId[1]);
                 static CommonHandlers   common;
                 common.ProcessInterfaceClass( field );
-                state    = 8;
+                state    = LogicalName0;
                 break;
             }
 
-            case 8:
+
+            case LogicalName0:
                 logicalName.d0      = value;
-                state    = 9;
+                state    = LogicalName1;
                 break;
 
-            case 9:
+            case LogicalName1:
                 logicalName.d1      = value;
-                state    = 10;
+                state    = LogicalName2;
                 break;
 
-            case 10:
+            case LogicalName2:
                 logicalName.d2      = value;
-                state    = 11;
+                state    = LogicalName3;
                 break;
 
-            case 11:
+            case LogicalName3:
                 logicalName.d3      = value;
-                state    = 12;
+                state    = LogicalName4;
                 break;
 
-            case 12:
+            case LogicalName4:
                 logicalName.d4      = value;
-                state    = 13;
+                state    = LogicalName5;
                 break;
 
-            case 13:
+            case LogicalName5:
             {
                 logicalName.d5      = value;
                 static CommonHandlers   common;
                 common.ProcessLogicalName( logicalName );
-                state    = 14;
+                state    = AttributeNumber0;
                 break;
             }
 
-            case 14:
+            case AttributeNumber0:
                 attributeNumber[0]   = value;
-                state    = 15;
+                state    = AttributeNumber1;
                 break;
 
-            case 15:
+            case AttributeNumber1:
             {
                 attributeNumber[1]   = value;
                 uint16_t    field   = (attributeNumber[1]<<8) | (attributeNumber[0]);
                 static CommonHandlers   common;
                 common.ProcessAttributeNumber( field );
-                state    = 16;
+                state    = Done;
                 break;
             }
 
