@@ -1,0 +1,33 @@
+
+
+
+
+World-Schema DEFINITIONS AUTOMATIC TAGS ::= 
+BEGIN
+
+
+Human ::= SEQUENCE 
+{
+     name UTF8String,
+     first-words UTF8String DEFAULT "Hello World",
+     age  CHOICE 
+     {
+        biblical INTEGER (1..1000),
+        modern  INTEGER (1..100)
+     } OPTIONAL
+}
+
+Currency ::= SEQUENCE
+{
+    currencyName  UTF8String,
+    currencyScale  INTEGER,
+    currencyUnit  ENUMERATED
+}
+
+
+
+
+END
+
+
+
