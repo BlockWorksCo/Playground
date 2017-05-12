@@ -1,4 +1,7 @@
 
+cd Output
+asn1c ../COSEM.asn
+cd ..
 g++ -g -std=c++11 -o DLMS Main.cpp
 
 

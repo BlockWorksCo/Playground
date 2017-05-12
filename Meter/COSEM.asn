@@ -25,6 +25,11 @@ Currency ::= SEQUENCE
 }
 
 
+Message ::= SEQUENCE
+{
+    one Currency,
+    two Human
+}
 
 
 END
