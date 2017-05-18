@@ -1,0 +1,3167 @@
+
+
+Date      OCTET STRING (SIZE(5)) 
+{ 
+    year highbyte, 
+    year lowbyte, 
+    month, 
+    day of month, 
+    day of week 
+} 
+
+
+
+Time      OCTET STRING (SIZE(4)) 
+{ 
+    hour, 
+    minute, 
+    second, 
+    hundredths 
+} 
+
+
+
+Date-time OCTET STRING (SIZE(12)) 
+{ 
+    year highbyte,  
+    year lowbyte, 
+    month, 
+    day of month, 
+    day of week, 
+    hour, 
+    minute, 
+    second, 
+    hundredths of second, 
+    deviation highbyte, 
+    deviation lowbyte, 
+    clock status 
+} 
+
+
+
+CHOICE
+{
+    -- simple data types logical_name  and possibly from the 
+    null-data       [0], 
+    boolean         [3], 
+    bit-string      [4],
+    double-long     [5],
+    double-long-unsigned [6],
+    octet-string    [9],
+    visible-string   [10], 
+    utf8-string     [12], 
+    bcd             [13], 
+    integer         [15], 
+    long            [16], 
+    unsigned        [17], 
+    long-unsigned   [18], 
+    long64          [20], 
+    long64-unsigned   [21], 
+    enum            [22], 
+    float32         [23], 
+    float64         [24], 
+    date-time       [25], 
+    date            [26], 
+    time            [27], 
+
+    -- complex data types 
+    array           [1], 
+    structure       [2], 
+    compact-array   [19] 
+} 
+
+
+
+CHOICE
+{
+    -- simple data types     logical_name  and possibly on the 
+    null-data         [0],
+    bit-string        [4],
+    double-long       [5],
+    double-long-unsigned [6],
+    octet-string      [9],
+    visible-string    [10],
+    utf8-string       [12],
+    integer           [15],
+    long              [16],
+    unsigned          [17],
+    long-unsigned     [18],
+    long64            [20],
+    long64-unsigned   [21], 
+    enum              [22], 
+    float32           [23], 
+    float64           [24], 
+} 
+
+
+scal_unit_type ::= structure 
+{ 
+    scaler, 
+    unit 
+} 
+
+
+
+data ::= integer (0) 
+
+
+
+CHOICE
+{
+    -- simple data types                     choice of the manufacturer. For the 
+    null-data                     [0],
+    bit-string                    [4],
+    double-long-unsigned          [6],
+    octet-string                  [9], 
+    visible-string                [10], 
+    utf8-string                   [12], 
+    unsigned                      [17], 
+    long-unsigned                 [18], 
+    long64-unsigned    [21] 
+} 
+
+
+data ::= integer (0) 
+data ::= integer (0) 
+data ::= integer (0) 
+
+array    object_definition 
+
+
+object_definition ::= structure 
+{ 
+    class_id:     long-unsigned, 
+    logical_name: octet-string 
+} 
+
+
+register_act_mask ::= structure 
+{ 
+    mask_name:        octet-string, 
+    index_list:       index_array 
+} 
+
+
+index_array ::= array unsigned 
+
+
+data ::= structure 
+{ 
+    class_id:     long-unsigned, 
+    logical_name: octet-string 
+} 
+
+
+data ::= register_act_mask (see above) 
+data ::= octet-string (mask_name) 
+
+
+entry ::= structure 
+{ 
+    CHOICE 
+    { 
+        -- simple data types 
+        null-data      [0], 
+        boolean        [3], 
+        bit-string    [4], 
+        double-long   [5], 
+        double-long-unsigned [6], 
+        octet-string    [9], 
+        visible-string   [10], 
+        utf8-string   [12], 
+        bcd           [13], 
+        integer       [15], 
+        long          [16], 
+        unsigned      [17], 
+        long-unsigned  [18], 
+        long64        [20], 
+        long64-unsigned   [21], 
+        enum          [22], 
+        float32       [23], 
+        float64       [24], 
+        date-time     [25], 
+        date          [26], 
+        time          [27], 
+        -- complex data types 
+        array         [1], 
+        structure     [2], 
+        compact-array  [19] 
+    } 
+} 
+
+
+
+capture_object_definition ::= structure 
+{ 
+    class_id:         long-unsigned, 
+    logical_name:     octet-string, 
+    attribute_index:  integer, 
+    data_index:       long-unsigned 
+} 
+
+
+
+range_descriptor ::= structure 
+{
+    CHOICE 
+    {  -- simple data types 
+        double-long    [5], 
+        double-long-unsigned [6], 
+        octet-string    [9], 
+        visible-string   [10], 
+        utf8-string    [12], 
+        integer        [15], 
+        long           [16], 
+        unsigned       [17], 
+        long-unsigned  [18], 
+        long64         [20], 
+        long64-unsigned   [21], 
+        float32        [23], 
+        float64        [24], 
+        date-time      [25], 
+        date           [26], 
+        time           [27] 
+    } 
+
+
+to_value:  CHOICE
+{see above} 
+
+entry_descriptor ::= structure 
+{ 
+    from_entry:   double-long-unsigned first entry to retrieve, 
+    to_entry:     double-long-unsigned last entry to retrieve 
+    to_entry == 0: highest possible entry, 
+    from_selected_value: long-unsigned  index of first value to retrieve, 
+    to_selected_value: long-unsigned  index of last value to retrieve 
+    to_selected_value == 0: highest possible selected_value 
+} 
+
+
+
+data ::= integer (0) 
+data ::= integer (0) 
+
+
+offset_selector ::= structure  
+{ 
+    Offset:  double-long-Offset
+    unsigned     the table. 
+    Count:   long-unsigned 
+}                   
+
+
+
+index_selector ::= structure  
+{ 
+    Index: array long
+    unsigned     
+    Count:  long-unsigned
+  
+   
+}   
+
+
+
+table_cell_entry ::= CHOICE 
+{ 
+    -- simple data types 
+    null-data         [0], 
+    bit-string        [4], 
+    double-long       [5], 
+    double-long-unsigned [6], 
+    octet-string      [9], 
+    visible-string    [10], 
+    utf8-string       [12], 
+    bcd               [13], 
+    integer           [15], 
+    long              [16], 
+    unsigned          [17], 
+    long-unsigned      [18], 
+
+    long64          [20], 
+    long64-unsigned   [21], 
+    float32         [23], 
+    float64         [24], 
+    -- complex data types 
+    structure       [2] 
+} 
+
+
+
+{ 
+    class_id:       long-unsigned, 
+    logical_name:   octet-string, 
+    group_E_values:   array  unsigned, 
+    attribute_index:  integer 
+} 
+
+
+
+data ::= integer (0) 
+CHOICE 
+{ 
+    bit-string        [4], 
+    double-long-unsigned [6], 
+    octet-string      [9], 
+    visible-string,   [10], 
+    utf8-string       [12], 
+    unsigned          [17], 
+    long-unsigned     [18], 
+    long64-unsigned   [21] 
+} 
+
+
+
+structure 
+{     
+    ref_table_id:     unsigned, 
+    ref_table_mapping: CHOICE 
+    { 
+        long-unsigned          [18], 
+        array  long-unsigned   [1] 
+    } 
+} 
+
+
+
+capture_object_definition ::= structure 
+{ 
+    class_id:               long-unsigned, 
+    logical_name:           octet-string, 
+    attribute_index:        integer, 
+    data_index:             long-unsigned 
+} 
+
+data ::= integer(0) 
+data ::= integer(0) 
+objlist_type ::= array  objlist_element 
+
+
+objlist_element ::= structure 
+{ 
+    base_name:  long, 
+    class_id:  long-unsigned, 
+    version:  unsigned, 
+    logical_name: octet-string    
+} 
+
+
+access_rights_type ::= array  access_rights_element 
+
+
+access_rights_element ::= structure 
+{ 
+    base_name:         long, 
+    attribute_access:   attribute_access_descriptor, 
+    method_access:     method_access_descriptor 
+} 
+
+
+attribute_access_descriptor ::= array attribute_access_item 
+
+
+attribute_access_item ::= structure 
+{ 
+    attribute_id:      integer, 
+    access_mode:       enum, 
+    { 
+        (0) read-access, 
+        (1) write-access, 
+        (2) authenticated request, 
+        (3) encrypted request, 
+        (4) digitally signed request, 
+        (5) authenticated response, 
+        (6) encrypted response, 
+        (7) digitally signed response 
+    } 
+
+    access_selectors:  CHOICE  
+    { 
+        null-data      [0], 
+        array  integer [1] 
+    } 
+} 
+
+
+method_access_descriptor ::= array    method_access_item 
+method_access_item ::= structure 
+{ 
+    method_id:         integer, 
+    access_mode:       enum 
+
+    { 
+        (0) access, 
+        (1) not-used, 
+        (2) authenticated request, 
+        (3) encrypted request, 
+        (4) digitally signed request, 
+        (5) authenticated response, 
+        (6) encrypted response, 
+        (7) digitally signed response 
+    } 
+} 
+
+
+array  user_list_entry 
+
+user_list_entry ::=   structure 
+{ 
+    user_id:  unsigned, 
+    user_name   visible-string 
+} 
+
+
+
+current_user ::= user_list_entry (see above) 
+
+
+data ::= array   attribute_identification 
+
+
+attribute_identification ::= structure 
+{ 
+    class_id:               long-unsigned, 
+    logical_name:           octet-string, 
+    attribute_index:        integer 
+} 
+
+
+
+data ::= octet-string
+data ::= octet-string
+data ::= octet-string
+object_list_type ::= array  object_list_element 
+
+
+object_list_element ::= structure 
+{ 
+    class_id:     long-unsigned, 
+    version:      unsigned, 
+    logical_name:  octet-string, 
+    access_rights:  access_right 
+} 
+
+
+access_right ::= structure 
+{ 
+    attribute_access:   attribute_access_descriptor, 
+    method_access:   method_access_descriptor 
+} 
+
+
+attribute_access_descriptor ::= array attribute_access_item 
+
+
+attribute_access_item ::= structure 
+{ 
+    attribute_id:  integer, 
+    access_mode: enum 
+    { 
+        (0) read-access, 
+        (1) write-access, 
+        (2) authenticated request, 
+        (3) encrypted request, 
+        (4) digitally signed request, 
+        (5) authenticated response, 
+        (6) encrypted response, 
+        (7) digitally signed response 
+    } 
+
+    access_selectors:  CHOICE 
+    { 
+        null-data  [0], 
+        array  integer [1] 
+    } 
+
+} 
+
+method_access_descriptor ::= array method_access_item 
+
+COSEM Interface Classes and OBIS Object Identification System, Edition 12. 1
+
+method_access_item ::= structure 
+{ 
+    method_id:    integer, 
+    access_mode:  enum 
+
+    { 
+        (0)  access, 
+        (1)  not-used, 
+        (2)  authenticated request, 
+        (3)  encrypted request, 
+        (4)  digitally signed request, 
+        (5)  authenticated response, 
+        (6)  encrypted response, 
+        (7)  digitally signed response 
+    } 
+} 
+
+
+associated_partners_type ::= structure 
+{ 
+    client_SAP:   integer,  
+    server_SAP:   long-unsigned 
+} 
+
+
+context_name_type ::=   CHOICE 
+{ 
+    context_name_structure   [2], 
+    octet-string           [9] 
+} 
+
+
+
+context_name_structure ::= structure 
+{ 
+    joint_iso_ctt_element:      unsigned, 
+    country_element:            unsigned, 
+    country_name_element:       long-unsigned, 
+    identified_organization_element: unsigned, 
+    DLMS_UA_element:            unsigned, 
+    application_context_element:  unsigned, 
+    context_id_element:         unsigned 
+} 
+
+
+
+context_info   xDLMS_context_type ::= structure 
+{ 
+    conformance:           bit-string, 
+    max_receive_pdu_size:   long-unsigned, 
+    max_send_pdu_size:     long-unsigned, 
+    dlms_version_number:   unsigned, 
+    quality_of_service:    integer, 
+    cyphering_info:        octet-string 
+} 
+
+
+
+mechanism_name_type ::=  CHOICE 
+{ 
+    mechanism_name_structure   [2], 
+    octet-string               [9] 
+} 
+
+
+
+mechanism_name_structure ::= structure 
+{ 
+    joint_iso_ctt_element:              unsigned, 
+    country_element:                    unsigned, 
+    country_name_element:               long-unsigned, 
+    identified_organization_element:    unsigned, 
+    DLMS_UA_element:                    unsigned, 
+    authentication_mechanism_name_element:  unsigned, 
+    mechanism_id_element:               unsigned 
+} 
+
+
+
+user_list_entry ::=  structure 
+{ 
+    user_id:  unsigned, 
+    user_name:  visible-string 
+} 
+
+
+current_user ::= user_list_entry (see above) 
+
+
+class_list ::= array class_id 
+
+
+object_id_list ::= array  object_id 
+
+object_id ::= structure 
+{ 
+    class_id:  long-unsigned, 
+    logical_name:  octet-string 
+} 
+
+
+asslist_type ::= array  asslist_element 
+
+
+asslist_element ::= structure 
+{ 
+    SAP:               long-unsigned, 
+    logical_device_name: CHOICE 
+    { 
+        octet-string   [9], 
+        visible-string  [10], 
+        utf8-string   [12] 
+    } 
+} 
+
+
+data ::= asslist_element 
+
+
+image_to_activate_info_element ::= structure 
+{ 
+    image_to_activate_size:    double-long-unsigned, 
+    image_to_activate_identification: octet-string, 
+    image_to_activate_signature:   octet-string 
+} 
+
+
+
+initiate (data) data ::= structure 
+{ 
+    image_identifier: octet-string, 
+    image_size:  double-long-unsigned 
+} 
+
+
+transfer (data)   data ::= structure 
+{ 
+    image_block_number:   double-long-unsigned, 
+    image_block_value:    octet-string 
+} 
+
+
+
+data ::= integer (0) 
+(data)            data ::= integer (0) 
+
+certificate_info ::= structure 
+{ 
+    certificate_entity: enum: 
+    {
+         (0) server, 
+         (1) client, 
+         (2) certification authority, 
+         (3) other 
+        certificate_type: enum: 
+         (0) digital signature, 
+         (1) key agreement, 
+         (2) TLS, 
+         (3) other 
+    }
+    serial_number:    octet-string, 
+
+    issuer:          octet-string, 
+    subject:         octet-string, 
+    subject_alt_name:  octet-string 
+} 
+
+
+
+data ::= enum, as specified at the security_policy attribute. 
+
+data ::= array  key_transfer_data 
+
+key_transfer_data ::= structure 
+{ 
+    key_id: enum: 
+    {
+        (0) global unicast encryption key, 
+        (1) global broadcast encryption key, 
+        (2) authentication key, 
+        (3) master key (KEK) 
+    }
+
+    key_wrapped:  octet-string 
+} 
+
+
+data ::=       array key_agreement_data 
+
+
+key_agreement_data ::= structure 
+{ 
+    key_id:        enum: 
+    {
+        (0) global unicast encryption key, 
+        (1) global broadcast encryption key ,
+        (2) authentication key, 
+        (3) master key (KEK) 
+    }
+    key_data:   octet-string 
+} 
+
+
+
+data  ::= enum: 
+{
+   (0) digital signature key pair ,
+}
+
+
+data  ::= enum: 
+{
+    (0) digital signature key pair ,
+}
+
+
+response data ::= octet-string, 
+
+data  ::= octet-string 
+
+
+data ::= certificate_identification 
+
+
+certificate_identification ::= structure 
+{ 
+    certificate_identification_type:   enum: 
+    {
+        (0) certificate_identification_entity, 
+        (1) certificate_identification_serial 
+    }
+
+    certification_identification_options: CHOICE 
+    { 
+        certificate_identification_by_entity, 
+        certificate_identification_by_serial 
+    } 
+} 
+
+
+export_certificate certificate_identification_by_entity ::= structure 
+{ 
+    certificate_entity: enum: 
+    {
+        (0) server, 
+        (1) client, 
+        (2) certification authority, 
+        (3) other 
+    },
+
+    certificate_type: enum: 
+    {
+        (0) digital signature, 
+        (1) key agreement, 
+        (2) TLS 
+    },
+
+    system_title:   octet-string 
+} 
+
+
+certificate_identification_by_serial ::= structure 
+{ 
+    serial_number:   octet-string, 
+    issuer:       octet-string 
+} 
+
+
+response data ::= octet-string 
+
+data ::= certificate_identification 
+
+array      object_definition 
+
+object_definition ::=  structure 
+{     
+    class_id:         long-unsigned, 
+    logical_name:     octet-string, 
+    attribute_index:  integer, 
+    data_index:       long-unsigned 
+} 
+
+
+
+send_destination_and_method ::= structure 
+{ 
+    transport_service:  transport_service_type, 
+    destination:   octet-string, 
+    message:     message_type 
+} 
+
+
+transport_service_type ::= enum: 
+{
+    (0)      TCP, 
+    (1) UDP,
+    (2) reserved for FTP,
+    (3) reserved for SMTP,
+    (4) SMS,
+    (5) HDLC
+    (6) reserved for M-Bus
+    (7) reserved for ZigBee®
+    (200...255) manufacturer specific
+}
+
+
+message_type ::= enum: 
+{
+    (0)      A-XDR encoded xDLMS APDU, 
+    (1) XML encoded xDLMS APDU,
+    (128...255) manufacturer specific
+}
+
+
+communication_window     ::=array     window_element 
+
+window_element ::= structure 
+{ 
+    start_time:  octet-string, 
+    end_time: octet-string 
+} 
+
+
+
+
+object_definition ::=  structure 
+{     
+class_id:               long-unsigned, 
+logical_name:           octet-string, 
+attribute_index:        integer, 
+data_index:             long-unsigned, 
+restriction:            restriction_element 
+} 
+
+
+restriction_element ::=  structure 
+{ 
+    restriction_type: enum:  
+    {
+        (0)  none, 
+        (1)  restriction by date, 
+        (2)  restriction by entry 
+    }
+
+    restriction_value: CHOICE 
+    { 
+        null-data,       // no restrictions apply 
+        restriction_by_date, 
+        restriction_by_entry 
+    } 
+} 
+
+
+restriction_by_date ::= structure 
+{ 
+    from_date:   octet-string, 
+    to_date:     octet-string 
+} 
+
+restriction_by_entry ::= structure 
+{ 
+    from_entry:   double-long-unsigned, 
+    to_entry:    double-long-unsigned 
+} 
+
+
+protection_parameters_element ::= structure
+{ 
+    protection_type:  enum: 
+    {
+        (0) authentication, 
+        (1) encryption, 
+        (2) authentication and encryption ,
+        (3) digital signature 
+    }
+
+    protection_options:  structure 
+    { 
+        transaction_id:   octet-string, 
+        originator_system_title:  octet-string, 
+        recipient_system_title:   octet-string, 
+        other_information:  octet-string, 
+        key_info:         key_info_element 
+    } 
+} 
+
+
+key_info_element ::= structure 
+{ 
+    key_info_type:   enum:  
+    {
+        (0) identified_key, -- used with identified_key_info_option s
+        (1) wrapped_key, -- used with wrapped_key_info_options 
+        (2) agreed_key -- used with agreed_key_info_options 
+    }
+
+    protection_        key_info_options:  CHOICE 
+    parameters_get     
+    { 
+        identified_key_info_options ,
+        wrapped_key_info_options ,
+        agreed_key_info_options 
+    } 
+} 
+
+
+identified_key_info_options ::= enum: 
+{
+    (0) global_unicast_encryption_key, 
+    (1) global_broadcast_encryption_key 
+}
+
+
+wrapped_key_info_options ::= structure 
+{ 
+    kek_id:       enum:   
+    {
+        (0) master_key, 
+    }
+
+    key_ciphered_data: octet-string 
+} 
+
+
+agreed_key_info_options ::= structure 
+{ 
+    key_parameters:  octet-string, 
+    key_ciphered_data: octet-string 
+} 
+
+
+
+data ::= get_protected_attributes_request
+
+get_protected_attributes_request ::= structure 
+{ 
+    object_list:      array object_definition, 
+    protection_parameters:  array protection_parameters_element ,
+} 
+
+
+
+data ::= get_protected_attributes_response 
+
+get_protected_attributes_response ::= structure 
+{ 
+    protection_parameters:  array protection_parameters_element ,
+    protected_attributes:  octet-string 
+} 
+
+
+protection_parameters ::= array protection_parameters_element
+
+
+data ::= set_protected_attributes_request
+
+
+set_protected_attributes_request ::= structure 
+{ 
+    object_list:           array object_definition, 
+    protection_parameters:  array protection_parameters_element ,
+    protected_attributes:  octet-string 
+} 
+
+
+method (data)   data ::= invoke_protected_method_request
+
+invoke_protected_method_request ::=  structure 
+{ 
+    object_method:                  object_method_definition, 
+    protection_parameters:  array  protection_parameters_element ,  
+    protected_method_invocation_parameters:  octet-string 
+} 
+
+
+object_method_definition ::= structure 
+{    
+    class_id:     long-unsigned, 
+    logical_name: octet-string, 
+    method_index : integer, 
+} 
+
+
+data ::= invoke_protected_method_response 
+
+invoke_protected_method_response ::=structure 
+{ 
+    protection_parameters:  array protection_parameters_element ,
+    protected_method_return_parameters : octet-string 
+} 
+
+data ::= structure 
+{ 
+    preset_time:      octet-string, 
+    validity_interval_start:  octet-string, 
+    validity_interval_end:  octet-string 
+} 
+
+
+data ::= long array    script 
+
+script ::= structure 
+{ 
+    script_identifier: long-unsigned, 
+    actions:      array  action_specification 
+} 
+
+action_specification ::= structure 
+{ 
+    service_id:        enum, 
+    class_id:          long-unsigned, 
+    logical_name:      octet-string, 
+    index:             integer, 
+    parameter:         service specific 
+} 
+
+
+data ::= long-unsigned 
+
+
+schedule_table_entry ::= structure 
+{ 
+    index:        long-unsigned, 
+    enable:       boolean, 
+    script_logical_name: octet-string, 
+    script_selector:  long-unsigned, 
+    switch_time:   octet-string, 
+    validity_window:  long-unsigned, 
+    exec_weekdays:   bit-string, 
+    exec_specdays:  bit-string, 
+    begin_date:   octet-string, 
+    end_date:     octet-string 
+} 
+
+
+data ::= structure 
+{ 
+    firstIndexA:   long-unsigned, 
+    lastIndexA:   long-unsigned, 
+    firstIndexB:   long-unsigned, 
+    lastIndexB:   long-unsigned 
+} 
+
+
+data ::= corresponding to entry
+
+
+data ::= structure 
+{ 
+    firstIndex: long-unsigned, 
+    lastIndex: long-unsigned 
+} 
+
+
+entries     ::= array  spec_day_entry 
+
+spec_day_entry ::= structure 
+{ 
+    index:    long-unsigned, 
+    specialday_date:  octet-string, 
+    day_id:   unsigned 
+} 
+
+
+
+entry ::= spec_day_entry 
+data ::= long-unsigned 
+
+
+season_profile  ::= array  season 
+
+season ::= structure 
+{ 
+    season_profile_name: octet-string, 
+    season_start:  octet-string, 
+    week_name:    octet-string 
+} 
+
+week_profile_table   ::= array  week_profile 
+
+
+week_profile ::= structure 
+{ 
+    week_profile_name: octet-string, 
+    monday:       day_id, 
+    tuesday:      day_id, 
+    wednesday:    day_id, 
+    thursday:     day_id, 
+    friday:       day_id, 
+    saturday:     day_id, 
+    sunday:       day_id 
+} 
+
+
+day_id: unsigned 
+
+
+
+day_profile_table ::= array     day_profile 
+
+
+day_profile ::= structure 
+{ 
+    day_id:       unsigned, 
+    day_schedule: array  day_profile_action 
+} 
+
+day_profile_action ::= structure 
+{ 
+    start_time:       octet-string, 
+    script_logical_name: octet-string, 
+    script_selector:  long-unsigned 
+} 
+
+
+
+calendar (data) data ::= integer (0) 
+value       simple data types are allowed. 
+
+monitored_value ::= value_definition
+
+value_definition: := structure 
+{ 
+    class_id:      long-unsigned, 
+    logical_name:  octet-string, 
+    attribute_index:  integer 
+} 
+
+
+actions ::= array  action_set 
+
+action_set ::= structure 
+{ 
+    action_up:   action_item, 
+    action_down: action_item 
+} 
+
+action_item ::= structure 
+{ 
+    script_logical_name: octet-string, 
+    script_selector:  long-unsigned 
+} 
+
+
+
+executed_script ::= script
+
+script ::= structure 
+{ 
+    script_logical_name: octet-string, 
+    script_selector:  long-unsigned 
+} 
+
+
+execution_time ::=  array  execution_time_date 
+
+execution_time_date ::= structure 
+{ 
+    time:  octet-string, 
+    date:  octet-string 
+} 
+
+
+
+monitored_value ::= value_definition
+
+value_definition ::= structure 
+{ 
+    class_id:     long-unsigned, 
+    logical_name:  octet-string, 
+    attribute_index:  integer 
+} 
+
+
+
+
+emergency_profile ::= structure 
+{ 
+    emergency_profile_id:  long-unsigned, 
+    emergency_activation_time: octet-string, 
+    emergency_duration:  double-long-unsigned 
+} 
+
+
+
+action ::= structure 
+{ 
+    action_over_threshold:    action_item, 
+    action_under_threshold:   action_item 
+} 
+
+
+
+action_item ::= structure 
+{ 
+    script_logical_name:  octet-string, 
+    script_selector:   long-unsigned 
+} 
+
+
+changed_parameter ::= structure 
+{ 
+    class_id:     long-unsigned, 
+    logical_name: octet-string, 
+    attribute_index: integer, 
+    attribute_value: CHOICE 
+    -- CHOICE as specified in the “Data” interface class 
+} 
+
+
+parameter_list ::= array  parameter_list_element 
+
+parameter_list_element ::= structure 
+{ 
+    class_id:  long-unsigned, 
+    logical_name: octet_string, 
+    attribute_index: integer 
+} 
+
+
+
+data ::= parameter_list_element 
+
+processed_value_definition ::= structure 
+{ 
+    class_id:     long-unsigned, 
+    logical_name: octet-string, 
+    attribute_index: integer 
+} 
+
+
+actions ::= array action_item 
+
+action_item ::= structure 
+{ 
+    script_logical_name: octet-string, 
+    script_selector:   long-unsigned 
+} 
+
+
+permissions_table ::= array   actor_permissions 
+
+actor_permissions ::=  bit-string 
+
+weightings_table ::= array actor_weighting_list
+
+actor_weighting_list ::=  array actor_action_weight 
+
+actor_action_weight ::= long-unsigned 
+
+most_recent_requests_table ::= array most_recent_request
+
+most_recent_request ::= bit-string 
+
+
+request_action ::= structure 
+{ 
+    request_actor:    unsigned, 
+    request_action_list:   bit-string 
+} 
+
+
+                    register_assignment   scaler_unit
+time           calendar_name
+_act        scripts ::= array ::= array object_def  value
+….            season_profile_act::= {script_identifier,{class_id, log_name}scaler_unit
+….                 array          actions {service_id, 
+{season_profile_name,  attribute /     mask_list ::= array
+  method_id,param 
+season_start,                }         {mask_name, 
+0-b:11.0.e.255      week_name}            execute           index_list}
+Special days table week_profile_table_act                   active_mask
+logical_name         ::=array                             add_register
+{week_profile
+_name,
+entries          Monday...Sunday}   Invokes the script that add_mask
+….           day_profile_table_act::= writes active_mask delete_mask
+….              array {day_id,    attribute to make one of 
+day_schedule        the masks active
+{start_time, 
+script_logName, 
+script_selector}
+calendar_name_pass
+Clock        Single action sched.Script table     Profile generic      logical_name
+logical_name     logical_name      logical_name     logical_name            value
+time           executed_script  scripts ::= array    buffer             scaler_unit
+….           {script_logName,  {script_identifier,capture_objects
+script_selector}Actions {service_id, 
+….            type (wildcards)   attribute /        ….
+execution_time {time, method_id,param } ….
+date}           execute           capture
+Gas ID: 7-b:0.1.0...9.255
+Register           Register
+logical_name      logical_name               capture_object points to attributes identified by {class_id, logical_name, 
+value             value                    attribute_index, data_index} the values of which will be captured to the 
+scaler_unit        scaler_unit                                  buffer
+account_mode_  Defines the payment_mode, enumerated below, and the status of the 
+and_status     “Account”, also enumerated. 
+account_mode_and_status ::= structure 
+{ 
+payment_mode: enum: 
+(1) Credit mode, 
+(2) Prepayment mode 
+
+account_status: enum:  
+(1) New (inactive) account, 
+(2) Account active, 
+(3) Account closed 
+} 
+
+Priority 0 credits shall NOT appear in this list, as by definition they are 
+not enabled. 
+credit_reference_list ::= array credit_reference 
+credit_reference ::= octet-string 
+charge_         This attribute is an array of logical names, identifying a set of “Charge” 
+being last). Priority 0 charges shall NOT  appear in this list, as by 
+definition they are not applied .
+charge_reference_list ::= array charge_referenc e
+
+charge_reference ::= octet-string 
+
+appropriate “Charge” object has bit 1 (continuous collection) of its charge_configuration cleared. 
+This will not alter the “Account” credit_charge_configuration. 
+credit_charge_configuration ::= array           
+credit_charge_configuration_elemen t
+credit_charge_configuration_element ::= structure 
+{ 
+credit_reference:    octet-string, 
+charge_reference:    octet-string, 
+collection_configuration:   bit-string 
+} 
+Where  credit_reference and charge_reference  contain the 
+logical_name of the relevant “Credit” and “Charge” objec t.
+
+collection_configuration ::= bi-tstring 
+This element defines behaviour under specific conditions .
+associated (by application of the value group D field; see also 4.6.1. 
+
+token_gateway_configuration ::= array 
+token_gateway_configuration_element 
+
+token_gateway_configuration_element ::= structure 
+{ 
+credit_reference  octet-string, 
+token_proportion   unsigned; 
+} 
+
+international symbol (GBP, USD, etc.) as defined in ISO 4217. 
+
+currency ::= structure 
+{ 
+currency_name:          utf8-string, 
+currency_scale:         integer, 
+currency_unit:          enum 
+} 
+Where: 
+Account active. 
+NOTE 26 The account_activation_time will be set to the time of invoking this method. 
+data ::= integer (0) 
+close_account This method forces the closure of the Account .
+object becomes active again, or the “Credit” and “Charge” objects are referenced from another 
+“Account” object. 
+data ::= integer (0) 
+reset_account If the account_status of the attribute account_mode_and_statusis   not 
+this method shall have no effect .
+
+data ::= integer (0) 
+4.6.3  Credit interface class 
+(data)         Positive values adjust the current_credit_amount positively. Negative 
+values are also permitted. 
+data ::= double-long, scaled according to thce urrency attribute of the 
+“Account” object. 
+to_value (data) amount previously in the updated attribute shall be given as the 
+response parameter. 
+data ::= double-long, scaled according to thce urrency attribute of the 
+“Account” object.  
+and shall be specified by the implementer (e.g. button push, meter 
+process, script etc.) 
+data ::= integer (0) 
+4.6.3.5  Additional notes 
+the object identified byt he commodity_reference structure. 
+
+unit_charge_active ::= structure 
+{ 
+charge_per_unit_scaling:  charge_per_unit_scaling_type, 
+commodity_reference:  commodity_reference_type, 
+charge_table:     charge_table_type 
+} 
+Where: 
+charge_per_unit_scaling_type: := structure 
+{ 
+commodity_scale : integer, 
+price_scale:  integer 
+} 
+
+COSEM Interface Classes and OBIS Object Identification System, Edition 12. 1
+
+commodity_reference_type ::= structure 
+{ 
+class_id:          long-unsigned, 
+logical_name:      octet-string, 
+attribute_index:    integer 
+} 
+
+charge_table_type ::= array  charge_table_element 
+
+charge_table_element ::= structure 
+{ 
+index:             octet-string, 
+charge_per_unit:   long 
+} 
+
+effect. 
+
+data ::= array charge_table_element 
+charge_table_element ::=  structure 
+{ 
+index:             octet-string, 
+charge_per_unit:   long 
+} 
+See the charge_table_element  of the unit_charge_active attribute for a 
+charge (data) NOTE 18   This method has no effect on the olclection activity or the priority of the “Charge” 
+object. 
+data ::= integer (0) 
+collect (data) Where  charge_type <> (0) consumption_based_collectio,n this method 
+Where charge_type = (0) consumption_based_collection, this method has 
+no effect. 
+data ::= integer (0) 
+update_total_ Allows the update of the total_amount_remaining attribute. The value is to 
+(data)        total_amount_remaininga ttribute shall be given as the response parameter .
+NOTE 19   This does not affect total_amount_paid. 
+data ::= dou-long, sble  caled according to the price_socf ale 
+unit_charge_active. 
+remaining     given as the response parameter .
+(data)        NOTE 20   total_amount_remainingi s set without affecting total_amount_paid, .
+data ::= dou-long, sble  caled according to the price_socf ale 
+unit_charge_active,  
+
+token_description :: = array  token_description_element 
+token_description_element ::=   octet-string 
+token_delivery_ Reflects the route by which the last token was received. 
+Authentication and Token result, while other specifications may have differing terms. 
+
+token_status ::= structure 
+{ 
+status_code:  enum, 
+data_value:   bit-string 
+} 
+
+server in the form of octe-tstring. If successful it may return the 
+token_status attribute. 
+data ::= octet-string, and returns token_status 
+Additional notes 
+logical device of the real equipment (the secondary station) has been 
+programmed. See IEC 62056-3-1:2013, 5.2.4. 
+primary_address_list_type ::=   array unsigned 
+tabi_list            Represents the list of the TAB(i) for which the real equipment (the 
+attribute is made of only one element of value 0, the value used for 
+the discovery process. 
+tabi_list_type ::=  array tabi_element 
+
+array    initialization_string_element 
+
+initialization_string_element ::= structure 
+{ 
+request:              octet-string, 
+response:             octet-string, 
+delay_after_response:  long-unsigned 
+} 
+If the array contains more than one initialization_string_element, the 
+array    window_element 
+
+window_element ::= structure 
+{ 
+start_time:  octet-string, 
+end_time: octet-string 
+} 
+start_time and end_time are formatted as specified in 4.1.6.1 for date-time. 
+rings        are distinguished: The number of rings within the window defined by the 
+attribute listening_window and the number of rings outside the listening_window. 
+nr_rings_type ::= structure 
+{ 
+nr_rings_in_window:    unsigned (0 = no connection in the window), 
+nr_rings_out_of_window : unsigned (0 = no connection outside the window) 
+} 
+If the number of rings inside and outside the window is the same, the modem 
+This requires the presence of a calling line identificat(iConLI ) service in the 
+communication network used. 
+list_of_allowed_callers ::= array list_of_allowed_callers_element 
+
+list_of_allowed_callers_element ::= structure 
+{ 
+caller_id: octet-string, 
+call_type: enum 
+} 
+-  the caller_id element holds a calling number from which calls or messages 
+array    window_element 
+
+window_element ::= structure 
+{ 
+start_time:  octet-string, 
+end_time: octet-string 
+} 
+start_time and end_time are formatted as specified in 4.1.6.1 for date-time. 
+array    destination 
+
+destination ::= octet-string 
+Method descriptio n
+connect (data)  Initiates the connection process to the communication network according to 
+the rules defined via the mode attribute .
+data ::= integer (0) 
+4.7.7  GPRS modem setup (class_id = 45, version = 0) 
+value; 
+-  the second element defines the requested parameters. 
+quality_of_service ::= structure 
+{ 
+default:      qos_element, 
+requested:    qos_element 
+} 
+qos_element ::= structure 
+{ 
+precedence:   unsigned, 
+delay:        unsigned, 
+reliability:  unsigned, 
+peak throughput:  unsigned, 
+mean throughput:  unsigned 
+} 
+
+(5)  ... (255) reserved 
+cell_info  Represents the cell information: 
+cell_info_type ::= structure 
+{ 
+cell_ID:       long-unsigned, 
+location_ID:   long-unsigned, 
+signal_quality:  unsigned, 
+ber:           unsigned 
+} 
+Where:  
+adjacent_cells  array   adjacent_cell_info 
+
+adjacent_cell_info ::= structure 
+{ 
+cell_ID:   long-unsigned, 
+signal_quality: unsigned 
+} 
+Where: 
+array   capture_definition_element 
+
+capture_definition_element ::= structure 
+{ 
+data_information_block:  octet-string, 
+value_information_block: octet-string 
+} 
+NOTE 2  The elements data_information_block and value_information_block correspond to Data 
+Method descriptio n
+slave_install  Installs a slave device, which is yet unconfigured (its primary address is 0 ).
+(data)         data ::= unsigned 
+This method can be successfully invoked only if the current value of the 
+NOTE 6   A new M-Bus slave can be installed only once the v altheue o  primf ary_address 
+attribute is 0. 
+data ::= unsigned (0) 
+capture (data) Captures values – as specified by the capture_definition attribute – from the 
+M-Bus slave device .
+data ::= integer (0) 
+reset_alarm    Resets alarm state of the M-Bus slave device. 
+(data)         data ::= integer (0) 
+synchronize_   Synchronize the clock of the- BMus slave device with that of the MBu-s 
+clock (data)   client device. 
+data ::= integer (0) 
+data_send (data) Sends data to the M-Bus slave device .
+data ::= array    data_definition_element 
+data_definition_element ::= structure 
+{ 
+data_information_block:   octet-string, 
+value_information_block:  octet-string, 
+data:                 CHOICE 
+
+
+DLMS User Association  2015-12-21      DLMS UA 1000-1 Ed. 12.1  210/492 
+© Copyright 1997-2015 DLMS User Association 
+
+COSEM Interface Classes and OBIS Object Identification System, Edition 12. 1
+
+data_send (data)  { 
+(continued)           -- simple data types 
+null-data             [0], 
+bit-string            [4], 
+double-long           [5], 
+double-long-unsigned   [6], 
+octet-string          [9], 
+visible-string        [10], 
+utf8-string           [12], 
+bcd                   [13] 
+integer               [15], 
+long                  [16], 
+unsigned              [17], 
+long-unsigned         [18], 
+long64                [20], 
+long64-unsigned       [21], 
+float32               [23], 
+float64               [24] 
+} 
+set_encryption_ Sets the encryption key in tBhe Mus cl-ient and enables encrypted 
+key (data)    communication with the M-Bus slave device .
+data ::= octet-string (encryption_key) 
+After the installation of the MB- us slave, the M-Bus client holds an empty 
+set_encryption_key method. 
+transfer_key  Transfers an encryption key to the M-Bus slave device. 
+(data)        data ::= octet-string (encrypted_key) 
+Before encrypted M-Bus frames can be used, an operational encryption key 
+defined. 
+array window_element  
+window_element ::= structure  
+{  
+start_time: octet-string,  
+end_time: octet-string  
+}  
+start_time and end_time are foratmted as specified in 4.1.6.1 for 
+counter         frame received and differentiated by client identifiers .
+array   broadcast_frame_counter_definition 
+broadcast_frame_counter_definition ::=  structure 
+{ 
+client_id:  unsigned, 
+counter:    double-long-unsigned, 
+time_stamp: date-time 
+} 
+The default value is 0. 
+capture_time      Holds the time stamp of the most recent change of the value of the 
+attributes 2, 4, 6, 7 or 8. 
+capture_time ::=  structure 
+{ 
+attribute_id: unsigned, 
+time_stamp:   date-time 
+} 
+Method descriptio n
+reset (data)      Clears all counters, received_signal_strength, link_status and 
+capture_time. 
+data ::= integer(0) 
+NOTE 2    Channel_id management is outside the scope of the specification of this IC.  
+datagram with one of these IP addresses in the destination IP address field, it 
+shall consider that this datagram is addressed to it .
+multicast_IP_address ::= array double-long-unsigned 
+IP_options    Contains the necessary parameters to support the selected IP opti ofnsor  –
+example Datagram time-stamping or security services (IPSec) .
+IP_options ::= array  IP_options_element 
+IP_options_element ::= structure 
+{ 
+IP_Option_Type:    unsigned, 
+IP_Option_Length:  unsigned, 
+IP_Option_Data:    octet-string 
+} 
+NOTE  In all cases, as specified in RFC 791, the IP_Option_Length field includes the total length of all three 
+Method descriptio n
+add_mc_IP_    Adds one multicast IP address to the multicast_IP_address array. 
+address       IP_Address ::= double-long-unsigned 
+(IP_Address) 
+delete_mc_IP_ Deletes one IP Address from the multicast_IP_addre sarsray. The IP Address to be 
+address       deleted is identified by its value. 
+(IP_Address)  IP_Address ::= double-long-unsigned 
+get_nbof_mc_  Returns the number of IP Addresses contained in the multicast_IP_address array. 
+IP_ addresses 
+(data)        data ::= unsigned 
+————————— 
+or global unicast addresses). An IPv6 address can be either (static) or 
+(dynamic) or both. 
+unicast_IPv6_addresses ::= array octet-string 
+The format of each unicast IPv6 address shall be as specified in RFC 351.3 
+shall be written. 
+multicast_IPv6_ Contains an array of IPv6 addresses used for multicast .
+addresses       multicast_IPv6_addresses ::= array octet-string 
+The format of each multicast IPv6 address shall be as specified in RFC 
+shall be written. 
+gateway_IPv6_   Contains the IPv6 addresses of the IPv6 gateway device. 
+addresses       gateway_IPv6_addresses ::= array octet-string 
+The format of each gateway IPv6 address shall be as specified inR FC 3513. 
+array neighbor_discovery_setup 
+
+neighbor_discovery_setup ::= structure 
+{ 
+RS_max_retry:     unsigned, 
+RS_retry_wait_time: long-unsigned, 
+RA_send_period:   double-long-unsigned 
+} 
+Where: 
+Method descriptio n
+add_IPv6_       Adds one IPv6 address for the physical interface to the IPv6 address array .
+address (data)  data ::= structure 
+{ 
+IPv6_address_type:  enum, 
+IPv6_address:     octet_string 
+} 
+Where IPv6_address_type defines the type of IPv6 addresst o add: 
+remove_IPv6_    Removes one IPv6 address for the physical interface to the IPv6 address 
+address (data)  array. 
+data ::= structure 
+{ 
+IPv6_address_type:  enum, 
+IPv6_address:     octet-string 
+} 
+Where IPv6_address_type defines the type of IPv6 address to remove: 
+LCP_options Contains the necessary parameters to support the selected LCP configuration 
+options. 
+LCP_options_type ::= array LCP_options_type_element 
+
+LCP_options_type_element ::=  structure 
+{ 
+LCP_Option_Type: unsigned, 
+LCP_Option_Length: unsigned, 
+LCP_Option_Data:  CHOICE 
+{ 
+structure     [2] -- for Callback-data 
+boolean       [3] -- for ProtF-Compr and AdCtr-Compr, 
+double-long-unsigned [6] -- for ACCM and Mag-Num, 
+unsigned      [17] -- for FCS-Alternatives, 
+long-unsigned  [18] -- for MRU and Auth-Prot 
+} 
+} 
+ensuring that the remote site can connect only from a single location as 
+defined by the callback number .
+callback_data ::= structure 
+
+COSEM Interface Classes and OBIS Object Identification System, Edition 12. 1
+
+LCP_options  { 
+(continued)    callback_active:   boolean,  // default: false, 
+callback_data_length:  unsigned, 
+callback_operation:  unsigned, 
+callback_message:  octet-string 
+} 
+Where: 
+Control Protocol module of the PPP–  that allow the negotiation of desirable 
+Internet Protocol parameters. For details on IPCP, please refer to RFC 1332. 
+IPCP_options_type ::= array  IPCP_options_type_element 
+
+IPCP_options_type_element ::=  structure 
+{ 
+IPCP_Option_Type:  unsigned, 
+IPCP_Option_Length:  unsigned, 
+IPCP_Option_Data:  CHOICE 
+{ 
+array             [1] -- for Pref-Peer-IP, 
+-- each IP address is of type double-long-unsigned 
+boolean           [3] -- for GAO and USIP, 
+double-long-unsigned  [6] -- for Pref-Local-IP, 
+long-unsigned     [18] -- for IP-Comp-Prot 
+} 
+} 
+end device during the IP Address negotiation phase or no t.
+PPP_          Contains the parameters required by the PPP authentication procedure used. 
+authentication PPP_auth_type ::= CHOICE 
+{ 
+null-data [0] -- used when no authentication is required, 
+structure       [2] -- PAP_login or CHAP_algorithm or EAP_params 
+} 
+
+PAP_login ::=  structure 
+{ 
+user-name:   octet-string, 
+PAP-password:  octet-string 
+} 
+
+
+CHAP_algorithm ::= structure 
+{ 
+user-name:   octet-string, 
+algorithm_id: unsigned 
+} 
+Possible values for CHAP-algorithm-id parameter today are as follows :
+NOTE 6 The PPP Challenge Handshake Authentication Protocol (CH)A iPs specified in 
+RFC 1994. 
+EAP_params ::= structure 
+{ 
+md5_challenge (Type 4):    boolean, 
+one_time_password (OTP, Type 5):   boolean, 
+generic_token_card (GTC, Type 6):  boolean 
+} 
+NOTE 7 The Extensible Authentication Protocol (EAP) is specified in RFC 3748. 
+The default value is 98 dBμV. 
+frequencies      Contains frequencies required for S-FSK modulation. 
+frequencies_type ::= structure 
+{ 
+mark_frequency:    double-long-unsigned, 
+space_frequency:    double-long-unsigned 
+} 
+The default unit is Hz. 
+Contains a set of MAC group addresses used for broadcast purposes  .
+array  mac-address 
+mac-address ::=  long-unsigned 
+
+The Initiator system is identified with its System Title, MAC addres asnd L-
+SAP selector: 
+initiator_descriptor ::= structure 
+{ 
+system_title:  octet-string, 
+MAC_address:  long-unsigned, 
+L_SAP_selector:  unsigned 
+} 
+The size and the structure of the system title may be specified in system 
+array synchronization_couple s
+
+synchronization_couples ::= structure 
+{ 
+mac_address:           long-unsigned, 
+synchronizations_counter: double-long-unsigned 
+} 
+This variable counts the number of synchronization processes performed 
+When a synchronizations-counter field reaches the maximum value, it 
+automatically returns to 0 on the next increment .
+The maximum number of synchronization couples {mac-address, 
+synchronizations-counter} contained in this variable should be specifiedin  
+the implementation specifications. When this maximum is reached, the 
+_listing         IEC 61334-4-512:2001, 5.8. 
+structure 
+{ 
+nb_physical_layer_desynchronization:   double-long-unsigned, 
+nb_time_out_not_addressed_desynchronization:  double-long-unsigned, 
+nb_timeout_frame_not_OK desynchronization:  double-long-unsigned, 
+nb_write_request_desynchronization:   double-long-unsigned, 
+nb_wrong_initiator_desynchronization:   double-long-unsigned 
+} 
+This variable counts the number of desynchronizations that occurred 
+array    broadcast-couples 
+
+broadcast-couples ::= structure 
+{ 
+source-mac-address: long-unsigned, 
+frames-counter:    double-long-unsigned 
+} 
+It counts the broadcast frames received by the server system and issued 
+system. When the frames-counter field reaches its maximum value, it 
+automatically returns to 0 on the next increment.  
+The maximum number of broadcas-tcouples {source-mac-address, 
+frames-counter} contained in this variable should be specified in the 
+implementation specifications. When this maximum is reached, the 
+Method descriptio n  
+reset (data)  Clears all counters. 
+data ::= integer (0) 
+4.10.7  IEC 61334-4-32 LLC setup (class_id = 55, version = 1) 
+reply_status_list array  reply_status 
+(continued)   
+reply_status ::= structure 
+{ 
+L_SAP_selector:    unsigned, 
+length_of_waiting_L_SDU: unsigned 
+} 
+
+array  system-title 
+
+system-title ::= octet-string 
+
+reset (data)    This method is used for resetting all the counters held by an instance of 
+this interface class. 
+data ::= integer (0) 
+4.12.9  PRIME NB OFDM PLC MAC network administration data( class_id = 85, version = 
+mac_list_ PIB attribute 0x0052: List of entries in multicast switching table. This list is not 
+multicast_ maintained in service nodes in a Terminal functional state. 
+entries   mac_list_multicast_entries_type ::= array mac_list_multicast_entries_elemen t
+
+mac_list_multicast_entries_element ::= structure 
+{ 
+mcast_entry_LCID : integer, -- LCID of multicast group 
+mcast_entry_members:  long      -- number of child nodes 
+} 
+The number of child nodes is the number of the members of this group, 
+mac_list_ PIB attribute 0x0053: Switch table. This table is not maintained by service 
+switch_table nodes in a Terminal state. 
+mac switch_table ::= array   stbl_entry_LSID 
+stbl_entry_LSID ::=  long   -- SID of attached Switch node 
+mac_list_ PIB attribute 0x0055: Direct table .
+direct_table mac_direct_table ::= array  mac_direct_table_element 
+
+mac_direct_table_element ::= structure 
+{ 
+dconn_entry_src_SID:  long, 
+dconn_entry_src_LNID:   long, 
+dconn_entry_src_LCID:   long, 
+dconn_entry_dst_SID:  long, 
+dconn_entry_dst_LNID:   long, 
+dconn_entry_dst_LCID:   long, 
+dconn_entry_DID:   octet-string (size 6 bytes) 
+} 
+
+-  dconn_entry_DID is the EU-I48 of the direct switch. 
+mac_list_    PIB attribute 0x0056: List of switch nodes whose beacons are received. 
+available_   mac_list_available_switches ::= array  mac_list_available_switches_element 
+switches      
+mac_list_available_switches_element ::= structure 
+{ 
+slist_entry_SNA:   octet-string (size 6 bytes), 
+slist_entry_LSID:   long, 
+slist_entry_level:  integer, 
+slist_entry_rx_level: integer, 
+slist_entry_rx_snr:  integer 
+} 
+Where: 
+node is connected through. For other nodes is contains also entries for every 
+directly connected child node. 
+mac_list_phy_comm ::= array   phy_comm_element 
+
+COSEM Interface Classes and OBIS Object Identification System, Edition 12. 1
+
+mac_list_     phy_comm_element ::= structure 
+phy_comm      { 
+(continued)        phy_Comm_EUI:          octet-string, 
+phy_Comm_Tx_Pwr:       integer, 
+phy_Comm_Tx_Cod:       integer, 
+phy_Comm_Rx_Cod:       integer, 
+phy_Comm_Rx_Lvl:       integer, 
+phy_Comm_SNR:          integer, 
+phy_Comm_Tx_Pwr_Mod:   integer, 
+phy_Comm_Tx_Cod_Mod:  integer, 
+phy_Comm_Rx_Cod_Mod:  integer 
+} 
+Where: 
+reset (data)  This method is used for resetting al lthe entries (to an array of 0 elements) of 
+the attributes 2 to 6 of the instance of this interface class .
+data ::= integer (0) 
+4.12.10  PRIME NB OFDM PLC MAC address setup (class_id = 43, version = 0) 
+reset (data)             This method forces a reset of the object. By invoking this 
+method, the value of all counters is set to 0 .
+data::= integer (0) 
+4.13.4  G3-PLC MAC setup (class_id = 91, version = 1) 
+written. 
+array mac_GMK 
+mac_GMK ::= structure 
+{ 
+key_id:  unsigned, 
+key:   octet-string 
+} 
+key_id        The Key Identifier used to refer to this key, 
+represents one PLC direct neighbour of the device .
+array neighbour_table 
+neighbour_table ::= structure 
+{ 
+short_address:           long-unsigned, 
+payload_modulation_scheme: boolean, 
+tone_map:                bit-string, 
+modulation:              enum, 
+tx_gain:                 integer, 
+tx_res:                  enum, 
+tx_coeff:                bit-string, 
+lqi:                     unsigned, 
+phase_differential       integer, 
+TMR_valid_time:          unsigned, 
+neighbour_valid_time:    unsigned 
+} 
+NOTE 1   This table is actualized each time any frame is received from a 
+The method invocation parameter contains a 
+mac_short_address. 
+data ::= long-unsigned 
+The response parameter includes the neighbour table for this 
+mac_short_address. 
+data ::= array neighbour_table 
+where mac_neighbour_table is as defined in the 
+
+array routing_configuration 
+routing_configuration::= structure 
+{ 
+adp_net_traversal_time:  unsigned, 
+adp_routing_table_entry_TTL: long-unsigned, 
+adp_Kr:                  unsigned, 
+adp_Km:                  unsigned, 
+adp_Kc:                  unsigned, 
+adp_Kq:                  unsigned, 
+adp_Kh:                  unsigned, 
+adp_Krt:                 unsigned, 
+adp_RREQ_retries:        unsigned, 
+adp_RREQ_RERR_wait:      unsigned, 
+adp_blacklist_table_entry_TTL: long-unsigned, 
+adp_unicast_RREQ_gen_enable: boolean, 
+adp_RLC_Enabled:         boolean, 
+adp_add_rev_link_cost:   unsigned 
+} 
+adp_net_      PIB attribute 0x11: Maximum time that a 
+adp_routing_table  PIB attribute 0x0C: Contains the routing table. 
+array routing_table 
+routing_table ::= structure 
+{ 
+destination_address:  long-unsigned, 
+next_hop_address:   long-unsigned, 
+route_cost:     long-unsigned, 
+hop_count:      unsigned, 
+weak_link_count:  unsigned, 
+valid_time:     long-unsigned 
+} 
+
+
+array context_information_table 
+context_information_table ::= structure 
+{ 
+CID:        bit-string, 
+context_length:  unsigned, 
+context:    octet-string, 
+C:          boolean, 
+valid_lifetime:   long-unsigned 
+} 
+CID        Corresponds to the 4b-it context information 
+array blacklisted_neighbour_set 
+blacklisted_neighbour_set: := structure 
+{ 
+blacklisted_neighbour_address: long-unsigned, 
+valid_time:              long-unsigned 
+} 
+blacklisted_  The 16bit a-  ddress of the blacklisted 
+received by this device. 
+array broadcast_log_table 
+broadcast_log_table ::= structure 
+{ 
+source_address:      long-unsigned, 
+sequence_number:     unsigned, 
+valid_time:          long-unsigned 
+} 
+source_      The 16-bit source address of a broadcast 
+device belongs. 
+array group_address 
+group_address ::= long-unsigned 
+group_address  Group address to which this node has been 
+array  active_device 
+
+active_device ::= structure 
+{ 
+mac_address:         octet-string,  
+status:              bit-string, 
+maxRSSI:             integer, 
+averageRSSI:         integer, 
+minRSSI :            integer, 
+maxLQI:              unsigned, 
+averageLQI:          unsigned, 
+minLQI :             unsigned, 
+last_communication_date-time:  octet-string, 
+number_of_hops:      unsigned, 
+transmission_failures:    unsigned, 
+transmission_successes:   unsigned, 
+application_version:   unsigned, 
+stack_version:       unsigned 
+} 
+
+
+they refer to the last day.
+status ::= bit-string[8] 
+Bit 0 = Authorised on PAN 
+actually join the devices to the network, they are just authorised to join at 
+some time in the future .
+data ::= structure 
+{ 
+ieee_address:    octet-string, 
+key_type:        enum, 
+key:             octet-string, 
+device_type:     enum, 
+} 
+
+                                                                                                                                                                                                                                                        COSEM Interface Classes and OBIS Object Identification System, Edition 12. 1
+                                                                                                 
+                                                                                                register_device                                                                                                                                                                                                device-type ::= enum 
+                                                                                                (data)                                                                                                                                                                                                                                                     Value                                                                                                                                                                                                                                                                                                             Description 
+                                                                                                unregister_                                                                                                                                                                                                    This method is called externally to instruct the coordinator that a device 
+                                                                                                device  (data)                                                                                                                                                                                                 should leave the network. 
+                                                                                                                                                                                                                                                                                                               data ::=                                                                                                              octet-string 
+                                                                                                                                                                                                                                                                                                               It holds the ieee_address. The length of the octet-string is 8 octets. 
+                                                                                                unregister_all_                                                                                                                                                                                                This method is called externally to instruct the coordinator that all devices 
+                                                                                                devices (data)                                                                                                                                                                                                 should leave the network. 
+                                                                                                                                                                                                                                                                                                               data ::= integer (0) 
+                                                                                                                                                                                                                                                                                                               NOTE 4                                                                                                                The likely use of this function is to ensure a network is empty of devices prior to 
+NOTE 5   The storage location of the back-up is not currently defined and is an internal function 
+of the DLMS/COSEM server. 
+data ::= integer (0) 
+
+Method invocation return parameters are detailed below  :
+
+data ::= structure 
+{ 
+date_time:             octet-string, 
+extended_PAN_ID:       octet-string, 
+devices_to_backup:     array device_to_backup 
+} 
+
+string is 8. 
+
+device_to_backup ::= structure 
+{ 
+MAC_address:           octet-string, 
+hashed_TC_link_key:    octet-string  
+} 
+
+(data)           information. The storage location of the b-acupk is not currently defined 
+and is an internal function of the DLMS/COSEM Server .
+data ::= structure 
+{ 
+extended_PAN_ID:       octet-string, 
+devices_to_restore:    array     device_to_restore 
+} 
+
+COSEM Interface Classes and OBIS Object Identification System, Edition 12. 1
+
+restore_PAN  device_to_restore ::= structure 
+(data)       { 
+(continued)      MAC_address:     octet-string, 
+hashed_TC_link_key: octet-string 
+} 
+
+identify_device This method is called externally to instruct a device to identify itself to an 
+(data)       engineer present on site, for example by sounding a buzzer  .
+data ::= ieee_address 
+
+remove_mirror This method causes the removal of a ZigBee® m itrharort reflects the real 
+(data)       device identified by the mac_address parameter .
+data ::= structure 
+{ 
+mac_address:  octet-string, 
+mirror_control:  bit-string 
+} 
+Where: 
+key (data)      key and propagate it to all devices on the PAN. For details of ZigBee® key 
+management, see the ZigBee® specification .
+data ::= integer (0) 
+update_link_key This method requests that the ZigBee® coordinator updates the link key 
+(data)          and propagate it to the identified device on the PAN. For details of ZigBee® 
+key management, see the ZigBee® specification .
+data ::= ieee_address 
+ieee_address: octet-string 
+create_PAN      This method is called externally to instruct a coordinator to create a 
+(data)          network using the configuraiton held in the ZigBee® SAS startup object .
+data ::= integer (0) 
+remove_PAN      This method is called externally to instruct a coordinator to destroy a 
+(data)          network by turning off the ZigBee® radio and removing all of the settings 
+associated with the current PAN. 
+data ::= integer (0) 
+
+5.1  New versions of interface classes 
+Any modification of an existing IC affecting the transmission of service requests or responses 
+results in a new version (version ::= version+1) and shall be documented accordingly. The 
+following rules shall be followed: 
+array       entry 
+
+entry ::= structure 
+Instance Specific 
+array       ObjectDefinition 
+
+ObjectDefinition ::= structure 
+{ 
+logical_name:     octet-string, 
+class_id:         long-unsigned, 
+attribute_index:  unsigned 
+} 
+where attribute_index is a pointer to the attribute within the object. 
+array (of instance_ out Sorted sequence of entries containing the 
+specific_value)        requested values of the capture objects  .
+data ::= structure {restricting_object; from_value; to_value; selected_values} 
+In the response “data” is an array of instance_specific_value. 
+array of instance_ out Sorted sequence of entries containing the 
+specific_value         requested values of the capture objects. 
+data ::= structure {from_index; to_index; selected_values}. 
+In the response “data” is an array of instance_specific_value. 
+4
+the first attribute), class_id, version  and logical_name .
+Objlist_type ::= array  objlist_element 
+objlist_element ::= structure 
+{ 
+short_name:  long, 
+class_id:   long-unsigned, 
+version =   unsigned, 
+logical_name: octet-string 
+} 
+Method descriptio n
+getlist_by_   Delivers the subset of the object_list for a specific class_id .
+classid (data) data ::= class_id: long-unsigned 
+For the response: data ::= objlist_type 
+getobj_by_    Delivers the entry of the object_list for a specificl ogical_namea  nd class_id. 
+logicalname   data ::= structure 
+(data)        { 
+class_id:   long-unsigned, 
+logical_name: octet-string 
+} 
+————————— 
+COSEM Interface Classes and OBIS Object Identification System, Edition 12. 1
+
+For the response: data ::= objlist_element 
+read_by_         Reads attributes for specific objects. The objects are specified by their 
+logicalname      class_id and their logical_name. 
+(data)           data ::= array AttributeIdentification 
+
+AttributeIdentification ::= structure 
+{ 
+class_id:     long-unsigned, 
+logical_name: octet-string, 
+attribute_index: unsigned 
+} 
+where attribute_index is a pointer (i.e. offset) to the attribute within the objec t.
+array    ObjectIdentification 
+
+ObjectIdentification ::= structure 
+{ 
+class_id:     long-unsigned, 
+logical_name: octet-string 
+} 
+For the response  
+data ::= array     AccessDescription 
+
+AccessDescription ::= structure 
+{ 
+read_attributes: bit-string, 
+write_attributes: bit-string, 
+services:     bit-string 
+} 
+The position in the bi-strting identifies the attribute/service (first position  ↔
+whether the attribute/service is available (bit set) or not available (bit clea r).
+change_LLS_      Changes the LLS secret (for example password) .
+secret (data)    data ::= octet-string new LLS secret 
+change_HLS_      Changes the HLS secret (for example encryption key) .
+secret (data)                    6
+data ::= octet-string  new HLS secret 
+
+
+get_HLS_     Asks the server for the client “challenge” (for example random number ).
+challenge (data) data ::= octet-string client challenge 
+reply_to_HLS_ Delivers the “secretly” processed “challenge” back to the server . 
+challenge (data) data ::= octet-string client’s response to the challenge 
+If the authentication is accepted, then the responseis  successful [0]. If the 
+version and logical_name. The base_name is the DLMS objectName of the 
+first attribute (logical_name) .
+objlist_type ::= array objlist_element 
+
+objlist_element ::= structure 
+{ 
+base_name:  long, 
+class_id:  long-unsigned, 
+version =  unsigned, 
+logical_name: octet-string 
+} 
+) to the attribute object_l imstay be available 
+               Delivers the subset of the object_list for a specific 
+1              class_id: long-unsigned      class_id. 
+               For the response: data ::= objlist_type 
+structure                    Delivers the entry of the object_list for a specific 
+{                            class_id and logical_name. 
+2               class_id:  long-unsigned,   For the response:  
+logical_name:   octet-string data ::= objlist_element 
+} 
+
+logicalname        and their logical_name. With this method, the parameterized access feature can 
+also be used .
+data ::=    array      attribute_identification 
+    
+attribute_identification ::= structure 
+{ 
+class_id:         long-unsigned, 
+logical_name:     octet-string, 
+attribute_index:  integer 
+} 
+where attribute_index is a pointer (i.e. offset) to the attribute within the objec t.
+their logical_name. With this method, the parameterized access feature can 
+also be used .
+data ::= array   object_identification 
+
+object_identification ::= structure 
+{ 
+class_id:         long-unsigned, 
+logical_name:     octet-string 
+} 
+For the response 
+data ::= array   access_description 
+
+access_description ::= structure 
+{ 
+read_attributes:        bit-string, 
+write_attributes:       bit-string, 
+methods:                bit-string 
+} 
+The position in the bit-string identifies the attribute/method (first position ↔ first 
+methods). 
+change_LLS_             Changes the LLS secre t(for example password). 
+secret (data)           data ::= octet-string          new LLS secret 
+change_HLS_             Changes the HLS secret (for example encryption key). 
+secret (data)           data ::= octet-string b        new HLS secret 
+reply_to_HLS_           The remote invocation of this method delivers the client's “secretly” processed 
+authentication          “challenge StoC” (f(StoC)) back to the server as the data service parameter of 
+(data)                  the invoked Write.request service .
+data ::= octet-string          client’s response to the challenge 
+data ::= octet-string          server's response to the challenge 
+If the authenticatin o is not accepted, then the result parameter in the respons e
+version and logical_name. The base_namei s the DLMS objectName of the 
+first attribute (logical_name) .
+objlist_type ::= array  objlist_element 
+
+objlist_element ::= structure 
+{ 
+base_name:  long, 
+class_id:   long-unsigned, 
+version:    unsigned, 
+logical_name: octet-string    
+} 
+selective access (see 4.1.4) to the attribute object_list may be available. The 
+in the array of objlist_element and the array of access_right_element shall 
+also be the same .
+access_rights_type ::= array  access_rights_element 
+access_rights_element ::= structure 
+{ 
+base_name:      long, 
+attribute_access:   attribute_access_descriptor, 
+method_access:   method_access_descriptor 
+} 
+attribute_access_descriptor ::= array attribute_access_item 
+
+attribute_access_item ::= structure 
+{ 
+attribute_id:  integer, 
+access_mode: enum:  
+(0)  no_access, 
+(1)  read_only, 
+(2)  write_only, 
+(3)  read_and_write, 
+(4)  authenticated_read_only, 
+(5)  authenticated_write_only, 
+(6)  authenticated_read_and_write 
+
+access_selectors:  CHOICE  
+{ 
+null-data   [0], 
+array  integer [1] 
+} 
+} 
+COSEM Interface Classes and OBIS Object Identification System, Edition 12. 1
+
+method_access_descriptor ::= array  method_access_item 
+
+method_access_item ::= structure 
+{ 
+method_id:     integer, 
+access_mode:   enum: 
+(0)  no_access, 
+(1)  access, 
+(2)  authenticated_access 
+} 
+) to the attribute access_righistst _lmay be 
+Delivers the subset of the object_list for a specific 
+1   class_id: long-unsigned 2 class_id. 
+For the response: data ::= objlist_type 
+structure                 Delivers the entry of the object_list for a specific 
+2   {                     2   class_id and logical_name. 
+class_id:  long-unsigned, For the response: data ::= objlist_element 
+logical_name: octet-string 
+} 
+In the case of attribute 2, delivers the entry of the 
+object_list for a specific base_name. 
+3   base_name: long       2, 3 For the response: data ::= objlist_element 
+In the case of attribute 3, delivers the entry of the 
+access_rights_list for a specific base_name. 
+For the response: data ::=access_rights_element 
+
+logicalname and their logical_name. With this method, the parameterized access feature can 
+(data)     also be used .
+data ::= array attribute_identification 
+
+attribute_identification ::= structure 
+{ 
+class_id:     long-unsigned, 
+logical_name:  octet-string, 
+attribute_index:  integer 
+} 
+where attribute_index is a pointer (i.e. offset) to the attribute within the objec t.
+change_secret     Changes the LLS or HLS secre (tfor example password). 
+(data)                                               
+data ::= octet-string  new secret
+NOTE 2      The structure of the “new secr”et depends on the security mechanism implemented. The 
+(data)            as the data service parameter of the Read.request primitive invoked with 
+parameterised access .
+data ::= octet-string  client’s response to the challenge 
+If the authentication is accepted, then the response (Read.confirm primitive) 
+the client’s challenge to the server, f(CtoS) in the data service parameter of the 
+Read.response service. 
+data ::= octet-string  server's response to the challenge 
+If the authentication is not accepted, then the result parameter in the response 
+version and logical_name. The base_name is the DLMS objectName of the first 
+attribute (logical_name) .
+objlist_type ::= array  objlist_element 
+objlist_element ::= structure 
+{ 
+base_name:    long, 
+class_id:     long-unsigned, 
+version:      unsigned, 
+logical_name: octet-string    
+} 
+) to the attribute object_li smt ay be available. The 
+number  –  and preferably, the or–d erof  the elements in the array of 
+objlist_element and the array of access_right_element shall also be the same. 
+access_rights_type ::= array  access_rights_element 
+access_rights_element ::= structure 
+{ 
+
+DLMS User Association  2015-12-21       DLMS UA 1000-1 Ed. 12.1   303/492 
+© Copyright 1997-2015 DLMS User Association 
+
+COSEM Interface Classes and OBIS Object Identification System, Edition 12. 1
+
+base_name:    long, 
+attribute_access:   attribute_access_descriptor, 
+method_access:   method_access_descriptor 
+} 
+
+attribute_access_descriptor ::= array attribute_access_item 
+
+attribute_access_item ::= structure 
+{ 
+attribute_id:  integer, 
+access_mode: enum: 
+(0) no_access, 
+(1) read_only, 
+(2) write_only, 
+(3) read_and_write, 
+(4) authenticated_read_only, 
+(5) authenticated_write_only, 
+(6) authenticated_read_and_write 
+
+access_selectors:  CHOICE  
+{ 
+null-data  [0], 
+array  integer [1] 
+} 
+} 
+
+method_access_descriptor ::= array  method_access_item 
+method_access_item ::= structure 
+{ 
+method_id:    integer, 
+access_mode:  enum: 
+(0)  no_access, 
+(1)  access, 
+(2)  authenticated_access 
+} 
+selective access (see 4.1.4) to the attribute access_rights_list may be available 
+array  user_list_entry 
+
+user_list_entry ::=  structure 
+{ 
+user_id: unsigned, 
+user_name: visible-string 
+} 
+Where: 
+established. 
+current_user Holds the identifier of the current user .
+current_user ::= user_list_entry (see above) 
+If the user_list is empty, then current_user shall be a structure {user_id: 
+unsigned 0, user_name: visible string of 0 elements }
+Parameters for selective access to the object_lis tand access_rights_list attribute 
+Delivers the subset of the object_list for a specific 
+1   class_id: long-unsigned 2 class_id. 
+For the response: data ::= objlist_type 
+structure                Delivers the entry of the object_list for a specific class_id 
+2   {                    2   and logical_name. 
+class_id: long-unsigned, For the response: data ::= objlist_element 
+logical_name: octet-string 
+} 
+In the case of attribute 2, delivers the entry of the 
+object_list for a specific base_name. 
+3   base_name: long     2, 3 For the response: data ::= objlist_element 
+In the case of attribute 3, delivers the entry of the 
+access_rights_list for a specific base_name. 
+For the response: data ::=access_rights_element 
+
+logicalname       and their logical_name. With this method, the parameterized access feature can 
+(data)            also be used .
+data ::= array    attribute_identification 
+
+attribute_identification ::= structure 
+{ 
+class_id:              long-unsigned, 
+logical_name:          octet-string, 
+attribute_index:       integer 
+} 
+where attribute_index is a pointer (i.e. offset) to the attribute within the objec t.
+change_secret     Changes the LLS or HLS secre (tfor example password). 
+(data)                                               
+data ::= octet-string  new secret
+NOTE 3      The structure of the “new secr” etdepends on the security mechanism implemented. The 
+(data)            as the data service parameter of the Read.request primitive invoked with 
+parameterised access .
+data ::= octet-string  client’s response to the challenge 
+If the authentication is accepted, then the response (Read.confirm primitive) 
+the client’s challenge to the server, f(CtoS) in the data service parameter of the 
+Read.response service. 
+data ::= octet-string  server's response to the challenge 
+If the authentication is not accepted, then the result parameter in the response 
+shall contain a non-OK value, and no data shall be sent back .
+add_user          Adds a user to the user_list. 
+(data)            data ::= user_list_entry (see above) 
+remove_user       Removes a user from the user_list. 
+(data)            data ::= user_list_entry (see above) 
+
+name and the access rights to their attributes and methods within the given 
+application association. 
+object_list_type ::= array  object_list_element 
+
+object_list_element ::= structure 
+{ 
+class_id:     long-unsigned, 
+version:      unsigned, 
+logical_name:  octet-string, 
+access_rights:  access_right 
+} 
+
+access_right ::= structure 
+{ 
+attribute_access:   attribute_access_descriptor, 
+method_access:   method_access_descriptor 
+} 
+
+attribute_access_descriptor ::= array attribute_access_item 
+
+COSEM Interface Classes and OBIS Object Identification System, Edition 12. 1
+
+attribute_access_item ::= structure 
+{ 
+attribute_id:     integer, 
+access_mode:      enum: 
+(0)  no_access, 
+(1)  read_only, 
+(2)  write_only, 
+(3)  read_and_write 
+
+access_selectors:  CHOICE  
+{ 
+null-data    [0], 
+array  integer [1] 
+} 
+} 
+
+method_access_descriptor ::= array method_access_item 
+method_access_item ::=  structure 
+{ 
+method_id:    integer, 
+access_mode:  boolean 
+} 
+Where: 
+partners_ id   within the physical devices hosting these processes, whichb elong to the AA 
+modelled by the “Association LN” object .
+associated_partners_type ::= structure 
+{ 
+client_SAP:   integer,  
+server_SAP:   long-unsigned 
+} 
+The range for the client_SAP is 0…0x7F .
+context_ name  and is referenced by its name during the establishment of an AA. This attribute 
+contains the name of the application context for that AA .
+context_name_type ::=  CHOICE 
+{ 
+context_name_structure   [2], 
+octet-string           [9] 
+} 
+The application context name is specified as OBJECT IDENTIFIER inDL MS UA 
+
+
+context_name_structure ::= structure 
+{ 
+joint_iso_ctt_element:     unsigned, 
+country_element:           unsigned, 
+country_name_element:      long-unsigned, 
+identified_organization_element: unsigned, 
+DLMS_UA_element:           unsigned, 
+application_context_element:  unsigned, 
+context_id_element:        unsigned 
+} 
+Example 1: In the case of context_id(1) the A-XDR encoding is: 02 07 11 02 11 10 12 02 F4 11 05 11 08 11 
+values are hexadecimal). 
+xDLMS_        Contains all the necessary information on the xDLMS context for the given AA .
+context_info  xDLMS-context-type ::= structure 
+{ 
+conformance:          bit-string, 
+max_receive_pdu_size:   long-unsigned, 
+max_send_pdu_size:    long-unsigned, 
+dlms_version_number:   unsigned, 
+quality_of_service:   integer, 
+cyphering_info:       octet-string 
+} 
+Where: 
+
+authentication_  Contains the name of the authentication mechanism for the A A.
+mechanism_     mechanism_name_type ::=  CHOICE 
+name           { 
+mechanism_name_structure    [2], 
+octet-string                [9] 
+} 
+The authentication mechanism name is specified as an OBJECT IDENTIFIER in 
+labels of the OBJECT IDENTIFIER.  
+
+mechanism_name_structure ::= structure 
+{ 
+joint_iso_ctt_element:               unsigned, 
+country_element:                     unsigned, 
+country_name_element:                long-unsigned, 
+identified_organization_element:     unsigned, 
+DLMS_UA_element:                     unsigned, 
+authentication_mechanism_name_element:  unsigned, 
+mechanism_id_element:                unsigned 
+} 
+
+                 equal to one of the class_id-s of the class-list. 
+2               class_list               No access_right information is included. 
+                 class_list ::= array  class_id 
+                 class_id ::= long-unsigned 
+                 Access by object. The fulli nformation record of object instances on the 
+                 object_id_list shall be returned .
+                 object_id_list   ::=  array  object_id 
+3               object_id_list           object_id ::= structure 
+                 { 
+                        class_id:              long-unsigned, 
+                        logical_name:          octet-string 
+                 } 
+                 The full information record of the required COSEM object instance 
+authentication                processed “challenge StoC” (f(StoC)) back to the server as the data service 
+(data)                        parameter of the ACTION.request primitive invoked .
+data ::=       octet-string client’s response to the challenge 
+If the authentication is accepted, then the response (ACTION.confirm 
+"challenge CtoS" (f(CtoS)) back to the client in theda  ta service parameter 
+of the response service. 
+data ::= octet-string server's response to the challenge 
+If the authentication is not accepted, then the result parameter in the 
+change_HLS_secret  Changes the HLS secret (for example encryption key). 
+(data)                                                 a
+data ::= octet-string         new HLS secret 
+
+add_object (data)             Adds the referenced object to the object_list .
+data ::= object_list_element (see above) 
+remove_object                 Removes the referenced object from the object_lis t.
+(data)                        data ::= object_list_element (see above) 
+a The structure of the “new secret” depends on the security mechanism implemented. The “new secret” may contain additional check 
+name and the access rights to their attresibu at nd methods within the given 
+application association. 
+object_list_type ::= array object_list_element 
+
+object_list_element ::= structure 
+{ 
+class_id:     long-unsigned, 
+version:      unsigned, 
+logical_name:  octet-string, 
+access_rights:  access_right 
+} 
+
+access_right ::= structure 
+{ 
+attribute_access:   attribute_access_descriptor, 
+method_access:   method_access_descriptor 
+} 
+attribute_access_descriptor ::= array attribute_access_item 
+
+COSEM Interface Classes and OBIS Object Identification System, Edition 12. 1
+
+attribute_access_item ::= structure 
+{ 
+attribute_id:  integer, 
+access_mode:  enum: 
+
+(0)  no_access, 
+(1)  read_only, 
+(2)  write_only, 
+(3)  read_and_write, 
+(4)  authenticated_read_only, 
+(5)  authenticated_write_only, 
+(6)  authenticated_read_and_write 
+
+
+access_selectors:  CHOICE  
+{ 
+null-data    [0], 
+array  integer [1] 
+} 
+} 
+method_access_descriptor ::= array method_access_item 
+
+method_access_item ::= structure 
+{ 
+method_id:    integer, 
+access_mode:  enum: 
+(0)  no_access, 
+(1)  access, 
+(2)  authenticated_access 
+} 
+
+partners_ id   within the physical devices hosting these APs, which belong to the AA 
+modelled by the “Association LN” object .
+associated_partners_type ::= structure 
+{ 
+client_SAP:   integer,  
+server_SAP:   long-unsigned 
+} 
+The range for the client_SAP is 0…0x7F .
+context_        and is referenced by its name during the establishment of an AA. This attribute 
+name            contains the name of the application context for that AA .
+context_name_type ::=   CHOICE 
+{ 
+context_name_structure   [2], 
+octet-string           [9] 
+} 
+The application context name is specified as OBJECT IDENTIFIER DinL MS 
+When the context_name_type is encoded as a structure, it includes the arc 
+labels of the OBJECT IDENTIFIER. 
+context_name_structure ::= structure 
+{ 
+joint_iso_ctt_element:      unsigned, 
+country_element:            unsigned, 
+country_name_element:       long-unsigned, 
+identified_organization_element: unsigned, 
+DLMS_UA_element:            unsigned, 
+application_context_element:  unsigned, 
+context_id_element:         unsigned 
+} 
+Example 1: In the case of context_id(1) the A-XDR encoding is: 02 07 11 02 11 10 12 02 F4 11 05 11 08 11 
+values are hexadecimal). 
+xDLMS_         Contains all the necessary information on the xDLMS context for the given AA .
+context_info   xDLMS_context_type ::= structure 
+{ 
+conformance:           bit-string, 
+max_receive_pdu_size:   long-unsigned, 
+max_send_pdu_size:     long-unsigned, 
+dlms_version_number:   unsigned, 
+quality_of_service:    integer, 
+cyphering_info:        octet-string 
+} 
+Where: 
+Ed. 8.1:201 9.5. 
+authentication_ Contains the name of the authentication mechanism for the A A.
+mechanism_     mechanism_name_type ::=  CHOICE 
+name           { 
+mechanism_name_structure    [2], 
+octet-string                [9] 
+} 
+The authentication mechanism name is specified as an OBJECT IDENTIFIER in 
+labels of the OBJECT IDENTIFIER.  
+
+mechanism_name_structure ::= structure 
+{ 
+joint_iso_ctt_element:                unsigned, 
+country_element:                      unsigned, 
+country_name_element:                 long-unsigned, 
+identified_organization_element:      unsigned, 
+DLMS_UA_element:                      unsigned, 
+authentication_mechanism_name_element:  unsigned, 
+mechanism_id_element:                 unsigned 
+} 
+Example 3: In the case of mechanism_id(1) the A-XDR encoding is: 02 07 11 02 11 10 12 02 F4 11 05 11 08 
+one of the class_id-s of the class_list. 
+2      class_list No access_right information is included. 
+class_list ::= array class_id 
+
+Access by object. The full information record of object instances on the 
+object_id_list shall be returned .
+object_id_list ::= array object_id 
+3      object_id_list  
+object_id ::= structure 
+{ 
+class_id:  long-unsigned, 
+logical_name:  octet-string 
+} 
+The full information record of the required COSEM object instance shall be 
+4      object_id  returned. 
+object_id ::= structure 
+See above. 
+f(StoC), as the data  service parameter of the ACTION.request primitive 
+invoked. 
+data ::= octet-string client’s response to the challenge 
+If the authentication is accepted, then the response (ACTION.confirm 
+the server of the client’s challenge to the server, f(CtoS) in thed ata service 
+parameter of the response service .
+data ::= octet-string  server's response to the challenge 
+If the authentication is not accepted, then the result parameter in the 
+response shall contain a non-OK value, and no data shall be sent back .
+change_HLS_secret Changes the HLS secret (for example encryption key). 
+(data)        data ::= octet-string new HLS secret 
+The structure of the “new secret” depends on the security mechanism 
+may be encrypted .
+add_object (data) Adds the referenced object to theob  ject_list. 
+data ::= object_list_element (see above) 
+remove_object (data)  Removes the referenced object from the object_lis. t
+data ::= object_list_element (see above) 
+
+object_list Contains the list of visible COSEM objects with their class_id, version, logical_ 
+name and the access rights to their attributes and methods within the given AA .
+object_list_type ::= array  object_list_element 
+
+object_list_element ::= structure 
+{ 
+class_id:     long-unsigned, 
+version:      unsigned, 
+logical_name:  octet-string, 
+access_rights:  access_right 
+} 
+
+COSEM Interface Classes and OBIS Object Identification System, Edition 12. 1
+
+object_list    access_right ::= structure 
+(continued)    { 
+attribute_access:   attribute_access_descriptor, 
+method_access:    method_access_descriptor 
+} 
+
+attribute_access_descriptor ::= array attribute_access_item 
+
+attribute_access_item ::= structure 
+{ 
+attribute_id:  integer, 
+access_mode:  enum: 
+(0)  no_access, 
+(1)  read_only, 
+(2)  write_only, 
+(3)  read_and_write, 
+(4)  authenticated_read_only, 
+(5)  authenticated_write_only, 
+(6)  authenticated_read_and_write 
+
+access_selectors:  CHOICE  
+{ 
+null-data    [0], 
+array  integer [1] 
+} 
+} 
+
+method_access_descriptor ::= array method_access_item 
+
+method_access_item ::= structure 
+{ 
+method_id:    integer, 
+access_mode:  enum: 
+(0)  no_access, 
+(1)  access, 
+(2)  authenticated_access 
+} 
+Where: 
+partners_ id   within the physical devices hosting these APs, which belong to the AA 
+modelled by the “Association LN” object .
+associated_partners_type ::= structure 
+{ 
+client_SAP:   integer,  
+server_SAP:   long-unsigned 
+} 
+
+context_name    and is referenced by its name during the establishment of an AA. This attribute 
+contains the name of the applicationc ontext for that AA. 
+context_name_type ::=   CHOICE 
+{ 
+context_name_structure   [2], 
+octet-string           [9] 
+} 
+The application context name is specified as OBJECT IDENTIFIER DinL MS 
+When the context_name_type is encoded as a structure, it includes the arc 
+labels of the OBJECT IDENTIFIER. 
+context_name_structure ::= structure 
+{ 
+joint_iso_ctt_element:      unsigned, 
+country_element:            unsigned, 
+country_name_element:       long-unsigned, 
+identified_organization_element: unsigned, 
+DLMS_UA_element:            unsigned, 
+application_context_element:  unsigned, 
+context_id_element:         unsigned 
+} 
+Example 1: In the case of context_id(1) the A-XDR encoding is: 02 07 11 02 11 10 12 02 F4 11 05 11 08 11 
+hexadecimal). 
+xDLMS_         Contains all the necessary information on the xDLMS context for the given AA .
+context_info   xDLMS_context_type ::= structure 
+{ 
+conformance:           bit-string, 
+max_receive_pdu_size:   long-unsigned, 
+max_send_pdu_size:     long-unsigned, 
+dlms_version_number:   unsigned, 
+quality_of_service:    integer, 
+cyphering_info:        octet-string 
+} 
+Where: 
+8.1:201 clause 9.5. 
+authentication_ Contains the name of the authentication mechanism for the A A.
+mechanism_    mechanism_name_type ::=  CHOICE 
+name          { 
+mechanism_name_structure   [2], 
+octet-string               [9] 
+} 
+The authentication mechanism name is specified as an OBJECT IDENTIFIER in 
+labels of the OBJECT IDENTIFIER.  
+
+mechanism_name_structure ::= structure 
+{ 
+joint_iso_ctt_element:              unsigned, 
+country_element:                    unsigned, 
+country_name_element:               long-unsigned, 
+identified_organization_element:    unsigned, 
+DLMS_UA_element:                    unsigned, 
+authentication_mechanism_name_element:  unsigned, 
+mechanism_id_element:               unsigned 
+} 
+
+of the “Association LN” IC. 
+array  user_list_entry 
+user_list_entry ::=  structure 
+{ 
+user_id:  unsigned, 
+user_name:  visible-string 
+} 
+Where: 
+established. 
+current_user Holds the identifierof   the current user. 
+current_user ::= user_list_entry (see above) 
+If theus er_list  is empty, then current_user shall be a structure {user_id: 
+unsigned 0, user_name: visible string of 0 elements }
+Parameters for selective access to the object_list attribute 
+one of the class_id-s of the class_list. 
+2      class_list No access_right information is included. 
+class_list ::= array class_id 
+
+Access by object. The full information record of object instances on the 
+object_id_list shall be returned .
+object_id_list ::= array  object_id 
+3      object_id_list object_id ::= structure 
+{ 
+class_id:  long-unsigned, 
+logical_name:  octet-string 
+} 
+The full information record of the required COSEM object instance shall be 
+4      object_id  returned. 
+object_id ::= structure 
+See above. 
+(data)        f(StoC), as the data  service parameter of the ACTION.request primitive 
+invoked. 
+data ::= octet-string client’s response to the challenge 
+If the authentication is accepted, then the response (ACTION.confirm 
+the server of the client’s challenge to the server, f(CtoS) in thed ata service 
+parameter of the response service .
+data ::= octet-string  server's response to the challenge 
+If the authentication is not accepted, then the result parameter in the 
+response shall contain a non-OK value, and no data shall be sent back .
+change_HLS_secret  Changes the HLS secret (for example encryption key). 
+(data)        data ::= octet-string new HLS secret 
+The structure of the “new secret” depends on the security mechanism 
+may be encrypted .
+add_object (data) Adds the referenced object to theob  ject_list. 
+data ::= object_list_element (see above) 
+remove_object Removes the referenced object from the object_lis. t
+(data)        data ::= object_list_element (see above) 
+add_user (data) Adds a user to the user_list. 
+data ::= user_list_entry (see above) 
+remove_user (data) Removes a user from the user_lis.t 
+data ::= user_list_entry (see above) 
+5.4.10  Security setup (class_id = 64, version = 0 )
+array    key_data 
+
+key_data ::= structure  
+{  
+key_id:       enum:    (0) global unicast encryption key, 
+  (1) global broadcast encryption key, 
+  (2) authentication key 
+key_wrapped:  octet-string   
+}    
+The key wrapping algorithm is as specified by the security suite. The KEK 
+physical addresses for which each logical device of the real equipment 
+(the secondary station) has been programmed. 
+primary_address_list_type ::= array primary_address_element 
+
+primary_address_element ::= octet-string 
+The length of the octe-tstring is one octet. 
+(the secondary station) has been programmed in case of forgotten 
+station call. 
+tabi_list_type ::= array tabi_elemen t
+
+tabi_element ::= integer 
+fatal_error        fatal_error represents the last occurrence of one of the fatal errors of 
+array    initialization_string_element 
+
+initialization_string_element ::= structure 
+{ 
+request: octet-string, 
+response: octet-string 
+} 
+If the array contains more than one initialization stringe lement, they are 
+array    window_element 
+
+window_element ::= structure 
+{ 
+start _time:  octet-string, 
+end_time: octet-string 
+} 
+start_time and end_time are formatted as specified in 4.1.6.1 for date-time. 
+attribute listening_window and number of rings outside the 
+listening_window. 
+nr_rings_type ::= structure 
+{ 
+nr_rings_in_window:    unsigned, (0: no connect in window) 
+nr_rings_out_of_window:  unsigned (0: no connect out of window) 
+} 
+5.4.16  PSTN auto dia l(class_id = 29, version = 0) 
+array    window_element 
+
+window_element ::= structure 
+{ 
+start_time:  octet-string, 
+end_time: octet-string 
+} 
+start_time and end_time are formatteasd  specified in 4.1.6.1  for date-
+not contained in here. 
+array phone_number 
+phone_number ::= octet-string 
+5.4.17  Auto connect (class_id = 29, version = 1) 
+array    window_element 
+
+window_element ::= structure 
+{ 
+start_time:  octet-string, 
+end_time: octet-string 
+} 
+start_time and end_time are formatteasd  specified in 4.1.6.1 for date-
+the array are not defined here .
+array destination 
+destination ::= octet-string 
+5.4.18  S-FSK Phy&MAC setup (class_id = 50, version = 0) 
+synchronization process is possible .
+frequencies     Contains frequencies required for S-FSK modulation. 
+frequencies_type ::= structure 
+{ 
+mark_frequency:  double-long-unsigned, 
+space_frequency:  double-long-unsigned 
+} 
+The default unit is Hz. 
+Contains a set of MAC group addresses used for broadcast purposes  .
+array    mac-address 
+mac-address ::= long-unsigned 
+The ALL-configured-address, ALL-physical-address and NO-BODY addresses 
+array  reply_status 
+
+reply_status ::= structure 
+{ 
+L-SAP-selector:  unsigned, 
+length-of-waiting-L-SDU: unsigned 
+} 
+length-of-waiting-LSDU in the case of the S-FSK profile is in number of 
+capture_   Provides the capture_definition for M-Bus slave devices. 
+definition array  capture_definition_element 
+capture_definition_element ::= structure 
+{ 
+data_information_block:   octet-string, 
+value_information_block:  octet-string 
+} 
+NOTE 2 The elements data_information_block and value_information_block correspond to Data 
+then the primary_address  attribute is set to this value and it is then 
+transferred to the M-Bus slave device .
+data ::= unsigned (no data, or a valid primary address )
+NOTE 4 Unconfigured slave devices are configured with primary address as specified in EN 13757-
+- the attribute primary_address is also set to 0. 
+NOTE 5 A new M-Bus slave can be installed only, once the value of the primary_address attribute is 0. 
+data ::= integer (0)  
+capture    Capture values – as specified by the capture_definition attribute – from the M-
+Bus slave device .
+data ::= integer (0) 
+reset_alarm Reset alarm state of the M-Bus slave device .
+data ::= integer (0) 
+synchronize_ Synchronize the clock of the MBu-s slave device with that of the M-Bus client 
+clock      device. 
+data ::= integer (0) 
+data_send  Send data to the M-Bus slave device .
+data ::= array   data_definition_element 
+data_definition_element ::= structure 
+{ 
+data_information_block:   octet-string, 
+value_information_block:  octet-string 
+data:             CHOICE 
+{ 
+-- simple data types 
+null-data     [0], 
+bit-string    [4], 
+double-long   [5], 
+double-long-unsigned  [6], 
+octet-string    [9], 
+visible-string   [10], 
+utf8-string   [12], 
+integer       [15], 
+long          [16], 
+unsigned      [17], 
+long-unsigned  [18], 
+long64        [20], 
+long64-unsigned   [21], 
+float32       [23], 
+float64       [24] 
+} 
+} 
+Second, the key is set in the- MBus master using these t_encryption_key
+method. 
+data ::= octet-string (encryption_key) 
+After the installation of the MBus - slave, the MB-us client holds an empty 
+parameter. 
+transfer_key Transfers an encryption key to the M-Bus slave. 
+data ::= octet-string (encrypted_key) 
+Each M-Bus slave device shall be delivered with a default encryption k. ey
+reset (data)             This method forces a reset of the object. By invoking this 
+method, the value of all counters is set to 0 .
+data ::= integer (0) 
+
+array    mac_neighbour_table_element 
+
+mac_neighbour_table_element ::= structure 
+{ 
+mac_short_address:     long-unsigned, 
+payload_modulation_scheme:  boolean, 
+tone_map:              bit-string, 
+modulation:            enum, 
+tx_gain:               integer, 
+tx_res:                boolean, 
+tx_coeff:              array, 
+lqi:                   unsigned, 
+TMR_valid_time:        double-long-unsigned, 
+neighbour_valid_time:  double-long-unsigned 
+} 
+NOTE 3   This table is actualized each time any frame is received from a neighbour device, 
+table_entry     client. 
+(data)          The method invocation parameter contains a mac_short_addres s.
+data ::= long-unsigned 
+
+mac_short_address. 
+
+data ::= array mac_neighbour_table_elemen t
+
+array routing_configuration 
+
+routing_configuration ::= structure 
+{ 
+adp_net_traversal_time:    long-unsigned, 
+adp_routing_table_entry_TTL:   double-long-unsigned, 
+adp_Kr:                    unsigned, 
+adp_Km:                    unsigned, 
+adp_Kc:                    unsigned, 
+adp_Kq:                    unsigned, 
+adp_Kh:                    unsigned, 
+adp_Krt:                   unsigned, 
+adp_RREQ_retries:          unsigned, 
+adp_RREQ_RERR_wait:        long-unsigned, 
+adp_blacklist_table_entry_TTL:  long-unsigned 
+}  
+adp_net_     PIB attribute 0x12: The Max duration between RREQ and 
+array    routing_table 
+
+routing_table ::= structure 
+{ 
+destination_address: long-unsigned, 
+next_hop_address:  long-unsigned, 
+route_cost:        long-unsigned, 
+hop_count:         unsigned, 
+weak_link_count:   unsigned, 
+status:            enum, 
+valid_time:        unsigned 
+} 
+NOTE 2   This table is actualized each time a route is built or updated (triggered by data 
+information_     CID extension field.  
+table            array    context_information_table 
+context_information_table ::= structure 
+{ 
+CID:               bit-string, 
+context_length:    unsigned, 
+context:           octet-string, 
+C:                 boolean, 
+valid_lifetime:    long-unsigned 
+} 
+CID      Corresponds to the 4b-it context information used for source 
+adp_blacklist_   PIB attribute 0x25: Contains the list of the blacklisted neighbours .
+table            array    blacklisted_neighbour_set 
+blacklisted_neighbour_set ::= structure 
+{ 
+blacklisted_neighbour_address:  long-unsigned, 
+valid_time:                  long-unsigned 
+} 
+blacklisted_ The 16-bit address of the blacklisted neighbour .
+log_table        NOTE 5 This table provides a list of the broadcast packets recently received by this device. 
+array    broadcast_log_table 
+broadcast_log_table ::= structure 
+{ 
+source_address:    long-unsigned, 
+sequence_number:   unsigned, 
+time_to_live:      long-unsigned 
+} 
+source_   The 16-bit source address of a broadcast packet. This is the 
+table            belongs. 
+array    group_table 
+group_table ::= structure 
+{ 
+group_address: long-unsigned 
+} 
+group_address  Group address to which this node has been subscribed .
+Conversion factors                                                                                                  
+                                7         b         0         4         0          
+{This area is to be used for polynomials, constant s             7         b         0         4         1          
+for conversion, and similar }                                    7         b         0         4         2          
+...                                                              7         b         0         4         3          
