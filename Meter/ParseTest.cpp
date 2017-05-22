@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 
 
@@ -247,12 +248,9 @@ typedef struct
 //
 typedef enum
 {
-    Long            = 0,
-    UnsignedLong    = 1,
-    Integer         = 2,
-    Unsigned        = 3,
-    Octet           = 4,
-    Array           = 5,
+    FixedArray      = 0,
+    VariableArray   = 1,
+    Choice          = 2,
 
 } Type;
 
@@ -278,6 +276,7 @@ typedef struct
     Type        type;
     uint32_t    offset;
     uint32_t    n;
+    uint32_t    determinantIndex;
     
 } ParseElement;
 
@@ -312,19 +311,67 @@ typedef struct
 //
 void ParseByte( ParsingContext& context, uint8_t* byte )
 {
+    bool    elementFinished = false;
+
     if(context.currentOffset == 0)
     {
-        void**  mapPtr  = (void**)(context.map + context.elements[context.currentElement].offset);
+        //
+        // If we're at the start of an element, update the pointer to to point to this
+        // location.
+        //
+        void**  mapPtr  = (void**)((ptrdiff_t)context.map + context.elements[context.currentElement].offset);
         *mapPtr = byte;
     }
 
+    //
+    // Always move on.
+    //
     context.currentOffset++;
 
-    if(context.currentOffset >= sizeOfType[context.elements[context.currentElement].type] )
+    //
+    // Type specific behaviour.
+    //
+    switch(context.elements[context.currentElement].type)
     {
+        case FixedArray:
+            if(context.currentOffset >= context.elements[context.currentElement].n )
+            {
+                elementFinished = true;
+            }
+            break;
+
+        case VariableArray:
+        {
+            uint32_t    determinantIndex    = context.elements[context.currentElement].determinantIndex;
+            uint8_t**   pDeterminant        = (uint8_t**)((ptrdiff_t)context.map + context.elements[context.currentElement].offset);
+            uint8_t*    determinant         = *pDeterminant;
+            //if( context.currentOffset >= determinant )
+            {
+                elementFinished = true;
+            }
+            break;
+        }
+
+        case Choice:
+        {
+            break;
+        }
+
+        default:
+            exit(-1);
+            break;
+    };
+
+
+    if(elementFinished == true)
+    {
+        //
+        // Move on to the next element.
+        //
         context.currentOffset   = 0;
         context.currentElement++;
     }
+
 }
 
 
@@ -335,6 +382,7 @@ void ParseByte( ParsingContext& context, uint8_t* byte )
 //
 typedef struct
 {
+    uint8_t*    stringType;
     uint8_t*    stringLength;
     uint8_t*    text;
 
@@ -345,8 +393,9 @@ ParsingContext  ClockAttribute2ResponseContext  =
 {
     .elements       =
     {
-        {.type=Octet,   .offset=offsetof(ClockAttribute2Response, stringLength),    .n=1},
-        {.type=Octet,   .offset=offsetof(ClockAttribute2Response, text),            .n=32},
+        {.type=FixedArray,      .offset=offsetof(ClockAttribute2Response, stringType),      .n=1,   .determinantIndex=-1},
+        {.type=FixedArray,      .offset=offsetof(ClockAttribute2Response, stringLength),    .n=1,   .determinantIndex=-1},
+        {.type=VariableArray,   .offset=offsetof(ClockAttribute2Response, text),            .n=32,  .determinantIndex=1},
     },
     .currentElement = 0,
     .currentOffset  = 0,
@@ -426,9 +475,16 @@ private:
 int main()
 {
     uint8_t                     request[]           = {0x7E,0xA0,0x19,0x95,0x75,0x54,0x68,0x35,0xE6,0xE6,0x00,0xC0,0x01,0x81,0x00,0x08,0x00,0x00,0x01,0x00,0x00,0xFF,0x01,0x00,0x0D,0xFD,0x7E};
+    uint8_t                     response[]          = {0x7E,0xA0,0x1E,0x75,0x95,0x96,0x6F,0x67,0xE6,0xE7,0x00,0xC4,0x01,0x81,0x00,0x09,0x0C,0x07,0xD2,0x0C,0x04,0x03,0x0A,0x06,0x0B,0xFF,0x00,0x78,0x00,0xF3,0x30,0x7E};
     Stream<uint8_t>             stream( &request[0], sizeof(request) );
     DLMSStack<Stream<uint8_t> > dlmsStack(stream);
     bool                        result;
+
+
+    for(uint32_t i=15; i<sizeof(response); i++)
+    {
+        ParseByte( ClockAttribute2ResponseContext, &response[i] );
+    }
 
     do
     {
