@@ -42,14 +42,18 @@ int main()
 %}
 
 %token PD BYTE
-%start pdulist
+%start framelist
 
 %%
 
-pdulist:    pdu         
-        |   pdulist pdu;
+framelist:      frame         
+           |    framelist frame;
 
-pdu: PD bytelist PD     {printf("PDU(%s)\n", $2);};
+frame: PD frameType frameLength bytelist PD     {printf("frame(%s,%s,%s)\n", $2,$3,$4);};
+
+frameType:      BYTE;
+
+frameLength:    BYTE;
 
 bytelist: BYTE              
         | bytelist BYTE     {$$=ConcatenateStrings($1,$2);};
