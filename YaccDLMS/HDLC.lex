@@ -10,8 +10,9 @@
 %}
 
 %%
-7[eE]           return PD;
-[0-9a-fA-F]{2}  yylval=strdup(yytext); return BYTE;
+7[eE]                   return PD;
+[0-9A-F][13579BDF]      yylval=strdup(yytext); return ODDBYTE;
+[0-9A-F][02468ACE]      yylval=strdup(yytext); return EVENBYTE;
 %%
 
 
