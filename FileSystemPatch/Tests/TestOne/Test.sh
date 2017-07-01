@@ -12,5 +12,6 @@ python3 ../../MakeFileSystemPatch.py $PWD/A $PWD/B $PWD/StagingArea
 
 
 pushd StagingArea
-./Patch.sh $PWD/C
+chmod a+x Patch.sh
+./Patch.sh $PWD/../C
 popd
