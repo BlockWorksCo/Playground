@@ -55,6 +55,7 @@ for file in filesToCopy:
         except FileExistsError:
             pass
         shutil.copy2(sourcePath, destPath)
+        patchScript.write('mkdir -p $1/%s \n'%(os.path.dirname(file)) )
         patchScript.write('cp -p -f ./%s $1/%s\n'%(file,file) )
 
     if os.path.islink(sourcePath) == True:
