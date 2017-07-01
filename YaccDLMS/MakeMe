@@ -1,6 +1,6 @@
 
 flex HDLC.lex
-yacc -d HDLC.yacc
+yacc --debug --verbose -d HDLC.yacc
 
 gcc lex.yy.c y.tab.c -o HDLC 
 

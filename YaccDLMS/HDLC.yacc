@@ -10,6 +10,8 @@
 int yylex(void);
 int yyparse(void);
 
+int yydebug=1;
+ 
 
 char* ConcatenateStrings(char* s1, char* s2)
 {
@@ -38,6 +40,17 @@ char* Concatenate4Strings(char* s1, char* s2, char* s3, char* s4)
     return newString;
 }
 
+
+
+char* PayloadFromPayloadAndChecksum(char* payloadAndChecksum)
+{
+    uint32_t    l  = strlen(payloadAndChecksum);
+    char*       newString   = (char*)malloc(l-4);
+    memset(newString, 0x00, l-4);
+    memcpy(newString, payloadAndChecksum, l-4);
+    return newString;
+}
+
  
 void yyerror(const char *str)
 {
@@ -57,29 +70,35 @@ int main()
 
 %}
 
-%token PD EVENBYTE ODDBYTE
+%token PD EVENBYTE ODDBYTE SNRMType UAType CRC16
 %start framelist
 
+%glr-parser
 %%
 
-BYTE:       ODDBYTE
-        |   EVENBYTE;
+BYTE:           ODDBYTE
+        |       EVENBYTE;
 
 framelist:      frame         
-           |    framelist frame;
+         |      framelist frame;
 
-frame: PD frameType frameLength address address bytelist PD     {printf("frame(%s,%s,%s,%s,%s)\n", $2,$3,$4,$5,$6);};
+frame:          SNRMframe
+        |       UAframe;
 
-frameType:      BYTE;
+SNRMframe:      PD frameType frameLength address address SNRMType bytelist PD       {printf("SNRMframe(ft=%s,fl=%s,add1=%s,add2=%s,frame=%s,payload=%s)\n", $2,$3,$4,$5,$6,$7); $$=PayloadFromPayloadAndChecksum($6);};
+
+UAframe:        PD frameType frameLength address address UAType CRC16 bytelist PD         {printf("UAframe(ft=%s,fl=%s,add1=%s,add2=%s,frame=%s,CRC=%s,payload=%s)\n", $2,$3,$4,$5,$6,$7,$8); $$=PayloadFromPayloadAndChecksum($8);};
 
 frameLength:    BYTE;
 
-address:        ODDBYTE
-        |       EVENBYTE ODDBYTE                       {$$=ConcatenateStrings($1,$2);}; 
-        |       EVENBYTE EVENBYTE EVENBYTE ODDBYTE     {$$=Concatenate4Strings($1,$2,$3,$4);}; ;
+frameType:      BYTE;
 
-bytelist: BYTE              
-        | bytelist BYTE     {$$=ConcatenateStrings($1,$2);};
+address:        ODDBYTE
+        |       EVENBYTE ODDBYTE                        {$$=ConcatenateStrings($1,$2);}; 
+        |       EVENBYTE EVENBYTE EVENBYTE ODDBYTE      {$$=Concatenate4Strings($1,$2,$3,$4);}; ;
+
+bytelist:       BYTE              
+        |       bytelist BYTE                           {$$=ConcatenateStrings($1,$2);};
 
 
 %%
