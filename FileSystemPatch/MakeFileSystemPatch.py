@@ -51,7 +51,7 @@ for file in filesToCopy:
     if os.path.isfile(sourcePath) == True and os.path.isdir(sourcePath) == False and os.path.islink(sourcePath) == False:
         path    = os.path.dirname(destPath)
         try:
-            os.mkdir(path)
+            os.makedirs(path)
         except FileExistsError:
             pass
         shutil.copy2(sourcePath, destPath)
