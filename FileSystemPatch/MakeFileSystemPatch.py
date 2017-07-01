@@ -61,7 +61,11 @@ for file in filesToCopy:
     if os.path.islink(sourcePath) == True:
         target  = os.readlink(sourcePath)
         path    = os.path.dirname(destPath)[len(stagingDirectory)+1:]
-        patchScript.write('ln -s $1/%s $1/%s\n'%(path+'/'+target,file) )
+        patchScript.write('mkdir -p $1/%s \n'%(os.path.dirname(file)) )
+        patchScript.write('ln -s %s $1/%s\n'%(target,file) )
+
+    if os.path.isdir(sourcePath) == True:
+        patchScript.write('mkdir -p $1/%s \n'%(os.path.dirname(destPath)) )
 
 #
 # Add the remove lines to the script
