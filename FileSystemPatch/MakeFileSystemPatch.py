@@ -12,18 +12,24 @@ directoryA       = '/home/ubuntu/Playground/RootA'
 directoryB       = '/home/ubuntu/Playground/RootB'
 stagingDirectory = '/home/ubuntu/Playground/StagingArea'
 
+directoryA       = './A'
+directoryB       = './B'
+stagingDirectory = './StagingArea'
+
 directoryA       = sys.argv[1]
 directoryB       = sys.argv[2]
 stagingDirectory = sys.argv[3]
 patchScript      = open(stagingDirectory+'/Patch.sh','w+')
 patchScript.write('#!/bin/sh\n')
-patchScript.write('set -xe\n')
+#patchScript.write('set -xe\n')
 
 #
 # Obtain the set of files that exist in both directories.
 #
-filesInA = [file[len(directoryA)+1:] for file in glob.iglob(directoryA+'/**',recursive=True) if os.path.isfile(file)==True]
-filesInB = [file[len(directoryB)+1:] for file in glob.iglob(directoryB+'/**',recursive=True) if os.path.isfile(file)==True]
+#filesInA = [file[len(directoryA)+1:] for file in glob.iglob(directoryA+'/**',recursive=True) if os.path.isfile(file)==True]
+#filesInB = [file[len(directoryB)+1:] for file in glob.iglob(directoryB+'/**',recursive=True) if os.path.isfile(file)==True]
+filesInA = [file[len(directoryA)+1:] for file in glob.iglob(directoryA+'/**',recursive=True)]
+filesInB = [file[len(directoryB)+1:] for file in glob.iglob(directoryB+'/**',recursive=True)]
 filesToCompare  = list(set(filesInA).union(filesInB))
 
 
@@ -48,6 +54,8 @@ for file in filesToCopy:
     sourcePath = directoryB+'/'+file
     destPath   = stagingDirectory+'/'+file
 
+    patchScript.write('#%s %s %s\n'%(file, sourcePath, destPath) )
+
     if os.path.isfile(sourcePath) == True and os.path.isdir(sourcePath) == False and os.path.islink(sourcePath) == False:
         path    = os.path.dirname(destPath)
         try:
@@ -65,7 +73,7 @@ for file in filesToCopy:
         patchScript.write('ln -s %s $1/%s\n'%(target,file) )
 
     if os.path.isdir(sourcePath) == True:
-        patchScript.write('mkdir -p $1/%s \n'%(os.path.dirname(destPath)) )
+        patchScript.write('mkdir -p $1/%s \n'%(file) )
 
 #
 # Add the remove lines to the script
