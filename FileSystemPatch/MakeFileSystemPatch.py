@@ -82,10 +82,16 @@ for file in filesToRemove:
     patchScript.write('rm -f $1/%s\n'%(file) )
 
 
+def StatOfFile(file):
+    try:
+        return os.stat(file)
+    except FileNotFoundError:
+        return os.stat(directoryB)  # random stand-in for the problem file.
+
 #
 # Set the ownership and permissions of all files (TODO: Make this more intelligent in future).
 #
-allFilesAndStats    = [ (os.stat(file),file) for file in glob.iglob(directoryB+'/**')]
+allFilesAndStats    = [ (StatOfFile(file),file) for file in glob.iglob(directoryB+'/**')]
 for (s,file) in allFilesAndStats:
 
     relativePath    = file[len(directoryB)+1:]
