@@ -54,7 +54,7 @@ for file in filesToCopy:
     sourcePath = directoryB+'/'+file
     destPath   = stagingDirectory+'/'+file
 
-    patchScript.write('#%s %s %s\n'%(file, sourcePath, destPath) )
+    #patchScript.write('#%s %s %s\n'%(file, sourcePath, destPath) )
 
     if os.path.isfile(sourcePath) == True and os.path.isdir(sourcePath) == False and os.path.islink(sourcePath) == False:
         path    = os.path.dirname(destPath)
@@ -81,5 +81,18 @@ for file in filesToCopy:
 for file in filesToRemove:
     patchScript.write('rm -f $1/%s\n'%(file) )
 
+
+#
+# Set the ownership and permissions of all files (TODO: Make this more intelligent in future).
+#
+allFilesAndStats    = [ (os.stat(file),file) for file in glob.iglob(directoryB+'/**')]
+for (s,file) in allFilesAndStats:
+
+    gid = s[stat.ST_GID]
+    uid = s[stat.ST_UID]
+    patchScript.write('chown %d:%d %s\n'%(gid,uid,file) )
+
+    mode = stat.S_IMODE(s.st_mode)
+    patchScript.write('chmod %o %s\n'%(mode,file) )
 
 
