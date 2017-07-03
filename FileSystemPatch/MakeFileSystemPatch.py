@@ -88,11 +88,13 @@ for file in filesToRemove:
 allFilesAndStats    = [ (os.stat(file),file) for file in glob.iglob(directoryB+'/**')]
 for (s,file) in allFilesAndStats:
 
+    relativePath    = file[len(directoryB)+1:]
+
     gid = s[stat.ST_GID]
     uid = s[stat.ST_UID]
     patchScript.write('chown %d:%d %s\n'%(gid,uid,file) )
 
     mode = stat.S_IMODE(s.st_mode)
-    patchScript.write('chmod %o %s\n'%(mode,file) )
+    patchScript.write('chmod %o $1/%s\n'%(mode,relativePath) )
 
 
