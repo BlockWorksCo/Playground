@@ -1,3 +1,6 @@
+# wget -o /tmp/WgetOutput -nv --post-data "value=08585858&message=This is yet another log entry4" http://127.0.0.1:5000/Log
+
+
 
 
 
