@@ -29,7 +29,7 @@ LDFLAGS			= -g
 # Compile a file and then generate its dependencies.
 #
 %.o: %.c
-	@ $(ECHO) Building $(basename $<)
+	@ $(ECHO) Compiling $(basename $<)
 	@ $(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 	@ $(CC) -MM $(CFLAGS) $(INCLUDES) $< -o $(notdir $(patsubst %.o,%.d,$@) )
 
@@ -37,7 +37,8 @@ LDFLAGS			= -g
 #
 # Link the objects into a binary.
 #
-%.elf: $(OBJS)
+%.elf: 
+	@ $(ECHO) Linking $(basename $<)
 	@ $(LD) $(LDFLAGS) -Xlinker -Map=$@.map -o $@ $^ $(LIBS)
 	@ $(SIZE) -d $@
 
