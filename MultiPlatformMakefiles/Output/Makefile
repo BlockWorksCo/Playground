@@ -40,6 +40,8 @@ LIBS		+= -lgcc -lc
 #
 all: Main.elf
 
+$(info  $(VPATH) )
+Main.elf: $(OBJS)
 
 #
 # Remove all the build artifacts.
@@ -53,14 +55,4 @@ clean:
 	-@ $(RM) -f *.hex
 	-@ $(RM) -f *.elf
 	-@ $(RM) -f *.map
-
-
-#
-# Link the objects into a binary.
-#
-Main.elf: $(OBJS)
-	@ $(LD) $(LDFLAGS) -Xlinker -Map=$@.map -o $@ $^ $(LIBS)
-	@ $(SIZE) -d $@
-
-
 

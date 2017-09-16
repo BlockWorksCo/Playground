@@ -34,3 +34,13 @@ LDFLAGS			= -g
 	@ $(CC) -MM $(CFLAGS) $(INCLUDES) $< -o $(notdir $(patsubst %.o,%.d,$@) )
 
 
+#
+# Link the objects into a binary.
+#
+%.elf: $(OBJS)
+	@ $(LD) $(LDFLAGS) -Xlinker -Map=$@.map -o $@ $^ $(LIBS)
+	@ $(SIZE) -d $@
+
+
+
+
