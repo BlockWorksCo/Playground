@@ -40,7 +40,9 @@ LIBS		+= -lgcc -lc
 #
 all: Main.elf
 
-$(info  $(VPATH) )
+#
+# Binary is dependent on the object files.
+#
 Main.elf: $(OBJS)
 
 #

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+pushd Output
+make TARGET=HostLinux PROJECT_BASE=.. clean all
+make TARGET=ARMLinux PROJECT_BASE=.. clean all
+popd
+
+
