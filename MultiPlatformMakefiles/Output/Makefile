@@ -15,11 +15,17 @@ include $(PROJECT_BASE)/Build.mk
 include $(PROJECT_BASE)/ComponentOne/Build.mk
 include $(PROJECT_BASE)/ComponentTwo/Build.mk
 
+#
+# Derive the platform specific objs.
+#
+PLATFORMS=ARM HOST
+ALL_OBJS=$(foreach platform,$(PLATFORMS), $(OBJS:.o=.$(platform).o) )
+$(info $(ALL_OBJS) )
 
 #
 #
 #
-LIBS		+= -lgcc -lc
+LIBS		+= 
 
 
 #########################################################################################################
