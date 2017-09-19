@@ -1,8 +1,7 @@
 #!/bin/bash
 
 pushd Output
-make TARGET=HOST PROJECT_BASE=.. clean all
-make TARGET=ARM PROJECT_BASE=.. clean all
+make PROJECT_BASE=.. clean all
 popd
 
 
