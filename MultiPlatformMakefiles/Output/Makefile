@@ -9,12 +9,17 @@
 #########################################################################################################
 
 #
-# Define the list of platforms to build.
+# define the binaries to output.
 #
-PLATFORMS=ARM HOST
+TARGETS=Main.ARM.elf Main.HOST.elf
 
 #
-# Include the .mk for each platform.
+# Derive the list of platform names from the binary names.
+#
+PLATFORMS=$(patsubst Main.%.elf,%,$(TARGETS) )
+
+#
+# Include the .mk files for each platform.
 #
 PLATFORM_MK_LIST=$(PLATFORMS:%=%.mk)
 include $(PLATFORM_MK_LIST)
@@ -30,6 +35,9 @@ include $(PROJECT_BASE)/ComponentTwo/Build.mk
 # Derive the platform specific objs.
 #
 REAL_OBJS=$(foreach platform,$(PLATFORMS), $(OBJS:.o=.$(platform).o) )
+$(foreach platform,$(PLATFORMS),$(eval OBJS_$(platform)=$(OBJS:.o=.$(platform).o)))
+$(info OBJS_ARM is $(OBJS_ARM) )
+$(info OBJS_HOST is $(OBJS_HOST) )
 
 #
 #
@@ -53,13 +61,12 @@ LIBS		+=
 #
 # Default target.
 #
-all: Main.ARM.elf Main.HOST.elf
+all: $(TARGETS)
 
 #
 # Binary is dependent on the object files.
 #
-Main.HOST.elf: $(REAL_OBJS)
-Main.ARM.elf: $(REAL_OBJS)
+$(TARGETS): $(REAL_OBJS)
 
 #
 # Remove all the build artifacts.
