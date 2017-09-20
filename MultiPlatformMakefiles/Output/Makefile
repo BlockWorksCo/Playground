@@ -5,7 +5,11 @@
 .DEFAULT_GOAL := all
 .SUFFIXES: .c .h .o
 
+#########################################################################################################
 
+#
+# Common tools for all platforms.
+#
 SHELL           = sh
 RM              = rm
 MKDIR           = mkdir
