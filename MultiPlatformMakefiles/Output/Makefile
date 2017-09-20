@@ -39,6 +39,8 @@ $(foreach platform,$(PLATFORMS),$(eval OBJS_$(platform)=$(OBJS:.o=.$(platform).o
 $(info OBJS_ARM is $(OBJS_ARM) )
 $(info OBJS_HOST is $(OBJS_HOST) )
 
+$(foreach platform,$(PLATFORMS),$(info Main.$(platform).elf:$OBJS_$(platform)))
+
 #
 #
 #
