@@ -2,25 +2,17 @@
 #
 # Tools
 #
-SHELL     		= sh
-CPPC      		= arm-linux-gnueabihf-g++
-CC        	    = arm-linux-gnueabihf-gcc
-LD        		= arm-linux-gnueabihf-gcc
-OBJCOPY   		= arm-linux-gnueabihf-objcopy
-RM        		= rm
-MKDIR     		= mkdir
-SIZE      		= size
-HEX2BIN   		= hex2bin
-ECHO      		= echo
-ECHO_RED  		= echo -e "\033[0;31m"
-ECHO_GREEN		= echo -e "\033[0;32m"
+ARM_CPPC      		= arm-linux-gnueabihf-g++
+ARM_CC        	    = arm-linux-gnueabihf-gcc
+ARM_LD        		= arm-linux-gnueabihf-gcc
+ARM_OBJCOPY   		= arm-linux-gnueabihf-objcopy
 
 
 #
 # Build flags.
 #
-CFLAGS 			= -g 
-LDFLAGS			= -g 
+ARM_CFLAGS 			= -g 
+ARM_LDFLAGS			= -g 
 
 
 
@@ -30,8 +22,8 @@ LDFLAGS			= -g
 #
 %.ARM.o: %.c
 	@ $(ECHO) \(ARM\) Compiling $(basename $<)
-	@ $(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-	@ $(CC) -MM $(CFLAGS) $(INCLUDES) $< -o $(notdir $(patsubst %.o,%.d,$@) )
+	@ $(ARM_CC) $(ARM_CFLAGS) $(INCLUDES) -c $< -o $@
+	@ $(ARM_CC) -MM $(ARM_CFLAGS) $(INCLUDES) $< -o $(notdir $(patsubst %.o,%.d,$@) )
 
 
 #
@@ -39,7 +31,7 @@ LDFLAGS			= -g
 #
 %.ARM.elf: 
 	@ $(ECHO) \(ARM\) Linking $(basename $<)
-	@ $(LD) $(LDFLAGS) -Xlinker -Map=$@.map -o $@ $^ $(LIBS)
+	@ $(ARM_LD) $(ARM_LDFLAGS) -Xlinker -Map=$@.map -o $@ $^ $(LIBS)
 	@ $(SIZE) -d $@
 
 

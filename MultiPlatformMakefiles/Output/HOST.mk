@@ -1,26 +1,19 @@
 
+
 #
 # Tools
 #
-SHELL     		= sh
-CPPC      		= g++
-CC        	    = gcc
-LD        		= gcc
-OBJCOPY   		= objcopy
-RM        		= rm
-MKDIR     		= mkdir
-SIZE      		= size
-HEX2BIN   		= hex2bin
-ECHO      		= echo
-ECHO_RED  		= echo -e "\033[0;31m"
-ECHO_GREEN		= echo -e "\033[0;32m"
+HOST_CPPC      		= g++
+HOST_CC        	    = gcc
+HOST_LD        		= gcc
+HOST_OBJCOPY   		= objcopy
 
 
 #
 # Build flags.
 #
-CFLAGS 			= -g 
-LDFLAGS			= -g 
+HOST_CFLAGS 		= -g 
+HOST_LDFLAGS		= -g 
 
 
 
@@ -30,8 +23,8 @@ LDFLAGS			= -g
 #
 %.HOST.o: %.c
 	@ $(ECHO) \(HOST\) Compiling $(basename $<)
-	@ $(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-	@ $(CC) -MM $(CFLAGS) $(INCLUDES) $< -o $(notdir $(patsubst %.o,%.d,$@) )
+	@ $(HOST_CC) $(HOST_CFLAGS) $(INCLUDES) -c $< -o $@
+	@ $(HOST_CC) -MM $(HOST_CFLAGS) $(INCLUDES) $< -o $(notdir $(patsubst %.o,%.d,$@) )
 
 
 
@@ -40,7 +33,7 @@ LDFLAGS			= -g
 #
 %.HOST.elf: 
 	@ $(ECHO) \(HOST\) Linking $(basename $<)
-	@ $(LD) $(LDFLAGS) -Xlinker -Map=$@.map -o $@ $^ $(LIBS)
+	@ $(HOST_LD) $(HOST_LDFLAGS) -Xlinker -Map=$@.map -o $@ $^ $(LIBS)
 	@ $(SIZE) -d $@
 
 

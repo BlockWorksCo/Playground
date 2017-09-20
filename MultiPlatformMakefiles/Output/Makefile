@@ -6,6 +6,16 @@
 .SUFFIXES: .c .h .o
 
 
+SHELL           = sh
+RM              = rm
+MKDIR           = mkdir
+SIZE            = size
+HEX2BIN         = hex2bin
+ECHO            = echo 
+ECHO_RED        = echo -e "\033[0;31m"
+ECHO_GREEN      = echo -e "\033[0;32m"
+
+
 #########################################################################################################
 
 #
