@@ -9,66 +9,28 @@
 #########################################################################################################
 
 #
-# define the binaries to output.
-#
-TARGETS=Main.ARM.elf Main.HOST.elf
-
-#
-# Derive the list of platform names from the binary names.
-#
-PLATFORMS=$(patsubst Main.%.elf,%,$(TARGETS) )
-
-#
-# Include the .mk files for each platform.
-#
-PLATFORM_MK_LIST=$(PLATFORMS:%=%.mk)
-include $(PLATFORM_MK_LIST)
-
-#
 # Include the components.
+# These files simply define the .o files that are required for the component and
+# the path to find them in and their includes.
 #
 include $(PROJECT_BASE)/Build.mk
 include $(PROJECT_BASE)/ComponentOne/Build.mk
 include $(PROJECT_BASE)/ComponentTwo/Build.mk
 
 #
-# Derive the platform specific objs.
-#
-REAL_OBJS=$(foreach platform,$(PLATFORMS), $(OBJS:.o=.$(platform).o) )
-$(foreach platform,$(PLATFORMS),$(eval OBJS_$(platform)=$(OBJS:.o=.$(platform).o)))
-$(info OBJS_ARM is $(OBJS_ARM) )
-$(info OBJS_HOST is $(OBJS_HOST) )
-
-$(foreach platform,$(PLATFORMS),$(info Main.$(platform).elf:$OBJS_$(platform)))
-
-#
-#
+# Extra libraries that need to be built in.
 #
 LIBS		+= 
 
-
-#########################################################################################################
-
+#
+# define the top-level target binaries.
+#
+TARGETS=Main.ARM.elf Main.HOST.elf
 
 #
-# Include the dependency rules for each target iff already generated.
-# If they haven't been generated, then we have to build anyway.
-#
--include $(notdir $(patsubst %.o,%.d,$(OBJS)) )
-
-
-#########################################################################################################
-
-
-#
-# Default target.
+# Default target(s).
 #
 all: $(TARGETS)
-
-#
-# Binary is dependent on the object files.
-#
-$(TARGETS): $(REAL_OBJS)
 
 #
 # Remove all the build artifacts.
@@ -82,4 +44,60 @@ clean:
 	-@ $(RM) -f *.hex
 	-@ $(RM) -f *.elf
 	-@ $(RM) -f *.map
+
+
+
+#########################################################################################################
+# ** Beware: Macro-magic **
+# The names here are of the form Main.<platform>.elf . the following commands derive
+# the lists of objects and rule requried to build the targets with the defined list of
+# object from the component list above.
+#
+# The intention is that foreach target in TARGETS, we derive commands of the form:
+# "PLATFORM=ARM HOST"
+# "include ARM.mk HOST.mk"
+# "OBJS_ARM=one.ARM.o two.ARM.o three.ARM.o"
+# "OBJS_HOST=one.HOST.o two.HOST.o three.HOST.o"
+# "Main.ARM.elf:$(OBJS_ARM)"
+# "Main.HOST.elf:$(OBJS_HOST)"
+#
+
+#
+# Derive the list of platform names from the binary names.
+# i.e. we end up with a command of the form "PLATFORMS=ARM HOST MIPS".
+#
+PLATFORMS=$(patsubst Main.%.elf,%,$(TARGETS) )
+
+#
+# Include the .mk files for each platform.
+# the <platform>.mk files contain the toolchain details for each platform.
+# From the above list, we end up with a command of the form "include ARM.mk HOST.mk MIPS.mk"
+#
+PLATFORM_MK_LIST=$(PLATFORMS:%=%.mk)
+include $(PLATFORM_MK_LIST)
+
+#
+# Derive the platform specific objs from the generic OBJS and assign the list to a variable with 
+# a name computed from the platform.
+# i.e. for each platform, we generate the a command such as "OBJS_ARM=$(OBJS:.o=ARM.o)".
+#
+$(foreach platform,$(PLATFORMS),$(eval OBJS_$(platform)=$(OBJS:.o=.$(platform).o)))
+
+#
+# Generate a target for each platform that depends on the objects for that platform.
+# NOTE: This generates a target of the form "Main.ARM.elf: $(OBJS_ARM)"
+#
+$(foreach platform,$(PLATFORMS),$(eval Main.$(platform).elf:$$(OBJS_$(platform))))
+
+
+#########################################################################################################
+
+#
+# Include the dependency rules for each target iff already generated.
+# If they haven't been generated, then we have to build anyway.
+#
+#$(foreach platform,$(PLATFORMS),$(eval include $(notdir $(patsubst %.$(platform).o,%.($platform).d,$(OBJS)) ))))
+-include $(notdir $(patsubst %.o,%.d,$(OBJS)) )
+
+
 
