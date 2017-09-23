@@ -16,8 +16,9 @@ MKDIR           = mkdir
 SIZE            = size
 HEX2BIN         = hex2bin
 ECHO            = echo 
-ECHO_RED        = echo -e "\033[0;31m"
-ECHO_GREEN      = echo -e "\033[0;32m"
+COLOUR_RED      = "\033[0;31m"
+COLOUR_GREEN    = "\033[0;32m"
+COLOUR_RESET    = "\033[0m"
 
 
 #########################################################################################################
@@ -103,12 +104,10 @@ $(foreach platform,$(PLATFORMS),$(eval OBJS_$(platform)=$(OBJS:.o=.$(platform).o
 #
 $(foreach platform,$(PLATFORMS),$(eval Main.$(platform).elf:$$(OBJS_$(platform))))
 
-
-#########################################################################################################
-
 #
-# Include the dependency rules for each target iff already generated.
-# If they haven't been generated, then we have to build anyway.
+# Generate include commands for all the targets for all the platforms.
+# e.g. for each platform the following dependency includes could be generated:
+# "include Main.ARM.d ComponentOne.ARM.d ComponentTwo.ARM.d"
 #
 $(foreach platform,$(PLATFORMS),$(eval include $(patsubst %.$(platform).o,%.$(platform).d,$(OBJS_$(platform)))))
 

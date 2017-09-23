@@ -22,7 +22,7 @@ HOST_LDFLAGS		= -g
 # Compile a file and then generate its dependencies.
 #
 %.HOST.o: %.c
-	@ $(ECHO) \(HOST\) Compiling $(basename $<)
+	@ $(ECHO) $(COLOUR_GREEN)\(HOST\) Compiling $(basename $<) $(COLOUR_RESET)
 	@ $(HOST_CC) $(HOST_CFLAGS) $(INCLUDES) -c $< -o $@
 	@ $(HOST_CC) -MT $@ -MM $(HOST_CFLAGS) $(INCLUDES) $< -o $(notdir $(patsubst %.o,%.d,$@) )
 
@@ -32,7 +32,7 @@ HOST_LDFLAGS		= -g
 # Link the objects into a binary.
 #
 %.HOST.elf: 
-	@ $(ECHO) \(HOST\) Linking $(basename $<)
+	@ $(ECHO) $(COLOUR_GREEN)\(HOST\) Linking $(basename $<) $(COLOUR_RESET)
 	@ $(HOST_LD) $(HOST_LDFLAGS) -Xlinker -Map=$@.map -o $@ $^ $(LIBS)
 	@ $(SIZE) -d $@
 
