@@ -23,7 +23,7 @@ ARM_LDFLAGS			= -g
 %.ARM.o: %.c
 	@ $(ECHO) \(ARM\) Compiling $(basename $<)
 	@ $(ARM_CC) $(ARM_CFLAGS) $(INCLUDES) -c $< -o $@
-	@ $(ARM_CC) -MM $(ARM_CFLAGS) $(INCLUDES) $< -o $(notdir $(patsubst %.o,%.d,$@) )
+	@ $(ARM_CC) -MT $@ -MM $(ARM_CFLAGS) $(INCLUDES) $< -o $(notdir $(patsubst %.o,%.d,$@) )
 
 
 #

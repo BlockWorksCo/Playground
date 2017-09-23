@@ -24,7 +24,7 @@ HOST_LDFLAGS		= -g
 %.HOST.o: %.c
 	@ $(ECHO) \(HOST\) Compiling $(basename $<)
 	@ $(HOST_CC) $(HOST_CFLAGS) $(INCLUDES) -c $< -o $@
-	@ $(HOST_CC) -MM $(HOST_CFLAGS) $(INCLUDES) $< -o $(notdir $(patsubst %.o,%.d,$@) )
+	@ $(HOST_CC) -MT $@ -MM $(HOST_CFLAGS) $(INCLUDES) $< -o $(notdir $(patsubst %.o,%.d,$@) )
 
 
 

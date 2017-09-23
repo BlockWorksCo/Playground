@@ -110,8 +110,5 @@ $(foreach platform,$(PLATFORMS),$(eval Main.$(platform).elf:$$(OBJS_$(platform))
 # Include the dependency rules for each target iff already generated.
 # If they haven't been generated, then we have to build anyway.
 #
-#$(foreach platform,$(PLATFORMS),$(eval include $(notdir $(patsubst %.$(platform).o,%.($platform).d,$(OBJS)) ))))
--include $(notdir $(patsubst %.o,%.d,$(OBJS)) )
-
-
+$(foreach platform,$(PLATFORMS),$(eval include $(patsubst %.$(platform).o,%.$(platform).d,$(OBJS_$(platform)))))
 
