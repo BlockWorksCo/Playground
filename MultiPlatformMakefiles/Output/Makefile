@@ -5,7 +5,7 @@
 .DEFAULT_GOAL := all
 .SUFFIXES: .c .h .o
 
-#########################################################################################################
+####################################################################################################
 
 #
 # Common tools for all platforms.
@@ -21,7 +21,7 @@ COLOUR_GREEN    = "\033[0;32m"
 COLOUR_RESET    = "\033[0m"
 
 
-#########################################################################################################
+####################################################################################################
 
 #
 # Include the components.
@@ -62,10 +62,10 @@ clean:
 
 
 
-#########################################################################################################
+####################################################################################################
 # ** Beware: Macro-magic **
 # The names here are of the form Main.<platform>.elf . the following commands derive
-# the lists of objects and rule requried to build the targets with the defined list of
+# the lists of objects and rule(s) requried to build the targets with the defined list of
 # object from the component list above.
 #
 # The intention is that foreach target in TARGETS, we derive commands of the form:
@@ -75,6 +75,9 @@ clean:
 # "OBJS_HOST=one.HOST.o two.HOST.o three.HOST.o"
 # "Main.ARM.elf:$(OBJS_ARM)"
 # "Main.HOST.elf:$(OBJS_HOST)"
+# 
+# Also, foreach object foreach platform, dependency files (.d) are created and included
+# # so we can manage dependencies correctly.
 #
 
 #
