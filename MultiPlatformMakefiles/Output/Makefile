@@ -109,5 +109,5 @@ $(foreach platform,$(PLATFORMS),$(eval Main.$(platform).elf:$$(OBJS_$(platform))
 # e.g. for each platform the following dependency includes could be generated:
 # "include Main.ARM.d ComponentOne.ARM.d ComponentTwo.ARM.d"
 #
-$(foreach platform,$(PLATFORMS),$(eval include $(patsubst %.$(platform).o,%.$(platform).d,$(OBJS_$(platform)))))
+$(foreach platform,$(PLATFORMS),$(eval -include $(patsubst %.$(platform).o,%.$(platform).d,$(OBJS_$(platform)))))
 
