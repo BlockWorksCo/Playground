@@ -65,6 +65,7 @@ clean:
 #
 # The HostTests.Report depends on the HostTests executable.
 #
+include TEST.mk
 HostTests.Report: HostTests
 	@ $(ECHO) $(COLOUR_GREEN)Generating $@$(COLOUR_RESET)
 	@ ./$< > $@
@@ -73,7 +74,7 @@ HostTests:
 	@ $(ECHO) $(COLOUR_GREEN)Building $@$(COLOUR_RESET)
 	@ $(ECHO) "#include <stdio.h>" > HostTests.c
 	@ $(ECHO) "int main(){printf(\"HostTests OK\\\n\");return 0;}" >> HostTests.c
-	@ $(HOST_CC) -o $@ HostTests.c
+	@ $(TEST_CC) -o $@ HostTests.c
 
 
 ####################################################################################################
