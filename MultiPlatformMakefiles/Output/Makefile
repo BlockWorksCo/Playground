@@ -45,7 +45,7 @@ TARGETS=Main.ARM.elf Main.HOST.elf
 #
 # Default target(s).
 #
-all: $(TARGETS)
+all: $(TARGETS) HostTests.Report
 
 #
 # Remove all the build artifacts.
@@ -59,7 +59,21 @@ clean:
 	-@ $(RM) -f *.hex
 	-@ $(RM) -f *.elf
 	-@ $(RM) -f *.map
+	-@ $(RM) -f HostTests* 
 
+
+#
+# The HostTests.Report depends on the HostTests executable.
+#
+HostTests.Report: HostTests
+	@ $(ECHO) $(COLOUR_GREEN)Generating $@$(COLOUR_RESET)
+	@ ./$< > $@
+
+HostTests:
+	@ $(ECHO) $(COLOUR_GREEN)Building $@$(COLOUR_RESET)
+	@ $(ECHO) "#include <stdio.h>" > HostTests.c
+	@ $(ECHO) "int main(){printf(\"HostTests OK\\\n\");return 0;}" >> HostTests.c
+	@ $(HOST_CC) -o $@ HostTests.c
 
 
 ####################################################################################################
