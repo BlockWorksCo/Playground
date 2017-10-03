@@ -70,7 +70,7 @@ HostTests.Report: HostTests
 	@ $(ECHO) $(COLOUR_GREEN)Generating $@$(COLOUR_RESET)
 	@ ./$< > $@
 
-HostTests:
+HostTests: $(TEST_OBJS)
 	@ $(ECHO) $(COLOUR_GREEN)Building $@$(COLOUR_RESET)
 	@ $(ECHO) "#include <stdio.h>" > HostTests.c
 	@ $(ECHO) "int main(){printf(\"HostTests OK\\\n\");return 0;}" >> HostTests.c

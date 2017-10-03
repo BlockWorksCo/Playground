@@ -22,3 +22,10 @@ OBJS		+=	ComponentOne.o
 #
 LIBS		+=
 
+#
+# Test Objects to build.
+#
+TEST_OBJS	+=	TestComponentOne.o
+    		  		
+
+

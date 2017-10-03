@@ -22,3 +22,9 @@ OBJS		+=	ComponentTwo.o
 #
 LIBS		+=
 
+#
+# Test Objects to build.
+#
+TEST_OBJS	+=	TestComponentTwo.o
+    		  		
+
