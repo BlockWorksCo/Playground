@@ -65,6 +65,13 @@ public class sampleclient {
         String              message;
         GXDLMSTranslator    translator = new GXDLMSTranslator(TranslatorOutputType.SIMPLE_XML);
 
+        pdu = args[0];
+        System.out.println(pdu);
+
+        xml = translator.pduToXml(pdu);
+        System.out.println(xml);
+        
+/*
         //
         //
         //
@@ -97,7 +104,7 @@ public class sampleclient {
         message = "c4028100000000080081a012000509060100030601ff0f02120000020412000509060100030602ff0f02120000020412000509060100030603ff0f02120000020412000509060100030604ff0f02120000020412000509060100040600ff0f02120000020412000509060100040601ff0f02120000020412000509060100040602ff0f02120000020412000509060100040603ff0f02120000020412000509060100040604ff0f02120000";
         xml = translator.pduToXml( message );
         System.out.println(xml);
-
+*/
     }
 
     /**

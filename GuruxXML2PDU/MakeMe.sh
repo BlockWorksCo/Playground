@@ -11,4 +11,5 @@ mvn clean
 mvn package
 popd
 
-java -jar gurux.dlms.java/gurux.dlms.client.example.java/target/gurux.dlms.client.example.java-0.0.1-SNAPSHOT.jar
+mv gurux.dlms.java/gurux.dlms.client.example.java/target/gurux.dlms.client.example.java-0.0.1-SNAPSHOT.jar pdu2xml.jar
+java -jar pdu2xml.jar c4018100090c303030303030303130303031
