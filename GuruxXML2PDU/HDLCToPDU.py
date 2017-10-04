@@ -5,6 +5,7 @@
 
 import binascii
 import sys
+#import subprocess
 
 
 def ReadPDU(position, hdlc):
@@ -128,6 +129,7 @@ else:
     print('PDU=%s'%(binascii.hexlify(pdu)))
     print('FCS=%x'%(FCS))
 
+    #subprocess.call(['java','-jar','pdu2xml.jar',binascii.hexlify(pdu)])
 
 
 
