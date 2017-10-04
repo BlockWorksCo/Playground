@@ -1,0 +1,55 @@
+<GetResponse>
+  <GetResponseNormal>
+    <InvokeIdAndPriority Value="81" />
+    <Result>
+      <Data>
+        <Array Qty="01" >
+          <Structure Qty="0A" >
+            <Structure Qty="02" >
+              <Int8 Value="FE" />
+              <Enum Value="21" />
+            </Structure>
+            <Structure Qty="02" >
+              <Int8 Value="FE" />
+              <Enum Value="21" />
+            </Structure>
+            <Structure Qty="02" >
+              <Int8 Value="FE" />
+              <Enum Value="21" />
+            </Structure>
+            <Structure Qty="02" >
+              <Int8 Value="FF" />
+              <Enum Value="23" />
+            </Structure>
+            <Structure Qty="02" >
+              <Int8 Value="FF" />
+              <Enum Value="23" />
+            </Structure>
+            <Structure Qty="02" >
+              <Int8 Value="FF" />
+              <Enum Value="23" />
+            </Structure>
+            <Structure Qty="02" >
+              <Int8 Value="FE" />
+              <Enum Value="1E" />
+            </Structure>
+            <Structure Qty="02" >
+              <Int8 Value="FE" />
+              <Enum Value="20" />
+            </Structure>
+            <Structure Qty="02" >
+              <Int8 Value="FE" />
+              <Enum Value="20" />
+            </Structure>
+            <Structure Qty="02" >
+              <Int8 Value="FE" />
+              <Enum Value="1F" />
+            </Structure>
+          </Structure>
+        </Array>
+      </Data>
+    </Result>
+  </GetResponseNormal>
+</GetResponse>
+
+
