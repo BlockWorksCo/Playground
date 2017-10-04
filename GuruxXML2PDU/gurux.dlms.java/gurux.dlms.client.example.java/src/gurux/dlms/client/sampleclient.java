@@ -60,44 +60,43 @@ public class sampleclient {
     public static void main(String[] args) {
         Settings settings = new Settings();
 
+        String              pdu;
+        String              xml;
+        String              message;
+        GXDLMSTranslator    translator = new GXDLMSTranslator(TranslatorOutputType.SIMPLE_XML);
 
         //
         //
         //
-        GXDLMSTranslator    translator = new GXDLMSTranslator(TranslatorOutputType.SIMPLE_XML);
-        String xml = translator.pduToXml("60 1D A1 09 06 07 60 85 74 05 08 01 01 BE 10 04 0E 01 00 00 00 06 5F 1F 04 00 18 02 20 1F FF");
+        xml = translator.pduToXml("60 1D A1 09 06 07 60 85 74 05 08 01 01 BE 10 04 0E 01 00 00 00 06 5F 1F 04 00 18 02 20 1F FF");
         System.out.println(xml);
 
         //
         //
         //
-        //String  message = "7E A0 19 95 75 54 68 35 E6 E6 00 C0 01 81 00 08 00 00 01 00 00 FF 01 00 0D FD 7E";
-        String  message = "C1 01 09 00 08 00 00 01 00 00 FF 02 00 09 0C 07 D2 0C 04 03 0A 06 0B FF 00 78 00";
+        message = "C1 01 09 00 08 00 00 01 00 00 FF 02 00 09 0C 07 D2 0C 04 03 0A 06 0B FF 00 78 00";
         //xml = translator.messageToXml( message.getBytes() );
         xml = translator.pduToXml( message );
         System.out.println(xml);
 
+        //
+        //
+        //
+        //message = "7E A0 19 95 75 54 68 35 E6 E6 00 C0 01 81 00 08 00 00 01 00 00 FF 01 00 0D FD 7E";
+        message = "C0 01 81 00 08 00 00 01 00 00 FF 01 00";
+        xml = translator.pduToXml( message );
+        System.out.println(xml);
 
         //
         //
         //
-        /*
-        String xml = "<HDLC len=\"34\" >"+
-                "<TargetAddress Value=\"16\" />"+
-                "<SourceAddress Value=\"16401\" />"+
-                    "<PDU>"+
-                        "<Ua>"+
-                            "<MaxInfoRX Value=\"128\" />"+
-                            "<MaxInfoTX Value=\"128\" />"+
-                            "<WindowSizeRX Value=\"1\" />"+
-                            "<WindowSizeTX Value=\"1\" />"+
-                        "</Ua>"+
-                    "</PDU>"+
-                "</HDLC>";
-        */
         xml="<HDLC len=\"57\" > <TargetAddress Value=\"16\" /> <SourceAddress Value=\"16401\" /> <PDU> <AssociationResponse> <ApplicationContextName Value=\"LN\" /> <AssociationResult Value=\"0\" /> <ResultSourceDiagnostic> <ACSEServiceUser Value=\"0\" /> </ResultSourceDiagnostic> <InitiateResponse> <NegotiatedDlmsVersionNumber Value=\"6\" /> <NegotiatedConformance> <ConformanceBit Name=\"Action\" /> <ConformanceBit Name=\"SelectiveAccess\" /> <ConformanceBit Name=\"Set\" /> <ConformanceBit Name=\"Get\" /> <ConformanceBit Name=\"BlockTransferWithGetOrRead\" /> <ConformanceBit Name=\"Attribute0SupportedWithGet\" /> </NegotiatedConformance> <NegotiatedMaxPduSize Value=\"6400\" /> <VaaName Value=\"7\" /> </InitiateResponse> </AssociationResponse> </PDU> </HDLC>";
-        String pdu = translator.xmlToHexPdu(xml);
+        pdu = translator.xmlToHexPdu(xml);
         System.out.println(pdu);
+
+        message = "c4028100000000080081a012000509060100030601ff0f02120000020412000509060100030602ff0f02120000020412000509060100030603ff0f02120000020412000509060100030604ff0f02120000020412000509060100040600ff0f02120000020412000509060100040601ff0f02120000020412000509060100040602ff0f02120000020412000509060100040603ff0f02120000020412000509060100040604ff0f02120000";
+        xml = translator.pduToXml( message );
+        System.out.println(xml);
 
     }
 
