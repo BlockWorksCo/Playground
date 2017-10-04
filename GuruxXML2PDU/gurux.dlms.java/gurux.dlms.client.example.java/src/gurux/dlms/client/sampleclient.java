@@ -72,8 +72,10 @@ public class sampleclient {
         //
         //
         //String  message = "7E A0 19 95 75 54 68 35 E6 E6 00 C0 01 81 00 08 00 00 01 00 00 FF 01 00 0D FD 7E";
+        String  message = "C1 01 09 00 08 00 00 01 00 00 FF 02 00 09 0C 07 D2 0C 04 03 0A 06 0B FF 00 78 00";
         //xml = translator.messageToXml( message.getBytes() );
-        //System.out.println(xml);
+        xml = translator.pduToXml( message );
+        System.out.println(xml);
 
 
         //
