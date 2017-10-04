@@ -47,7 +47,7 @@ def WriteFrameLength(hdlc):
     frameLength = len(hdlc)
     frameLength = 0x22
 
-    hdlc = hdlc[0:4] + ('%08x'%frameLength) + hdlc[6:]
+    hdlc = hdlc[0:4] + ('%02x'%frameLength) + hdlc[6:]
 
     return hdlc
 
@@ -77,9 +77,13 @@ def WriteAddress(hdlc, address):
 
 #hdlcHex = "7e a047 00020023 41 10 974b e6e600 6036a1090607608574050801018a0207808b0760857405080201ac0a80083132333435363738be10040e01000000065f1f0400001f1fffff dc52 7e"
 #pduHex = "6036a1090607608574050801018a0207808b0760857405080201ac0a80083132333435363738be10040e01000000065f1f0400001f1fffff"
+
+# 7e a011 00020023 41 10 abcd e6e600 C4018100090C303030303030303130303031 abcd 7e
+# 7e a022 00020023 41 10 abcd e6e600 C4018100090C303030303030303130303031abcd7e
+
 pduHex  = sys.argv[1]
 
-print(pduHex)
+#print(pduHex)
 
 controlField= 0x10
 frameType   = 0xa0
