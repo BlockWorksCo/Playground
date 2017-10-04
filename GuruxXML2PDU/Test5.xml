@@ -1,0 +1,15 @@
+<SetRequest>
+  <SetRequestNormal>
+    <InvokeIdAndPriority Value="81" />
+    <AttributeDescriptor>
+      <ClassId Value="0008" />
+      <InstanceId Value="0000010000FF" />
+      <AttributeId Value="02" />
+    </AttributeDescriptor>
+    <Value>
+      <OctetString Value="07D20C04030A060BFF007800" />
+    </Value>
+  </SetRequestNormal>
+</SetRequest>
+
+

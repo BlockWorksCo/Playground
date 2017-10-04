@@ -1,0 +1,12 @@
+<GetRequest>
+  <GetRequestNormal>
+    <InvokeIdAndPriority Value="81" />
+    <AttributeDescriptor>
+      <ClassId Value="0009" />
+      <InstanceId Value="012345678901" />
+      <AttributeId Value="01" />
+    </AttributeDescriptor>
+  </GetRequestNormal>
+</GetRequest>
+
+

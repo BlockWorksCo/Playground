@@ -1,0 +1,13 @@
+<GetResponse>
+  <GetResponseNormal>
+    <InvokeIdAndPriority Value="81" />
+    <Result>
+      <Data>
+        <Enum Value="01" />
+      </Data>
+    </Result>
+  </GetResponseNormal>
+</GetResponse>
+
+
+
