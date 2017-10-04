@@ -19,14 +19,14 @@ def WriteCS(hdlc):
     """
     cs = 0xabcd
 
-    return hdlc+'%04x'%cs
+    return hdlc+('%04x'%cs)
 
 
 
 def WriteLLC(hdlc, llc):
     """
     """
-    return hdlc+'%06x'%(llc)
+    return hdlc+('%06x'%llc)
 
 
 
@@ -36,7 +36,7 @@ def WriteFrameFormat(hdlc, frameType):
     frameLength = 0x11
     format  = (frameType<<8) | (frameLength&0x7ff)
 
-    return hdlc+'%04x'%(format)
+    return hdlc+('%04x'%format)
 
 
 
@@ -47,7 +47,7 @@ def WriteFrameLength(hdlc):
     frameLength = len(hdlc)
     frameLength = 0x22
 
-    hdlc = hdlc[0:2] + ('%08x'%frameLength) + hdlc[3:]
+    hdlc = hdlc[0:4] + ('%08x'%frameLength) + hdlc[6:]
 
     return hdlc
 
@@ -56,7 +56,7 @@ def WriteFrameLength(hdlc):
 def WriteControlField(hdlc, control):
     """
     """
-    return hdlc+'%02x'%(control)
+    return hdlc+('%02x'%control)
 
 
 
@@ -78,7 +78,6 @@ def WriteAddress(hdlc, address):
 #hdlcHex = "7e a047 00020023 41 10 974b e6e600 6036a1090607608574050801018a0207808b0760857405080201ac0a80083132333435363738be10040e01000000065f1f0400001f1fffff dc52 7e"
 #pduHex = "6036a1090607608574050801018a0207808b0760857405080201ac0a80083132333435363738be10040e01000000065f1f0400001f1fffff"
 pduHex  = sys.argv[1]
-pdu    = binascii.unhexlify(pduHex)
 
 print(pduHex)
 
@@ -96,7 +95,7 @@ hdlc   = WriteAddress(hdlc,srcAddress)
 hdlc   = WriteControlField(hdlc, controlField)
 hdlc   = WriteCS(hdlc)
 hdlc   = WriteLLC(hdlc, LLC)
-hdlc   = WritePDU(hdlc, pdu)
+hdlc   = WritePDU(hdlc, pduHex)
 hdlc   = WriteFrameLength(hdlc)
 hdlc   = WriteCS(hdlc)
 hdlc   = hdlc+'7e'
