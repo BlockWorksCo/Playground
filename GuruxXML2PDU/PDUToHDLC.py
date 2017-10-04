@@ -7,6 +7,12 @@ import binascii
 import sys
 
 
+def crc16(hexData):
+    """
+    """
+    return 0xabcd
+
+
 def WritePDU(hdlc, pdu):
     """
     """
@@ -14,11 +20,9 @@ def WritePDU(hdlc, pdu):
 
 
 
-def WriteCS(hdlc):
+def WriteCS(hdlc,cs):
     """
     """
-    cs = 0xabcd
-
     return hdlc+('%04x'%cs)
 
 
@@ -97,11 +101,11 @@ hdlc   = WriteFrameFormat(hdlc,frameType)
 hdlc   = WriteAddress(hdlc,dstAddress)
 hdlc   = WriteAddress(hdlc,srcAddress)
 hdlc   = WriteControlField(hdlc, controlField)
-hdlc   = WriteCS(hdlc)
+hdlc   = WriteCS(hdlc, crc16(hdlc[2:]) )
 hdlc   = WriteLLC(hdlc, LLC)
 hdlc   = WritePDU(hdlc, pduHex)
 hdlc   = WriteFrameLength(hdlc)
-hdlc   = WriteCS(hdlc)
+hdlc   = WriteCS(hdlc, crc16(hdlc[2:-2]) )
 hdlc   = hdlc+'7e'
 
 print(hdlc)
