@@ -20,4 +20,5 @@ mv gurux.dlms.java/xml2pdu/target/gurux.dlms.client.example.java-0.0.1-SNAPSHOT.
 
 
 java -jar pdu2xml.jar c4018100090c303030303030303130303031
+java -jar xml2pdu.jar Test.xml
 

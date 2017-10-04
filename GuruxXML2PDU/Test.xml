@@ -1,0 +1,12 @@
+<GetResponse>
+  <GetResponseNormal>
+    <InvokeIdAndPriority Value="81" />
+    <Result>
+      <Data>
+        <OctetString Value="303030303030303130303031" />
+      </Data>
+    </Result>
+  </GetResponseNormal>
+</GetResponse>
+
+

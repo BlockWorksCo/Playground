@@ -51,8 +51,23 @@ import gurux.io.Parity;
 import gurux.io.StopBits;
 import gurux.net.GXNet;
 import gurux.serial.GXSerial;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.io.IOException;
+
 
 public class sampleclient {
+
+
+    static String readFile(String path) 
+        throws java.io.IOException
+    {
+      byte[] encoded = Files.readAllBytes(Paths.get(path));
+      return Arrays.toString(encoded);
+    }
+
     /**
      * @param args
      *            the command line arguments
@@ -62,15 +77,24 @@ public class sampleclient {
 
         String              pdu;
         String              xml;
+        String              xmlFile;
         String              message;
         GXDLMSTranslator    translator = new GXDLMSTranslator(TranslatorOutputType.SIMPLE_XML);
 
-        pdu = args[0];
+        xmlFile = args[0];
         System.out.println("xml2pdu");
 
-        xml = translator.pduToXml(pdu);
-        System.out.println(xml);
-        
+        //xml="<HDLC len=\"57\" > <TargetAddress Value=\"16\" /> <SourceAddress Value=\"16401\" /> <PDU> <AssociationResponse> <ApplicationContextName Value=\"LN\" /> <AssociationResult Value=\"0\" /> <ResultSourceDiagnostic> <ACSEServiceUser Value=\"0\" /> </ResultSourceDiagnostic> <InitiateResponse> <NegotiatedDlmsVersionNumber Value=\"6\" /> <NegotiatedConformance> <ConformanceBit Name=\"Action\" /> <ConformanceBit Name=\"SelectiveAccess\" /> <ConformanceBit Name=\"Set\" /> <ConformanceBit Name=\"Get\" /> <ConformanceBit Name=\"BlockTransferWithGetOrRead\" /> <ConformanceBit Name=\"Attribute0SupportedWithGet\" /> </NegotiatedConformance> <NegotiatedMaxPduSize Value=\"6400\" /> <VaaName Value=\"7\" /> </InitiateResponse> </AssociationResponse> </PDU> </HDLC>";
+        try
+        {
+            xml = readFile(xmlFile);
+            pdu = translator.xmlToHexPdu(xml);
+            System.out.println(pdu);
+        } 
+        catch(IOException e)
+        {
+        }
+
 /*
         //
         //
