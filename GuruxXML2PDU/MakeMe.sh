@@ -1,5 +1,7 @@
 #!/bin/bash
 
+rm xml2pdu.jar
+rm pdu2xml.jar
 
 pushd gurux.dlms.java/development
 mvn clean

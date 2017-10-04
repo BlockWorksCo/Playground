@@ -65,7 +65,7 @@ public class sampleclient {
         throws java.io.IOException
     {
       byte[] encoded = Files.readAllBytes(Paths.get(path));
-      return Arrays.toString(encoded);
+      return new String(encoded, "UTF-8");
     }
 
     /**
@@ -83,17 +83,21 @@ public class sampleclient {
 
         xmlFile = args[0];
         System.out.println("xml2pdu");
+        System.out.println(xmlFile);
 
         //xml="<HDLC len=\"57\" > <TargetAddress Value=\"16\" /> <SourceAddress Value=\"16401\" /> <PDU> <AssociationResponse> <ApplicationContextName Value=\"LN\" /> <AssociationResult Value=\"0\" /> <ResultSourceDiagnostic> <ACSEServiceUser Value=\"0\" /> </ResultSourceDiagnostic> <InitiateResponse> <NegotiatedDlmsVersionNumber Value=\"6\" /> <NegotiatedConformance> <ConformanceBit Name=\"Action\" /> <ConformanceBit Name=\"SelectiveAccess\" /> <ConformanceBit Name=\"Set\" /> <ConformanceBit Name=\"Get\" /> <ConformanceBit Name=\"BlockTransferWithGetOrRead\" /> <ConformanceBit Name=\"Attribute0SupportedWithGet\" /> </NegotiatedConformance> <NegotiatedMaxPduSize Value=\"6400\" /> <VaaName Value=\"7\" /> </InitiateResponse> </AssociationResponse> </PDU> </HDLC>";
-        try
-        {
-            xml = readFile(xmlFile);
-            pdu = translator.xmlToHexPdu(xml);
-            System.out.println(pdu);
-        } 
-        catch(IOException e)
-        {
-        }
+            System.out.println("reading file: "+xmlFile);
+            try
+            {
+                xml = readFile(xmlFile);
+                System.out.println(xml);
+                pdu = translator.xmlToHexPdu(xml);
+                System.out.println("PDU is "+pdu);
+            }
+            catch(IOException e)
+            {
+                System.out.println("Ouch!");
+            }
 
 /*
         //
