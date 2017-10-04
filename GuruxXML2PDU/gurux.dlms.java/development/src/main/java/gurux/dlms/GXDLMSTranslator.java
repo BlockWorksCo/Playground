@@ -430,7 +430,7 @@ public class GXDLMSTranslator {
             if (!tagsByName.containsKey(str)) {
                 tagsByName.put(str, it.getKey());
             } else {
-                System.out.println("Tag exists: " + str);
+                //System.out.println("Tag exists: " + str);
             }
         }
     }
