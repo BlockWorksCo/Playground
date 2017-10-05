@@ -119,7 +119,6 @@ def WriteFrameLength(hdlc, frameLength):
     """
     11-bit field
     """
-    print('length = %x'%frameLength)
 
     hdlc = hdlc[0:4] + ('%02x'%frameLength) + hdlc[6:]
 
