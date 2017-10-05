@@ -115,12 +115,11 @@ def WriteFrameFormat(hdlc, frameType):
 
 
 
-def WriteFrameLength(hdlc):
+def WriteFrameLength(hdlc, frameLength):
     """
     11-bit field
     """
-    frameLength = len(hdlc)
-    frameLength = 0x47
+    print('length = %x'%frameLength)
 
     hdlc = hdlc[0:4] + ('%02x'%frameLength) + hdlc[6:]
 
@@ -150,7 +149,6 @@ def WriteAddress(hdlc, address):
     return hdlc+address
 
 
-#7ea047000200234110974be6e6006036a1090607608574050801018a0207808b0760857405080201ac0a80083132333435363738be10040e01000000065f1f0400001f1fffff28967e
 #7ea047000200234110974be6e6006036a1090607608574050801018a0207808b0760857405080201ac0a80083132333435363738be10040e01000000065f1f0400001f1fffffdc527e"
 
 #hdlcHex = "7e a047 00020023 41 10 974b e6e600 6036a1090607608574050801018a0207808b0760857405080201ac0a80083132333435363738be10040e01000000065f1f0400001f1fffff dc52 7e"
@@ -178,7 +176,7 @@ hdlc   = WriteControlField(hdlc, controlField)
 hdlc   = WriteCS(hdlc, crc16(hdlc[2:]) )
 hdlc   = WriteLLC(hdlc, LLC)
 hdlc   = WritePDU(hdlc, pduHex)
-hdlc   = WriteFrameLength(hdlc)
+hdlc   = WriteFrameLength(hdlc, (len(hdlc[2:])+4)/2 )
 hdlc   = WriteCS(hdlc, crc16(hdlc[2:]) )
 hdlc   = hdlc+'7e'
 
