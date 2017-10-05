@@ -105,7 +105,7 @@ def ReadAddress(position, hdlc):
 hdlcHex = sys.argv[1]
 hdlc    = binascii.unhexlify(hdlcHex)
 
-print(hdlcHex)
+#print(hdlcHex)
 
 if ord(hdlc[0]) != 0x7e or ord(hdlc[-1]) != 0x7e:
     print('no HDLC framing detected.')
@@ -120,15 +120,16 @@ else:
     pdu,position                = ReadPDU(position, hdlc)
     FCS,position                = ReadCS(position, hdlc)
 
-    print('controlField=%x'%(controlField))
-    print('frameFormat=%x,%d'%(frameType,length))
-    print('src=%x'%(srcAddress))
-    print('dst=%x'%(dstAddress))
-    print('LLC=%x'%(LLC))
-    print('HCS=%x'%(HCS))
-    print('PDU=%s'%(binascii.hexlify(pdu)))
-    print('FCS=%x'%(FCS))
+    #print('controlField=%x'%(controlField))
+    #print('frameFormat=%x,%d'%(frameType,length))
+    #print('src=%x'%(srcAddress))
+    #print('dst=%x'%(dstAddress))
+    #print('LLC=%x'%(LLC))
+    #print('HCS=%x'%(HCS))
+    #print('PDU=%s'%(binascii.hexlify(pdu)))
+    #print('FCS=%x'%(FCS))
 
+    print(binascii.hexlify(pdu))
     #subprocess.call(['java','-jar','pdu2xml.jar',binascii.hexlify(pdu)])
 
 

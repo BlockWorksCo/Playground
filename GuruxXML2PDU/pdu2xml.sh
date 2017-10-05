@@ -1,10 +1,7 @@
 #!/bin/sh
 
 
-rm -f hdlcInfo
-python HDLCToPDU.py $1 > hdlcInfo
-cat hdlcInfo
-PDU=`grep -oP "PDU=\K(.*)" hdlcInfo`
+PDU=`python HDLCToPDU.py $1`
 java -jar pdu2xml.jar $PDU
 
 

@@ -66,7 +66,7 @@ public class sampleclient {
         GXDLMSTranslator    translator = new GXDLMSTranslator(TranslatorOutputType.SIMPLE_XML);
 
         pdu = args[0];
-        System.out.println("pdu2xml");
+        //System.out.println("pdu2xml");
 
         xml = translator.pduToXml(pdu);
         System.out.println(xml);
