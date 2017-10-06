@@ -186,9 +186,19 @@ def TestMe():
     SendHDLCToMeter(p, CreateAARQ('LN', 'Low', '3132333435363738') )
     time.sleep(1.0)
     print( DLMS.HDLCToDict(GetResponseFromMeter(p)) )
+
+    rq    = CreateGetRequest(8,'0203010000FF',2)
+    print(rq)
+    SendHDLCToMeter(p, rq )
+    time.sleep(1.0)
+    rsp    = GetResponseFromMeter(p)
+    print(rsp)
+    print( DLMS.HDLCToDict(rsp) )
  
 
 
+if __name__ == '__main__':
+    TestMe()
 
 
 

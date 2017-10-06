@@ -150,6 +150,7 @@ class FCS16(object):
     def pppfcs16(self, fcs, packet, formated=False):
         for ch in packet:
             fcs = (fcs >> 8) ^ self.fcstab[(fcs ^ ord(ch)) & 0xff]
+            print('%02x = %04x'%(ord(ch),0xffff-fcs))
 
         if formated is True:
             fcs = fcs ^ 0xffff
@@ -185,7 +186,20 @@ def WritePDU(hdlc, pdu):
 
 
 
-def WriteCS(hdlc,cs):
+def WriteHCS(hdlc,hcsPos,cs):
+    """
+    """
+    hdlc = hdlc[0:hcsPos] + ('%04x'%cs) + hdlc[hcsPos+4:]
+    return hdlc
+
+
+def WriteFakeHCS(hdlc,hcsPos,cs):
+    """
+    """
+    return hdlc+('%04x'%cs)
+
+
+def WriteFCS(hdlc,cs):
     """
     """
     return hdlc+('%04x'%cs)
@@ -243,10 +257,12 @@ def WriteAddress(hdlc, address):
 
 
 
-def PDUToHDLC(pduHex):
+def PDUToHDLC(pduHex, controlField=0x10):
     """
+    7e a01c 00020023 41 32 ca4d e6e600 c0018100010000600100ff0200 8c6d 7e <-- good
+    7e a01c 00020023 41 10 974b e6e600 C0018100010000600101FF0200 030f 7e
+    7e a01c 00020023 41 32 8749 e6e600 c0018100010000600100ff0200 b813 7e
     """
-    controlField= 0x10
     frameType   = 0xa0
     length      = 0x00
     srcAddress  = 0x41
@@ -258,11 +274,14 @@ def PDUToHDLC(pduHex):
     hdlc   = WriteAddress(hdlc,dstAddress)
     hdlc   = WriteAddress(hdlc,srcAddress)
     hdlc   = WriteControlField(hdlc, controlField)
-    hdlc   = WriteCS(hdlc, crc16(hdlc[2:]) )
+    hcsPos   = len(hdlc)
+    hdlc   = WriteFakeHCS(hdlc, hcsPos, 0xffff )
+    print()
     hdlc   = WriteLLC(hdlc, LLC)
     hdlc   = WritePDU(hdlc, pduHex)
     hdlc   = WriteFrameLength(hdlc, (len(hdlc[2:])+4)/2 )
-    hdlc   = WriteCS(hdlc, crc16(hdlc[2:]) )
+    hdlc   = WriteHCS(hdlc, hcsPos, crc16(hdlc[2:hcsPos]) )
+    hdlc   = WriteFCS(hdlc, crc16(hdlc[2:]) )
     hdlc   = hdlc+'7e'
 
     return hdlc
@@ -316,4 +335,7 @@ def DictToHDLC(d):
 
 
 
+if __name__ == '__main__':
+    print(PDUToHDLC('c0018100010000600100ff0200', controlField=0x32))
+    print('7ea01c000200234132ca4de6e600c0018100010000600100ff02008c6d7e')
 
