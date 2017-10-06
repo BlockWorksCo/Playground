@@ -72,7 +72,7 @@ def CreateSetRequest_OctetString(ic, obis, attributeId, value):
 
 
 
-AARETemplate  = \
+AARQTemplate  = \
 """
 <AssociationRequest>
   <ApplicationContextName Value="%s" />
@@ -98,11 +98,11 @@ AARETemplate  = \
 </AssociationRequest>
 """
 
-def CreateAARE(contextName, mechanismName, password):
+def CreateAARQ(contextName, mechanismName, password):
     """
-    DLMSPlayground.CreateAARE('LN', 'Low', '3132333435363738')
+    DLMSPlayground.CreateAARQ('LN', 'Low', '3132333435363738')
     """
-    xml     = AARETemplate%(contextName, mechanismName, password) 
+    xml     = AARQTemplate%(contextName, mechanismName, password) 
     d       = xmltodict.parse(xml)
     hdlc    = DLMS.DictToHDLC(d)
 
@@ -115,7 +115,7 @@ def CreateSNRM():
     DLMSPlayground.CreateSNRM()
     """
     #return '7ea023000200234193f736818014050200b4060200b407040000000108040000000115ca7e'
-    return '7ea00a410002002373fd607e'
+    return '7ea023000200234193f7368180140502010006020100070400000001080400000001696d7e'
 
 
 
@@ -174,9 +174,24 @@ def TestMe():
     """
     """
     p=OpenPortToMeter('/dev/ttyUSB2')
-    snrm=CreateSNRM()
-    SendHDLCToMeter(p, snrm)
+
+    SendHDLCToMeter(p, CreateDISC() )
     time.sleep(1.0)
-    GetResponseFromMeter(p)
+    print( GetResponseFromMeter(p) )
+
+    SendHDLCToMeter(p, CreateSNRM() )
+    time.sleep(1.0)
+    print( GetResponseFromMeter(p) )
+
+    SendHDLCToMeter(p, CreateAARQ('LN', 'Low', '3132333435363738') )
+    time.sleep(1.0)
+    print( DLMS.HDLCToDict(GetResponseFromMeter(p)) )
  
+
+
+
+
+
+
+
 
