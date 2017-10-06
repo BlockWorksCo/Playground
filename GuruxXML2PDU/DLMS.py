@@ -150,7 +150,7 @@ class FCS16(object):
     def pppfcs16(self, fcs, packet, formated=False):
         for ch in packet:
             fcs = (fcs >> 8) ^ self.fcstab[(fcs ^ ord(ch)) & 0xff]
-            print('%02x = %04x'%(ord(ch),0xffff-fcs))
+            #print('%02x = %04x'%(ord(ch),0xffff-fcs))
 
         if formated is True:
             fcs = fcs ^ 0xffff
@@ -276,7 +276,6 @@ def PDUToHDLC(pduHex, controlField=0x10):
     hdlc   = WriteControlField(hdlc, controlField)
     hcsPos   = len(hdlc)
     hdlc   = WriteFakeHCS(hdlc, hcsPos, 0xffff )
-    print()
     hdlc   = WriteLLC(hdlc, LLC)
     hdlc   = WritePDU(hdlc, pduHex)
     hdlc   = WriteFrameLength(hdlc, (len(hdlc[2:])+4)/2 )

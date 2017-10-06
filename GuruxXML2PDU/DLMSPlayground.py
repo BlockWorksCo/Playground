@@ -187,7 +187,7 @@ def TestMe():
     time.sleep(1.0)
     print( DLMS.HDLCToDict(GetResponseFromMeter(p)) )
 
-    rq    = CreateGetRequest(8,'0203010000FF',2)
+    rq    = CreateGetRequest(3,'0000600100FF',3)
     print(rq)
     SendHDLCToMeter(p, rq )
     time.sleep(1.0)
