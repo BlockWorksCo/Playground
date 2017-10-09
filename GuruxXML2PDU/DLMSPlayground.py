@@ -34,7 +34,7 @@ def CreateGetRequest(ic, obis, attributeId):
     """
     xml     = GetRequestTemplate%(ic,obis,attributeId) 
     d       = xmltodict.parse(xml)
-    hdlc    = DLMS.DictToHDLC(d)
+    hdlc    = DLMS.DictToHDLC(d, controlField=0x32)
 
     return hdlc
 
@@ -187,7 +187,7 @@ def TestMe():
     time.sleep(1.0)
     print( DLMS.HDLCToDict(GetResponseFromMeter(p)) )
 
-    rq    = CreateGetRequest(3,'0000600100FF',3)
+    rq    = CreateGetRequest(1,'0000600100FF',2)
     print(rq)
     SendHDLCToMeter(p, rq )
     time.sleep(1.0)

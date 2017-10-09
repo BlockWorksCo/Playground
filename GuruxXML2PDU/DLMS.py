@@ -262,6 +262,9 @@ def PDUToHDLC(pduHex, controlField=0x10):
     7e a01c 00020023 41 32 ca4d e6e600 c0018100010000600100ff0200 8c6d 7e <-- good
     7e a01c 00020023 41 10 974b e6e600 C0018100010000600101FF0200 030f 7e
     7e a01c 00020023 41 32 8749 e6e600 c0018100010000600100ff0200 b813 7e
+
+    7e a01c 00020023 41 32 ca4de 6e600 c0018100010000600100ff0200 8c6d 7e
+    7e a01c 00020023 41 10 da4fe 6e600 C0018100010000600100FF0200 8c6d 7e
     """
     frameType   = 0xa0
     length      = 0x00
@@ -312,7 +315,7 @@ def HDLCToDict(hdlcHex):
         return d
 
 
-def DictToHDLC(d):
+def DictToHDLC(d, controlField=0x10):
     """
     """
     xml = xmltodict.unparse(d)
@@ -321,7 +324,7 @@ def DictToHDLC(d):
     p   = subprocess.Popen(['java','-jar','xml2pdu.jar','temp.xml'], stdout=subprocess.PIPE)
     pdu,errorOutput  = p.communicate()
 
-    hdlc    = PDUToHDLC(pdu.replace('\n',''))
+    hdlc    = PDUToHDLC(pdu.replace('\n',''), controlField)
 
     return hdlc
 
