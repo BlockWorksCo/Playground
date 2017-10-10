@@ -11,6 +11,25 @@ import binascii
 
 
 
+sequenceNumber  = 1
+
+def SequenceNumber():
+    """
+    """
+    global sequenceNumber
+    thisSequenceNumber  = sequenceNumber
+    sequenceNumber      = (sequenceNumber + 1) & 0x3
+
+    return thisSequenceNumber
+
+
+def ControlField():
+    """
+    """
+    seq = SequenceNumber()
+    control = (seq<<5) | (0x01<<4) | (0x02)
+
+    return control
 
 
 GetRequestTemplate = \
@@ -34,7 +53,7 @@ def CreateGetRequest(ic, obis, attributeId):
     """
     xml     = GetRequestTemplate%(ic,obis,attributeId) 
     d       = xmltodict.parse(xml)
-    hdlc    = DLMS.DictToHDLC(d, controlField=0x32)
+    hdlc    = DLMS.DictToHDLC(d, controlField=ControlField() )
 
     return hdlc
 
@@ -64,7 +83,7 @@ def CreateSetRequest_OctetString(ic, obis, attributeId, value):
     """
     xml     = SetRequestTemplate_OctetString%(ic,obis,attributeId, value) 
     d       = xmltodict.parse(xml)
-    hdlc    = DLMS.DictToHDLC(d)
+    hdlc    = DLMS.DictToHDLC(d, controlField=0x32)
 
     return hdlc
 
@@ -104,7 +123,7 @@ def CreateAARQ(contextName, mechanismName, password):
     """
     xml     = AARQTemplate%(contextName, mechanismName, password) 
     d       = xmltodict.parse(xml)
-    hdlc    = DLMS.DictToHDLC(d)
+    hdlc    = DLMS.DictToHDLC(d, controlField=0x10)
 
     return hdlc
 
