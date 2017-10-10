@@ -5,6 +5,7 @@
 import DLMSPlayground
 import DLMS
 import time
+import xmltodict
 
 
 
@@ -107,6 +108,37 @@ OBISList    = \
 
 
 
+def ReadObjectList():
+    """
+    C0 01 81 00 0F 00 00 28 00 00 FF 02 00
+    """
+    p=DLMSPlayground.OpenPortToMeter('/dev/ttyUSB2')
+    
+    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateDISC() )
+    time.sleep(1.0)
+    print( DLMSPlayground.GetResponseFromMeter(p) )
+
+    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateSNRM() )
+    time.sleep(1.0)
+    print( DLMSPlayground.GetResponseFromMeter(p) )
+
+    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateAARQ('LN', 'Low', '3132333435363738') )
+    time.sleep(1.0)
+    print( DLMS.HDLCToDict(DLMSPlayground.GetResponseFromMeter(p)) )
+
+    hexCode = '%02x%02x%02x%02x%02x%02x'%(0,0,40,0,0,255)
+    print('------- getting %s --------'%hexCode)
+
+    rq    = DLMSPlayground.CreateGetRequest(15,hexCode,2)
+    print(rq)
+    DLMSPlayground.SendHDLCToMeter(p, rq )
+    time.sleep(1.0)
+    rsp    = DLMSPlayground.GetResponseFromMeter(p)
+    print(rsp)
+    print( DLMS.HDLCToDict(rsp) )
+
+
+
 def StaticDiscovery():
     """
     """
@@ -136,7 +168,7 @@ def StaticDiscovery():
         hexCode = '%02x%02x%02x%02x%02x%02x'%(a,b,c,d,e,f)
         print('------- getting %s --------'%hexCode)
 
-        rq    = DLMSPlayground.CreateGetRequest(ic,hexCode,2)
+        rq    = DLMSPlayground.CreateGetRequest(ic,hexCode,3)
         print(rq)
         DLMSPlayground.SendHDLCToMeter(p, rq )
         time.sleep(1.0)
@@ -144,17 +176,17 @@ def StaticDiscovery():
         print(rsp)
         print( DLMS.HDLCToDict(rsp) )
      
-        rq    = DLMSPlayground.CreateGetRequest(ic,hexCode,2)
-        print(rq)
-        DLMSPlayground.SendHDLCToMeter(p, rq )
-        time.sleep(1.0)
-        rsp    = DLMSPlayground.GetResponseFromMeter(p)
-        print(rsp)
-        print( DLMS.HDLCToDict(rsp) )
+        if rsp != None:
+            xml     = xmltodict.unparse(DLMS.HDLCToDict(rsp))
+            print(xml)
+            open('Objects/%s_attr3.xml'%(hexCode),'w+').write(xml)
+
+            
      
 
 
 
 if __name__ == '__main__':
-    StaticDiscovery()
+    #StaticDiscovery()
+    ReadObjectList()
 

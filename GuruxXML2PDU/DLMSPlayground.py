@@ -38,9 +38,9 @@ GetRequestTemplate = \
   <GetRequestNormal>
     <InvokeIdAndPriority Value="81" />
     <AttributeDescriptor>
-      <ClassId Value="%04d" />
+      <ClassId Value="%04x" />
       <InstanceId Value="%s" />
-      <AttributeId Value="%d" />
+      <AttributeId Value="%x" />
     </AttributeDescriptor>
   </GetRequestNormal>
 </GetRequest>
