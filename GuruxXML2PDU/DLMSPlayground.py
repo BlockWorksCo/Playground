@@ -203,12 +203,12 @@ def GetResponseFromMeter(port):
     """
     """
     response    = ''
-    while len(response) == 0:
-        while port.inWaiting() > 0:
-            response += port.read(1)
+    while port.inWaiting() > 0:
+        response += port.read(1)
 
-        response    = binascii.hexlify(response)
-    print(response)
+    response    = binascii.hexlify(response)
+    print('%d bytes received: [%s]'%(len(response),response))
+
     return response
 
 

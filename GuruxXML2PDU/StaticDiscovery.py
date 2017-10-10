@@ -11,8 +11,8 @@ import xmltodict
 
 OBISList    = \
 [
-   {'code':[ 0,0,1,0,0,255 ], 'ic':3 },
-   {'code':[ 1,0,0,1,2,255 ], 'ic':3 },
+   {'code':[ 0,0,1,0,0,255 ], 'ic':8 },
+   {'code':[ 1,0,0,1,2,255 ], 'ic':1 },
    {'code':[ 1,0,31,7,0,255 ], 'ic':3 },
    {'code':[ 1,0,51,7,0,255 ], 'ic':3 },
    {'code':[ 1,0,71,7,0,255 ], 'ic':3 },
@@ -42,16 +42,16 @@ OBISList    = \
    {'code':[ 1,0,44,7,0,255 ], 'ic':3 },
    {'code':[ 1,0,63,7,0,255 ], 'ic':3 },
    {'code':[ 1,0,64,7,0,255 ], 'ic':3 },
-   {'code':[ 1,0,1,6,0,255 ], 'ic':3 },
-   {'code':[ 1,0,1,6,1,255 ], 'ic':3 },
-   {'code':[ 1,0,1,6,2,255 ], 'ic':3 },
-   {'code':[ 1,0,1,6,3,255 ], 'ic':3 },
-   {'code':[ 1,0,1,6,4,255 ], 'ic':3 },
-   {'code':[ 1,0,2,6,0,255 ], 'ic':3 },
-   {'code':[ 1,0,2,6,1,255 ], 'ic':3 },
-   {'code':[ 1,0,2,6,2,255 ], 'ic':3 },
-   {'code':[ 1,0,2,6,3,255 ], 'ic':3 },
-   {'code':[ 1,0,2,6,4,255 ], 'ic':3 },
+   {'code':[ 1,0,1,6,0,255 ], 'ic':1 },
+   {'code':[ 1,0,1,6,1,255 ], 'ic':1 },
+   {'code':[ 1,0,1,6,2,255 ], 'ic':1 },
+   {'code':[ 1,0,1,6,3,255 ], 'ic':1 },
+   {'code':[ 1,0,1,6,4,255 ], 'ic':1 },
+   {'code':[ 1,0,2,6,0,255 ], 'ic':1 },
+   {'code':[ 1,0,2,6,1,255 ], 'ic':1 },
+   {'code':[ 1,0,2,6,2,255 ], 'ic':1 },
+   {'code':[ 1,0,2,6,3,255 ], 'ic':1 },
+   {'code':[ 1,0,2,6,4,255 ], 'ic':1 },
    {'code':[ 1,0,1,8,0,255 ], 'ic':3 },
    {'code':[ 1,0,1,8,1,255 ], 'ic':3 },
    {'code':[ 1,0,1,8,2,255 ], 'ic':3 },
@@ -72,16 +72,16 @@ OBISList    = \
    {'code':[ 1,0,2,2,2,255 ], 'ic':3 },
    {'code':[ 1,0,2,2,3,255 ], 'ic':3 },
    {'code':[ 1,0,2,2,4,255 ], 'ic':3 },
-   {'code':[ 1,0,3,6,0,255 ], 'ic':3 },
-   {'code':[ 1,0,3,6,1,255 ], 'ic':3 },
-   {'code':[ 1,0,3,6,2,255 ], 'ic':3 },
-   {'code':[ 1,0,3,6,3,255 ], 'ic':3 },
-   {'code':[ 1,0,3,6,4,255 ], 'ic':3 },
-   {'code':[ 1,0,4,6,0,255 ], 'ic':3 },
-   {'code':[ 1,0,4,6,1,255 ], 'ic':3 },
-   {'code':[ 1,0,4,6,2,255 ], 'ic':3 },
-   {'code':[ 1,0,4,6,3,255 ], 'ic':3 },
-   {'code':[ 1,0,4,6,4,255 ], 'ic':3 },
+   {'code':[ 1,0,3,6,0,255 ], 'ic':1 },
+   {'code':[ 1,0,3,6,1,255 ], 'ic':1 },
+   {'code':[ 1,0,3,6,2,255 ], 'ic':1 },
+   {'code':[ 1,0,3,6,3,255 ], 'ic':1 },
+   {'code':[ 1,0,3,6,4,255 ], 'ic':1 },
+   {'code':[ 1,0,4,6,0,255 ], 'ic':1 },
+   {'code':[ 1,0,4,6,1,255 ], 'ic':1 },
+   {'code':[ 1,0,4,6,2,255 ], 'ic':1 },
+   {'code':[ 1,0,4,6,3,255 ], 'ic':1 },
+   {'code':[ 1,0,4,6,4,255 ], 'ic':1 },
    {'code':[ 1,0,3,8,0,255 ], 'ic':3 },
    {'code':[ 1,0,3,8,1,255 ], 'ic':3 },
    {'code':[ 1,0,3,8,2,255 ], 'ic':3 },
@@ -102,9 +102,28 @@ OBISList    = \
    {'code':[ 1,0,4,2,2,255 ], 'ic':3 },
    {'code':[ 1,0,4,2,3,255 ], 'ic':3 },
    {'code':[ 1,0,4,2,3,255 ], 'ic':3 },
-   {'code':[ 0,0,1,0,0,255 ], 'ic':3 },
 ]
 
+
+
+def Associate():
+    """
+    """
+    p=DLMSPlayground.OpenPortToMeter('/dev/ttyUSB2')
+    
+    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateDISC() )
+    time.sleep(0.5)
+    print( DLMSPlayground.GetResponseFromMeter(p) )
+
+    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateSNRM() )
+    time.sleep(0.5)
+    print( DLMSPlayground.GetResponseFromMeter(p) )
+
+    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateAARQ('LN', 'Low', '3132333435363738') )
+    time.sleep(0.5)
+    print( DLMS.HDLCToDict(DLMSPlayground.GetResponseFromMeter(p)) )
+
+    return p
 
 
 
@@ -112,19 +131,8 @@ def ReadObjectList():
     """
     C0 01 81 00 0F 00 00 28 00 00 FF 02 00
     """
-    p=DLMSPlayground.OpenPortToMeter('/dev/ttyUSB2')
-    
-    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateDISC() )
-    time.sleep(1.0)
-    print( DLMSPlayground.GetResponseFromMeter(p) )
 
-    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateSNRM() )
-    time.sleep(1.0)
-    print( DLMSPlayground.GetResponseFromMeter(p) )
-
-    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateAARQ('LN', 'Low', '3132333435363738') )
-    time.sleep(1.0)
-    print( DLMS.HDLCToDict(DLMSPlayground.GetResponseFromMeter(p)) )
+    p   = Associate()
 
     hexCode = '%02x%02x%02x%02x%02x%02x'%(0,0,40,0,0,255)
     print('------- getting %s --------'%hexCode)
@@ -138,16 +146,16 @@ def ReadObjectList():
     print( DLMS.HDLCToDict(rsp) )
 
 
-    for i in range(2,10):
+    for i in range(5,10):
 
         print('--------> Block %d <-------'%i)
     
         rq    = DLMSPlayground.CreateGetBlockRequest(i)
-        print('get block: %s'%rq)
+        print('get block: [%s]'%rq)
         DLMSPlayground.SendHDLCToMeter(p, rq )
-        time.sleep(1.0)
+        time.sleep(0.5)
         rsp    = DLMSPlayground.GetResponseFromMeter(p)
-        print('block response: %s'%rsp)
+        print('block response: [%s]'%rsp)
         xml = DLMS.HDLCToXML(rsp)
         xml = xml.replace('=',' Value=')    # xml is not valid, no tag, just attribute, fix it up.
         print('response = %s'%xml)
@@ -158,19 +166,7 @@ def ReadObjectList():
 def StaticDiscovery():
     """
     """
-    p=DLMSPlayground.OpenPortToMeter('/dev/ttyUSB2')
-
-    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateDISC() )
-    time.sleep(1.0)
-    print( DLMSPlayground.GetResponseFromMeter(p) )
-
-    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateSNRM() )
-    time.sleep(1.0)
-    print( DLMSPlayground.GetResponseFromMeter(p) )
-
-    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateAARQ('LN', 'Low', '3132333435363738') )
-    time.sleep(1.0)
-    print( DLMS.HDLCToDict(DLMSPlayground.GetResponseFromMeter(p)) )
+    p   = Associate()
 
     for obisInfo in OBISList:
         a   = obisInfo['code'][0]
@@ -184,10 +180,10 @@ def StaticDiscovery():
         hexCode = '%02x%02x%02x%02x%02x%02x'%(a,b,c,d,e,f)
         print('------- getting %s --------'%hexCode)
 
-        rq    = DLMSPlayground.CreateGetRequest(ic,hexCode,3)
+        rq    = DLMSPlayground.CreateGetRequest(ic,hexCode,2)
         print(rq)
         DLMSPlayground.SendHDLCToMeter(p, rq )
-        time.sleep(1.0)
+        time.sleep(0.5)
         rsp    = DLMSPlayground.GetResponseFromMeter(p)
         print(rsp)
         print( DLMS.HDLCToDict(rsp) )
