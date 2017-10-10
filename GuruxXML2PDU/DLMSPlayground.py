@@ -18,7 +18,9 @@ def SequenceNumber():
     """
     global sequenceNumber
     thisSequenceNumber  = sequenceNumber
-    sequenceNumber      = (sequenceNumber + 1) & 0x3
+    sequenceNumber      = (sequenceNumber + 1) & 0x7
+
+    #print('*** New sequence number %d ***'%(thisSequenceNumber))
 
     return thisSequenceNumber
 
@@ -27,7 +29,7 @@ def ControlField():
     """
     """
     seq = SequenceNumber()
-    control = (seq<<5) | (0x01<<4) | (0x02)
+    control = (seq<<1) | (0x01<<4)
 
     return control
 
@@ -52,6 +54,29 @@ def CreateGetRequest(ic, obis, attributeId):
     DLMSPlayground.CreateGetRequest(8,'0203010000FF',2)
     """
     xml     = GetRequestTemplate%(ic,obis,attributeId) 
+    d       = xmltodict.parse(xml)
+    hdlc    = DLMS.DictToHDLC(d, controlField=ControlField() )
+
+    return hdlc
+
+
+
+
+GetRequestBlockTemplate = \
+"""
+<GetRequest>
+ <GetRequestForNextDataBlock>
+  <InvokeIdAndPriority Value="81" />
+  <BlockNumber Value="%d" />
+ </GetRequestForNextDataBlock>
+</GetRequest>
+"""
+
+
+def CreateGetBlockRequest(blockNumber):
+    """
+    """
+    xml     = GetRequestBlockTemplate%(blockNumber) 
     d       = xmltodict.parse(xml)
     hdlc    = DLMS.DictToHDLC(d, controlField=ControlField() )
 
@@ -178,11 +203,12 @@ def GetResponseFromMeter(port):
     """
     """
     response    = ''
-    while port.inWaiting() > 0:
-        response += port.read(1)
+    while len(response) == 0:
+        while port.inWaiting() > 0:
+            response += port.read(1)
 
-    response    = binascii.hexlify(response)
-    #print(response)
+        response    = binascii.hexlify(response)
+    print(response)
     return response
 
 

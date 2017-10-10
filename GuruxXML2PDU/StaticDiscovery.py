@@ -138,11 +138,39 @@ def ReadObjectList():
     print( DLMS.HDLCToDict(rsp) )
 
 
+    for i in range(2,10):
+
+        print('--------> Block %d <-------'%i)
+    
+        rq    = DLMSPlayground.CreateGetBlockRequest(i)
+        print('get block: %s'%rq)
+        DLMSPlayground.SendHDLCToMeter(p, rq )
+        time.sleep(1.0)
+        rsp    = DLMSPlayground.GetResponseFromMeter(p)
+        print('block response: %s'%rsp)
+        xml = DLMS.HDLCToXML(rsp)
+        xml = xml.replace('=',' Value=')    # xml is not valid, no tag, just attribute, fix it up.
+        print('response = %s'%xml)
+        print( xmltodict.parse(xml) )
+
+
 
 def StaticDiscovery():
     """
     """
     p=DLMSPlayground.OpenPortToMeter('/dev/ttyUSB2')
+
+    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateDISC() )
+    time.sleep(1.0)
+    print( DLMSPlayground.GetResponseFromMeter(p) )
+
+    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateSNRM() )
+    time.sleep(1.0)
+    print( DLMSPlayground.GetResponseFromMeter(p) )
+
+    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateAARQ('LN', 'Low', '3132333435363738') )
+    time.sleep(1.0)
+    print( DLMS.HDLCToDict(DLMSPlayground.GetResponseFromMeter(p)) )
 
     for obisInfo in OBISList:
         a   = obisInfo['code'][0]
@@ -152,18 +180,6 @@ def StaticDiscovery():
         e   = obisInfo['code'][4]
         f   = obisInfo['code'][5]
         ic  = obisInfo['ic']
-
-        DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateDISC() )
-        time.sleep(1.0)
-        print( DLMSPlayground.GetResponseFromMeter(p) )
-
-        DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateSNRM() )
-        time.sleep(1.0)
-        print( DLMSPlayground.GetResponseFromMeter(p) )
-
-        DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateAARQ('LN', 'Low', '3132333435363738') )
-        time.sleep(1.0)
-        print( DLMS.HDLCToDict(DLMSPlayground.GetResponseFromMeter(p)) )
 
         hexCode = '%02x%02x%02x%02x%02x%02x'%(a,b,c,d,e,f)
         print('------- getting %s --------'%hexCode)
@@ -187,6 +203,6 @@ def StaticDiscovery():
 
 
 if __name__ == '__main__':
-    #StaticDiscovery()
-    ReadObjectList()
+    StaticDiscovery()
+    #ReadObjectList()
 
