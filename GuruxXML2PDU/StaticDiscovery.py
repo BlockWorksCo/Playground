@@ -112,18 +112,6 @@ def StaticDiscovery():
     """
     p=DLMSPlayground.OpenPortToMeter('/dev/ttyUSB2')
 
-    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateDISC() )
-    time.sleep(1.0)
-    print( DLMSPlayground.GetResponseFromMeter(p) )
-
-    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateSNRM() )
-    time.sleep(1.0)
-    print( DLMSPlayground.GetResponseFromMeter(p) )
-
-    DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateAARQ('LN', 'Low', '3132333435363738') )
-    time.sleep(1.0)
-    print( DLMS.HDLCToDict(DLMSPlayground.GetResponseFromMeter(p)) )
-
     for obisInfo in OBISList:
         a   = obisInfo['code'][0]
         b   = obisInfo['code'][1]
@@ -132,6 +120,18 @@ def StaticDiscovery():
         e   = obisInfo['code'][4]
         f   = obisInfo['code'][5]
         ic  = obisInfo['ic']
+
+        DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateDISC() )
+        time.sleep(1.0)
+        print( DLMSPlayground.GetResponseFromMeter(p) )
+
+        DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateSNRM() )
+        time.sleep(1.0)
+        print( DLMSPlayground.GetResponseFromMeter(p) )
+
+        DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateAARQ('LN', 'Low', '3132333435363738') )
+        time.sleep(1.0)
+        print( DLMS.HDLCToDict(DLMSPlayground.GetResponseFromMeter(p)) )
 
         hexCode = '%02x%02x%02x%02x%02x%02x'%(a,b,c,d,e,f)
         print('------- getting %s --------'%hexCode)

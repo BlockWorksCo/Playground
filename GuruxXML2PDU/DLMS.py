@@ -303,15 +303,19 @@ def HDLCToDict(hdlcHex):
         srcAddress,position         = ReadAddress(position, hdlc)
         controlField,position       = ReadControlField(position, hdlc)
         HCS,position                = ReadCS(position, hdlc)
-        LLC,position                = ReadLLC(position, hdlc)
-        pdu,position                = ReadPDU(position, hdlc)
-        FCS,position                = ReadCS(position, hdlc)
+        print('len = %d'%(len(hdlc)))
+        if len(hdlc) > 13:
+            LLC,position                = ReadLLC(position, hdlc)
+            pdu,position                = ReadPDU(position, hdlc)
+            FCS,position                = ReadCS(position, hdlc)
 
-        p   = subprocess.Popen(['java','-jar','pdu2xml.jar',binascii.hexlify(pdu)], stdout=subprocess.PIPE)
-        output,errorOutput  = p.communicate()
+            p   = subprocess.Popen(['java','-jar','pdu2xml.jar',binascii.hexlify(pdu)], stdout=subprocess.PIPE)
+            output,errorOutput  = p.communicate()
 
-        d   = xmltodict.parse(output)
-    
+            d   = xmltodict.parse(output)
+        else:
+            d   = None
+        
         return d
 
 
