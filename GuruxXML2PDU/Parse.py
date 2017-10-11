@@ -27,159 +27,158 @@ def Indent():
     return ' '*len(inspect.stack())
 
 
-def ParseArray(pdu):
+def ParseArray(pdu,position):
     """
     """
-    if len(pdu) == 0:
-        return 0
+    if position == len(pdu):
+        return position
 
-    length = ord(pdu[0])
+    length = ord(pdu[position])
     print('%sarray of length %d'%(Indent(),length)) 
 
-    position    = 1
+    position    += 1
     for i in range(length):
-        position    += ParseAXDR(pdu[position:])
+        position    = ParseAXDR(pdu,position)
 
     return position
 
 
-def ParseOctetString(pdu):
+def ParseOctetString(pdu,position):
     """
     """
-    if len(pdu) == 0:
-        return 0
+    if position == len(pdu):
+        return position
 
-    length = ord(pdu[0])
-    value   = pdu[1:1+length]
+    length = ord(pdu[position])
+    value   = pdu[position:position+1+length]
     value   = binascii.hexlify(value)
     print('%soctet string of length %d = [%s]'%(Indent(),length,value))
 
-    return 1+length
+    return position+1+length
 
 
-def ParseStructure(pdu):
+def ParseStructure(pdu,position):
     """
     """
-    if len(pdu) == 0:
-        return 0
+    if position == len(pdu):
+        return position
 
-    numberOfFields = ord(pdu[0])
+    numberOfFields = ord(pdu[position])
     print('%sstructure with %d fields'%(Indent(),numberOfFields)) 
 
-    position    = 1
+    position    += 1
     for i in range(numberOfFields):
-        position    += ParseField(pdu[position:])
+        position    = ParseField(pdu,position)
 
     return position
 
 
-def ParseUint8(pdu):
+def ParseUint8(pdu,position):
     """
     """
-    if len(pdu) == 0:
-        return 0
+    if position == len(pdu):
+        return position
 
-    value  = ord(pdu[0])
+    value  = ord(pdu[position])
     print('%sUINT8 of value %02x'%(Indent(),value))
 
-    return 1
+    return position+1
 
 
-def ParseInt8(pdu):
+def ParseInt8(pdu,position):
     """
     """
-    if len(pdu) == 0:
-        return 0
+    if position == len(pdu):
+        return position
 
-    value  = ord(pdu[0])
+    value  = ord(pdu[position])
     print('%sINT8 of value %02x'%(Indent(),value))
 
-    return 1
+    return position+1
 
 
-def ParseBoolean(pdu):
+def ParseBoolean(pdu,position):
     """
     """
-    if len(pdu) == 0:
-        return 0
+    if position == len(pdu):
+        return position
 
-    value  = ord(pdu[0])
+    value  = ord(pdu[position])
     print('%sBOOLEAN of value %02x'%(Indent(),value))
 
-    return 1
+    return position+1
 
 
-def ParseEnum(pdu):
+def ParseEnum(pdu,position):
     """
     """
-    if len(pdu) == 0:
-        return 0
+    if position == len(pdu):
+        return position
 
-    hi  = ord(pdu[0])
-    lo  = ord(pdu[1])
+    hi  = ord(pdu[position+0])
+    lo  = ord(pdu[position+1])
     value   = (hi<<8)|lo
     print('%sENUM of value %02x'%(Indent(),value))
 
-    return 3
+    return position+3
 
 
-def ParseUint16(pdu):
+def ParseUint16(pdu,position):
     """
     """
-    if len(pdu) == 0:
-        return 0
+    if position == len(pdu):
+        return position
 
-    hi  = ord(pdu[0])
-    lo  = ord(pdu[1])
+    hi  = ord(pdu[position+0])
+    lo  = ord(pdu[position+1])
     value   = (hi<<8)|lo
     print('%sUINT16 of value %04x'%(Indent(),value))
 
-    return 2
+    return position+2
 
 
-def ParseFloat32(pdu):
+def ParseFloat32(pdu,position):
     """
     """
-    if len(pdu) == 0:
-        return 0
+    if position == len(pdu):
+        return position
 
-    b0  = ord(pdu[0])
-    b1  = ord(pdu[1])
-    b2  = ord(pdu[2])
-    b3  = ord(pdu[3])
+    b0  = ord(pdu[position+0])
+    b1  = ord(pdu[position+1])
+    b2  = ord(pdu[position+2])
+    b3  = ord(pdu[position+3])
     print('%sFLOAT32 of value %02x%02x%02x%02x'%(Indent(),b0,b1,b2,b3))
 
-    return 4
+    return position+4
 
 
-def ParseField(pdu):
+def ParseField(pdu,position):
     """
     """
-    if len(pdu) == 0:
-        return 0
+    if position == len(pdu):
+        return position
 
-    position    = 0
     tag = ord(pdu[position])
     position    += 1
 
     if tag == ARRAY:
-        position    += ParseArray(pdu[position:])
+        position    = ParseArray(pdu,position)
     elif tag == STRUCTURE:
-        position    += ParseStructure(pdu[position:])
+        position    = ParseStructure(pdu,position)
     elif tag == UINT8:
-        position    += ParseUint8(pdu[position:])
+        position    = ParseUint8(pdu,position)
     elif tag == UINT16:
-        position    += ParseUint16(pdu[position:])
+        position    = ParseUint16(pdu,position)
     elif tag == OCTET_STRING:
-        position    += ParseOctetString(pdu[position:])
+        position    = ParseOctetString(pdu,position)
     elif tag == INT8:
-        position    += ParseInt8(pdu[position:])
+        position    = ParseInt8(pdu,position)
     elif tag == ENUM:
-        position    += ParseEnum(pdu[position:])
+        position    = ParseEnum(pdu,position)
     elif tag == BOOLEAN:
-        position    += ParseBoolean(pdu[position:])
+        position    = ParseBoolean(pdu,position)
     elif tag == FLOAT32:
-        position    += ParseFloat32(pdu[position:])
+        position    = ParseFloat32(pdu,position)
     else:
         print('unknown tag %02x'%tag)
         sys.exit(-1)
@@ -187,15 +186,14 @@ def ParseField(pdu):
     return position
 
 
-def ParseAXDR(pdu):
+def ParseAXDR(pdu,position):
     """
     """
-    if len(pdu) == 0:
-        return 0
+    if position == len(pdu):
+        return position
 
-    position    = 0
     while position < len(pdu):
-        position    += ParseField(pdu[position:])
+        position    = ParseField(pdu,position)
         
     return position
 
@@ -204,6 +202,6 @@ def ParseAXDR(pdu):
 pduHex=open(sys.argv[1]).read()
 pdu     = binascii.unhexlify(pduHex.replace('\n',''))
 
-ParseAXDR(pdu)
+ParseAXDR(pdu,0)
 
 
