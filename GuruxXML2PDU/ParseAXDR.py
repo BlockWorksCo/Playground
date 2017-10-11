@@ -67,7 +67,7 @@ def ParseArray(pdu,position):
     position    += 1
     for i in range(length):
         print('%s<ArrayElement index="%d" offset="%d">'%(Indent(),i,position)) 
-        position    = ParseAXDR(pdu,position)
+        position    = ParseField(pdu,position)
         print('%s</ArrayElement>'%(Indent())) 
 
     print('%s</Array>'%(Indent())) 

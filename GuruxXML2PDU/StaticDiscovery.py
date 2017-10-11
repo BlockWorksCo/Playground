@@ -145,21 +145,30 @@ def ReadInstantaneousProfile():
     rq    = DLMSPlayground.CreateGetRequest(7,hexCode,3)
     print(rq)
     DLMSPlayground.SendHDLCToMeter(p, rq )
-    time.sleep(1.0)
+    time.sleep(0.5)
     rsp    = DLMSPlayground.GetResponseFromMeter(p)
     print(rsp)
-    print( DLMS.HDLCToDict(rsp) )
+    d= DLMS.HDLCToDict(rsp)
+    print(d)
 
-    for i in range(1,5):
+    ISCaptureObjects    = d['GetResponse']['GetResponsewithDataBlock']['Result']['Result']['RawData']['@Value']
+
+    for i in range(1,100):
 
         rq  = DLMSPlayground.CreateGetRequestforNextDataBlock(i)
         print(rq)
         DLMSPlayground.SendHDLCToMeter(p, rq )
-        time.sleep(1.0)
+        time.sleep(0.5)
         rsp    = DLMSPlayground.GetResponseFromMeter(p)
+        if len(rsp) == 0:
+            break
+        else:
+            ISCaptureObjects   = ISCaptureObjects + d['GetResponse']['GetResponsewithDataBlock']['Result']['Result']['RawData']['@Value']
+
         print(rsp)
         print( DLMS.HDLCToDict(rsp) )
 
+    print('IS capture objects: [%s]'%ISCaptureObjects)
 
     print('----- now reading buffer -----');
 
@@ -173,21 +182,41 @@ def ReadInstantaneousProfile():
     rq    = DLMSPlayground.CreateGetRequest(7,hexCode,2)
     print(rq)
     DLMSPlayground.SendHDLCToMeter(p, rq )
-    time.sleep(1.0)
+    time.sleep(0.5)
     rsp    = DLMSPlayground.GetResponseFromMeter(p)
     print(rsp)
-    print( DLMS.HDLCToDict(rsp) )
+    d   = DLMS.HDLCToDict(rsp)
+    print(d)
 
-    for i in range(1,5):
+    ISProfileBuffer   = d['GetResponse']['GetResponsewithDataBlock']['Result']['Result']['RawData']['@Value']
+
+    for i in range(1,20):
 
         rq  = DLMSPlayground.CreateGetRequestforNextDataBlock(i)
         print(rq)
         DLMSPlayground.SendHDLCToMeter(p, rq )
-        time.sleep(1.0)
+        time.sleep(0.5)
         rsp    = DLMSPlayground.GetResponseFromMeter(p)
-        print(rsp)
-        print( DLMS.HDLCToDict(rsp) )
+        if len(rsp) == 0:
+            break
 
+        xml = DLMS.HDLCToXML(rsp)
+        print(xml)
+        if xml[0:6] == '<Data=': 
+            xml = xml.replace('=',' Value=')    # xml is not valid, no tag, just attribute, fix it up.
+            d = xmltodict.parse(xml)
+            dataField   = d['Data']['@Value']
+        else:
+            d = xmltodict.parse(xml)
+            dataField   = d['GetResponse']['GetResponsewithDataBlock']['Result']['Result']['RawData']['@Value']
+
+        ISProfileBuffer = ISProfileBuffer + dataField
+
+        print(rsp)
+        print(d)
+
+
+    print('IS Profile buffer: %s'%ISProfileBuffer)
 
 
 
@@ -298,7 +327,7 @@ def StaticDiscovery():
 
 
 if __name__ == '__main__':
-    #ReadInstantaneousProfile()
-    StaticDiscovery()
+    ReadInstantaneousProfile()
+    #StaticDiscovery()
     #ReadObjectList()
 
