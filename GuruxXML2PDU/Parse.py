@@ -30,6 +30,9 @@ def Indent():
 def ParseArray(pdu):
     """
     """
+    if len(pdu) == 0:
+        return 0
+
     length = ord(pdu[0])
     print('%sarray of length %d'%(Indent(),length)) 
 
@@ -43,6 +46,9 @@ def ParseArray(pdu):
 def ParseOctetString(pdu):
     """
     """
+    if len(pdu) == 0:
+        return 0
+
     length = ord(pdu[0])
     value   = pdu[1:1+length]
     value   = binascii.hexlify(value)
@@ -54,12 +60,15 @@ def ParseOctetString(pdu):
 def ParseStructure(pdu):
     """
     """
+    if len(pdu) == 0:
+        return 0
+
     numberOfFields = ord(pdu[0])
     print('%sstructure with %d fields'%(Indent(),numberOfFields)) 
 
     position    = 1
     for i in range(numberOfFields):
-        position    += ParseAXDR(pdu[position:])
+        position    += ParseField(pdu[position:])
 
     return position
 
@@ -67,6 +76,9 @@ def ParseStructure(pdu):
 def ParseUint8(pdu):
     """
     """
+    if len(pdu) == 0:
+        return 0
+
     value  = ord(pdu[0])
     print('%sUINT8 of value %02x'%(Indent(),value))
 
@@ -76,6 +88,9 @@ def ParseUint8(pdu):
 def ParseInt8(pdu):
     """
     """
+    if len(pdu) == 0:
+        return 0
+
     value  = ord(pdu[0])
     print('%sINT8 of value %02x'%(Indent(),value))
 
@@ -85,6 +100,9 @@ def ParseInt8(pdu):
 def ParseBoolean(pdu):
     """
     """
+    if len(pdu) == 0:
+        return 0
+
     value  = ord(pdu[0])
     print('%sBOOLEAN of value %02x'%(Indent(),value))
 
@@ -94,6 +112,9 @@ def ParseBoolean(pdu):
 def ParseEnum(pdu):
     """
     """
+    if len(pdu) == 0:
+        return 0
+
     hi  = ord(pdu[0])
     lo  = ord(pdu[1])
     value   = (hi<<8)|lo
@@ -105,6 +126,9 @@ def ParseEnum(pdu):
 def ParseUint16(pdu):
     """
     """
+    if len(pdu) == 0:
+        return 0
+
     hi  = ord(pdu[0])
     lo  = ord(pdu[1])
     value   = (hi<<8)|lo
@@ -116,6 +140,9 @@ def ParseUint16(pdu):
 def ParseFloat32(pdu):
     """
     """
+    if len(pdu) == 0:
+        return 0
+
     b0  = ord(pdu[0])
     b1  = ord(pdu[1])
     b2  = ord(pdu[2])
@@ -125,37 +152,51 @@ def ParseFloat32(pdu):
     return 4
 
 
+def ParseField(pdu):
+    """
+    """
+    if len(pdu) == 0:
+        return 0
+
+    position    = 0
+    tag = ord(pdu[position])
+    position    += 1
+
+    if tag == ARRAY:
+        position    += ParseArray(pdu[position:])
+    elif tag == STRUCTURE:
+        position    += ParseStructure(pdu[position:])
+    elif tag == UINT8:
+        position    += ParseUint8(pdu[position:])
+    elif tag == UINT16:
+        position    += ParseUint16(pdu[position:])
+    elif tag == OCTET_STRING:
+        position    += ParseOctetString(pdu[position:])
+    elif tag == INT8:
+        position    += ParseInt8(pdu[position:])
+    elif tag == ENUM:
+        position    += ParseEnum(pdu[position:])
+    elif tag == BOOLEAN:
+        position    += ParseBoolean(pdu[position:])
+    elif tag == FLOAT32:
+        position    += ParseFloat32(pdu[position:])
+    else:
+        print('unknown tag %02x'%tag)
+        sys.exit(-1)
+
+    return position
+
+
 def ParseAXDR(pdu):
     """
     """
+    if len(pdu) == 0:
+        return 0
+
     position    = 0
     while position < len(pdu):
+        position    += ParseField(pdu[position:])
         
-        tag = ord(pdu[position])
-        position    += 1
-
-        if tag == ARRAY:
-            position    += ParseArray(pdu[position:])
-        elif tag == STRUCTURE:
-            position    += ParseStructure(pdu[position:])
-        elif tag == UINT8:
-            position    += ParseUint8(pdu[position:])
-        elif tag == UINT16:
-            position    += ParseUint16(pdu[position:])
-        elif tag == OCTET_STRING:
-            position    += ParseOctetString(pdu[position:])
-        elif tag == INT8:
-            position    += ParseInt8(pdu[position:])
-        elif tag == ENUM:
-            position    += ParseEnum(pdu[position:])
-        elif tag == BOOLEAN:
-            position    += ParseBoolean(pdu[position:])
-        elif tag == FLOAT32:
-            position    += ParseFloat32(pdu[position:])
-        else:
-            print('unknown tag %02x'%tag)
-            sys.exit(-1)
-
     return position
 
 

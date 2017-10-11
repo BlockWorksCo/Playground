@@ -130,11 +130,43 @@ def Associate():
 
 def ReadInstantaneousProfile():
     """
-    C0 01 81 00 0F 00 00 28 00 00 FF 02 00
     """
 
     p   = Associate()
 
+    print('----- now capture_objects -----');
+
+    #
+    # read capture_objects.
+    #
+    hexCode = '%02x%02x%02x%02x%02x%02x'%(1,0,94,66,0,255)
+    print('------- getting %s --------'%hexCode)
+
+    rq    = DLMSPlayground.CreateGetRequest(7,hexCode,3)
+    print(rq)
+    DLMSPlayground.SendHDLCToMeter(p, rq )
+    time.sleep(1.0)
+    rsp    = DLMSPlayground.GetResponseFromMeter(p)
+    print(rsp)
+    print( DLMS.HDLCToDict(rsp) )
+
+    for i in range(1,5):
+
+        rq  = DLMSPlayground.CreateGetRequestforNextDataBlock(i)
+        print(rq)
+        DLMSPlayground.SendHDLCToMeter(p, rq )
+        time.sleep(1.0)
+        rsp    = DLMSPlayground.GetResponseFromMeter(p)
+        print(rsp)
+        print( DLMS.HDLCToDict(rsp) )
+
+
+    print('----- now reading buffer -----');
+
+
+    #
+    # read buffer (values)
+    #
     hexCode = '%02x%02x%02x%02x%02x%02x'%(1,0,94,66,0,255)
     print('------- getting %s --------'%hexCode)
 
