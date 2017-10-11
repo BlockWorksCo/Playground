@@ -81,7 +81,7 @@ def ParseOctetString(pdu,position):
         return position
 
     length = ord(pdu[position])
-    value   = pdu[position:position+1+length]
+    value   = pdu[position+1:position+1+length]
     value   = binascii.hexlify(value)
     print('%s<OctetString offset="%d">%s</OctetString>'%(Indent(),position,value))
 
@@ -95,7 +95,7 @@ def ParseStructure(pdu,position):
         return position
 
     numberOfFields = ord(pdu[position])
-    print('%s<Structure length="%d" offset="%d">'%(Indent(),position,numberOfFields)) 
+    print('%s<Structure length="%d" offset="%d">'%(Indent(),numberOfFields,position)) 
 
     position    += 1
     for i in range(numberOfFields):
