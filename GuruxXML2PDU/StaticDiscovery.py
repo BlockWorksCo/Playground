@@ -196,8 +196,11 @@ def ReadObjectList():
     """
     C0 01 81 00 0F 00 00 28 00 00 FF 02 00
     """
+   
 
     p   = Associate()
+
+    objectList  = ''
 
     hexCode = '%02x%02x%02x%02x%02x%02x'%(0,0,40,0,0,255)
     print('------- getting %s --------'%hexCode)
@@ -208,23 +211,39 @@ def ReadObjectList():
     time.sleep(1.0)
     rsp    = DLMSPlayground.GetResponseFromMeter(p)
     print(rsp)
-    print( DLMS.HDLCToDict(rsp) )
+    d   = DLMS.HDLCToDict(rsp)
+    print(d)
 
 
-    for i in range(5,10):
+    objectList  = objectList + d['GetResponse']['GetResponsewithDataBlock']['Result']['Result']['RawData']['@Value']
+
+    for i in range(1,200):
 
         print('--------> Block %d <-------'%i)
     
-        rq    = DLMSPlayground.CreateGetBlockRequest(i)
-        print('get block: [%s]'%rq)
+        rq  = DLMSPlayground.CreateGetRequestforNextDataBlock(i)
+        print(rq)
         DLMSPlayground.SendHDLCToMeter(p, rq )
         time.sleep(0.5)
+
         rsp    = DLMSPlayground.GetResponseFromMeter(p)
-        print('block response: [%s]'%rsp)
-        xml = DLMS.HDLCToXML(rsp)
-        xml = xml.replace('=',' Value=')    # xml is not valid, no tag, just attribute, fix it up.
-        print('response = %s'%xml)
-        print( xmltodict.parse(xml) )
+        if len(rsp) > 0:
+            print('block response: [%s]'%rsp)
+            xml = DLMS.HDLCToXML(rsp)
+            #xml = xml.replace('=',' Value=')    # xml is not valid, no tag, just attribute, fix it up.
+            print('response = %s'%xml)
+            d   = xmltodict.parse(xml)
+            print(d)
+            print(rsp)
+            #print( DLMS.HDLCToDict(rsp) )
+        
+            objectList  = objectList + d['GetResponse']['GetResponsewithDataBlock']['Result']['Result']['RawData']['@Value']
+        else:
+            break
+
+
+    print(objectList)
+
 
 
 
@@ -279,7 +298,7 @@ def StaticDiscovery():
 
 
 if __name__ == '__main__':
-    ReadInstantaneousProfile()
+    #ReadInstantaneousProfile()
     #StaticDiscovery()
-    #ReadObjectList()
+    ReadObjectList()
 

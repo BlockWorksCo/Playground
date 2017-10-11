@@ -34,7 +34,7 @@ def ParseArray(pdu,position):
         return position
 
     length = ord(pdu[position])
-    print('%sarray of length %d'%(Indent(),length)) 
+    print('%04x:%sarray of length %d'%(position,Indent(),length)) 
 
     position    += 1
     for i in range(length):
@@ -52,7 +52,7 @@ def ParseOctetString(pdu,position):
     length = ord(pdu[position])
     value   = pdu[position:position+1+length]
     value   = binascii.hexlify(value)
-    print('%soctet string of length %d = [%s]'%(Indent(),length,value))
+    print('%04x:%soctet string of length %d = [%s]'%(position,Indent(),length,value))
 
     return position+1+length
 
@@ -64,7 +64,7 @@ def ParseStructure(pdu,position):
         return position
 
     numberOfFields = ord(pdu[position])
-    print('%sstructure with %d fields'%(Indent(),numberOfFields)) 
+    print('%04x:%sstructure with %d fields'%(position,Indent(),numberOfFields)) 
 
     position    += 1
     for i in range(numberOfFields):
@@ -80,7 +80,7 @@ def ParseUint8(pdu,position):
         return position
 
     value  = ord(pdu[position])
-    print('%sUINT8 of value %02x'%(Indent(),value))
+    print('%04x:%sUINT8 of value %02x'%(position,Indent(),value))
 
     return position+1
 
@@ -92,7 +92,7 @@ def ParseInt8(pdu,position):
         return position
 
     value  = ord(pdu[position])
-    print('%sINT8 of value %02x'%(Indent(),value))
+    print('%04x:%sINT8 of value %02x'%(position,Indent(),value))
 
     return position+1
 
@@ -104,7 +104,7 @@ def ParseBoolean(pdu,position):
         return position
 
     value  = ord(pdu[position])
-    print('%sBOOLEAN of value %02x'%(Indent(),value))
+    print('%04x:%sBOOLEAN of value %02x'%(position,Indent(),value))
 
     return position+1
 
@@ -118,7 +118,7 @@ def ParseEnum(pdu,position):
     hi  = ord(pdu[position+0])
     lo  = ord(pdu[position+1])
     value   = (hi<<8)|lo
-    print('%sENUM of value %02x'%(Indent(),value))
+    print('%04x:%sENUM of value %02x'%(position,Indent(),value))
 
     return position+3
 
@@ -132,7 +132,7 @@ def ParseUint16(pdu,position):
     hi  = ord(pdu[position+0])
     lo  = ord(pdu[position+1])
     value   = (hi<<8)|lo
-    print('%sUINT16 of value %04x'%(Indent(),value))
+    print('%04x:%sUINT16 of value %04x'%(position,Indent(),value))
 
     return position+2
 
@@ -147,7 +147,7 @@ def ParseFloat32(pdu,position):
     b1  = ord(pdu[position+1])
     b2  = ord(pdu[position+2])
     b3  = ord(pdu[position+3])
-    print('%sFLOAT32 of value %02x%02x%02x%02x'%(Indent(),b0,b1,b2,b3))
+    print('%04x:%sFLOAT32 of value %02x%02x%02x%02x'%(position,Indent(),b0,b1,b2,b3))
 
     return position+4
 
