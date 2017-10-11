@@ -6,6 +6,7 @@ import DLMSPlayground
 import DLMS
 import time
 import xmltodict
+import re
 
 
 
@@ -42,16 +43,16 @@ OBISList    = \
    {'code':[ 1,0,44,7,0,255 ], 'ic':3 },
    {'code':[ 1,0,63,7,0,255 ], 'ic':3 },
    {'code':[ 1,0,64,7,0,255 ], 'ic':3 },
-   {'code':[ 1,0,1,6,0,255 ], 'ic':1 },
-   {'code':[ 1,0,1,6,1,255 ], 'ic':1 },
-   {'code':[ 1,0,1,6,2,255 ], 'ic':1 },
-   {'code':[ 1,0,1,6,3,255 ], 'ic':1 },
-   {'code':[ 1,0,1,6,4,255 ], 'ic':1 },
-   {'code':[ 1,0,2,6,0,255 ], 'ic':1 },
-   {'code':[ 1,0,2,6,1,255 ], 'ic':1 },
-   {'code':[ 1,0,2,6,2,255 ], 'ic':1 },
-   {'code':[ 1,0,2,6,3,255 ], 'ic':1 },
-   {'code':[ 1,0,2,6,4,255 ], 'ic':1 },
+   {'code':[ 1,0,1,6,0,255 ], 'ic':4 },
+   {'code':[ 1,0,1,6,1,255 ], 'ic':4 },
+   {'code':[ 1,0,1,6,2,255 ], 'ic':4 },
+   {'code':[ 1,0,1,6,3,255 ], 'ic':4 },
+   {'code':[ 1,0,1,6,4,255 ], 'ic':4 },
+   {'code':[ 1,0,2,6,0,255 ], 'ic':4 },
+   {'code':[ 1,0,2,6,1,255 ], 'ic':4 },
+   {'code':[ 1,0,2,6,2,255 ], 'ic':4 },
+   {'code':[ 1,0,2,6,3,255 ], 'ic':4 },
+   {'code':[ 1,0,2,6,4,255 ], 'ic':4 },
    {'code':[ 1,0,1,8,0,255 ], 'ic':3 },
    {'code':[ 1,0,1,8,1,255 ], 'ic':3 },
    {'code':[ 1,0,1,8,2,255 ], 'ic':3 },
@@ -72,16 +73,16 @@ OBISList    = \
    {'code':[ 1,0,2,2,2,255 ], 'ic':3 },
    {'code':[ 1,0,2,2,3,255 ], 'ic':3 },
    {'code':[ 1,0,2,2,4,255 ], 'ic':3 },
-   {'code':[ 1,0,3,6,0,255 ], 'ic':1 },
-   {'code':[ 1,0,3,6,1,255 ], 'ic':1 },
-   {'code':[ 1,0,3,6,2,255 ], 'ic':1 },
-   {'code':[ 1,0,3,6,3,255 ], 'ic':1 },
-   {'code':[ 1,0,3,6,4,255 ], 'ic':1 },
-   {'code':[ 1,0,4,6,0,255 ], 'ic':1 },
-   {'code':[ 1,0,4,6,1,255 ], 'ic':1 },
-   {'code':[ 1,0,4,6,2,255 ], 'ic':1 },
-   {'code':[ 1,0,4,6,3,255 ], 'ic':1 },
-   {'code':[ 1,0,4,6,4,255 ], 'ic':1 },
+   {'code':[ 1,0,3,6,0,255 ], 'ic':4 },
+   {'code':[ 1,0,3,6,1,255 ], 'ic':4 },
+   {'code':[ 1,0,3,6,2,255 ], 'ic':4 },
+   {'code':[ 1,0,3,6,3,255 ], 'ic':4 },
+   {'code':[ 1,0,3,6,4,255 ], 'ic':4 },
+   {'code':[ 1,0,4,6,0,255 ], 'ic':4 },
+   {'code':[ 1,0,4,6,1,255 ], 'ic':4 },
+   {'code':[ 1,0,4,6,2,255 ], 'ic':4 },
+   {'code':[ 1,0,4,6,3,255 ], 'ic':4 },
+   {'code':[ 1,0,4,6,4,255 ], 'ic':4 },
    {'code':[ 1,0,3,8,0,255 ], 'ic':3 },
    {'code':[ 1,0,3,8,1,255 ], 'ic':3 },
    {'code':[ 1,0,3,8,2,255 ], 'ic':3 },
@@ -180,6 +181,18 @@ def StaticDiscovery():
         hexCode = '%02x%02x%02x%02x%02x%02x'%(a,b,c,d,e,f)
         print('------- getting %s --------'%hexCode)
 
+        rq    = DLMSPlayground.CreateGetRequest(ic,hexCode,3)
+        print(rq)
+        DLMSPlayground.SendHDLCToMeter(p, rq )
+        time.sleep(0.5)
+        rsp    = DLMSPlayground.GetResponseFromMeter(p)
+        print(rsp)
+        print( DLMS.HDLCToDict(rsp) )
+     
+        if rsp != None:
+            xmlAttr3     = xmltodict.unparse(DLMS.HDLCToDict(rsp))
+
+
         rq    = DLMSPlayground.CreateGetRequest(ic,hexCode,2)
         print(rq)
         DLMSPlayground.SendHDLCToMeter(p, rq )
@@ -189,9 +202,12 @@ def StaticDiscovery():
         print( DLMS.HDLCToDict(rsp) )
      
         if rsp != None:
-            xml     = xmltodict.unparse(DLMS.HDLCToDict(rsp))
-            print(xml)
-            open('Objects/%s_attr3.xml'%(hexCode),'w+').write(xml)
+            xmlAttr2     = xmltodict.unparse(DLMS.HDLCToDict(rsp))
+
+
+        combinedXML = '<Object><OBIS value="%s" /><ClassID Value="%d" /><Attribute2Read>%s</Attribute2Read>\n<Attribute3Read>%s</Attribute3Read></Object>'%(hexCode,ic,xmlAttr2,xmlAttr3)
+        combinedXML = re.sub(r'<\?.*\?>','',combinedXML)
+        open('Objects/%s.xml'%(hexCode),'w+').write(combinedXML)
 
             
      
