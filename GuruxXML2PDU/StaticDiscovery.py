@@ -299,6 +299,6 @@ def StaticDiscovery():
 
 if __name__ == '__main__':
     #ReadInstantaneousProfile()
-    #StaticDiscovery()
-    ReadObjectList()
+    StaticDiscovery()
+    #ReadObjectList()
 
