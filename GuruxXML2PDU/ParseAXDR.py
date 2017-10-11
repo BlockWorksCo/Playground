@@ -62,13 +62,15 @@ def ParseArray(pdu,position):
         return position
 
     length = ord(pdu[position])
-    print('%04x:%s<Array length="%d">'%(position,Indent(),length)) 
+    print('%s<Array length="%d" offset="%d">'%(Indent(),length,position)) 
 
     position    += 1
     for i in range(length):
+        print('%s<ArrayElement index="%d" offset="%d">'%(Indent(),i,position)) 
         position    = ParseAXDR(pdu,position)
+        print('%s</ArrayElement>'%(Indent())) 
 
-    print('%04x:%s</Array>'%(position,Indent())) 
+    print('%s</Array>'%(Indent())) 
     return position
 
 
@@ -81,7 +83,7 @@ def ParseOctetString(pdu,position):
     length = ord(pdu[position])
     value   = pdu[position:position+1+length]
     value   = binascii.hexlify(value)
-    print('%04x:%s<OctetString>%s</OctetString>'%(position,Indent(),value))
+    print('%s<OctetString offset="%d">%s</OctetString>'%(Indent(),position,value))
 
     return position+1+length
 
@@ -93,13 +95,15 @@ def ParseStructure(pdu,position):
         return position
 
     numberOfFields = ord(pdu[position])
-    print('%04x:%s<Structure length="%d">'%(position,Indent(),numberOfFields)) 
+    print('%s<Structure length="%d" offset="%d">'%(Indent(),position,numberOfFields)) 
 
     position    += 1
     for i in range(numberOfFields):
+        print('%s<Field index="%d" offset="%d">'%(Indent(),i,position)) 
         position    = ParseField(pdu,position)
+        print('%s</Field>'%(Indent())) 
 
-    print('%04x:%s</Structure>'%(position,Indent()))
+    print('%s</Structure>'%(Indent()))
 
     return position
 
@@ -111,7 +115,7 @@ def ParseUint8(pdu,position):
         return position
 
     value  = ord(pdu[position])
-    print('%04x:%s<Uint8>%02x</Uint8>'%(position,Indent(),value))
+    print('%s<Uint8 offset="%d">%02x</Uint8>'%(Indent(),position,value))
 
     return position+1
 
@@ -123,7 +127,7 @@ def ParseInt8(pdu,position):
         return position
 
     value  = ord(pdu[position])
-    print('%04x:%s<Int8>%02x</Int8>'%(position,Indent(),value))
+    print('%s<Int8 offset="%d">%02x</Int8>'%(Indent(),position,value))
 
     return position+1
 
@@ -135,7 +139,7 @@ def ParseBoolean(pdu,position):
         return position
 
     value  = ord(pdu[position])
-    print('%04x:%s<Boolean>%02x</Boolean>'%(position,Indent(),value))
+    print('%s<Boolean offset="%d">%02x</Boolean>'%(Indent(),position,value))
 
     return position+1
 
@@ -149,7 +153,7 @@ def ParseEnum(pdu,position):
     hi  = ord(pdu[position+0])
     lo  = ord(pdu[position+1])
     value   = (hi<<8)|lo
-    print('%04x:%s<Enum>%02x</Enum>'%(position,Indent(),value))
+    print('%s<Enum offset="%d">%02x</Enum>'%(Indent(),position,value))
 
     return position+3
 
@@ -163,7 +167,7 @@ def ParseBitString(pdu,position):
     length = ord(pdu[position])/8
     value   = pdu[position:position+1+length]
     value   = binascii.hexlify(value)
-    print('%04x:%s<BitString>%s</BitString>'%(position,Indent(),value))
+    print('%s<BitString offset="%d">%s</BitString>'%(Indent(),position,value))
 
     return position+1+length
 
@@ -177,7 +181,7 @@ def ParseUint16(pdu,position):
     hi  = ord(pdu[position+0])
     lo  = ord(pdu[position+1])
     value   = (hi<<8)|lo
-    print('%04x:%s<Uint16>%04x</Uint16>'%(position,Indent(),value))
+    print('%s<Uint16 offset="%d">%04x</Uint16>'%(Indent(),position,value))
 
     return position+2
 
@@ -192,7 +196,7 @@ def ParseFloat32(pdu,position):
     b1  = ord(pdu[position+1])
     b2  = ord(pdu[position+2])
     b3  = ord(pdu[position+3])
-    print('%04x:%s<Float32>%02x%02x%02x%02x</Float32>'%(position,Indent(),b0,b1,b2,b3))
+    print('%s<Float32 offset="%d">%02x%02x%02x%02x</Float32>'%(Indent(),position,b0,b1,b2,b3))
 
     return position+4
 
@@ -207,7 +211,7 @@ def ParseUint32(pdu,position):
     b1  = ord(pdu[position+1])
     b2  = ord(pdu[position+2])
     b3  = ord(pdu[position+3])
-    print('%04x:%s<Uint32>%02x%02x%02x%02x</Float32>'%(position,Indent(),b0,b1,b2,b3))
+    print('%s<Uint32 offset="%d">%02x%02x%02x%02x</Float32>'%(Indent(),position,b0,b1,b2,b3))
 
     return position+4
 
@@ -256,11 +260,11 @@ def ParseAXDR(pdu,position):
     if position == len(pdu):
         return position
 
-    print('%04x:%s<Data>'%(position,Indent())) 
+    print('%s<Data>'%(Indent())) 
     while position < len(pdu):
         position    = ParseField(pdu,position)
         
-    print('%04x:%s</Data>'%(position,Indent())) 
+    print('%s</Data>'%(Indent())) 
 
     return position
 
