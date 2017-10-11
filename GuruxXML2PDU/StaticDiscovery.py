@@ -146,6 +146,16 @@ def ReadInstantaneousProfile():
     print(rsp)
     print( DLMS.HDLCToDict(rsp) )
 
+    for i in range(1,5):
+
+        rq  = DLMSPlayground.CreateGetRequestforNextDataBlock(i)
+        print(rq)
+        DLMSPlayground.SendHDLCToMeter(p, rq )
+        time.sleep(1.0)
+        rsp    = DLMSPlayground.GetResponseFromMeter(p)
+        print(rsp)
+        print( DLMS.HDLCToDict(rsp) )
+
 
 
 

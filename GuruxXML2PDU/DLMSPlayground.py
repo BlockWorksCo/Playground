@@ -85,6 +85,28 @@ def CreateGetBlockRequest(blockNumber):
 
 
 
+GetRequestforNextDataBlock = \
+"""
+<GetRequest>
+  <GetRequestForNextDataBlock>
+    <InvokeIdAndPriority Value="81" />
+    <BlockNumber Value="%02x" />
+  </GetRequestForNextDataBlock>
+</GetRequest>
+"""
+
+def CreateGetRequestforNextDataBlock(blockNumber):
+    """
+    """
+    xml     = GetRequestforNextDataBlock%(blockNumber) 
+    d       = xmltodict.parse(xml)
+    hdlc    = DLMS.DictToHDLC(d, controlField=ControlField() )
+
+    return hdlc
+
+
+
+
 SetRequestTemplate_OctetString  = \
 """
 <SetRequest>
