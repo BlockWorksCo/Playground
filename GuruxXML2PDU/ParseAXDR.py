@@ -8,6 +8,7 @@ import inspect
 import binascii
 import sys
 
+NONE        = 0x00
 ARRAY       = 0x01
 STRUCTURE   = 0x02
 BOOLEAN     = 0x03
@@ -87,6 +88,19 @@ def ParseOctetString(pdu,position):
 
     return position+1+length
 
+def ParseNone(pdu,position):
+    """
+    """
+    if position == len(pdu):
+        return position
+
+    length = ord(pdu[position])
+    value   = pdu[position+1:position+1+length]
+    value   = binascii.hexlify(value)
+    print('%s<NoData offset="%d">%s</NoData>'%(Indent(),position,value))
+
+    return position+1+length
+
 
 def ParseStructure(pdu,position):
     """
@@ -150,12 +164,10 @@ def ParseEnum(pdu,position):
     if position == len(pdu):
         return position
 
-    hi  = ord(pdu[position+0])
-    lo  = ord(pdu[position+1])
-    value   = (hi<<8)|lo
+    value  = ord(pdu[position+0])
     print('%s<Enum offset="%d">%02x</Enum>'%(Indent(),position,value))
 
-    return position+3
+    return position+1
 
 
 def ParseBitString(pdu,position):
@@ -247,6 +259,10 @@ def ParseField(pdu,position):
         position    = ParseBitString(pdu,position)
     elif tag == UINT32:
         position    = ParseUint32(pdu,position)
+    elif tag == NONE:
+        #position    = ParseNone(pdu,position)
+        #position    = position + 1
+        pass
     else:
         print('unknown tag %02x'%tag)
         sys.exit(-1)
