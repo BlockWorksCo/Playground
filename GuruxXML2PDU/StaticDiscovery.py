@@ -128,6 +128,28 @@ def Associate():
 
 
 
+def ReadInstantaneousProfile():
+    """
+    C0 01 81 00 0F 00 00 28 00 00 FF 02 00
+    """
+
+    p   = Associate()
+
+    hexCode = '%02x%02x%02x%02x%02x%02x'%(1,0,94,66,0,255)
+    print('------- getting %s --------'%hexCode)
+
+    rq    = DLMSPlayground.CreateGetRequest(7,hexCode,2)
+    print(rq)
+    DLMSPlayground.SendHDLCToMeter(p, rq )
+    time.sleep(1.0)
+    rsp    = DLMSPlayground.GetResponseFromMeter(p)
+    print(rsp)
+    print( DLMS.HDLCToDict(rsp) )
+
+
+
+
+
 def ReadObjectList():
     """
     C0 01 81 00 0F 00 00 28 00 00 FF 02 00
@@ -215,6 +237,7 @@ def StaticDiscovery():
 
 
 if __name__ == '__main__':
-    StaticDiscovery()
+    ReadInstantaneousProfile()
+    #StaticDiscovery()
     #ReadObjectList()
 

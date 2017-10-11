@@ -17,6 +17,7 @@ UINT8       = 0x11
 UINT16      = 0x12
 INT8        = 0x0f
 ENUM        = 0x16
+FLOAT32     = 0x17
 
 
 
@@ -112,6 +113,18 @@ def ParseUint16(pdu):
     return 2
 
 
+def ParseFloat32(pdu):
+    """
+    """
+    b0  = ord(pdu[0])
+    b1  = ord(pdu[1])
+    b2  = ord(pdu[2])
+    b3  = ord(pdu[3])
+    print('%sFLOAT32 of value %02x%02x%02x%02x'%(Indent(),b0,b1,b2,b3))
+
+    return 4
+
+
 def ParseAXDR(pdu):
     """
     """
@@ -137,6 +150,8 @@ def ParseAXDR(pdu):
             position    += ParseEnum(pdu[position:])
         elif tag == BOOLEAN:
             position    += ParseBoolean(pdu[position:])
+        elif tag == FLOAT32:
+            position    += ParseFloat32(pdu[position:])
         else:
             print('unknown tag %02x'%tag)
             sys.exit(-1)
@@ -145,7 +160,7 @@ def ParseAXDR(pdu):
 
 
 
-pduHex=open('object_list').read()
+pduHex=open(sys.argv[1]).read()
 pdu     = binascii.unhexlify(pduHex.replace('\n',''))
 
 ParseAXDR(pdu)
