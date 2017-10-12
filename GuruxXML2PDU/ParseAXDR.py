@@ -13,41 +13,18 @@ ARRAY       = 0x01
 STRUCTURE   = 0x02
 BOOLEAN     = 0x03
 BIT_STRING  = 0x04
+INT32       = 0x05
 UINT32      = 0x06
-STRING_UTF8 = 0x0b
 OCTET_STRING= 0x09
+STRING      = 0x0a
+STRING_UTF8 = 0x0c
+INT8        = 0x0f
 UINT8       = 0x11
 UINT16      = 0x12
-INT8        = 0x0f
+UINT64      = 0x15
 ENUM        = 0x16
 FLOAT32     = 0x17
-
-"""
-    DLMS_TYPE_NULL = 0,
-    DLMS_TYPE_ARRAY = 1,
-    DLMS_TYPE_STRUCT = 2,
-    DLMS_TYPE_BOOLEAN = 3,
-    DLMS_TYPE_BIT_STRING = 4, // Ordered sequence of boolean values
-    DLMS_TYPE_DOUBLE_LONG = 5, // int32_t
-    DLMS_TYPE_DOUBLE_U_LONG = 6, // uint32_t
-    DLMS_TYPE_OCTET_STRING = 9, // Ordered sequence of octets (8 bit values)
-    DLMS_TYPE_VISIBLE_STRING = 10, // Ordered sequence of ASCII characters
-    DLMS_TYPE_BCD = 13, // Binary coded decimal (size?)
-    DLMS_TYPE_INTEGER = 15, // int8_t
-    DLMS_TYPE_LONG = 16, // int16_t
-    DLMS_TYPE_U = 17, // uint8_t
-    DLMS_TYPE_U_LONG = 18, // uint16_t
-    DLMS_TYPE_COMPACT_ARRAY = 19,
-    DLMS_TYPE_LONG64 = 20, // int64_t
-    DLMS_TYPE_U_LONG64 = 21, // uint64_t
-    DLMS_TYPE_ENUM = 22,
-    DLMS_TYPE_FLOAT32 = 23,
-    DLMS_TYPE_FLOAT64 = 24,
-    DLMS_TYPE_DATE_TIME = 25,
-    DLMS_TYPE_DATE = 26,
-    DLMS_TYPE_TIME = 27,
-
-"""
+TIME        = 0x1b
 
 
 def Indent():
