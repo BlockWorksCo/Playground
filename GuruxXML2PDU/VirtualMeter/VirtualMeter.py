@@ -325,7 +325,9 @@ def StaticDiscovery():
         open('Objects/%s.xml'%(hexCode),'w+').write(combinedXML)
 
             
-     
+
+
+
 
 
 class Meter:
@@ -338,7 +340,7 @@ class Meter:
     def __init__(self):
         """
         """
-        pass
+        self.counter    = 0
 
     
     def SetTransport(self, transport):
@@ -346,6 +348,55 @@ class Meter:
         """
         self.transport  = transport
 
+
+
+    def CreateResponse(self):
+        """
+        """
+        template    = \
+        """
+        <GetResponse>
+          <GetResponseNormal>
+            <InvokeIdAndPriority Value="81" />
+            <Result>
+              <Data>
+                <OctetString Value="%s" />
+              </Data>
+            </Result>
+          </GetResponseNormal>
+        </GetResponse>
+        """
+        value   = '0000%d'%self.counter
+        self.counter    = self.counter+1
+        xml = template%binascii.hexlify(value)
+        print(xml)
+        d   = xmltodict.parse(xml)
+        return DLMS.DictToHDLC(d)
+
+
+    def GetRequest(self, message):
+        """
+        """
+        ic          = message['GetRequest']['GetRequestNormal']['AttributeDescriptor']['ClassId']['@Value']
+        code        = message['GetRequest']['GetRequestNormal']['AttributeDescriptor']['InstanceId']['@Value']
+        attribute   = message['GetRequest']['GetRequestNormal']['AttributeDescriptor']['AttributeId']['@Value']
+
+        print('--- GetRequest for code:%s ic:%s attribute:%s---'%(code,ic,attribute))
+
+        return self.CreateResponse()
+   
+
+    def SetRequest(self, message):
+        """
+        """
+        ic          = message['SetRequest']['SetRequestNormal']['AttributeDescriptor']['ClassId']['@Value']
+        code        = message['SetRequest']['SetRequestNormal']['AttributeDescriptor']['InstanceId']['@Value']
+        attribute   = message['SetRequest']['SetRequestNormal']['AttributeDescriptor']['AttributeId']['@Value']
+
+        print('--- SetRequest for code:%s ic:%s attribute:%s---'%(code,ic,attribute))
+
+        return message
+   
 
     def ProcessHDLC(self, hdlcHex):
         """
@@ -356,18 +407,12 @@ class Meter:
         print(xml)
 
         d   = xmltodict.parse(xml)
-        print(d)
+        #print(d)
 
         messageType = d.keys()[0]
-        if messageType == 'GetRequest':
+        responseHex = getattr(self, messageType)(d)
 
-            ic          = d['GetRequest']['GetRequestNormal']['AttributeDescriptor']['ClassId']['@Value']
-            code        = d['GetRequest']['GetRequestNormal']['AttributeDescriptor']['InstanceId']['@Value']
-            attribute   = d['GetRequest']['GetRequestNormal']['AttributeDescriptor']['AttributeId']['@Value']
-
-            print('--- %s for code:%s ic:%s attribute:%s---'%(messageType,code,ic,attribute))
-       
-        return hdlcHex
+        return responseHex
 
 
     def ByteReceived(self, byte):
@@ -411,11 +456,9 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
                 numberOfBytes   = len(data)
 
                 if numberOfBytes == 0:
-                    print('<closed>')
                     break
 
                 elif numberOfBytes > 0:
-                    print('<%d>'%numberOfBytes)
                     for byte in data:
                         meter.ByteReceived(byte)
 
