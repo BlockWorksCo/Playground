@@ -327,37 +327,51 @@ def StaticDiscovery():
             
      
 
-def ProcessHDLC(hdlcHex):
+
+class Meter:
     """
     """
-    print('[%s]'%hdlcHex)
-    xml = DLMS.HDLCToXML(hdlcHex)
-    print(xml)
-   
-    return hdlcHex
+    currentMessage  = ''
+    inMessage       = False
 
 
+    def __init__(self):
+        """
+        """
+        pass
+
+    
+    def SetTransport(self, transport):
+        """
+        """
+        self.transport  = transport
 
 
-currentMessage  = ''
-inMessage       = False
+    def ProcessHDLC(self, hdlcHex):
+        """
+        """
+        print('[%s]'%hdlcHex)
+        xml = DLMS.HDLCToXML(hdlcHex)
+        print(xml)
+       
+        return hdlcHex
 
-def ByteReceived(byte):
-    """
-    """
-    global inMessage
-    global currentMessage
 
-    if inMessage == True:
-        currentMessage  = currentMessage + '%02x'%ord(byte)
-        if ord(byte) == 0x7e:
-            inMessage   = False
-            response    = ProcessHDLC(currentMessage)
-            OutputBytes(binascii.unhexlify(response))
-    else:
-        if ord(byte) == 0x7e:
-            inMessage       = True
-            currentMessage  = '7e'
+    def ByteReceived(self, byte):
+        """
+        """
+        if self.inMessage == True:
+            self.currentMessage  = self.currentMessage + '%02x'%ord(byte)
+            if ord(byte) == 0x7e:
+                self.inMessage   = False
+                response    = self.ProcessHDLC(self.currentMessage)
+                self.transport.OutputBytes(binascii.unhexlify(response))
+        else:
+            if ord(byte) == 0x7e:
+                self.inMessage       = True
+                self.currentMessage  = '7e'
+
+
 
 
 
@@ -365,10 +379,17 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
     """
     """
 
+    def OutputBytes(self, data):
+        """
+        """
+        self.request.sendall(data)
+
+
     def handle(self):
         """
         """
 
+        meter.SetTransport(self)
         count   = 0
         while True:
             r, w, e = select.select((self.request,), (), (), 0)
@@ -380,17 +401,20 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
                     print('<closed>')
                     break
 
-                if numberOfBytes > 0:
+                elif numberOfBytes > 0:
+                    print('<%d>'%numberOfBytes)
                     for byte in data:
-                        global OutputBytes
-                        OutputBytes = self.request.sendall
-                        ByteReceived(byte)
+                        meter.ByteReceived(byte)
+
+
+
 
 
 if __name__ == "__main__":
 
-    server = SocketServer.TCPServer(('localhost', 9999), MyTCPHandler)
+    meter       = Meter()
+    transport   = SocketServer.TCPServer(('localhost', 9999), MyTCPHandler)
 
-    server.serve_forever()
+    transport.serve_forever()
 
 
