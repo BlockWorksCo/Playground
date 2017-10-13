@@ -349,8 +349,32 @@ class Meter:
         self.transport  = transport
 
 
+    def CreateResponse_0000010000FF_02(self):
+        """
+        """
+        template    = \
+        """
+        <GetResponse>
+          <GetResponseNormal>
+            <InvokeIdAndPriority Value="81" />
+            <Result>
+              <Data>
+                <OctetString Value="%s" />
+              </Data>
+            </Result>
+          </GetResponseNormal>
+        </GetResponse>
+        """
+        value   = 'xxxx%d'%self.counter
+        self.counter    = self.counter+1
+        xml = template%binascii.hexlify(value)
+        print(xml)
+        d   = xmltodict.parse(xml)
+        return DLMS.DictToHDLC(d)
 
-    def CreateResponse(self):
+
+
+    def CreateResponse_0000600104FF_02(self):
         """
         """
         template    = \
@@ -383,7 +407,8 @@ class Meter:
 
         print('--- GetRequest for code:%s ic:%s attribute:%s---'%(code,ic,attribute))
 
-        return self.CreateResponse()
+        handlerName = 'CreateResponse_%s_%s'%(code,attribute)
+        return getattr(self,handlerName)()
    
 
     def SetRequest(self, message):
