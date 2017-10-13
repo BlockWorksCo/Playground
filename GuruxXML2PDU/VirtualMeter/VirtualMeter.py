@@ -351,8 +351,21 @@ class Meter:
         """
         """
         print('[%s]'%hdlcHex)
+
         xml = DLMS.HDLCToXML(hdlcHex)
         print(xml)
+
+        d   = xmltodict.parse(xml)
+        print(d)
+
+        messageType = d.keys()[0]
+        if messageType == 'GetRequest':
+
+            ic          = d['GetRequest']['GetRequestNormal']['AttributeDescriptor']['ClassId']['@Value']
+            code        = d['GetRequest']['GetRequestNormal']['AttributeDescriptor']['InstanceId']['@Value']
+            attribute   = d['GetRequest']['GetRequestNormal']['AttributeDescriptor']['AttributeId']['@Value']
+
+            print('--- %s for code:%s ic:%s attribute:%s---'%(messageType,code,ic,attribute))
        
         return hdlcHex
 
