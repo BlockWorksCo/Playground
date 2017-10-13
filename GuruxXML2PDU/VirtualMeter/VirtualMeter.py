@@ -2,6 +2,7 @@
 
 
 
+import select
 import SocketServer
 import DLMSPlayground
 import DLMS
@@ -370,17 +371,20 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
 
         count   = 0
         while True:
-            self.data = self.request.recv(1024)
+            r, w, e = select.select((self.request,), (), (), 0)
+            if r:
+                data = self.request.recv(1024)
+                numberOfBytes   = len(data)
 
-            numberOfBytes   = len(self.data)
-            if numberOfBytes > 0:
-                for byte in self.data:
-                    global OutputBytes
-                    OutputBytes = self.request.sendall
-                    ByteReceived(byte)
-            else:
-                print('.')
-                time.sleep(0.2)
+                if numberOfBytes == 0:
+                    print('<closed>')
+                    break
+
+                if numberOfBytes > 0:
+                    for byte in data:
+                        global OutputBytes
+                        OutputBytes = self.request.sendall
+                        ByteReceived(byte)
 
 
 if __name__ == "__main__":
