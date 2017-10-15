@@ -407,8 +407,26 @@ class Meter:
 
         print('--- GetRequest for code:%s ic:%s attribute:%s---'%(code,ic,attribute))
 
-        handlerName = 'CreateResponse_%s_%s'%(code,attribute)
-        return getattr(self,handlerName)()
+        try:
+            handlerName = 'CreateResponse_%s_%s'%(code,attribute)
+            return getattr(self,handlerName)()
+        except:
+            template    = \
+            """
+            <GetResponse>
+              <GetResponseNormal>
+                <InvokeIdAndPriority Value="81" />
+                <Result>
+                  <Data>
+                    <OctetString Value="%s" />
+                  </Data>
+                </Result>
+              </GetResponseNormal>
+            </GetResponse>
+            """
+            xml = template
+            d   = xmltodict.parse(xml)
+            return DLMS.DictToHDLC(d)
    
 
     def SetRequest(self, message):
