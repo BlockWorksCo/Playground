@@ -415,11 +415,9 @@ class Meter:
             """
             <GetResponse>
               <GetResponseNormal>
-                <InvokeIdAndPriority Value="81" />
+                <InvokeIdAndPriority Value="81"/>
                 <Result>
-                  <Data>
-                    <OctetString Value="%s" />
-                  </Data>
+                  <DataAccessError Value="ReadWriteDenied"/>
                 </Result>
               </GetResponseNormal>
             </GetResponse>
