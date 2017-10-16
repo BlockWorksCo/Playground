@@ -110,7 +110,7 @@ OBISList    = \
 def Associate():
     """
     """
-    p=DLMSPlayground.OpenPortToMeter('/dev/ttyUSB2')
+    p=DLMSPlayground.OpenPortToMeter('/dev/ttyUSB0')
     
     DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateDISC() )
     time.sleep(0.5)
@@ -327,7 +327,7 @@ def StaticDiscovery():
 
 
 if __name__ == '__main__':
-    ReadInstantaneousProfile()
+    #ReadInstantaneousProfile()
     #StaticDiscovery()
-    #ReadObjectList()
+    ReadObjectList()
 
