@@ -7,6 +7,7 @@
 import inspect
 import binascii
 import sys
+import struct
 
 NONE        = 0x00
 ARRAY       = 0x01
@@ -185,7 +186,10 @@ def ParseFloat32(pdu,position):
     b1  = ord(pdu[position+1])
     b2  = ord(pdu[position+2])
     b3  = ord(pdu[position+3])
-    print('%s<Float32 offset="%d">%02x%02x%02x%02x</Float32>'%(Indent(),position,b0,b1,b2,b3))
+    hexValue    = '%02x%02x%02x%02x'%(b0,b1,b2,b3)
+    value   = struct.unpack('!f',binascii.unhexlify(hexValue) )[0]
+    #print('%s<Float32 offset="%d">%1.10f</Float32>'%(Indent(),position,value))
+    print('%s<Float32 offset="%d">%s</Float32>'%(Indent(),position,hexValue))
 
     return position+4
 
