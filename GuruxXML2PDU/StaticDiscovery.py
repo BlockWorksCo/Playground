@@ -168,7 +168,7 @@ def ReadInstantaneousProfile():
         print(rsp)
         print( DLMS.HDLCToDict(rsp) )
 
-    print('IS capture objects: [%s]'%ISCaptureObjects)
+    print('IS capture objects: \n\n[%s]\n\n'%ISCaptureObjects)
 
     print('----- now reading buffer -----');
 
@@ -176,9 +176,6 @@ def ReadInstantaneousProfile():
     #
     # read buffer (values)
     #
-    hexCode = '%02x%02x%02x%02x%02x%02x'%(1,0,94,66,0,255)
-    print('------- getting %s --------'%hexCode)
-
     rq    = DLMSPlayground.CreateGetRequest(7,hexCode,2)
     print(rq)
     DLMSPlayground.SendHDLCToMeter(p, rq )
@@ -324,10 +321,119 @@ def StaticDiscovery():
             
      
 
+def ReadLoadProfile():
+    """
+    """
+
+    p   = Associate()
+
+    hexCode = '%02x%02x%02x%02x%02x%02x'%(1,0,99,1,1,255)
+
+    #
+    # read capture_period.
+    #
+    print('------- getting %s --------'%hexCode)
+
+    rq    = DLMSPlayground.CreateGetRequest(7,hexCode,4)
+    print(rq)
+    DLMSPlayground.SendHDLCToMeter(p, rq )
+    time.sleep(0.5)
+    rsp    = DLMSPlayground.GetResponseFromMeter(p)
+    print(rsp)
+    d= DLMS.HDLCToDict(rsp)
+    print(d)
+
+    capturePeriod   = d['GetResponse']['GetResponseNormal']['Result']['Data']['UInt32']['@Value']
+    print('Capture period is %s '%capturePeriod)
+
+    #
+    # read entries_in_use.
+    #
+    print('------- getting %s --------'%hexCode)
+
+    rq    = DLMSPlayground.CreateGetRequest(7,hexCode,7)
+    print(rq)
+    DLMSPlayground.SendHDLCToMeter(p, rq )
+    time.sleep(0.5)
+    rsp    = DLMSPlayground.GetResponseFromMeter(p)
+    print(rsp)
+    d= DLMS.HDLCToDict(rsp)
+    print(d)
+
+    entriesInUse   = d['GetResponse']['GetResponseNormal']['Result']['Data']['UInt32']['@Value']
+    print('Entries in useis %s '%entriesInUse)
+
+    #
+    # Call the capture method.
+    #
+    print('------- Calling capture_objects --------')
+    rq  = DLMSPlayground.CreateActionRequest_NoParams(7, hexCode, 2 ) 
+    print(rq)
+    DLMSPlayground.SendHDLCToMeter(p, rq )
+    time.sleep(0.5)
+    rsp    = DLMSPlayground.GetResponseFromMeter(p)
+    print(rsp)
+    d= DLMS.HDLCToDict(rsp)
+    print(d)
+
+    #
+    # read capture_objects.
+    #
+    rq    = DLMSPlayground.CreateGetRequest(7,hexCode,3)
+    print(rq)
+    DLMSPlayground.SendHDLCToMeter(p, rq )
+    time.sleep(0.5)
+    rsp    = DLMSPlayground.GetResponseFromMeter(p)
+    print(rsp)
+    d= DLMS.HDLCToDict(rsp)
+    print(d)
+
+    LSCaptureObjects    = d['GetResponse']['GetResponsewithDataBlock']['Result']['Result']['RawData']['@Value']
+
+    for i in range(1,100):
+
+        rq  = DLMSPlayground.CreateGetRequestforNextDataBlock(i)
+        print(rq)
+        DLMSPlayground.SendHDLCToMeter(p, rq )
+        time.sleep(0.5)
+        rsp    = DLMSPlayground.GetResponseFromMeter(p)
+        if len(rsp) == 0:
+            break
+        else:
+            LSCaptureObjects   = LSCaptureObjects + d['GetResponse']['GetResponsewithDataBlock']['Result']['Result']['RawData']['@Value']
+
+        print(rsp)
+        print( DLMS.HDLCToDict(rsp) )
+
+    print('LS capture objects: \n\n[%s]\n\n'%LSCaptureObjects)
+
+    print('----- now reading buffer -----');
+
+
+    #
+    # read buffer (values)
+    #
+    rq    = DLMSPlayground.CreateGetRequest(7,hexCode,2)
+    print(rq)
+    DLMSPlayground.SendHDLCToMeter(p, rq )
+    time.sleep(0.5)
+    rsp    = DLMSPlayground.GetResponseFromMeter(p)
+    print(rsp)
+    d   = DLMS.HDLCToDict(rsp)
+    print(d)
+
+    #ISProfileBuffer   = d['GetResponse']['GetResponsewithDataBlock']['Result']['Result']['RawData']['@Value']
+    numberOfElements    = d['GetResponse']['GetResponseNormal']['Result']['Data']['Array']['@Qty']
+
+    print('LS Profile buffer has %s elements: '%numberOfElements)
+
+
+
 
 
 if __name__ == '__main__':
     #ReadInstantaneousProfile()
     #StaticDiscovery()
-    ReadObjectList()
+    ReadLoadProfile()
+    #ReadObjectList()
 

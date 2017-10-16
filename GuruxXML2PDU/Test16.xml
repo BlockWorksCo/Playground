@@ -1,0 +1,17 @@
+<ActionRequest>
+  <ActionRequestNormal>
+    <InvokeIdAndPriority Value="C1" />
+    <MethodDescriptor>
+      <!--SCRIPT_TABLE-->
+      <ClassId Value="0009" />
+      <!--0.0.10.0.107.255-->
+      <InstanceId Value="00000A006BFF" />
+      <MethodId Value="01" />
+    </MethodDescriptor>
+    <MethodInvocationParameters>
+      <None />
+    </MethodInvocationParameters>
+  </ActionRequestNormal>
+</ActionRequest>
+
+

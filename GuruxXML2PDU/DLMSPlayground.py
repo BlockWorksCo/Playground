@@ -176,6 +176,35 @@ def CreateAARQ(contextName, mechanismName, password):
 
 
 
+
+def CreateActionRequest_NoParams(ic, obis, methodId):
+    """
+    """
+    template    = \
+    """
+    <ActionRequest>
+      <ActionRequestNormal>
+        <InvokeIdAndPriority Value="81" />
+        <MethodDescriptor>
+          <ClassId Value="%x" />
+          <InstanceId Value="%s" />
+          <MethodId Value="%x" />
+        </MethodDescriptor>
+        <MethodInvocationParameters>
+          <None />
+        </MethodInvocationParameters>
+      </ActionRequestNormal>
+    </ActionRequest>
+    """
+    xml     = template%(ic, obis, methodId) 
+    d       = xmltodict.parse(xml)
+    hdlc    = DLMS.DictToHDLC(d, controlField=0x32)
+
+    return hdlc
+
+
+
+
 def CreateSNRM():
     """
     DLMSPlayground.CreateSNRM()

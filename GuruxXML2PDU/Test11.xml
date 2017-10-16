@@ -1,0 +1,9 @@
+<GetResponse>
+  <GetResponseNormal>
+    <InvokeIdAndPriority Value="81"/>
+    <Result>
+      <DataAccessError Value="ReadWriteDenied"/>
+    </Result>
+  </GetResponseNormal>
+</GetResponse>
+

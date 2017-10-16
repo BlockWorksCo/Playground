@@ -1,0 +1,284 @@
+   <Data>
+     <Array length="1" offset="1">
+     <ArrayElement index="0" offset="2">
+       <Structure length="92" offset="3">
+       <Field index="0" offset="4">
+         <OctetString offset="5">07d0010402002418ff800000</OctetString>
+       </Field>
+       <Field index="1" offset="18">
+         <OctetString offset="19">07d0000000000000ff800000</OctetString>
+       </Field>
+       <Field index="2" offset="32">
+         <Uint16 offset="33">0002</Uint16>
+       </Field>
+       <Field index="3" offset="35">
+         <Float32 offset="36">00000000</Float32>
+       </Field>
+       <Field index="4" offset="40">
+         <Float32 offset="41">00000000</Float32>
+       </Field>
+       <Field index="5" offset="45">
+         <Float32 offset="46">00000000</Float32>
+       </Field>
+       <Field index="6" offset="50">
+         <Float32 offset="51">43757561</Float32>
+       </Field>
+       <Field index="7" offset="55">
+         <Float32 offset="56">00000000</Float32>
+       </Field>
+       <Field index="8" offset="60">
+         <Float32 offset="61">00000000</Float32>
+       </Field>
+       <Field index="9" offset="65">
+         <Float32 offset="66">00000000</Float32>
+       </Field>
+       <Field index="10" offset="70">
+         <Float32 offset="71">00000000</Float32>
+       </Field>
+       <Field index="11" offset="75">
+         <Float32 offset="76">00000000</Float32>
+       </Field>
+       <Field index="12" offset="80">
+         <Float32 offset="81">3f800000</Float32>
+       </Field>
+       <Field index="13" offset="85">
+         <Float32 offset="86">3f800000</Float32>
+       </Field>
+       <Field index="14" offset="90">
+         <Float32 offset="91">3f800000</Float32>
+       </Field>
+       <Field index="15" offset="95">
+         <Float32 offset="96">3f800000</Float32>
+       </Field>
+       <Field index="16" offset="100">
+         <Float32 offset="101">37031ed5</Float32>
+       </Field>
+       <Field index="17" offset="105">
+         <Float32 offset="106">37269e17</Float32>
+       </Field>
+       <Field index="18" offset="110">
+         <Float32 offset="111">3701ac89</Float32>
+       </Field>
+       <Field index="19" offset="115">
+         <Float32 offset="116">37266c0d</Float32>
+       </Field>
+       <Field index="20" offset="120">
+         <Float32 offset="121">33021a9f</Float32>
+       </Field>
+       <Field index="21" offset="125">
+         <Float32 offset="126">31f03126</Float32>
+       </Field>
+       <Field index="22" offset="130">
+         <Float32 offset="131">33703126</Float32>
+       </Field>
+       <Field index="23" offset="135">
+         <Float32 offset="136">31a020c4</Float32>
+       </Field>
+       <Field index="24" offset="140">
+         <Float32 offset="141">3c7196d1</Float32>
+       </Field>
+       <Field index="25" offset="145">
+         <Float32 offset="146">389cc694</Float32>
+       </Field>
+       <Field index="26" offset="150">
+         <Float32 offset="151">3c71967e</Float32>
+       </Field>
+       <Field index="27" offset="155">
+         <Float32 offset="156">389cc414</Float32>
+       </Field>
+       <Field index="28" offset="160">
+         <Float32 offset="161">33161eb8</Float32>
+       </Field>
+       <Field index="29" offset="165">
+         <Float32 offset="166">312020c4</Float32>
+       </Field>
+       <Field index="30" offset="170">
+         <Float32 offset="171">333424dc</Float32>
+       </Field>
+       <Field index="31" offset="175">
+         <Float32 offset="176">312020c4</Float32>
+       </Field>
+       <Field index="32" offset="180">
+         <Float32 offset="181">3f6531fe</Float32>
+       </Field>
+       <Field index="33" offset="185">
+         <Float32 offset="186">3e4b6b22</Float32>
+       </Field>
+       <Field index="34" offset="190">
+         <Float32 offset="191">3d55139f</Float32>
+       </Field>
+       <Field index="35" offset="195">
+         <Float32 offset="196">3f6531fe</Float32>
+       </Field>
+       <Field index="36" offset="200">
+         <Float32 offset="201">37722ebb</Float32>
+       </Field>
+       <Field index="37" offset="205">
+         <Float32 offset="206">36ff404b</Float32>
+       </Field>
+       <Field index="38" offset="210">
+         <Float32 offset="211">36ecee2f</Float32>
+       </Field>
+       <Field index="39" offset="215">
+         <Float32 offset="216">36f43cf4</Float32>
+       </Field>
+       <Field index="40" offset="220">
+         <Float32 offset="221">36ff404b</Float32>
+       </Field>
+       <Field index="41" offset="225">
+         <Float32 offset="226">36efd834</Float32>
+       </Field>
+       <Field index="42" offset="230">
+         <Float32 offset="231">3ea0f04c</Float32>
+       </Field>
+       <Field index="43" offset="235">
+         <Float32 offset="236">3d996de9</Float32>
+       </Field>
+       <Field index="44" offset="240">
+         <Float32 offset="241">3c5fea28</Float32>
+       </Field>
+       <Field index="45" offset="245">
+         <Float32 offset="246">3e66508e</Float32>
+       </Field>
+       <Field index="46" offset="250">
+         <Float32 offset="251">3a5a740e</Float32>
+       </Field>
+       <Field index="47" offset="255">
+         <Float32 offset="256">00000000</Float32>
+       </Field>
+       <Field index="48" offset="260">
+         <Float32 offset="261">00000000</Float32>
+       </Field>
+       <Field index="49" offset="265">
+         <Float32 offset="266">00000000</Float32>
+       </Field>
+       <Field index="50" offset="270">
+         <Float32 offset="271">00000000</Float32>
+       </Field>
+       <Field index="51" offset="275">
+         <Float32 offset="276">00000000</Float32>
+       </Field>
+       <Field index="52" offset="280">
+         <Float32 offset="281">37ae9687</Float32>
+       </Field>
+       <Field index="53" offset="285">
+         <Float32 offset="286">379c5b91</Float32>
+       </Field>
+       <Field index="54" offset="290">
+         <Float32 offset="291">379740ca</Float32>
+       </Field>
+       <Field index="55" offset="295">
+         <Float32 offset="296">37ad6c2e</Float32>
+       </Field>
+       <Field index="56" offset="300">
+         <Float32 offset="301">37ad7048</Float32>
+       </Field>
+       <Field index="57" offset="305">
+         <Float32 offset="306">375d32b4</Float32>
+       </Field>
+       <Field index="58" offset="310">
+         <Float32 offset="311">370acf81</Float32>
+       </Field>
+       <Field index="59" offset="315">
+         <Float32 offset="316">36eba19d</Float32>
+       </Field>
+       <Field index="60" offset="320">
+         <Float32 offset="321">37425c59</Float32>
+       </Field>
+       <Field index="61" offset="325">
+         <Float32 offset="326">3747129b</Float32>
+       </Field>
+       <Field index="62" offset="330">
+         <Float32 offset="331">3c7196c3</Float32>
+       </Field>
+       <Field index="63" offset="335">
+         <Float32 offset="336">3c7196c2</Float32>
+       </Field>
+       <Field index="64" offset="340">
+         <Float32 offset="341">3c7196c3</Float32>
+       </Field>
+       <Field index="65" offset="345">
+         <Float32 offset="346">3c7196c2</Float32>
+       </Field>
+       <Field index="66" offset="350">
+         <Float32 offset="351">3c7196c2</Float32>
+       </Field>
+       <Field index="67" offset="355">
+         <Float32 offset="356">389220a4</Float32>
+       </Field>
+       <Field index="68" offset="360">
+         <Float32 offset="361">3885fa35</Float32>
+       </Field>
+       <Field index="69" offset="365">
+         <Float32 offset="366">38912d4d</Float32>
+       </Field>
+       <Field index="70" offset="370">
+         <Float32 offset="371">38893209</Float32>
+       </Field>
+       <Field index="71" offset="375">
+         <Float32 offset="376">3887420d</Float32>
+       </Field>
+       <Field index="72" offset="380">
+         <Float32 offset="381">3b83126f</Float32>
+       </Field>
+       <Field index="73" offset="385">
+         <Float32 offset="386">3a704c75</Float32>
+       </Field>
+       <Field index="74" offset="390">
+         <Float32 offset="391">392ec33e</Float32>
+       </Field>
+       <Field index="75" offset="395">
+         <Float32 offset="396">3b3f258c</Float32>
+       </Field>
+       <Field index="76" offset="400">
+         <Float32 offset="401">00000000</Float32>
+       </Field>
+       <Field index="77" offset="405">
+         <Float32 offset="406">3ce76c8b</Float32>
+       </Field>
+       <Field index="78" offset="410">
+         <Float32 offset="411">3bf30782</Float32>
+       </Field>
+       <Field index="79" offset="415">
+         <Float32 offset="416">3be81b4f</Float32>
+       </Field>
+       <Field index="80" offset="420">
+         <Float32 offset="421">3bd7b901</Float32>
+       </Field>
+       <Field index="81" offset="425">
+         <Float32 offset="426">3bead65b</Float32>
+       </Field>
+       <Field index="82" offset="430">
+         <Float32 offset="431">359d783a</Float32>
+       </Field>
+       <Field index="83" offset="435">
+         <Float32 offset="436">3545419f</Float32>
+       </Field>
+       <Field index="84" offset="440">
+         <Float32 offset="441">33875e8c</Float32>
+       </Field>
+       <Field index="85" offset="445">
+         <Float32 offset="446">350ad162</Float32>
+       </Field>
+       <Field index="86" offset="450">
+         <Float32 offset="451">358b6263</Float32>
+       </Field>
+       <Field index="87" offset="455">
+         <Float32 offset="456">359d783a</Float32>
+       </Field>
+       <Field index="88" offset="460">
+         <Float32 offset="461">3545419f</Float32>
+       </Field>
+       <Field index="89" offset="465">
+         <Float32 offset="466">33875e8c</Float32>
+       </Field>
+       <Field index="90" offset="470">
+         <Float32 offset="471">350ad162</Float32>
+       </Field>
+       <Field index="91" offset="475">
+         <Float32 offset="476">358b6263</Float32>
+       </Field>
+       </Structure>
+     </ArrayElement>
+     </Array>
+   </Data>

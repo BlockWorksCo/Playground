@@ -1,0 +1,25 @@
+<ReadRequest Qty="01" >
+  <ParameterisedAccess>
+    <VariableName Value="60E8" />
+    <Selector Value="01" />
+    <Parameter>
+      <Structure Qty="04" >
+        <Structure Qty="04" >
+          <UInt16 Value="0008" />
+          <!--0.0.1.0.0.255-->
+          <OctetString Value="0000010000FF" />
+          <Int8 Value="02" />
+          <UInt16 Value="0000" />
+        </Structure>
+        <!--2008-02-29 12:19:13-->
+        <OctetString Value="07D8021DFF0C130DFF8000FF" />
+        <!--2009-10-29 11:54:34-->
+        <OctetString Value="07D90A1DFF0B3622FF8000FF" />
+        <Array Qty="00" >
+        </Array>
+      </Structure>
+    </Parameter>
+  </ParameterisedAccess>
+</ReadRequest>
+
+
