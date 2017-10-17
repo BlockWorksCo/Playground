@@ -515,9 +515,9 @@ def GetTest():
 if __name__ == '__main__':
     #ReadInstantaneousProfile()
     #StaticDiscovery()
-    #ReadLoadProfile()
+    ReadLoadProfile()
     #ReadObjectList()
 
     #ActionTest()
-    GetTest()
+    #GetTest()
 

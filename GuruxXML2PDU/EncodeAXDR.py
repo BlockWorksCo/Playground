@@ -26,7 +26,8 @@ def EncodeAXDR(name,d):
         typeName    = type(d).__name__
 
         if name == 'OctetString':
-            hexData = '09%s'%(d['#text'])
+            textHex = d['#text']
+            hexData = '09%02x%s'%(len(textHex)/2, textHex)
 
         elif name == 'Int8':
             hexData = '0f%s'%(d['#text'])
