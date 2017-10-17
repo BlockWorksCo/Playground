@@ -364,6 +364,40 @@ def ReadLoadProfile():
     print('Entries in useis %s '%entriesInUse)
 
     #
+    # read profile_entries
+    #
+    print('------- getting %s --------'%hexCode)
+
+    rq    = DLMSPlayground.CreateGetRequest(7,hexCode,8)
+    print(rq)
+    DLMSPlayground.SendHDLCToMeter(p, rq )
+    time.sleep(0.5)
+    rsp    = DLMSPlayground.GetResponseFromMeter(p)
+    print(rsp)
+    d= DLMS.HDLCToDict(rsp)
+    print(d)
+
+    profileEntries   = d['GetResponse']['GetResponseNormal']['Result']['Data']['UInt32']['@Value']
+    print('profile_entries = %s '%entriesInUse)
+
+    #
+    # read sort_method
+    #
+    print('------- getting %s --------'%hexCode)
+
+    rq    = DLMSPlayground.CreateGetRequest(7,hexCode,5)
+    print(rq)
+    DLMSPlayground.SendHDLCToMeter(p, rq )
+    time.sleep(0.5)
+    rsp    = DLMSPlayground.GetResponseFromMeter(p)
+    print(rsp)
+    d= DLMS.HDLCToDict(rsp)
+    print(d)
+
+    sortMethod   = d['GetResponse']['GetResponseNormal']['Result']['Data']['Enum']['@Value']
+    print('sort_method = %s '%sortMethod)
+
+    #
     # Call the capture method.
     #
     print('------- Calling capture_objects --------')
@@ -435,10 +469,35 @@ def ReadLoadProfile():
 
 
 
+def ActionTest():
+    """
+    """
+    p   = Associate()
+
+    hexCode = '%02x%02x%02x%02x%02x%02x'%(1,0,99,1,1,255)
+
+    for i in range(5):
+        #
+        # Call the capture method.
+        #
+        rq  = DLMSPlayground.CreateActionRequest_NoParams(7, hexCode, 2 ) 
+        print(rq)
+        DLMSPlayground.SendHDLCToMeter(p, rq )
+        time.sleep(0.5)
+        rsp    = DLMSPlayground.GetResponseFromMeter(p)
+        print(rsp)
+        d= DLMS.HDLCToDict(rsp)
+        print(d)
+
+
+
+
 
 if __name__ == '__main__':
     #ReadInstantaneousProfile()
     #StaticDiscovery()
-    ReadLoadProfile()
+    #ReadLoadProfile()
     #ReadObjectList()
+
+    ActionTest()
 

@@ -191,14 +191,14 @@ def CreateActionRequest_NoParams(ic, obis, methodId):
           <MethodId Value="%x" />
         </MethodDescriptor>
         <MethodInvocationParameters>
-          <None />
+          <UInt16 Value="2" />
         </MethodInvocationParameters>
       </ActionRequestNormal>
     </ActionRequest>
     """
     xml     = template%(ic, obis, methodId) 
     d       = xmltodict.parse(xml)
-    hdlc    = DLMS.DictToHDLC(d, controlField=0x32)
+    hdlc    = DLMS.DictToHDLC(d, controlField=ControlField())
 
     return hdlc
 
