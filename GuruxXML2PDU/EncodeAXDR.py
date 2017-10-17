@@ -3,14 +3,6 @@
 
 import xmltodict
 import sys
-import inspect
-
-
-def Indent():
-    """
-    """
-    return ' '*len(inspect.stack())
-
 
 
 def EncodeAXDR(name,d):
@@ -19,7 +11,6 @@ def EncodeAXDR(name,d):
     hexData = ''
 
     if name[0] == '@':
-        #print('...ignoring')
         pass
 
     else:

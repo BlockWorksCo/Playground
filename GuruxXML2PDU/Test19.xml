@@ -1,0 +1,34 @@
+<GetRequest>
+  <GetRequestNormal>
+    <InvokeIdAndPriority Value="193" />
+    <AttributeDescriptor>
+      <!--PROFILE_GENERIC-->
+      <ClassId Value="7" />
+      <!--1.0.99.1.0.255-->
+      <InstanceId Value="0100630100FF" />
+      <AttributeId Value="2" />
+    </AttributeDescriptor>
+    <AccessSelection>
+      <AccessSelector Value="1" />
+      <AccessParameters>
+        <Structure Qty="4" >
+          <Structure Qty="4" >
+            <UInt16 Value="0" />
+            <!--0.0.1.0.0.255-->
+            <OctetString Value="0000010000FF" />
+            <Int8 Value="0" />
+            <UInt16 Value="0" />
+          </Structure>
+          <!--2016-11-28 10:00:00-->
+          <OctetString Value="07E00B1CFF0A000000FFFFFF" />
+          <!--2016-11-29 00:00:00-->
+          <OctetString Value="07E00B1DFF00000000FFFFFF" />
+          <Array Qty="0" >
+          </Array>
+        </Structure>
+      </AccessParameters>
+    </AccessSelection>
+  </GetRequestNormal>
+</GetRequest>
+
+
