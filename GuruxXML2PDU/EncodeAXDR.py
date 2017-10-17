@@ -13,48 +13,31 @@ def Indent():
 
 
 
-def EncodeAXDR(d):
+def EncodeAXDR(name,d):
     """
     """
     hexData = ''
-    typeName    = type(d).__name__
 
-    if typeName == 'unicode':
-        print('%sScalar type [%s] is %s'%(Indent(),str(d),typeName))
+    if name[0] == '@':
+        #print('...ignoring')
+        pass
+
     else:
-        print(d.keys())
+        typeName    = type(d).__name__
+        print('[in %s of type %s]'%(name, typeName))
 
-        for key in d.keys():
-            element = d[key]
-            print('%sComposite %s %s'%(Indent(),key, typeName))
+        if typeName == 'dict' or typeName == 'OrderedDict':
+            children    = d.keys()
+            print('%d children %s (dict)'%(len(children),children))
+            for child in children:
+                EncodeAXDR(child, d[child])
 
-            if key == 'Array':
-                print('%sArray of %d elements'%(Indent(),len(element)))
-                i   = 0
-                for arrayElement in element:
-                    print('%sItem %d [%s]'%(Indent(),i,str(arrayElement)))
-                    if arrayElement[0] == '@':
-                        print('%sIgnoring [%s]'%(Indent(),str(d)))
-                    else:
-                        hexData = EncodeAXDR(d[arrayElement])
-                    i   = i+1 
-
-            elif key == 'Data':
-                print('%sData'%(Indent()))
-                hexData = EncodeAXDR(d[key])
-
-            elif key == 'ArrayElement':
-                print('%s->ArrayElement'%(Indent()))
-                hexData = EncodeAXDR(d[key])
-
-            elif key == 'Structure':
-                print('%sStructure of %d fields'%(Indent(),len(d[key])))
-                i   = 0
-                for element in d.items():
-                    print('%sField %d'%(Indent(),i))
-                    hexData = EncodeAXDR(element)
-                    i   = i+1 
-
+        if typeName == 'list':
+            print('%d children (list)'%(len(d)))
+            i   = 0
+            for child in d:
+                EncodeAXDR(name+'_%d'%i, child)
+                i   = i + 1
 
     return hexData 
 
@@ -65,6 +48,6 @@ if __name__ == '__main__':
     """
     xml     = open(sys.argv[1]).read()
     d       = xmltodict.parse(xml)
-    hexPDU  = EncodeAXDR(d)
+    hexPDU  = EncodeAXDR('xml',d)
     print(hexPDU)
 

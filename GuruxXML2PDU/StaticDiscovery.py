@@ -476,11 +476,30 @@ def ActionTest():
 
     hexCode = '%02x%02x%02x%02x%02x%02x'%(1,0,99,1,1,255)
 
-    for i in range(5):
-        #
-        # Call the capture method.
-        #
-        rq  = DLMSPlayground.CreateActionRequest_NoParams(7, hexCode, 2 ) 
+    #
+    # Call the capture method.
+    #
+    rq  = DLMSPlayground.CreateActionRequest_NoParams(7, hexCode, 4 ) 
+    print(rq)
+    DLMSPlayground.SendHDLCToMeter(p, rq )
+    time.sleep(0.5)
+    rsp    = DLMSPlayground.GetResponseFromMeter(p)
+    print(rsp)
+    d= DLMS.HDLCToDict(rsp)
+    print(d)
+
+
+
+def GetTest():
+    """
+    """
+    p   = Associate()
+
+    hexCode = '%02x%02x%02x%02x%02x%02x'%(1,0,99,1,1,255)
+
+    for i in range(4,8):
+        print('\n\nDoing Get')
+        rq    = DLMSPlayground.CreateGetRequest(7,hexCode,i)
         print(rq)
         DLMSPlayground.SendHDLCToMeter(p, rq )
         time.sleep(0.5)
@@ -499,5 +518,6 @@ if __name__ == '__main__':
     #ReadLoadProfile()
     #ReadObjectList()
 
-    ActionTest()
+    #ActionTest()
+    GetTest()
 
