@@ -26,6 +26,24 @@ def EncodeAXDR(name,d):
         elif name == 'Uint16':
             hexData = '12%s'%(d['#text'])
 
+        elif name == 'Enum':
+            hexData = '16%s'%(d['#text'])
+
+        elif name == 'Uint32':
+            hexData = '06%s'%(d['#text'])
+
+        elif name == 'Uint8':
+            hexData = '11%s'%(d['#text'])
+
+        elif name == 'Uint64':
+            hexData = '15%s'%(d['#text'])
+
+        elif name == 'Float32':
+            hexData = '17%s'%(d['#text'])
+
+        elif name == 'Time':
+            hexData = '1b%s'%(d['#text'])
+
         else:
             if typeName == 'dict' or typeName == 'OrderedDict':
                 children    = d.keys()
