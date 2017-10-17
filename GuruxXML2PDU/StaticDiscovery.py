@@ -379,6 +379,7 @@ def ReadLoadProfile():
     #
     # read capture_objects.
     #
+    print('\n\nReading capture_objects 0')
     rq    = DLMSPlayground.CreateGetRequest(7,hexCode,3)
     print(rq)
     DLMSPlayground.SendHDLCToMeter(p, rq )
@@ -389,9 +390,11 @@ def ReadLoadProfile():
     print(d)
 
     LSCaptureObjects    = d['GetResponse']['GetResponsewithDataBlock']['Result']['Result']['RawData']['@Value']
+    print('LSCaptureObjects = [%s]'%LSCaptureObjects)
 
     for i in range(1,100):
 
+        print('\n\nReading capture_objects %d'%i)
         rq  = DLMSPlayground.CreateGetRequestforNextDataBlock(i)
         print(rq)
         DLMSPlayground.SendHDLCToMeter(p, rq )
@@ -400,10 +403,12 @@ def ReadLoadProfile():
         if len(rsp) == 0:
             break
         else:
-            LSCaptureObjects   = LSCaptureObjects + d['GetResponse']['GetResponsewithDataBlock']['Result']['Result']['RawData']['@Value']
+            d= DLMS.HDLCToDict(rsp)
+            print(rsp)
+            thisBlock   = d['GetResponse']['GetResponsewithDataBlock']['Result']['Result']['RawData']['@Value']  
+            LSCaptureObjects   = LSCaptureObjects + thisBlock
+            print('LSCaptureObjects = [%s]'%thisBlock)
 
-        print(rsp)
-        print( DLMS.HDLCToDict(rsp) )
 
     print('LS capture objects: \n\n[%s]\n\n'%LSCaptureObjects)
 
