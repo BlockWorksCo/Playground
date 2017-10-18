@@ -417,11 +417,11 @@ def ReadLoadProfile():
     """
     <GetRequest>
       <GetRequestNormal>
-        <InvokeIdAndPriority Value="193" />
+        <InvokeIdAndPriority Value="131" />
         <AttributeDescriptor>
           <!--PROFILE_GENERIC-->
           <ClassId Value="7" />
-          <!--1.0.99.1.0.255-->
+          <!--1.0.99.1.1.255-->
           <InstanceId Value="0100630101FF" />
           <AttributeId Value="2" />
         </AttributeDescriptor>
@@ -430,10 +430,10 @@ def ReadLoadProfile():
           <AccessParameters>
             <Structure Qty="4" >
               <Structure Qty="4" >
-                <UInt16 Value="0" />
+                <UInt16 Value="8" />
                 <!--0.0.1.0.0.255-->
                 <OctetString Value="0000010000FF" />
-                <Int8 Value="0" />
+                <Int8 Value="2" />
                 <UInt16 Value="0" />
               </Structure>
               <!--2016-11-28 10:00:00-->
