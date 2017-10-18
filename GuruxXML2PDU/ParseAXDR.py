@@ -25,6 +25,7 @@ UINT16      = 0x12
 UINT64      = 0x15
 ENUM        = 0x16
 FLOAT32     = 0x17
+DATE        = 0x1a
 TIME        = 0x1b
 
 
@@ -209,6 +210,18 @@ def ParseUint32(pdu,position):
     return position+4
 
 
+def ParseDate(pdu,position):
+    """
+    """
+    if position == len(pdu):
+        return position
+
+    b0  = ord(pdu[position+0])
+    print('%s<Date offset="%d">%02x</Date>'%(Indent(),position,b0))
+
+    return position+1
+
+
 def ParseField(pdu,position):
     """
     """
@@ -240,6 +253,8 @@ def ParseField(pdu,position):
         position    = ParseBitString(pdu,position)
     elif tag == UINT32:
         position    = ParseUint32(pdu,position)
+    elif tag == DATE:
+        position    = ParseDate(pdu,position)
     elif tag == NONE:
         #position    = ParseNone(pdu,position)
         #position    = position + 1
