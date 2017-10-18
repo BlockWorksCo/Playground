@@ -188,19 +188,52 @@ class Meter:
             if ord(byte) == 0x7e:
                 self.inMessage   = False
                 response    = self.ProcessHDLC(self.currentMessage)
-                self.transport.OutputBytes(binascii.unhexlify(response))
+                self.lowerLevel.OutputBytes(binascii.unhexlify(response))
         else:
             if ord(byte) == 0x7e:
                 self.inMessage       = True
                 self.currentMessage  = '7e'
 
+    def Link(self, upper, lower):
+        """
+        """
+        self.upperLevel = upper
+        self.lowerLevel = lower
 
 
 
 
 
 
-class HDLCTransport:
+
+class HDLC:
+    """
+    """
+
+    def __init__(self):
+        """
+        """
+        pass
+
+    def Link(self, upper, lower):
+        """
+        """
+        self.upperLevel = upper
+        self.lowerLevel = lower
+
+    def ByteReceived(self, byte):
+        """
+        """
+        self.upperLevel.ByteReceived(byte)
+
+    def OutputBytes(self, data):
+        """
+        """
+        self.lowerLevel.OutputBytes(data)
+
+
+
+class TCPTransport:
     """
     """
 
@@ -210,13 +243,7 @@ class HDLCTransport:
         pass
 
 
-
-
-class TCPTransportHandler:
-    """
-    """
-
-    def __init__(self, upperLevel):
+    def Run(self):
         """
         """
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -224,11 +251,9 @@ class TCPTransportHandler:
         sock.bind(server_address)
         sock.listen(1)
 
-        upperLevel.SetTransport(self)
         while True:
             self.connection, client_address = sock.accept()
 
-            count   = 0
             while True:
                 r, w, e = select.select((self.connection,), (), (), 1.0)
                 if r:
@@ -241,13 +266,19 @@ class TCPTransportHandler:
 
                     elif numberOfBytes > 0:
                         for byte in data:
-                            upperLevel.ByteReceived(byte)
+                            self.upperLevel.ByteReceived(byte)
+
+
+    def Link(self, upper, lower):
+        """
+        """
+        self.upperLevel = upper
+        self.lowerLevel = lower
 
 
     def OutputBytes(self, data):
         """
         """
-        print('<%s>'%binascii.hexlify(data))
         self.connection.send(data)
 
 
@@ -255,9 +286,14 @@ class TCPTransportHandler:
 
 if __name__ == "__main__":
 
-    meter           = Meter()
-    hdlcTransport   = HDLCTransport()
-    tcpTransport    = TCPTransportHandler(meter)
+    meter   = Meter()
+    hdlc    = HDLC()
+    tcp     = TCPTransport()
 
+    meter.Link(None,hdlc)
+    hdlc.Link(meter,tcp)
+    tcp.Link(hdlc,None)
+
+    tcp.Run()
 
 
