@@ -54,6 +54,24 @@ def ParseArray(pdu,position):
     return position
 
 
+
+def DLMSDateTimeToText(dlmsDatetime):
+    """
+    """
+    year        = int(dlmsDatetime[0:4], 16)
+    month       = int(dlmsDatetime[4:6], 16)
+    dayOfMonth  = int(dlmsDatetime[6:8], 16)
+    dayOfWeek   = int(dlmsDatetime[8:10], 16)
+    hour        = int(dlmsDatetime[10:12], 16)
+    minute      = int(dlmsDatetime[12:14], 16)
+    second      = int(dlmsDatetime[14:16], 16)
+    hundreths   = int(dlmsDatetime[16:18], 16)
+    deviation   = int(dlmsDatetime[18:22], 16)
+    status      = int(dlmsDatetime[22:24], 16)
+    text    =  "{}:{}:{}:{} {}/{}/{}".format(hour, minute, second, hundreths, dayOfMonth, month, year)
+    return text
+
+
 def ParseOctetString(pdu,position):
     """
     """
@@ -63,7 +81,10 @@ def ParseOctetString(pdu,position):
     length = ord(pdu[position])
     value   = pdu[position+1:position+1+length]
     value   = binascii.hexlify(value)
-    print('%s<OctetString offset="%d">%s</OctetString>'%(Indent(),position,value))
+    if length == 0x0c:
+        print('%s<OctetString offset="%d" datetime="%s">%s</OctetString>'%(Indent(),position,DLMSDateTimeToText(value),value))
+    else:
+        print('%s<OctetString offset="%d">%s</OctetString>'%(Indent(),position,value))
 
     return position+1+length
 
