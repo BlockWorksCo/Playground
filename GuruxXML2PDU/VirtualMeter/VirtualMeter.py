@@ -173,6 +173,7 @@ class Meter:
         # Now package the response into transport format (HDLC).
         #
         responseHex = DLMS.DictToPDU(responseDict)
+        print('responseHex=[%s]'%responseHex)
         response    = binascii.unhexlify(responseHex)
         print('[%s]'%responseHex)
 
@@ -237,7 +238,8 @@ class HDLC:
         """
         print('OutputBytes [%s]'%pduHex)
         hdlc     = DLMS.PDUToHDLC(pduHex)
-        self.lowerLevel.OutputBytes(hdlc)
+        print('hdlc=[%s]'%hdlc)
+        self.lowerLevel.OutputBytes(binascii.unhexlify(hdlc))
 
 
 
