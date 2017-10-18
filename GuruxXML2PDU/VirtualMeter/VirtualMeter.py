@@ -370,7 +370,7 @@ class Meter:
         xml = template%binascii.hexlify(value)
         print(xml)
         d   = xmltodict.parse(xml)
-        return DLMS.DictToHDLC(d)
+        return d
 
 
 
@@ -395,7 +395,7 @@ class Meter:
         xml = template%binascii.hexlify(value)
         print(xml)
         d   = xmltodict.parse(xml)
-        return DLMS.DictToHDLC(d)
+        return d
 
 
     def GetRequest(self, message):
@@ -424,7 +424,7 @@ class Meter:
             """
             xml = template
             d   = xmltodict.parse(xml)
-            return DLMS.DictToHDLC(d)
+            return d
    
 
     def SetRequest(self, message):
@@ -439,6 +439,21 @@ class Meter:
         return message
    
 
+    def AssociationRequest(self, message):
+        """
+        """
+        template  = \
+        """
+        <AssociationResponse>
+        </AssociationResponse>
+        """
+        xml = template
+        d   = xmltodict.parse(xml)
+        return d
+
+
+        
+
     def ProcessHDLC(self, hdlcHex):
         """
         """
@@ -450,8 +465,17 @@ class Meter:
         d   = xmltodict.parse(xml)
         #print(d)
 
+        #
+        # Identify the message type, then call the method
+        # of the same name on this object.
+        #
         messageType = d.keys()[0]
-        responseHex = getattr(self, messageType)(d)
+        responseDict = getattr(self, messageType)(d)
+
+        #
+        # Now package the response into transport format (HDLC).
+        #
+        responseHex = DLMS.DictToHDLC(responseDict)
 
         return responseHex
 
