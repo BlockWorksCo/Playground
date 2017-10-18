@@ -3,7 +3,7 @@
 
 
 import select
-import SocketServer
+import socket
 import DLMSPlayground
 import DLMS
 import time
@@ -212,35 +212,43 @@ class HDLCTransport:
 
 
 
-class TCPTransportHandler(SocketServer.BaseRequestHandler):
+class TCPTransportHandler:
     """
     """
+
+    def __init__(self, upperLevel):
+        """
+        """
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_address = ('localhost', 9999)
+        sock.bind(server_address)
+        sock.listen(1)
+
+        upperLevel.SetTransport(self)
+        while True:
+            self.connection, client_address = sock.accept()
+
+            count   = 0
+            while True:
+                r, w, e = select.select((self.connection,), (), (), 1.0)
+                if r:
+                    data = self.connection.recv(1024)
+                    numberOfBytes   = len(data)
+
+                    if numberOfBytes == 0:
+                        self.connection.close()
+                        break
+
+                    elif numberOfBytes > 0:
+                        for byte in data:
+                            upperLevel.ByteReceived(byte)
+
 
     def OutputBytes(self, data):
         """
         """
-        self.request.sendall(data)
-
-
-    def handle(self):
-        """
-        """
-
-        meter.SetTransport(self)
-        count   = 0
-        while True:
-            r, w, e = select.select((self.request,), (), (), 0)
-            if r:
-                data = self.request.recv(1024)
-                numberOfBytes   = len(data)
-
-                if numberOfBytes == 0:
-                    break
-
-                elif numberOfBytes > 0:
-                    for byte in data:
-                        meter.ByteReceived(byte)
-
+        print('<%s>'%binascii.hexlify(data))
+        self.connection.send(data)
 
 
 
@@ -249,8 +257,7 @@ if __name__ == "__main__":
 
     meter           = Meter()
     hdlcTransport   = HDLCTransport()
-    tcpTransport    = SocketServer.TCPServer(('localhost', 9999), TCPTransportHandler)
+    tcpTransport    = TCPTransportHandler(meter)
 
-    tcpTransport.serve_forever()
 
 
