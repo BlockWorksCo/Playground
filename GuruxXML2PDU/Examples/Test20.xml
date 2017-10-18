@@ -1,0 +1,18 @@
+<AssociationResponse>
+  <ApplicationContextName Value="LN" />
+  <AssociationResult Value="1" />
+  <ResultSourceDiagnostic>
+    <ACSEServiceUser Value="13" />
+  </ResultSourceDiagnostic>
+  <InitiateResponse>
+    <NegotiatedDlmsVersionNumber Value="6" />
+    <NegotiatedConformance>
+      <ConformanceBit Name="Get" />
+      <ConformanceBit Name="BlockTransferWithGetOrRead" />
+    </NegotiatedConformance>
+    <NegotiatedMaxPduSize Value="180" />
+    <VaaName Value="7" />
+  </InitiateResponse>
+</AssociationResponse>
+
+
