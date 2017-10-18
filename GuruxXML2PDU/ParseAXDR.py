@@ -35,16 +35,34 @@ def Indent():
     return ' '*len(inspect.stack())
 
 
+def ParseLength(pdu, position):
+    """
+    If MSB != 0, LS 7 bits contains num of following bytes which make up length
+    If MSB == 0, byte contain length value
+    """
+    length = ord(pdu[position])
+    position    = position + 1
+    if length & 0x80 != 0:
+        numberOfBytes   = length&0x7f
+        length  = 0
+        for i in range(numberOfBytes):
+            length = length << 8 
+            length = length | ord(pdu[position])
+            position    = position + 1
+
+    return length, position
+    
+
 def ParseArray(pdu,position):
     """
     """
     if position == len(pdu):
         return position
 
-    length = ord(pdu[position])
+    #length = ord(pdu[position])
+    length,position = ParseLength(pdu, position)
     print('%s<Array length="%d" offset="%d">'%(Indent(),length,position)) 
 
-    position    += 1
     for i in range(length):
         print('%s<ArrayElement index="%d" offset="%d">'%(Indent(),i,position)) 
         position    = ParseField(pdu,position)
