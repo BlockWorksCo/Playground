@@ -154,45 +154,39 @@ class Meter:
 
         
 
-    def ProcessHDLC(self, hdlcHex):
+    def ProcessHDLC(self, pdu):
         """
         """
-        print('[%s]'%hdlcHex)
-
-        xml = DLMS.HDLCToXML(hdlcHex)
-        print(xml)
-
-        d   = xmltodict.parse(xml)
-        #print(d)
+        print(pdu)
+        d  = DLMS.PDUToDict(pdu)
 
         #
         # Identify the message type, then call the method
         # of the same name on this object.
         #
+        print(d)
         messageType = d.keys()[0]
         responseDict = getattr(self, messageType)(d)
+        print(responseDict)
 
         #
         # Now package the response into transport format (HDLC).
         #
-        responseHex = DLMS.DictToHDLC(responseDict)
+        responseHex = DLMS.DictToPDU(responseDict)
+        response    = binascii.unhexlify(responseHex)
+        print('[%s]'%responseHex)
 
         return responseHex
 
 
-    def ByteReceived(self, byte):
+    def PDUReceived(self, pdu):
         """
         """
-        if self.inMessage == True:
-            self.currentMessage  = self.currentMessage + '%02x'%ord(byte)
-            if ord(byte) == 0x7e:
-                self.inMessage   = False
-                response    = self.ProcessHDLC(self.currentMessage)
-                self.lowerLevel.OutputBytes(binascii.unhexlify(response))
-        else:
-            if ord(byte) == 0x7e:
-                self.inMessage       = True
-                self.currentMessage  = '7e'
+        response    = self.ProcessHDLC(pdu)
+        self.lowerLevel.OutputBytes(response) 
+
+        return response
+
 
     def Link(self, upper, lower):
         """
@@ -213,7 +207,8 @@ class HDLC:
     def __init__(self):
         """
         """
-        pass
+        self.inMessage  = False
+
 
     def Link(self, upper, lower):
         """
@@ -224,12 +219,25 @@ class HDLC:
     def ByteReceived(self, byte):
         """
         """
-        self.upperLevel.ByteReceived(byte)
+        if self.inMessage == True:
+            self.currentMessage  = self.currentMessage + '%02x'%ord(byte)
+            if ord(byte) == 0x7e:
+                self.inMessage   = False
+                pdu     = DLMS.HDLCToPDU(self.currentMessage)
 
-    def OutputBytes(self, data):
+                self.upperLevel.PDUReceived(pdu)
+        else:
+            if ord(byte) == 0x7e:
+                self.inMessage       = True
+                self.currentMessage  = '7e'
+
+
+    def OutputBytes(self, pduHex):
         """
         """
-        self.lowerLevel.OutputBytes(data)
+        print('OutputBytes [%s]'%pduHex)
+        hdlc     = DLMS.PDUToHDLC(pduHex)
+        self.lowerLevel.OutputBytes(hdlc)
 
 
 

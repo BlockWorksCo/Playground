@@ -318,6 +318,58 @@ def HDLCToXML(hdlcHex):
         
         return d
 
+
+def HDLCToPDU(hdlcHex):
+    """
+    """
+    hdlc    = binascii.unhexlify(hdlcHex)
+
+    if ord(hdlc[0]) != 0x7e or ord(hdlc[-1]) != 0x7e:
+        print('no HDLC framing detected.')
+    else:
+        position                    = 1
+        frameType,length,position   = ReadFrameFormat(position, hdlc)
+        dstAddress,position         = ReadAddress(position, hdlc)
+        srcAddress,position         = ReadAddress(position, hdlc)
+        controlField,position       = ReadControlField(position, hdlc)
+        HCS,position                = ReadCS(position, hdlc)
+        print('len = %d'%(len(hdlc)))
+        if len(hdlc) > 13:
+            LLC,position                = ReadLLC(position, hdlc)
+            pdu,position                = ReadPDU(position, hdlc)
+            FCS,position                = ReadCS(position, hdlc)
+
+            return pdu
+
+        else:
+            return None
+        
+
+
+def PDUToDict(pdu):
+    """
+    """
+    p   = subprocess.Popen(['java','-jar','pdu2xml.jar',binascii.hexlify(pdu)], stdout=subprocess.PIPE)
+    output,errorOutput  = p.communicate()
+    d   = xmltodict.parse(output)
+   
+    return d
+
+
+
+def DictToPDU(d):
+    """
+    """
+    xml = xmltodict.unparse(d)
+    open('temp.xml','w+').write(xml)
+
+    p   = subprocess.Popen(['java','-jar','xml2pdu.jar','temp.xml'], stdout=subprocess.PIPE)
+    pdu,errorOutput  = p.communicate()
+   
+    return pdu.replace('\n','')
+
+
+
 def HDLCToDict(hdlcHex):
     """
     """
@@ -340,7 +392,6 @@ def HDLCToDict(hdlcHex):
 
             p   = subprocess.Popen(['java','-jar','pdu2xml.jar',binascii.hexlify(pdu)], stdout=subprocess.PIPE)
             output,errorOutput  = p.communicate()
-
             d   = xmltodict.parse(output)
         else:
             d   = None
