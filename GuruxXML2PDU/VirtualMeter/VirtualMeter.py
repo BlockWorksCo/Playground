@@ -154,39 +154,41 @@ class Meter:
 
         
 
-    def ProcessHDLC(self, pdu):
+    def ProcessHDLC(self, pduHex):
         """
         """
-        print(pdu)
-        d  = DLMS.PDUToDict(pdu)
+        print('\n----------------request (hex) ---------\n%s'%pduHex)
+        d  = DLMS.PDUToDict(pduHex)
 
         #
         # Identify the message type, then call the method
         # of the same name on this object.
         #
-        print(d)
+        print('\n----------------request ---------\n%s'%d)
         messageType = d.keys()[0]
         responseDict = getattr(self, messageType)(d)
+        print('\n----------------response ---------\n%s'%responseDict)
         print(responseDict)
 
         #
         # Now package the response into transport format (HDLC).
         #
         responseHex = DLMS.DictToPDU(responseDict)
-        print('responseHex=[%s]'%responseHex)
+        #print('responseHex=[%s]'%responseHex)
         response    = binascii.unhexlify(responseHex)
-        print('[%s]'%responseHex)
+        #print('[%s]'%responseHex)
 
+        print('\n----------------response (hex)---------\n%s'%responseHex)
         return responseHex
 
 
-    def PDUReceived(self, pdu):
+    def PDUReceived(self, pduHex):
         """
         """
-        response    = self.ProcessHDLC(pdu)
-        self.lowerLevel.OutputBytes(response) 
+        responseHex    = self.ProcessHDLC(pduHex)
+        self.lowerLevel.OutputBytes(responseHex) 
 
-        return response
+        return responseHex
 
 
     def Link(self, upper, lower):
@@ -225,8 +227,9 @@ class HDLC:
             if ord(byte) == 0x7e:
                 self.inMessage   = False
                 pdu     = DLMS.HDLCToPDU(self.currentMessage)
+                pduHex  = binascii.hexlify(pdu)
 
-                self.upperLevel.PDUReceived(pdu)
+                self.upperLevel.PDUReceived(pduHex)
         else:
             if ord(byte) == 0x7e:
                 self.inMessage       = True
@@ -236,9 +239,9 @@ class HDLC:
     def OutputBytes(self, pduHex):
         """
         """
-        print('OutputBytes [%s]'%pduHex)
+        #print('OutputBytes [%s]'%pduHex)
         hdlc     = DLMS.PDUToHDLC(pduHex)
-        print('hdlc=[%s]'%hdlc)
+        #print('hdlc=[%s]'%hdlc)
         self.lowerLevel.OutputBytes(binascii.unhexlify(hdlc))
 
 

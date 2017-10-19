@@ -349,7 +349,7 @@ def HDLCToPDU(hdlcHex):
 def PDUToDict(pdu):
     """
     """
-    p   = subprocess.Popen(['java','-jar','pdu2xml.jar',binascii.hexlify(pdu)], stdout=subprocess.PIPE)
+    p   = subprocess.Popen(['java','-jar','pdu2xml.jar',pdu], stdout=subprocess.PIPE)
     output,errorOutput  = p.communicate()
     d   = xmltodict.parse(output)
    
