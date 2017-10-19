@@ -2,13 +2,11 @@
 
 
 
-import select
-import socket
+import HDLC
+import TCP
 import DLMSPlayground
 import DLMS
-import time
 import xmltodict
-import re
 import binascii
 
 
@@ -157,7 +155,7 @@ class Meter:
     def ProcessHDLC(self, pduHex):
         """
         """
-        print('\n----------------request (hex) ---------\n%s'%pduHex)
+        #print('\n----------------request (hex) ---------\n%s'%pduHex)
         d  = DLMS.PDUToDict(pduHex)
 
         #
@@ -178,7 +176,7 @@ class Meter:
         response    = binascii.unhexlify(responseHex)
         #print('[%s]'%responseHex)
 
-        print('\n----------------response (hex)---------\n%s'%responseHex)
+        #print('\n----------------response (hex)---------\n%s'%responseHex)
         return responseHex
 
 
@@ -201,107 +199,11 @@ class Meter:
 
 
 
-
-
-class HDLC:
-    """
-    """
-
-    def __init__(self):
-        """
-        """
-        self.inMessage  = False
-
-
-    def Link(self, upper, lower):
-        """
-        """
-        self.upperLevel = upper
-        self.lowerLevel = lower
-
-    def ByteReceived(self, byte):
-        """
-        """
-        if self.inMessage == True:
-            self.currentMessage  = self.currentMessage + '%02x'%ord(byte)
-            if ord(byte) == 0x7e:
-                self.inMessage   = False
-                pdu     = DLMS.HDLCToPDU(self.currentMessage)
-                pduHex  = binascii.hexlify(pdu)
-
-                self.upperLevel.PDUReceived(pduHex)
-        else:
-            if ord(byte) == 0x7e:
-                self.inMessage       = True
-                self.currentMessage  = '7e'
-
-
-    def OutputBytes(self, pduHex):
-        """
-        """
-        #print('OutputBytes [%s]'%pduHex)
-        hdlc     = DLMS.PDUToHDLC(pduHex)
-        #print('hdlc=[%s]'%hdlc)
-        self.lowerLevel.OutputBytes(binascii.unhexlify(hdlc))
-
-
-
-class TCPTransport:
-    """
-    """
-
-    def __init__(self):
-        """
-        """
-        pass
-
-
-    def Run(self):
-        """
-        """
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_address = ('localhost', 9999)
-        sock.bind(server_address)
-        sock.listen(1)
-
-        while True:
-            self.connection, client_address = sock.accept()
-
-            while True:
-                r, w, e = select.select((self.connection,), (), (), 1.0)
-                if r:
-                    data = self.connection.recv(1024)
-                    numberOfBytes   = len(data)
-
-                    if numberOfBytes == 0:
-                        self.connection.close()
-                        break
-
-                    elif numberOfBytes > 0:
-                        for byte in data:
-                            self.upperLevel.ByteReceived(byte)
-
-
-    def Link(self, upper, lower):
-        """
-        """
-        self.upperLevel = upper
-        self.lowerLevel = lower
-
-
-    def OutputBytes(self, data):
-        """
-        """
-        self.connection.send(data)
-
-
-
-
 if __name__ == "__main__":
 
     meter   = Meter()
-    hdlc    = HDLC()
-    tcp     = TCPTransport()
+    hdlc    = HDLC.HDLC()
+    tcp     = TCP.TCPTransport()
 
     meter.Link(None,hdlc)
     hdlc.Link(meter,tcp)
