@@ -417,7 +417,7 @@ def ReadLoadProfile():
     """
     <GetRequest>
       <GetRequestNormal>
-        <InvokeIdAndPriority Value="131" />
+        <InvokeIdAndPriority Value="129" />
         <AttributeDescriptor>
           <!--PROFILE_GENERIC-->
           <ClassId Value="7" />
@@ -436,10 +436,8 @@ def ReadLoadProfile():
                 <Int8 Value="2" />
                 <UInt16 Value="0" />
               </Structure>
-              <!--2016-11-28 10:00:00-->
-              <OctetString Value="07E00B1CFF0A000000FFFFFF" />
-              <!--2016-11-29 00:00:00-->
-              <OctetString Value="07E00B1DFF00000000FFFFFF" />
+              <OctetString Value="07d0010400021000ff800000" />
+              <OctetString Value="07d0010400021300ff800000" />
               <Array Qty="0" >
               </Array>
             </Structure>
@@ -447,11 +445,14 @@ def ReadLoadProfile():
         </AccessSelection>
       </GetRequestNormal>
     </GetRequest>
+
     """
     xml     = template 
     d       = xmltodict.parse(xml)
     rq      = DLMS.DictToHDLC(d, controlField=DLMSPlayground.ControlField())
 
+
+    lastBlock   = 0
 
     print('\n\nReading capture_objects 0')
     #rq    = DLMSPlayground.CreateGetRequest(7,hexCode,3)
@@ -463,10 +464,17 @@ def ReadLoadProfile():
     d= DLMS.HDLCToDict(rsp)
     print(d)
 
-    LSCaptureObjects    = d['GetResponse']['GetResponsewithDataBlock']['Result']['Result']['RawData']['@Value']
-    print('LSCaptureObjects = [%s]'%LSCaptureObjects)
+    try:
+        LSCaptureObjects    = d['GetResponse']['GetResponsewithDataBlock']['Result']['Result']['RawData']['@Value']
+        print('LSCaptureObjects = [%s]'%LSCaptureObjects)
+    except KeyError:
+        qty    = int(d['GetResponse']['GetResponsewithDataBlock']['Result']['Array']['@Qty'])
+        print('LSCaptureObjects = [%s]'%LSCaptureObjects)
+        
 
-    for i in range(1,10000):
+    i   = 1
+    while lastBlock == 0:
+
 
         print('\n\nReading capture_objects %d'%i)
         rq  = DLMSPlayground.CreateGetRequestforNextDataBlock(i)
@@ -475,13 +483,20 @@ def ReadLoadProfile():
         time.sleep(1.0)
         rsp    = DLMSPlayground.GetResponseFromMeter(p)
         if len(rsp) == 0:
+            print('----> No response, breaking out.')
             break
         else:
+            print('rsp = %s'%rsp)
             d= DLMS.HDLCToDict(rsp)
             print(rsp)
+            print(d)
+            lastBlock   = int(d['GetResponse']['GetResponsewithDataBlock']['Result']['LastBlock']['@Value'], 16)
+            print('------> lastBlock = [%d]'%lastBlock)
             thisBlock   = d['GetResponse']['GetResponsewithDataBlock']['Result']['Result']['RawData']['@Value']  
             LSCaptureObjects   = LSCaptureObjects + thisBlock
             print('LSCaptureObjects = [%s]'%thisBlock)
+
+        i   += 1
 
 
     print('LS capture objects: \n\n[%s]\n\n'%LSCaptureObjects)
