@@ -436,8 +436,8 @@ def ReadLoadProfile():
                 <Int8 Value="2" />
                 <UInt16 Value="0" />
               </Structure>
-              <OctetString Value="07d0010400021000ff800000" />
-              <OctetString Value="07d0010400021300ff800000" />
+              <OctetString Value="07c0010400021500ff800000" />
+              <OctetString Value="07d0010400021800ff800000" />
               <Array Qty="0" >
               </Array>
             </Structure>
@@ -468,7 +468,11 @@ def ReadLoadProfile():
         LSCaptureObjects    = d['GetResponse']['GetResponsewithDataBlock']['Result']['Result']['RawData']['@Value']
         print('LSCaptureObjects = [%s]'%LSCaptureObjects)
     except KeyError:
-        qty    = int(d['GetResponse']['GetResponsewithDataBlock']['Result']['Array']['@Qty'])
+        qty    = int(d['GetResponse']['GetResponseNormal']['Result']['Data']['Array']['@Qty'])
+        if qty == 0:
+            print('----> qty is zero <-----')
+            lastBlock   = 255
+            LSCaptureObjects    = ''
         print('LSCaptureObjects = [%s]'%LSCaptureObjects)
         
 
