@@ -321,61 +321,9 @@ def ParseAXDR(pdu,position):
 
 
 
+pduHex=open(sys.argv[1]).read()
+pdu     = binascii.unhexlify(pduHex.replace('\n',''))
 
-def ParseDLMS(pdu, position):
-    """
-        'x', // Request tag
-        0x01, 0x81, 0x00, // Type, subtype, invoke ID, priority
-        'x', // Interface class
-        'x', 'x', 'x', 'x', 'x', 'x', // OBIS code
-        'x', // Attribute
-        0x00, // Data
-
-    7e a01a 00020023 41   10  1717 e6e600    c4   01      81   00  0905 3030303030 23a4 7e
-            addr     add  ctl hcs  llc       type subtype invk pri data            fcs
-    """
-    if position == len(pdu):
-        return position
-
-    type        = ord(pdu[position])
-    position    += 1
-    subType     = ord(pdu[position])
-    position    += 1
-    invokeId    = ord(pdu[position])
-    position    += 1
-    priority    = ord(pdu[position])
-    position    += 1
-
-    fullType    = type << 8 | subType
-
-    print('type = %02x'%type)
-    print('subtype = %02x'%subType)
-    print('invokeId = %02x'%invokeId)
-    print('priority = %02x'%priority)
-    print('fullType = %02x'%fullType)
-
-    tags    = \
-    {
-        0xc001:{'OpenTag':'<GetRequest><GetRequestNormal>', 'CloseTag':'</GetRequestNormal></GetRequest>'},
-        0xc002:{'OpenTag':'<GetRequest><GetRequestwithDataBlock>', 'CloseTag':'</GetRequestNormal></GetRequest>'},
-        0xc101:{'OpenTag':'<SetRequest><SetRequestNormal>', 'CloseTag':'</SetRequestNormal></SetRequest>'},
-    }
-
-    print(tags[fullType]['OpenTag'])
-    print(tags[fullType]['CloseTag'])
-
-    return position
-
-    
-
-
-
-if __name__ == '__main__':
-
-    #pduHex=open(sys.argv[1]).read()
-    #pdu     = binascii.unhexlify(pduHex.replace('\n',''))
-    #ParseAXDR(pdu,0)
-
-    ParseDLMS(binascii.unhexlify('C0018100070100630100FF0201010204020412000809060000010000FF0F02120000090C07E007170600000000000000090C07E00719010B0300000000000100'), 0)
+ParseAXDR(pdu,0)
 
 
