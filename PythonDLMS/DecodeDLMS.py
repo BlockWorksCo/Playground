@@ -8,25 +8,7 @@ import inspect
 import binascii
 import sys
 import struct
-
-NONE        = 0x00
-ARRAY       = 0x01
-STRUCTURE   = 0x02
-BOOLEAN     = 0x03
-BIT_STRING  = 0x04
-INT32       = 0x05
-UINT32      = 0x06
-OCTET_STRING= 0x09
-STRING      = 0x0a
-STRING_UTF8 = 0x0c
-INT8        = 0x0f
-UINT8       = 0x11
-UINT16      = 0x12
-UINT64      = 0x15
-ENUM        = 0x16
-FLOAT32     = 0x17
-DATE        = 0x1a
-TIME        = 0x1b
+import DecodeAXDR
 
 
 def Indent():
@@ -34,6 +16,33 @@ def Indent():
     """
     return ' '*len(inspect.stack())
 
+
+
+
+def ParseGetRequestNormal(pdu, position):
+    """
+    """
+    ic          = ord(pdu[position])
+    position    += 1
+
+    obis        = pdu[position:position+6]
+    position    += 6
+    
+    attribute   = ord(pdu[position])
+    position    += 1
+
+    template    = \
+    """
+    <AttributeDescriptor>
+      <ClassId Value="%04x" />
+      <InstanceId Value="%08s" />
+      <AttributeId Value="%02x" />
+    </AttributeDescriptor>
+    """
+
+    print(template%(ic,binascii.hexlify(obis),attribute))
+
+    return position
 
 
 
@@ -63,20 +72,19 @@ def ParseDLMS(pdu, position):
 
     fullType    = type << 8 | subType
 
-    print('type = %02x'%type)
-    print('subtype = %02x'%subType)
-    print('invokeId = %02x'%invokeId)
-    print('priority = %02x'%priority)
-    print('fullType = %02x'%fullType)
-
     tags    = \
     {
-        0xc001:{'OpenTag':'<GetRequest><GetRequestNormal>', 'CloseTag':'</GetRequestNormal></GetRequest>'},
+        0xc001:{'OpenTag':'<GetRequest><GetRequestNormal><InvokeIdAndPriority Value="%02x%02x" />'%(invokeId,priority), 'CloseTag':'</GetRequestNormal></GetRequest>'},
         0xc002:{'OpenTag':'<GetRequest><GetRequestwithDataBlock>', 'CloseTag':'</GetRequestNormal></GetRequest>'},
         0xc101:{'OpenTag':'<SetRequest><SetRequestNormal>', 'CloseTag':'</SetRequestNormal></SetRequest>'},
     }
 
     print(tags[fullType]['OpenTag'])
+    
+    if fullType == 0xc001:
+        position    = ParseGetRequestNormal(pdu, position)
+
+    DecodeAXDR.ParseAXDR(pdu, position)
     print(tags[fullType]['CloseTag'])
 
     return position
