@@ -46,6 +46,33 @@ def ParseGetRequestNormal(pdu, position):
 
 
 
+def ParseGetResponseNormal(pdu, position):
+    """
+    """
+    ic          = ord(pdu[position])
+    position    += 1
+
+    obis        = pdu[position:position+6]
+    position    += 6
+    
+    attribute   = ord(pdu[position])
+    position    += 1
+
+    template    = \
+    """
+    <AttributeDescriptor>
+      <ClassId Value="%04x" />
+      <InstanceId Value="%08s" />
+      <AttributeId Value="%02x" />
+    </AttributeDescriptor>
+    """
+
+    print(template%(ic,binascii.hexlify(obis),attribute))
+
+    return position
+
+
+
 def ParseDLMS(pdu, position):
     """
         'x', // Request tag
@@ -77,12 +104,16 @@ def ParseDLMS(pdu, position):
         0xc001:{'OpenTag':'<GetRequest><GetRequestNormal><InvokeIdAndPriority Value="%02x%02x" />'%(invokeId,priority), 'CloseTag':'</GetRequestNormal></GetRequest>'},
         0xc002:{'OpenTag':'<GetRequest><GetRequestwithDataBlock>', 'CloseTag':'</GetRequestNormal></GetRequest>'},
         0xc101:{'OpenTag':'<SetRequest><SetRequestNormal>', 'CloseTag':'</SetRequestNormal></SetRequest>'},
+        0xc401:{'OpenTag':'<GetResponse><GetResponseNormal><InvokeIdAndPriority Value="%02x%02x" />'%(invokeId,priority), 'CloseTag':'</GetResponseNormal></GetResponse>'},
     }
 
     print(tags[fullType]['OpenTag'])
     
     if fullType == 0xc001:
         position    = ParseGetRequestNormal(pdu, position)
+
+    elif fullType == 0xc501:
+        position    = ParseGetResponseNormal(pdu, position)
 
     DecodeAXDR.ParseAXDR(pdu, position)
     print(tags[fullType]['CloseTag'])
@@ -95,6 +126,8 @@ def ParseDLMS(pdu, position):
 
 if __name__ == '__main__':
 
-    ParseDLMS(binascii.unhexlify('C0018100070100630100FF0201010204020412000809060000010000FF0F02120000090C07E007170600000000000000090C07E00719010B0300000000000100'), 0)
+    hex = open(sys.argv[1]).read().replace('\n','').replace('\r','')
+    #ParseDLMS(binascii.unhexlify('C0018100070100630100FF0201010204020412000809060000010000FF0F02120000090C07E007170600000000000000090C07E00719010B0300000000000100'), 0)
+    ParseDLMS(binascii.unhexlify(hex), 0)
 
 
