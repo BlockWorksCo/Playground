@@ -1,0 +1,43 @@
+<GetRequest><GetRequestNormal><InvokeIdAndPriority Value="8100" />
+
+    <AttributeDescriptor>
+      <ClassId Value="0007" />
+      <InstanceId Value="0100630100ff" />
+      <AttributeId Value="02" />
+    </AttributeDescriptor>
+    
+    <Data>
+      <Array length="1" offset="14">
+      <ArrayElement index="0" offset="14">
+        <Structure length="4" offset="15">
+        <Field index="0" offset="16">
+          <Structure length="4" offset="17">
+          <Field index="0" offset="18">
+            <Uint16 offset="19">0008</Uint16>
+          </Field>
+          <Field index="1" offset="21">
+            <OctetString offset="22">0000010000ff</OctetString>
+          </Field>
+          <Field index="2" offset="29">
+            <Int8 offset="30">02</Int8>
+          </Field>
+          <Field index="3" offset="31">
+            <Uint16 offset="32">0000</Uint16>
+          </Field>
+          </Structure>
+        </Field>
+        <Field index="1" offset="34">
+          <OctetString offset="35" datetime="0:0:0:0 23/7/2016">07e007170600000000000000</OctetString>
+        </Field>
+        <Field index="2" offset="48">
+          <OctetString offset="49" datetime="11:3:0:0 25/7/2016">07e00719010b030000000000</OctetString>
+        </Field>
+        <Field index="3" offset="62">
+          <Array length="0" offset="64">
+          </Array>
+        </Field>
+        </Structure>
+      </ArrayElement>
+      </Array>
+    </Data>
+</GetRequestNormal></GetRequest>
