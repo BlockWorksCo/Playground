@@ -587,14 +587,50 @@ def TimeGet():
 
 
 
+def TimeGet():
+    """
+    """
+    template    = \
+    """
+    <GetRequest>
+      <GetRequestNormal>
+        <InvokeIdAndPriority Value="129" />
+        <AttributeDescriptor>
+          <!--CLOCK-->
+          <ClassId Value="8" />
+          <!--0.0.1.0.0.255-->
+          <InstanceId Value="0000010000FF" />
+          <AttributeId Value="2" />
+        </AttributeDescriptor>
+      </GetRequestNormal>
+    </GetRequest>
+    """
+    p   = Associate()
+
+    hexCode = '0000010000FF'
+    rq    = DLMSPlayground.CreateGetRequest(8,hexCode,2)
+    print(rq)
+    DLMSPlayground.SendHDLCToMeter(p, rq )
+    time.sleep(0.5)
+    rsp    = DLMSPlayground.GetResponseFromMeter(p)
+    print(rsp)
+    d= DLMS.HDLCToDict(rsp)
+    print(d)
+
+    timeHex = d['GetResponse']['GetResponseNormal']['Result']['Data']['OctetString']['@Value']
+    print('time is: %s'%(timeHex))
+
+
+
+
 
 if __name__ == '__main__':
     #ReadInstantaneousProfile()
     #StaticDiscovery()
-    #ReadLoadProfile()
+    ReadLoadProfile()
     #ReadObjectList()
 
     #ActionTest()
     #GetTest()
-    TimeGet()
+    #TimeGet()
 
