@@ -12,8 +12,26 @@ import re
 
 OBISList    = \
 [
+   {'code':[0x00,0x00,0x60,0x0a,0x02,0xff], 'ic':5 },   # 
+   {'code':[0x01,0x00,0x0d,0x1b,0x00,0xff], 'ic':5 },
+   {'code':[0x01,0x00,0x20,0x1b,0x00,0xff], 'ic':5 },
+   {'code':[0x01,0x00,0x34,0x1b,0x00,0xff], 'ic':5 },
+   {'code':[0x01,0x00,0x48,0x1b,0x00,0xff], 'ic':5 },
+   {'code':[0x01,0x00,0x1f,0x1b,0x00,0xff], 'ic':5 },
+   {'code':[0x01,0x00,0x33,0x1b,0x00,0xff], 'ic':5 },
+   {'code':[0x01,0x00,0x47,0x1b,0x00,0xff], 'ic':5 },
+   {'code':[0x01,0x00,0x20,0x18,0x7c,0xff], 'ic':5 },
+   {'code':[0x01,0x00,0x34,0x18,0x7c,0xff], 'ic':5 },
+   {'code':[0x01,0x00,0x48,0x18,0x7c,0xff], 'ic':5 },
+   {'code':[0x01,0x00,0x1f,0x18,0x7c,0xff], 'ic':5 },
+   {'code':[0x01,0x00,0x33,0x18,0x7c,0xff], 'ic':5 },
+   {'code':[0x01,0x00,0x47,0x18,0x7c,0xff], 'ic':5 },
+   {'code':[0x01,0x00,0x21,0x1b,0x00,0xff], 'ic':5 },
+   {'code':[0x01,0x00,0x35,0x1b,0x00,0xff], 'ic':5 },
+   {'code':[0x01,0x00,0x49,0x1b,0x00,0xff], 'ic':5 },
+
    {'code':[ 0,0,1,0,0,255 ], 'ic':8 },
-   {'code':[ 1,0,0,1,2,255 ], 'ic':1 },
+   {'code':[ 1,0,0,1,2,255 ], 'ic':1 }, # 
    {'code':[ 1,0,31,7,0,255 ], 'ic':3 },
    {'code':[ 1,0,51,7,0,255 ], 'ic':3 },
    {'code':[ 1,0,71,7,0,255 ], 'ic':3 },
@@ -285,12 +303,25 @@ def StaticDiscovery():
         d   = obisInfo['code'][3]
         e   = obisInfo['code'][4]
         f   = obisInfo['code'][5]
-        ic  = obisInfo['ic']
+        ic  = int(obisInfo['ic'])
 
         hexCode = '%02x%02x%02x%02x%02x%02x'%(a,b,c,d,e,f)
-        print('------- getting %s --------'%hexCode)
+        print('------- getting %s ic=%d --------'%(hexCode,ic))
 
-        rq    = DLMSPlayground.CreateGetRequest(ic,hexCode,3)
+        if ic == 3:
+            rq    = DLMSPlayground.CreateGetRequest(ic,hexCode,3)
+        elif ic == 4:
+            rq    = DLMSPlayground.CreateGetRequest(ic,hexCode,4)
+        elif ic == 5:
+            rq    = DLMSPlayground.CreateGetRequest(ic,hexCode,4)
+        elif ic == 8:
+            rq    = DLMSPlayground.CreateGetRequest(ic,hexCode,3)
+        elif ic == 1:
+            rq    = DLMSPlayground.CreateGetRequest(ic,hexCode,3)
+        else:
+            print('oops...')
+            pass
+            
         print(rq)
         DLMSPlayground.SendHDLCToMeter(p, rq )
         time.sleep(0.5)
@@ -434,7 +465,6 @@ def ReadLoadProfile():
                 <!--0.0.1.0.0.255-->
                 <OctetString Value="0000010000FF" />
                 <Int8 Value="2" />
-                <UInt16 Value="0" />
               </Structure>
               <OctetString Value="07d0010400021500ff800000" />
               <OctetString Value="07d0010400021800ff800000" />
@@ -454,7 +484,7 @@ def ReadLoadProfile():
 
     lastBlock   = 0
 
-    print('\n\nReading capture_objects 0')
+    print('\n\nReading 0')
     #rq    = DLMSPlayground.CreateGetRequest(7,hexCode,3)
     print(rq)
     DLMSPlayground.SendHDLCToMeter(p, rq )
@@ -626,8 +656,8 @@ def TimeGet():
 
 if __name__ == '__main__':
     #ReadInstantaneousProfile()
-    #StaticDiscovery()
-    ReadLoadProfile()
+    StaticDiscovery()
+    #ReadLoadProfile()
     #ReadObjectList()
 
     #ActionTest()

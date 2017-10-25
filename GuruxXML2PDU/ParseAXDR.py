@@ -372,10 +372,10 @@ def ParseDLMS(pdu, position):
 
 if __name__ == '__main__':
 
-    #pduHex=open(sys.argv[1]).read()
-    #pdu     = binascii.unhexlify(pduHex.replace('\n',''))
-    #ParseAXDR(pdu,0)
+    pduHex=open(sys.argv[1]).read()
+    pdu     = binascii.unhexlify(pduHex.replace('\n',''))
+    ParseAXDR(pdu,0)
 
-    ParseDLMS(binascii.unhexlify('C0018100070100630100FF0201010204020412000809060000010000FF0F02120000090C07E007170600000000000000090C07E00719010B0300000000000100'), 0)
+    #ParseDLMS(binascii.unhexlify('C0018100070100630100FF0201010204020412000809060000010000FF0F02120000090C07E007170600000000000000090C07E00719010B0300000000000100'), 0)
 
 
