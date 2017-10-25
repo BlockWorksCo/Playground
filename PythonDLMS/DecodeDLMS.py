@@ -58,6 +58,9 @@ def ParseGetResponseNormal(pdu, position):
     attribute   = ord(pdu[position])
     position    += 1
 
+    accessSelector = ord(pdu[position])
+    position    += 1
+
     template    = \
     """
     <AttributeDescriptor>
