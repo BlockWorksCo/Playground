@@ -28,7 +28,7 @@ def EncodeDLMS(d):
         except KeyError:
             dataPDU         = ''
             accessSelector  = 0
-        print('accessSelector=%d'%accessSelector)
+        #print('accessSelector=%d'%accessSelector)
         priority    = invokeIDAndPriority&0xff
         invokeID    = (invokeIDAndPriority&0xff00)>>8
         pdu         = '%04x%02x%02x%02x%s%02x%02x%s'%(fullType,invokeID,priority,ic,obis,attributeId,accessSelector,dataPDU)
