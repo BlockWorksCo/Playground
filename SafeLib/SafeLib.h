@@ -6,6 +6,7 @@
 
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <stddef.h>
 
 
@@ -26,6 +27,7 @@ void safeFree(void* block);
 void safeBlockRegister(Tag tag, void* block, size_t numberOfBytes);
 SafeBlock* safeBlockOfPointer(void* pointer);
 void safeBlockUnregister(void* block);
+bool safeBoundsOfPointer(void* pointer, void** low, void** high);
 
 #endif
 

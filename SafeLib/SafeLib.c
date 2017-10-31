@@ -69,5 +69,22 @@ void safeBlockUnregister(void* block)
 }
 
 
+bool safeBoundsOfPointer(void* pointer, void** low, void** high)
+{
+    SafeBlock*  safeBlock   = safeBlockOfPointer(pointer);
+
+    if( safeBlock != NULL )
+    {
+        *low    = safeBlock->block;
+        *high   = (*low) + safeBlock->size;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+
 
 
