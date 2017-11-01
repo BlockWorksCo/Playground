@@ -3,6 +3,8 @@
 
 #include "SafeLib.h"
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 #define NUMBER_OF_ELEMENTS(a)   (sizeof(a)/sizeof(a[0]))
 
@@ -34,13 +36,14 @@ SafeBlock* safeBlockOfPointer(void* pointer)
 {
     for(uint32_t i=0; i<NUMBER_OF_ELEMENTS(safeBlockList); i++)
     {
-        if( (safeBlockList[i].block < pointer) && 
+        if( (safeBlockList[i].block <= pointer) && 
             (safeBlockList[i].block+safeBlockList[i].size > pointer) )
         {
             return &safeBlockList[i];
         }
     }
 
+    printf("BAD [%p]\n",pointer);
     return NULL;
 }
 
@@ -64,7 +67,9 @@ void safeBlockUnregister(void* block)
    
     if( safeBlock != NULL )
     {
-        safeBlock->block = 0;
+        safeBlock->block    = 0;
+        safeBlock->size     = 0;
+        safeBlock->tag      = 0;
     }
 }
 
@@ -88,15 +93,17 @@ bool safeBoundsOfPointer(void* pointer, void** low, void** high)
 
 bool safeBlockCheck(void* blockA, void* blockB)
 {
-    void*   aLow;
-    void*   aHigh;
-    void*   bLow;
-    void*   bHigh;
+    void*   aLow        = 0;
+    void*   aHigh       = 0;
+    void*   bLow        = 0;
+    void*   bHigh       = 0;
+    bool    successFlag = true;
 
-    safeBoundsOfPointer(a, &aLow, &aHigh);
-    safeBoundsOfPointer(b, &bLow, &bHigh);
+    successFlag &= safeBoundsOfPointer(blockA, &aLow, &aHigh);
+    successFlag &= safeBoundsOfPointer(blockB, &bLow, &bHigh);
     
-    if( (aLow==bLow) && (aHigh==bHigh) )
+    if( (aLow==bLow) && (aHigh==bHigh) &&
+        (successFlag==true) )
     {
         return true;
     }
@@ -112,16 +119,26 @@ bool safeBlockCheck(void* blockA, void* blockB)
 
 void safeMemcpy(void* dst, void* src, size_t numberOfBytes)
 {
-    void*   dstLow;
-    void*   dstHigh;
-    void*   srcLow;
-    void*   srcHigh;
+    void*   dstLow      = 0;
+    void*   dstHigh     = 0;
+    void*   srcLow      = 0;
+    void*   srcHigh     = 0;
+    bool    successFlag = true;
 
-    safeBoundsOfPointer(dst, &dstLow, &dstHigh);
-    safeBoundsOfPointer(src, &srcLow, &srcHigh);
+    successFlag   &= safeBoundsOfPointer(dst, &dstLow, &dstHigh);
+    successFlag   &= safeBoundsOfPointer(src, &srcLow, &srcHigh);
 
-    safeBlockCheck(dst, dst+numberOfBytes);
-    safeBlockCheck(src, src+numberOfBytes);
+    successFlag   &= safeBlockCheck(dst, dst+numberOfBytes);
+    successFlag   &= safeBlockCheck(src, src+numberOfBytes);
+
+    if( successFlag == true )
+    {
+        memcpy( dst, src, numberOfBytes );
+    }
+    else
+    {
+        safeViolation();
+    }
 
 }
 

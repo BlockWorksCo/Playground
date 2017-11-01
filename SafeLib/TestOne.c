@@ -3,7 +3,15 @@
 
 #include "SafeLib.h"
 #include <stdio.h>
+#include <stdlib.h>
 
+
+
+void safeViolation()
+{
+    printf("!!! PROBLEMS! !!!");
+    exit(-1);
+}
 
 
 int main()
@@ -25,6 +33,8 @@ int main()
 
     safeBoundsOfPointer( b2+50, &low, &high );
     printf("low=%p, high=%p\n", low, high);
+
+    safeMemcpy( b0+10, b2+50, 25 );
 
     safeFree(b0);
     safeFree(b1);

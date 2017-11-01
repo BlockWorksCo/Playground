@@ -31,6 +31,8 @@ SafeBlock* safeBlockOfPointer(void* pointer);
 void safeBlockUnregister(void* block);
 bool safeBoundsOfPointer(void* pointer, void** low, void** high);
 
+extern void safeViolation();
+
 #endif
 
 
