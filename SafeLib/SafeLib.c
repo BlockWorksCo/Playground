@@ -86,5 +86,42 @@ bool safeBoundsOfPointer(void* pointer, void** low, void** high)
 }
 
 
+bool safeBlockCheck(void* blockA, void* blockB)
+{
+    void*   aLow;
+    void*   aHigh;
+    void*   bLow;
+    void*   bHigh;
 
+    safeBoundsOfPointer(a, &aLow, &aHigh);
+    safeBoundsOfPointer(b, &bLow, &bHigh);
+    
+    if( (aLow==bLow) && (aHigh==bHigh) )
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+
+
+
+
+void safeMemcpy(void* dst, void* src, size_t numberOfBytes)
+{
+    void*   dstLow;
+    void*   dstHigh;
+    void*   srcLow;
+    void*   srcHigh;
+
+    safeBoundsOfPointer(dst, &dstLow, &dstHigh);
+    safeBoundsOfPointer(src, &srcLow, &srcHigh);
+
+    safeBlockCheck(dst, dst+numberOfBytes);
+    safeBlockCheck(src, src+numberOfBytes);
+
+}
 

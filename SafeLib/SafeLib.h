@@ -23,6 +23,8 @@ typedef struct
 void* safeMalloc(size_t numberOfBytes);
 void safeFree(void* block);
 
+void safeMemcpy(void* dst, void* src, size_t numberOfBytes);
+
 
 void safeBlockRegister(Tag tag, void* block, size_t numberOfBytes);
 SafeBlock* safeBlockOfPointer(void* pointer);
