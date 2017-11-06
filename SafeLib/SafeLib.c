@@ -139,6 +139,30 @@ void safeMemcpy(void* dst, void* src, size_t numberOfBytes)
     {
         safeViolation();
     }
+}
 
+
+void safeStrcpy(char* dst, char* src)
+{
+    void*   dstLow      = 0;
+    void*   dstHigh     = 0;
+    void*   srcLow      = 0;
+    void*   srcHigh     = 0;
+    bool    successFlag = true;
+
+    successFlag   &= safeBoundsOfPointer(dst, &dstLow, &dstHigh);
+    successFlag   &= safeBoundsOfPointer(src, &srcLow, &srcHigh);
+
+    successFlag   &= safeBlockCheck(dst, dst+strlen(src));
+    successFlag   &= safeBlockCheck(src, src+strlen(src));
+
+    if( successFlag == true )
+    {
+        strcpy( dst, src);
+    }
+    else
+    {
+        safeViolation();
+    }
 }
 

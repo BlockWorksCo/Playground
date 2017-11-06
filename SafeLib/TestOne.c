@@ -14,8 +14,13 @@ void safeViolation()
 }
 
 
+
+#define NEW(typeName)   (typeName*)safeMalloc(sizeof(typeName))
+#define BLAA(typeName)   printf("[%ld] %s[%c]\n",sizeof(typeName),#typeName, (#typeName)[1])
+
 int main()
 {
+    BLAA(int);
     void*   b0  = safeMalloc(100);
     void*   b1  = safeMalloc(100);
     void*   b2  = safeMalloc(100);

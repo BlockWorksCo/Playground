@@ -305,7 +305,7 @@ def ParseField(pdu,position):
     return position
 
 
-def ParseAXDR(pdu,position):
+def DecodeAXDR(pdu,position=0):
     """
     """
     if position == len(pdu):
@@ -326,6 +326,6 @@ if __name__ == '__main__':
 
     pduHex=open(sys.argv[1]).read()
     pdu     = binascii.unhexlify(pduHex.replace('\n',''))
-    ParseAXDR(pdu,0)
+    DecodeAXDR(pdu)
 
 
