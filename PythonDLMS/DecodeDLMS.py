@@ -76,6 +76,23 @@ def ParseGetResponseNormal(pdu, position):
 
 
 
+def ParseGetResponseNormal_C4(pdu, position):
+    """
+    """
+    template    = \
+    """
+    <Data>
+     %s
+    </Data>
+    """
+
+    axdrData    = pdu
+    xml = template%(binascii.hexlify(axdrData))
+
+    return xml,position
+
+
+
 def DecodeDLMS(pdu, position=0):
     """
         'x', // Request tag
@@ -118,11 +135,17 @@ def DecodeDLMS(pdu, position=0):
         result,position = ParseGetRequestNormal(pdu, position)
         xml += result
 
+    elif fullType == 0xc401:
+        #result,position = ParseGetResponseNormal_C4(pdu, position)
+        result  = ''
+        xml += result
+
     elif fullType == 0xc501:
         result,position = ParseGetResponseNormal(pdu, position)
         xml += result
 
-    DecodeAXDR.DecodeAXDR(pdu, position)
+    print(binascii.hexlify(pdu[position:]))
+    DecodeAXDR.DecodeAXDR(pdu, position, '')
     xml += tags[fullType]['CloseTag']
 
     return xml

@@ -35,7 +35,7 @@ def Indent():
     return ' '*len(inspect.stack())
 
 
-def ParseLength(pdu, position):
+def ParseLength(pdu, position,xml):
     """
     If MSB != 0, LS 7 bits contains num of following bytes which make up length
     If MSB == 0, byte contain length value
@@ -50,26 +50,26 @@ def ParseLength(pdu, position):
             length = length | ord(pdu[position])
             position    = position + 1
 
-    return length, position
+    return length, position,xml
     
 
-def ParseArray(pdu,position):
+def ParseArray(pdu,position,xml):
     """
     """
     if position == len(pdu):
-        return position
+        return position,xml
 
     #length = ord(pdu[position])
-    length,position = ParseLength(pdu, position)
-    print('%s<Array length="%d" offset="%d">'%(Indent(),length,position)) 
+    length,position,xml = ParseLength(pdu, position, xml)
+    xml += ('%s<Array length="%d" offset="%d">'%(Indent(),length,position)) 
 
     for i in range(length):
-        print('%s<ArrayElement index="%d" offset="%d">'%(Indent(),i,position)) 
-        position    = ParseField(pdu,position)
-        print('%s</ArrayElement>'%(Indent())) 
+        xml += ('%s<ArrayElement index="%d" offset="%d">'%(Indent(),i,position)) 
+        position,xml    = ParseField(pdu,position, xml)
+        xml += ('%s</ArrayElement>'%(Indent())) 
 
-    print('%s</Array>'%(Indent())) 
-    return position
+    xml += ('%s</Array>'%(Indent())) 
+    return position,xml
 
 
 
@@ -90,137 +90,137 @@ def DLMSDateTimeToText(dlmsDatetime):
     return text
 
 
-def ParseOctetString(pdu,position):
+def ParseOctetString(pdu,position,xml):
     """
     """
     if position == len(pdu):
-        return position
+        return position,xml
 
     length = ord(pdu[position])
     value   = pdu[position+1:position+1+length]
     value   = binascii.hexlify(value)
     if length == 0x0c:
-        print('%s<OctetString offset="%d" datetime="%s">%s</OctetString>'%(Indent(),position,DLMSDateTimeToText(value),value))
+        xml += ('%s<OctetString offset="%d" datetime="%s">%s</OctetString>'%(Indent(),position,DLMSDateTimeToText(value),value))
     else:
-        print('%s<OctetString offset="%d">%s</OctetString>'%(Indent(),position,value))
+        xml += ('%s<OctetString offset="%d">%s</OctetString>'%(Indent(),position,value))
 
-    return position+1+length
+    return position+1+length,xml
 
-def ParseNone(pdu,position):
+def ParseNone(pdu,position,xml):
     """
     """
     if position == len(pdu):
-        return position
+        return position,xml
 
     length = ord(pdu[position])
     value   = pdu[position+1:position+1+length]
     value   = binascii.hexlify(value)
-    print('%s<NoData offset="%d">%s</NoData>'%(Indent(),position,value))
+    xml += ('%s<NoData offset="%d">%s</NoData>'%(Indent(),position,value))
 
-    return position+1+length
+    return position+1+length,xml
 
 
-def ParseStructure(pdu,position):
+def ParseStructure(pdu,position,xml):
     """
     """
     if position == len(pdu):
-        return position
+        return position,xml
 
     numberOfFields = ord(pdu[position])
-    print('%s<Structure length="%d" offset="%d">'%(Indent(),numberOfFields,position)) 
+    xml += ('%s<Structure length="%d" offset="%d">'%(Indent(),numberOfFields,position)) 
 
     position    += 1
     for i in range(numberOfFields):
-        print('%s<Field index="%d" offset="%d">'%(Indent(),i,position)) 
-        position    = ParseField(pdu,position)
-        print('%s</Field>'%(Indent())) 
+        xml += ('%s<Field index="%d" offset="%d">'%(Indent(),i,position)) 
+        position,xml    = ParseField(pdu,position, xml)
+        xml += ('%s</Field>'%(Indent())) 
 
-    print('%s</Structure>'%(Indent()))
+    xml += ('%s</Structure>'%(Indent()))
 
-    return position
+    return position,xml
 
 
-def ParseUint8(pdu,position):
+def ParseUint8(pdu,position,xml):
     """
     """
     if position == len(pdu):
-        return position
+        return position,xml
 
     value  = ord(pdu[position])
-    print('%s<Uint8 offset="%d">%02x</Uint8>'%(Indent(),position,value))
+    xml += ('%s<Uint8 offset="%d">%02x</Uint8>'%(Indent(),position,value))
 
-    return position+1
+    return position+1,xml
 
 
-def ParseInt8(pdu,position):
+def ParseInt8(pdu,position,xml):
     """
     """
     if position == len(pdu):
-        return position
+        return position,xml
 
     value  = ord(pdu[position])
-    print('%s<Int8 offset="%d">%02x</Int8>'%(Indent(),position,value))
+    xml += ('%s<Int8 offset="%d">%02x</Int8>'%(Indent(),position,value))
 
-    return position+1
+    return position+1,xml
 
 
-def ParseBoolean(pdu,position):
+def ParseBoolean(pdu,position,xml):
     """
     """
     if position == len(pdu):
-        return position
+        return position,xml
 
     value  = ord(pdu[position])
-    print('%s<Boolean offset="%d">%02x</Boolean>'%(Indent(),position,value))
+    xml += ('%s<Boolean offset="%d">%02x</Boolean>'%(Indent(),position,value))
 
-    return position+1
+    return position+1,xml
 
 
-def ParseEnum(pdu,position):
+def ParseEnum(pdu,position,xml):
     """
     """
     if position == len(pdu):
-        return position
+        return position,xml
 
     value  = ord(pdu[position+0])
-    print('%s<Enum offset="%d">%02x</Enum>'%(Indent(),position,value))
+    xml += ('%s<Enum offset="%d">%02x</Enum>'%(Indent(),position,value))
 
-    return position+1
+    return position+1,xml
 
 
-def ParseBitString(pdu,position):
+def ParseBitString(pdu,position,xml):
     """
     """
     if position == len(pdu):
-        return position
+        return position,xml
 
     length = ord(pdu[position])/8
     value   = pdu[position:position+1+length]
     value   = binascii.hexlify(value)
-    print('%s<BitString offset="%d">%s</BitString>'%(Indent(),position,value))
+    xml += ('%s<BitString offset="%d">%s</BitString>'%(Indent(),position,value))
 
-    return position+1+length
+    return position+1+length,xml
 
 
-def ParseUint16(pdu,position):
+def ParseUint16(pdu,position,xml):
     """
     """
     if position == len(pdu):
-        return position
+        return position,xml
 
     hi  = ord(pdu[position+0])
     lo  = ord(pdu[position+1])
     value   = (hi<<8)|lo
-    print('%s<Uint16 offset="%d">%04x</Uint16>'%(Indent(),position,value))
+    xml += ('%s<Uint16 offset="%d">%04x</Uint16>'%(Indent(),position,value))
 
-    return position+2
+    return position+2,xml
 
 
-def ParseFloat32(pdu,position):
+def ParseFloat32(pdu,position,xml):
     """
     """
     if position == len(pdu):
-        return position
+        return position,xml
 
     b0  = ord(pdu[position+0])
     b1  = ord(pdu[position+1])
@@ -228,96 +228,96 @@ def ParseFloat32(pdu,position):
     b3  = ord(pdu[position+3])
     hexValue    = '%02x%02x%02x%02x'%(b0,b1,b2,b3)
     value   = struct.unpack('!f',binascii.unhexlify(hexValue) )[0]
-    #print('%s<Float32 offset="%d">%1.10f</Float32>'%(Indent(),position,value))
-    print('%s<Float32 offset="%d">%s</Float32>'%(Indent(),position,hexValue))
+    #xml += ('%s<Float32 offset="%d">%1.10f</Float32>'%(Indent(),position,value))
+    xml += ('%s<Float32 offset="%d">%s</Float32>'%(Indent(),position,hexValue))
 
-    return position+4
+    return position+4,xml
 
 
-def ParseUint32(pdu,position):
+def ParseUint32(pdu,position,xml):
     """
     """
     if position == len(pdu):
-        return position
+        return position,xml
 
     b0  = ord(pdu[position+0])
     b1  = ord(pdu[position+1])
     b2  = ord(pdu[position+2])
     b3  = ord(pdu[position+3])
-    print('%s<Uint32 offset="%d">%02x%02x%02x%02x</Float32>'%(Indent(),position,b0,b1,b2,b3))
+    xml += ('%s<Uint32 offset="%d">%02x%02x%02x%02x</Float32>'%(Indent(),position,b0,b1,b2,b3))
 
-    return position+4
+    return position+4,xml
 
 
-def ParseDate(pdu,position):
+def ParseDate(pdu,position,xml):
     """
     """
     if position == len(pdu):
-        return position
+        return position,xml
 
     b0  = ord(pdu[position+0])
-    print('%s<Date offset="%d">%02x</Date>'%(Indent(),position,b0))
+    xml += ('%s<Date offset="%d">%02x</Date>'%(Indent(),position,b0))
 
-    return position+1
+    return position+1,xml
 
 
-def ParseField(pdu,position):
+def ParseField(pdu,position,xml):
     """
     """
     if position == len(pdu):
-        return position
+        return position,xml
 
     tag = ord(pdu[position])
     position    += 1
 
     if tag == ARRAY:
-        position    = ParseArray(pdu,position)
+        position,xml    = ParseArray(pdu,position, xml)
     elif tag == STRUCTURE:
-        position    = ParseStructure(pdu,position)
+        position,xml    = ParseStructure(pdu,position, xml)
     elif tag == UINT8:
-        position    = ParseUint8(pdu,position)
+        position,xml    = ParseUint8(pdu,position, xml)
     elif tag == UINT16:
-        position    = ParseUint16(pdu,position)
+        position,xml    = ParseUint16(pdu,position, xml)
     elif tag == OCTET_STRING:
-        position    = ParseOctetString(pdu,position)
+        position,xml    = ParseOctetString(pdu,position, xml)
     elif tag == INT8:
-        position    = ParseInt8(pdu,position)
+        position,xml    = ParseInt8(pdu,position, xml)
     elif tag == ENUM:
-        position    = ParseEnum(pdu,position)
+        position,xml    = ParseEnum(pdu,position, xml)
     elif tag == BOOLEAN:
-        position    = ParseBoolean(pdu,position)
+        position,xml    = ParseBoolean(pdu,position, xml)
     elif tag == FLOAT32:
-        position    = ParseFloat32(pdu,position)
+        position,xml    = ParseFloat32(pdu,position, xml)
     elif tag == BIT_STRING:
-        position    = ParseBitString(pdu,position)
+        position,xml    = ParseBitString(pdu,position, xml)
     elif tag == UINT32:
-        position    = ParseUint32(pdu,position)
+        position,xml    = ParseUint32(pdu,position, xml)
     elif tag == DATE:
-        position    = ParseDate(pdu,position)
+        position,xml    = ParseDate(pdu,position, xml)
     elif tag == NONE:
-        #position    = ParseNone(pdu,position)
+        #position    = ParseNone(pdu,position, xml)
         #position    = position + 1
         pass
     else:
-        print('unknown tag %02x'%tag)
+        xml += ('unknown tag %02x'%tag)
         sys.exit(-1)
 
-    return position
+    return position,xml
 
 
-def DecodeAXDR(pdu,position=0):
+def DecodeAXDR(pdu,position,xml):
     """
     """
     if position == len(pdu):
-        return position
+        return position,xml
 
-    print('%s<Data>'%(Indent())) 
+    xml += ('%s<Data>'%(Indent())) 
     while position < len(pdu):
-        position    = ParseField(pdu,position)
+        position,xml    = ParseField(pdu,position,xml)
         
-    print('%s</Data>'%(Indent())) 
+    xml += ('%s</Data>'%(Indent())) 
 
-    return position
+    return position,xml
 
 
 
@@ -326,6 +326,7 @@ if __name__ == '__main__':
 
     pduHex=open(sys.argv[1]).read()
     pdu     = binascii.unhexlify(pduHex.replace('\n',''))
-    DecodeAXDR(pdu)
+    position,xml    = DecodeAXDR(pdu,0,'')
+    print(xml)
 
 

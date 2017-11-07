@@ -12,8 +12,15 @@ import xmltodict
 
 class DecodeDLMSTests(unittest.TestCase):
 
-    def testOne(self):
+    def tstOne(self):
         input   = 'c00181000100002a0000ff0200'
+        result  = DecodeDLMS(binascii.unhexlify(input))
+        print('[%s]'%result)
+        self.assertEqual('foo'.upper(), 'FOO')
+
+
+    def testTwo(self):
+        input   = 'C40181000101020A02020FFE162102020FFE162102020FFE162102020FFF162302020FFF162302020FFF162302020FFE161E02020FFE162002020FFE162002020FFE161F'
         result  = DecodeDLMS(binascii.unhexlify(input))
         print('[%s]'%result)
         self.assertEqual('foo'.upper(), 'FOO')
@@ -40,6 +47,7 @@ class DecodeHDLCTests(unittest.TestCase):
         self.assertEqual(controlField, 0x93)
         self.assertEqual(LLC, '818014')
         self.assertEqual(binascii.hexlify(pdu), '0502080006020800070400000007080400000007')
+
 
 
 if __name__ == '__main__':
