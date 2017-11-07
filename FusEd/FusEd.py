@@ -2,12 +2,7 @@
 
 
 import os
-import os.path
-import sys
 import errno
-import curses
-import threading
-import time
 
 from fuse import FUSE, FuseOSError, Operations
 
@@ -135,28 +130,6 @@ class Passthrough(Operations):
 
 def FUSEThread(root):
     FUSE(Passthrough(root), './tmp', nothreads=True, foreground=True)
-
-
-
-
-
-if __name__ == '__main__':
-    try:
-        os.mkdir('./tmp')
-    except OSError:
-        pass
-
-    dirName,fileName    = os.path.split(sys.argv[1])
-
-    t = threading.Thread(target=FUSEThread, args=(dirName,))
-    t.daemon    = True;
-    t.start()
-
-    while True:
-        time.sleep(1)
-        print('Tick...')
-        #print(open('./tmp/'+fileName).read())
-
 
 
 
