@@ -1,6 +1,9 @@
 
 
 #include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdint.h>
 
 
 
@@ -8,7 +11,7 @@
 int main(int argc, char* argv[])
 {
     char*   fileName    = argv[1];
-    int     fd          = open(fileName, "r");
+    int     fd          = open(fileName, O_RDONLY);
     
     if(fd != -1)
     {
