@@ -69,11 +69,11 @@ if __name__ == '__main__':
     t.daemon    = True;
     t.start()
 
-    FrontEnd().Run()
-    #while True:
-    #    time.sleep(1)
-    #    print('Tick...')
-    #    #print(open('./tmp/'+fileName).read())
+    #FrontEnd().Run()
+    while True:
+        time.sleep(1)
+        print('Tick...')
+        #print(open('./tmp/'+fileName).read())
 
 
 

@@ -6,6 +6,56 @@ import errno
 
 from fuse import FUSE, FuseOSError, Operations
 
+"""
+                  SEEK_SET                                    SEEK_END
+                     |                                           |
+File:                ---------------------------------------------
+                         | |       ___|____     \______/
+                        /   \     /        \        |
+ModificationBlocks:     +++++     ++++++++++     
+                       overlay    insertion      deletion
+                          & 
+                      insertion
+
+Note: These are byte-ranges, not lines.
+
+"""
+
+
+class ModificationBlock:
+    """
+    A few cases exist:
+    
+    deletion:  end-start > 0 AND len(data) == 0
+    insertion: end == start  AND len(data) > 0
+    overlay:   end-start > 0 AND len(data) > 0
+    unused     end == start  AND len(data) == 0
+
+    """
+
+    start   = -1
+    end     = -1
+    data    = None
+
+    def __init__(self, start,end, data):
+
+        self.start  = start
+        self.end    = end
+        self.data   = data
+
+
+
+
+
+class ModificationBlockList:
+    """
+    """
+
+    modList = []
+
+    def AddModBlock(self, start,end, data):
+        newBlock    = ModificationBlock(start,end,data)
+        modList.append(newBlock)
 
 
 
@@ -30,8 +80,27 @@ class Passthrough(Operations):
     openFiles   = {}
 
     def AddBlockListForFile(self, fh):
-        self.openFiles[fh]   = []
+        """
+        The overlay block list contains blocks of data that overlay the on-disk data.
+        """
+        self.openFiles[fh]   = {} 
 
+    def AddBlockForFile(self, fh, blockIndex, data):
+        """
+        Add an overlay block for the file at the specified location.
+        """
+        self.openFiles[fh][blockIndex]  = data
+
+
+    def GetBlockForFile(self, fh, blockIndex):
+        """
+        """
+        if blockIndex in self.openFiles[fh]:
+            return self.openFiles[fh]
+        else:
+            os.lseek(fh, blockIndex*self.BLOCK_SIZE, os.SEEK_SET)
+            return os.read(fh, self.BLOCK_SIZE)
+             
 
     # Filesystem methods
     # ==================
@@ -124,11 +193,7 @@ class Passthrough(Operations):
 
         print('read %s from %d of %d bytes'%(path,offset,length))
 
-        if blockNumber == 1:
-            return 'x'*self.BLOCK_SIZE
-        else:
-            os.lseek(fh, offset, os.SEEK_SET)
-            return os.read(fh, length)
+        return self.GetBlockForFile(fh, blockNumber)
 
     def write(self, path, buf, offset, fh):
         os.lseek(fh, offset, os.SEEK_SET)
