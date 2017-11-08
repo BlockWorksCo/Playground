@@ -7,7 +7,13 @@ import errno
 from fuse import FUSE, FuseOSError, Operations
 
 
+
+
+
+
 class Passthrough(Operations):
+
+
     def __init__(self, root):
         self.root = root
 
@@ -19,6 +25,13 @@ class Passthrough(Operations):
             partial = partial[1:]
         path = os.path.join(self.root, partial)
         return path
+
+    BLOCK_SIZE  = 1024*4
+    openFiles   = {}
+
+    def AddBlockListForFile(self, fh):
+        self.openFiles[fh]   = []
+
 
     # Filesystem methods
     # ==================
@@ -96,18 +109,26 @@ class Passthrough(Operations):
 
     def open(self, path, flags):
         full_path = self._full_path(path)
-        return os.open(full_path, flags)
+        fh  = os.open(full_path, flags)
+        self.AddBlockListForFile(fh)
+        return fh
 
     def create(self, path, mode, fi=None):
         full_path = self._full_path(path)
         return os.open(full_path, os.O_WRONLY | os.O_CREAT, mode)
 
     def read(self, path, length, offset, fh):
-        if length > 4096:
-            length  = 4096
+        blockNumber = int(offset / self.BLOCK_SIZE)
+        if length > self.BLOCK_SIZE:
+            length  = self.BLOCK_SIZE
+
         print('read %s from %d of %d bytes'%(path,offset,length))
-        os.lseek(fh, offset, os.SEEK_SET)
-        return os.read(fh, length)
+
+        if blockNumber == 1:
+            return 'x'*self.BLOCK_SIZE
+        else:
+            os.lseek(fh, offset, os.SEEK_SET)
+            return os.read(fh, length)
 
     def write(self, path, buf, offset, fh):
         os.lseek(fh, offset, os.SEEK_SET)
