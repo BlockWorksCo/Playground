@@ -6,60 +6,6 @@ import errno
 
 from fuse import FUSE, FuseOSError, Operations
 
-"""
-                  SEEK_SET                                    SEEK_END
-                     |                                           |
-File:                ---------------------------------------------
-                         | |       ___|____     \______/
-                        /   \     /        \        |
-ModificationBlocks:     +++++     ++++++++++     
-                       overlay    insertion      deletion
-                          & 
-                      insertion
-
-Note: These are byte-ranges, not lines.
-
-"""
-
-
-class ModificationBlock:
-    """
-    A few cases exist:
-    
-    deletion:  end-start > 0 AND len(data) == 0
-    insertion: end == start  AND len(data) > 0
-    overlay:   end-start > 0 AND len(data) > 0
-    unused     end == start  AND len(data) == 0
-
-    """
-
-    start   = -1
-    end     = -1
-    data    = None
-
-    def __init__(self, start,end, data):
-
-        self.start  = start
-        self.end    = end
-        self.data   = data
-
-
-
-
-
-class ModificationBlockList:
-    """
-    """
-
-    modList = []
-
-    def AddModBlock(self, start,end, data):
-        newBlock    = ModificationBlock(start,end,data)
-        modList.append(newBlock)
-
-
-    
-
 
 
 class Passthrough(Operations):
