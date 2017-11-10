@@ -31,12 +31,21 @@ def AddSpan(spans, start,end):
     return spans
 
 
+def RationaliseSpans(spans):
+
+    for span in spans:
+        start,end   = span
+
+        if start == end:
+            spans.remove(span)
+
 
 if __name__ == '__main__':
 
     spans   = [(0,100)]
     AddSpan(spans, 10,20)
     AddSpan(spans, 0,5)
+    RationaliseSpans(spans)
 
     print(spans)
     
