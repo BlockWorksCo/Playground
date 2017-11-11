@@ -29,8 +29,8 @@ def AddSpan(spans, start,end):
     except ValueError:
         endContainerIndex   = -1
 
-    print('start='+str(startContainerIndex))
-    print('end='+str(endContainerIndex))
+    #print('start='+str(startContainerIndex))
+    #print('end='+str(endContainerIndex))
 
     if startContainerIndex == endContainerIndex:
         spans.remove( (sS,sE) )
@@ -41,6 +41,11 @@ def AddSpan(spans, start,end):
     if startContainerIndex != endContainerIndex and endContainerIndex == -1:
         
         spans.append( (start,end) )
+
+
+    if startContainerIndex != endContainerIndex and startContainerIndex == -1:
+        
+        spans.insert(0, (start,end) )
 
 
 
@@ -75,6 +80,15 @@ class TestSpans(unittest.TestCase):
         RationaliseSpans(spans)
 
         self.assertEqual(spans, [(0, 100), (100, 120)] )
+
+
+
+    def test_three(self):
+        spans   = [(0,100)]
+        AddSpan(spans, -10,0)
+        RationaliseSpans(spans)
+
+        self.assertEqual(spans, [(-10, 0), (0, 100)] )
 
 
 
