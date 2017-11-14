@@ -5,60 +5,77 @@ import unittest
 
 
 
-def SpanContainingPoint(spans, point):
 
-    for start,end in spans:
-        if start <= point and end >= point:
-            return (start,end)
+def SplitAtPosition(spans, position):
 
-    return None,None
+    newSpans    = []
+    for j in range(len(spans)):
+        tS,tE,t   = spans[j]
 
+        if tS<=position and tE>position:
+            newSpans.append( (tS,position,t) )
+            newSpans.append( (position,tE,t) )
 
-def AddSpan(spans, start,end):
+        else:
+            newSpans.append( (tS,tE,t) )
 
-    sS,sE   = SpanContainingPoint(spans, start)
-    eS,eE   = SpanContainingPoint(spans, end)
-
-    try:
-        startContainerIndex = spans.index( (sS,sE) )
-    except ValueError:
-        startContainerIndex = -1
-
-    try:
-        endContainerIndex   = spans.index( (eS,eE) )
-    except ValueError:
-        endContainerIndex   = -1
-
-    #print('start='+str(startContainerIndex))
-    #print('end='+str(endContainerIndex))
-
-    if startContainerIndex == endContainerIndex:
-        spans.remove( (sS,sE) )
-        spans.insert(startContainerIndex, (end,eE))
-        spans.insert(startContainerIndex, (start,end))
-        spans.insert(startContainerIndex, (sS,start))
-
-    if startContainerIndex != endContainerIndex and endContainerIndex == -1:
-        
-        spans.append( (start,end) )
+    return newSpans
 
 
-    if startContainerIndex != endContainerIndex and startContainerIndex == -1:
-        
-        spans.insert(0, (start,end) )
+def RemoveSpansCoveredBy(spans, s,e):
+    
+    newSpans    = []
+    for j in range(len(spans)):
+        tS,tE,t   = spans[j]
+
+        if tS<s or tE>e:
+            newSpans.append( (tS,tE,t) )
+    
+    return newSpans
 
 
+
+def OrderedInsert(spans, span):
+    
+    if spans == []:
+        newSpans    = [span]
+
+    else:
+        newSpans    = []
+        s,e,t0      = span
+        for j in range(len(spans)):
+            tS,tE,t1   = spans[j]
+
+            newSpans.append( (tS,tE,t1) )
+
+            if tE == s:
+                newSpans.append(span)
+
+    return newSpans
+
+
+
+def AddSpan(spans, span):
+
+    newSpans    = []
+
+    s,e,t = span
+    spans   = SplitAtPosition(spans, s)
+    spans   = SplitAtPosition(spans, e)
+    spans   = RemoveSpansCoveredBy(spans, s,e)
+    spans   = OrderedInsert( spans, span )
 
     return spans
 
 
-def RationaliseSpans(spans):
+def ReduceSpans(spans):
 
-    for span in spans:
-        start,end   = span
+    for tS,tE,t in spans:
+        if tS == tE:
+            spans.remove( (tS,tE,t) )
 
-        if start == end:
-            spans.remove(span)
+    return spans
+
 
 
 
@@ -66,29 +83,19 @@ def RationaliseSpans(spans):
 class TestSpans(unittest.TestCase):
 
     def test_one(self):
-        spans   = [(0,100)]
-        AddSpan(spans, 10,20)
-        AddSpan(spans, 0,5)
-        RationaliseSpans(spans)
 
-        self.assertEqual(spans, [(0, 5), (5, 10), (10, 20), (20, 100)] )
+        spans=[(0,50,'A'),(50,100,'A')]
+        spans   = AddSpan( spans, (10,20,'B') )
+        self.assertEqual(spans, [(0, 10, 'A'), (10, 20, 'B'), (20, 50, 'A'), (50, 100, 'A')] )
 
 
     def test_two(self):
-        spans   = [(0,100)]
-        AddSpan(spans, 100,120)
-        RationaliseSpans(spans)
 
-        self.assertEqual(spans, [(0, 100), (100, 120)] )
+        spans=[]
+        spans   = AddSpan( spans, (10,20,'B') )
+        print(spans)
+        self.assertEqual(spans, [(10, 20, 'B')] )
 
-
-
-    def test_three(self):
-        spans   = [(0,100)]
-        AddSpan(spans, -10,0)
-        RationaliseSpans(spans)
-
-        self.assertEqual(spans, [(-10, 0), (0, 100)] )
 
 
 
@@ -99,4 +106,6 @@ if __name__ == '__main__':
 
     unittest.main()
     
+
+
 
