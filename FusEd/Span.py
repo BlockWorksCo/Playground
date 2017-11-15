@@ -142,6 +142,28 @@ class TestSpans(unittest.TestCase):
         self.assertEqual(spans, [(10,50,'A'),(50,100,'B'),(100,120,'C')] )
 
 
+    def test_seven(self):
+
+        spans=[(10,50,'A'),(50,100,'B')]
+        spans   = AddSpan( spans, (0,10,'C') )
+        self.assertEqual(spans, [(0,10,'C'),(10,50,'A'),(50,100,'B')] )
+
+
+    def test_eight(self):
+
+        spans=[(10,50,'A'),(50,100,'B')]
+        spans   = AddSpan( spans, (0,20,'C') )
+        self.assertEqual(spans, [(0,20,'C'),(20,50,'A'),(50,100,'B')] )
+
+
+
+    def test_nine(self):
+
+        spans=[(10,50,'A'),(50,100,'B')]
+        spans   = AddSpan( spans, (80,120,'C') )
+        self.assertEqual(spans, [(10,50,'A'),(50,80,'B'),(80,120,'C')] )
+
+
 
 
 
