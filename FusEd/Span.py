@@ -197,6 +197,20 @@ class TestSpans(unittest.TestCase):
         self.assertEqual(span, (0,50,'A') )
 
 
+    def test_thirteen(self):
+
+        spans=[(0,50,'A'),(50,100,'B')]
+        span    = SpanAtPoint(spans, 55)
+        self.assertEqual(span, (50,100,'B') )
+
+
+    def test_fourteen(self):
+
+        spans=[(0,50,'A'),(50,100,'B')]
+        span    = SpanAtPoint(spans, 101)
+        self.assertEqual(span, None )
+
+
 
 
 
