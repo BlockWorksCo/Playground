@@ -5,12 +5,19 @@ import unittest
 
 
 
+def SpanAtPoint(spans, position):
+
+    for tS,tE,t in spans:
+        if tS<=position and tE>position:
+            return (tS,tE,t)
+
+    return None
+
 
 def SplitAtPosition(spans, position):
 
     newSpans    = []
-    for j in range(len(spans)):
-        tS,tE,t   = spans[j]
+    for tS,tE,t in spans:
 
         if tS<=position and tE>position:
             newSpans.append( (tS,position,t) )
@@ -25,8 +32,7 @@ def SplitAtPosition(spans, position):
 def RemoveSpansCoveredBy(spans, s,e):
     
     newSpans    = []
-    for j in range(len(spans)):
-        tS,tE,t   = spans[j]
+    for tS,tE,t in spans:
 
         if tS<s or tE>e:
             newSpans.append( (tS,tE,t) )
@@ -44,8 +50,7 @@ def OrderedInsert(spans, span):
         newSpans    = []
         s,e,t0      = span
         inserted    = False
-        for j in range(len(spans)):
-            tS,tE,t1   = spans[j]
+        for tS,tE,t1 in spans:
 
             if e == tS and inserted == False:
                 newSpans.append(span)
@@ -183,6 +188,13 @@ class TestSpans(unittest.TestCase):
         spans=[(0,50,'A'),(50,100,'A')]
         spans   = RemoveSpan( spans, (0,50,'A') )
         self.assertEqual(spans, [(50,100,'A')] )
+
+
+    def test_twelve(self):
+
+        spans=[(0,50,'A'),(50,100,'A')]
+        span    = SpanAtPoint(spans, 10)
+        self.assertEqual(span, (0,50,'A') )
 
 
 
