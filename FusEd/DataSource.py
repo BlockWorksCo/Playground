@@ -15,7 +15,7 @@ class StringDataSource:
     def Read(self, offset, numberOfBytes):
 
         readStart   = self.rangeStart+offset
-        readEnd     = min(readStart+numberOfBytes, self.rangeEnd)
+        readEnd     = min(readStart+numberOfBytes, self.rangeEnd+offset)
 
         #print('readStart=%d'%readStart)
         #print('readEnd=%d'%readEnd)
@@ -31,11 +31,24 @@ class StringDataSource:
 class Tests(unittest.TestCase):
 
     def test_one(self):
-
         text        = 'abcdefghijklmnopqrstuvwxyz'
         dataSource  = StringDataSource(text, 0,len(text))
         data        = dataSource.Read(10,5)
         self.assertEqual(data, 'klmno' )
+
+
+    def test_two(self):
+        text        = 'abcdefghijklmnopqrstuvwxyz'
+        dataSource  = StringDataSource(text, 5,len(text)-5)
+        data        = dataSource.Read(10,5)
+        self.assertEqual(data, 'pqrst' )
+
+
+    def test_three(self):
+        text        = 'abcdefghijklmnopqrstuvwxyz'
+        dataSource  = StringDataSource(text, 5,len(text)-5)
+        data        = dataSource.Read(10,100)
+        self.assertEqual(data, 'pqrstuvwxyz' )
 
 
 
