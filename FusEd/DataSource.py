@@ -26,6 +26,10 @@ class StringDataSource:
         return data
         
 
+    def SubDataSource(self, rangeStart,rangeEnd):
+        
+        return StringDataSource(self.text, self.rangeStart+rangeStart, self.rangeStart+rangeEnd)
+
 
 
 class Tests(unittest.TestCase):
@@ -49,6 +53,14 @@ class Tests(unittest.TestCase):
         dataSource  = StringDataSource(text, 5,len(text)-5)
         data        = dataSource.Read(10,100)
         self.assertEqual(data, 'pqrstuvwxyz' )
+
+
+    def test_four(self):
+        text            = 'abcdefghijklmnopqrstuvwxyz'
+        dataSource      = StringDataSource(text, 5,len(text)-5)
+        subDataSource   = dataSource.SubDataSource(5,15)
+        data            = subDataSource.Read(0,10)
+        self.assertEqual(data, 'klmnopqrst' )
 
 
 
