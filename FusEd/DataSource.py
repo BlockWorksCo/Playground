@@ -14,7 +14,14 @@ class StringDataSource:
 
     def Read(self, offset, numberOfBytes):
 
-        data    = self.text[self.rangeStart+offset:self.rangeStart+offset+numberOfBytes]
+        readStart   = self.rangeStart+offset
+        readEnd     = min(readStart+numberOfBytes, self.rangeEnd)
+
+        #print('readStart=%d'%readStart)
+        #print('readEnd=%d'%readEnd)
+        #print('readData=%s'%self.text[readStart:readEnd])
+
+        data        = self.text[readStart:readEnd]
 
         return data
         
