@@ -48,14 +48,12 @@ def OrderedInsert(spans, span):
             tS,tE,t1   = spans[j]
 
             if e == tS and inserted == False:
-                print('insert before')
                 newSpans.append(span)
                 inserted    = True
 
             newSpans.append( (tS,tE,t1) )
 
             if tE == s and inserted == False:
-                print('insert after')
                 newSpans.append(span)
                 inserted    = True
 
@@ -89,6 +87,13 @@ def AddSpan(spans, span):
 
 
 
+def RemoveSpan(spans, span):
+
+    spans.remove(span)
+
+    return spans
+
+
 class TestSpans(unittest.TestCase):
 
     def test_one(self):
@@ -119,6 +124,22 @@ class TestSpans(unittest.TestCase):
         spans=[(10,20,'A'),(20,50,'A')]
         spans   = AddSpan( spans, (15,30,'B') )
         self.assertEqual(spans, [(10,15,'A'),(15, 30, 'B'),(30,50,'A')] )
+
+
+
+    def test_five(self):
+
+        spans=[(10,20,'A'),(20,50,'A'),(50,100,'C')]
+        spans   = AddSpan( spans, (15,80,'B') )
+        self.assertEqual(spans, [(10,15,'A'),(15, 80, 'B'),(80,100,'C')] )
+
+
+
+    def test_six(self):
+
+        spans=[(10,50,'A'),(50,100,'B')]
+        spans   = AddSpan( spans, (100,120,'C') )
+        self.assertEqual(spans, [(10,50,'A'),(50,100,'B'),(100,120,'C')] )
 
 
 
