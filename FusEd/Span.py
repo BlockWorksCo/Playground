@@ -114,6 +114,14 @@ class TestSpans(unittest.TestCase):
 
 
 
+    def test_four(self):
+
+        spans=[(10,20,'A'),(20,50,'A')]
+        spans   = AddSpan( spans, (15,30,'B') )
+        self.assertEqual(spans, [(10,15,'A'),(15, 30, 'B'),(30,50,'A')] )
+
+
+
 
 
 
