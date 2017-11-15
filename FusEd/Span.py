@@ -43,29 +43,23 @@ def OrderedInsert(spans, span):
     else:
         newSpans    = []
         s,e,t0      = span
+        inserted    = False
         for j in range(len(spans)):
             tS,tE,t1   = spans[j]
 
+            if e == tS and inserted == False:
+                print('insert before')
+                newSpans.append(span)
+                inserted    = True
+
             newSpans.append( (tS,tE,t1) )
 
-            if tE == s:
+            if tE == s and inserted == False:
+                print('insert after')
                 newSpans.append(span)
+                inserted    = True
 
     return newSpans
-
-
-
-def AddSpan(spans, span):
-
-    newSpans    = []
-
-    s,e,t = span
-    spans   = SplitAtPosition(spans, s)
-    spans   = SplitAtPosition(spans, e)
-    spans   = RemoveSpansCoveredBy(spans, s,e)
-    spans   = OrderedInsert( spans, span )
-
-    return spans
 
 
 def ReduceSpans(spans):
@@ -77,6 +71,21 @@ def ReduceSpans(spans):
     return spans
 
 
+
+
+
+def AddSpan(spans, span):
+
+    newSpans    = []
+
+    s,e,t = span
+    spans   = SplitAtPosition(spans, s)
+    spans   = SplitAtPosition(spans, e)
+    spans   = RemoveSpansCoveredBy(spans, s,e)
+    spans   = ReduceSpans(spans)
+    spans   = OrderedInsert( spans, span )
+
+    return spans
 
 
 
@@ -93,8 +102,15 @@ class TestSpans(unittest.TestCase):
 
         spans=[]
         spans   = AddSpan( spans, (10,20,'B') )
-        print(spans)
         self.assertEqual(spans, [(10, 20, 'B')] )
+
+
+
+    def test_three(self):
+
+        spans=[(10,20,'B')]
+        spans   = AddSpan( spans, (5,10,'C') )
+        self.assertEqual(spans, [(5,10,'C'),(10, 20, 'B')] )
 
 
 
