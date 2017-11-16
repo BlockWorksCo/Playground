@@ -1,7 +1,16 @@
+"""
+
+          ----- -------- --------     ---------
+
+          +++++ ++       ++++++++++++ +++++++++
+
+
+"""
 
 
 
 import unittest
+from DataSource import *
 
 
 
@@ -97,6 +106,35 @@ def RemoveSpan(spans, span):
     spans.remove(span)
 
     return spans
+
+
+
+
+def GetData(spans, rangeStart,rangeEnd):
+
+    numberOfBytes       = rangeEnd-rangeStart
+    numberOfBytesCopied = 0
+    position            = rangeStart
+    data                = ''
+    while numberOfBytesCopied < numberOfBytes:
+        spanStart,spanEnd,spanData  = SpanAtPoint(spans, position)
+
+        #print('spanStart=%d'%spanStart)
+        #print('spanEnd=%d'%spanEnd)
+        #print('spanData=%s'%str(spanData))
+
+        numberOfBytesToCopy = min(numberOfBytes,spanEnd-spanStart)
+        data                += spanData.Read(0,numberOfBytesToCopy)
+        numberOfBytesCopied += numberOfBytesToCopy
+        position            += numberOfBytesToCopy
+
+    return data
+    
+
+
+
+
+
 
 
 class TestSpans(unittest.TestCase):
@@ -209,6 +247,16 @@ class TestSpans(unittest.TestCase):
         spans=[(0,50,'A'),(50,100,'B')]
         span    = SpanAtPoint(spans, 101)
         self.assertEqual(span, None )
+
+
+    def test_fifteen(self):
+
+        text        = 'abcdefghijklmnopqrstuvwxyz'
+        dataSource  = StringDataSource(text, 0,len(text))
+
+        spans   = [ (0,10,dataSource.SubDataSource(0,10)) , (10,20,dataSource.SubDataSource(10,20)) ]
+        result  = GetData( spans, 0,20 )
+        self.assertEqual(result, 'abcdefghijklmnopqrst' )
 
 
 
