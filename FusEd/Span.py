@@ -259,6 +259,16 @@ class TestSpans(unittest.TestCase):
         self.assertEqual(result, 'abcdefghijklmnopqrst' )
 
 
+    def test_sixteen(self):
+
+        text        = 'abcdefghijklmnopqrstuvwxyz'
+        dataSource  = StringDataSource(text, 0,len(text))
+
+        spans   = [ (0,10,dataSource.SubDataSource(0,10)) , (10,20,dataSource.SubDataSource(12,22)) ]
+        result  = GetData( spans, 0,20 )
+        self.assertEqual(result, 'abcdefghijmnopqrstuv' )
+
+
 
 
 
