@@ -128,7 +128,7 @@ OBISList    = \
 def Associate():
     """
     """
-    p=DLMSPlayground.OpenPortToMeter('/dev/ttyUSB0')
+    p=DLMSPlayground.OpenPortToMeter('/dev/ttyUSB2')
     
     DLMSPlayground.SendHDLCToMeter(p, DLMSPlayground.CreateDISC() )
     time.sleep(0.5)
@@ -358,7 +358,8 @@ def ReadLoadProfile():
 
     p   = Associate()
 
-    hexCode = '%02x%02x%02x%02x%02x%02x'%(1,0,99,1,1,255)
+    #hexCode = '%02x%02x%02x%02x%02x%02x'%(1,0,99,1,1,255)
+    hexCode = '%02x%02x%02x%02x%02x%02x'%(1,0,98,1,0,255)
 
     #
     # read capture_period.
@@ -431,15 +432,15 @@ def ReadLoadProfile():
     #
     # Call the capture method.
     #
-    print('------- Calling capture_objects --------')
-    rq  = DLMSPlayground.CreateActionRequest_NoParams(7, hexCode, 2 ) 
-    print(rq)
-    DLMSPlayground.SendHDLCToMeter(p, rq )
-    time.sleep(0.5)
-    rsp    = DLMSPlayground.GetResponseFromMeter(p)
-    print(rsp)
-    d= DLMS.HDLCToDict(rsp)
-    print(d)
+    #print('------- Calling capture_objects --------')
+    #rq  = DLMSPlayground.CreateActionRequest_NoParams(7, hexCode, 2 ) 
+    #print(rq)
+    #DLMSPlayground.SendHDLCToMeter(p, rq )
+    #time.sleep(0.5)
+    #rsp    = DLMSPlayground.GetResponseFromMeter(p)
+    #print(rsp)
+    #d= DLMS.HDLCToDict(rsp)
+    #print(d)
 
     #
     # read capture_objects.
@@ -453,26 +454,9 @@ def ReadLoadProfile():
           <!--PROFILE_GENERIC-->
           <ClassId Value="7" />
           <!--1.0.99.1.1.255-->
-          <InstanceId Value="0100630101FF" />
-          <AttributeId Value="2" />
+          <InstanceId Value="0100620100FF" />
+          <AttributeId Value="3" />
         </AttributeDescriptor>
-        <AccessSelection>
-          <AccessSelector Value="1" />
-          <AccessParameters>
-            <Structure Qty="4" >
-              <Structure Qty="4" >
-                <UInt16 Value="8" />
-                <!--0.0.1.0.0.255-->
-                <OctetString Value="0000010000FF" />
-                <Int8 Value="2" />
-              </Structure>
-              <OctetString Value="07d0010400021500ff800000" />
-              <OctetString Value="07d0010400021800ff800000" />
-              <Array Qty="0" >
-              </Array>
-            </Structure>
-          </AccessParameters>
-        </AccessSelection>
       </GetRequestNormal>
     </GetRequest>
 
@@ -656,8 +640,8 @@ def TimeGet():
 
 if __name__ == '__main__':
     #ReadInstantaneousProfile()
-    StaticDiscovery()
-    #ReadLoadProfile()
+    #StaticDiscovery()
+    ReadLoadProfile()
     #ReadObjectList()
 
     #ActionTest()
