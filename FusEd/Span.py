@@ -119,10 +119,6 @@ def GetData(spans, rangeStart,rangeEnd):
     while numberOfBytesCopied < numberOfBytes:
         spanStart,spanEnd,spanData  = SpanAtPoint(spans, position)
 
-        #print('spanStart=%d'%spanStart)
-        #print('spanEnd=%d'%spanEnd)
-        #print('spanData=%s'%str(spanData))
-
         numberOfBytesToCopy = min(numberOfBytes,spanEnd-spanStart)
         data                += spanData.Read(0,numberOfBytesToCopy)
         numberOfBytesCopied += numberOfBytesToCopy
@@ -132,6 +128,26 @@ def GetData(spans, rangeStart,rangeEnd):
     
 
 
+def InsertData(spans, rangeStart,rangeEnd, dataSource):
+
+    spans   = AddSpan( spans, rangeStart,rangeEnd, (rangeStart,rangeEnd,dataSource) )
+    return spans
+
+
+def AddData(spans, rangeStart,rangeEnd, dataSource):
+
+    spans   = InsertData( spans, rangeStart,rangeEnd, (rangeStart,rangeEnd,dataSource) )
+    return spans
+
+
+
+def RemoveData(spans, rangeStart,rangeEnd):
+
+    span    = (rangeStart,rangeEnd,None)
+    spans   = AddSpan(spans, span)
+    spans   = RemoveSpan(spans, span)
+
+    return spans
 
 
 
@@ -280,6 +296,64 @@ class TestSpans(unittest.TestCase):
         spans   = [ (0,10,dataSource1.SubDataSource(0,10)), (10,15,dataSource2.SubDataSource(0,10)) , (15,20,dataSource1.SubDataSource(10,20)) ]
         result  = GetData( spans, 0,20 )
         self.assertEqual(result, 'abcdefghijABCDEklmno' )
+
+
+
+    def test_eighteen(self):
+
+        text1       = 'abcdefghijklmnopqrstuvwxyz'
+        dataSource1 = StringDataSource(text1, 0,len(text1))
+
+        spans   = [ (0,6,dataSource1.SubDataSource(0,10)), (6,10,dataSource1.SubDataSource(11,20)) ]
+        result  = GetData( spans, 0,10 )
+        self.assertEqual(result, 'abcdeflmno' )
+
+
+
+    def _test_nineteen(self):
+
+        text1       = 'abcdefghijklmnopqrstuvwxyz'
+        dataSource1 = StringDataSource(text1, 0,len(text1))
+
+        text2       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        dataSource2 = StringDataSource(text2, 0,len(text2))
+
+        spans   = [ (0,26,dataSource1.SubDataSource(0,26)) ]
+        spans   = AddSpan(spans, (6,10,dataSource2.SubDataSource(10,17)) )
+
+        result  = GetData( spans, 0,26 )
+        self.assertEqual(result, 'abcdefKLMNklmnopqrstuvwxyz' )
+
+
+
+    def _test_twenty(self):
+
+        text1       = 'abcdefghijklmnopqrstuvwxyz'
+        dataSource1 = StringDataSource(text1, 0,len(text1))
+
+        text2       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        dataSource2 = StringDataSource(text2, 0,len(text2))
+
+        spans   = [ (0,26,dataSource1.SubDataSource(0,26)) ]
+        spans   = AddSpan(spans, (10,15,dataSource2.SubDataSource(10,26)) )
+
+        result  = GetData( spans, 0,26 )
+        self.assertEqual(result, 'abcdefghijKLMNOPQRSTklmnopqrstuvwxyz' )
+
+
+
+    def test_twentyone(self):
+
+        text1       = 'abcdefghijklmnopqrstuvwxyz'
+        dataSource1 = StringDataSource(text1, 0,len(text1))
+
+        spans   = [ (0,26,dataSource1.SubDataSource(0,26)) ]
+        spans   = RemoveData(spans, 10,15 )
+
+        print(spans)
+        result  = GetData( spans, 0,15 )
+        self.assertEqual(result, 'abcdefghijpqrstuvwxyz' )
+
 
 
 
