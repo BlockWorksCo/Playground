@@ -84,6 +84,24 @@ def ReduceSpans(spans):
 
 
 
+def RemoveGaps(spans):
+
+    for i in range(len(spans)-1):
+        
+        s0,e0,t0    = spans[i]
+        s1,e1,t1    = spans[i+1]
+
+        if e0 != s1:
+            width   = e1-s1
+            s1      = e0
+            e1      = s1+width
+
+        spans[i+1]  = (s1,e1,t1)
+
+    return spans
+
+
+
 
 
 def AddSpan(spans, span):
@@ -96,6 +114,7 @@ def AddSpan(spans, span):
     spans   = RemoveSpansCoveredBy(spans, s,e)
     spans   = ReduceSpans(spans)
     spans   = OrderedInsert( spans, span )
+    spans   = RemoveGaps(spans)
 
     return spans
 
@@ -104,6 +123,7 @@ def AddSpan(spans, span):
 def RemoveSpan(spans, span):
 
     spans.remove(span)
+    spans   = RemoveGaps(spans)
 
     return spans
 
