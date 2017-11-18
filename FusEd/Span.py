@@ -29,8 +29,17 @@ def SplitAtPosition(spans, position):
     for tS,tE,t in spans:
 
         if tS<=position and tE>position:
-            newSpans.append( (tS,position,t) )
-            newSpans.append( (position,tE,t) )
+            if type(t).__name__ == 'str':
+                tA    = t
+                tB    = t
+            else:
+                tA    = t.SubDataSource(0, position-tS)
+                tB    = t.SubDataSource(position-tS, tE-tS)
+                #print('t  %d->%d'%(t.rangeStart,t.rangeEnd))
+                #print('tA %d->%d'%(tA.rangeStart,tA.rangeEnd))
+                #print('tB %d->%d'%(tB.rangeStart,tB.rangeEnd))
+            newSpans.append( (tS,position,tA) )
+            newSpans.append( (position,tE,tB) )
 
         else:
             newSpans.append( (tS,tE,t) )
@@ -370,7 +379,7 @@ class TestSpans(unittest.TestCase):
         spans   = [ (0,26,dataSource1.SubDataSource(0,26)) ]
         spans   = RemoveData(spans, 10,15 )
 
-        print(spans)
+        #print(spans)
         result  = GetData( spans, 0,15 )
         self.assertEqual(result, 'abcdefghijpqrstuvwxyz' )
 
