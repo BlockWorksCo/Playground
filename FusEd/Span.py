@@ -355,7 +355,7 @@ class TestSpans(unittest.TestCase):
 
 
 
-    def _test_twenty(self):
+    def test_twenty(self):
 
         text1       = 'abcdefghijklmnopqrstuvwxyz'
         dataSource1 = StringDataSource(text1, 0,len(text1))
@@ -364,10 +364,10 @@ class TestSpans(unittest.TestCase):
         dataSource2 = StringDataSource(text2, 0,len(text2))
 
         spans   = [ (0,26,dataSource1.SubDataSource(0,26)) ]
-        spans   = AddSpan(spans, (10,15,dataSource2.SubDataSource(10,26)) )
+        spans   = AddSpan(spans, (10,20,dataSource2.SubDataSource(10,26)) )
 
         result  = GetData( spans, 0,26 )
-        self.assertEqual(result, 'abcdefghijKLMNOPQRSTklmnopqrstuvwxyz' )
+        self.assertEqual(result, 'abcdefghijKLMNOPQRSTuvwxyz' )
 
 
 
