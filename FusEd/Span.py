@@ -339,7 +339,7 @@ class TestSpans(unittest.TestCase):
 
 
 
-    def _test_nineteen(self):
+    def test_nineteen(self):
 
         text1       = 'abcdefghijklmnopqrstuvwxyz'
         dataSource1 = StringDataSource(text1, 0,len(text1))
