@@ -183,12 +183,6 @@ def GetData(spans, rangeStart,rangeEnd):
     
 
 
-def InsertData(spans, rangeStart,rangeEnd, dataSource):
-
-    spans   = InsertSpan( spans, (rangeStart,rangeEnd,dataSource) )
-    return spans
-
-
 
 def RemoveData(spans, rangeStart,rangeEnd):
 
@@ -427,7 +421,7 @@ class TestSpans(unittest.TestCase):
         dataSource2 = StringDataSource(text2, 0,len(text2))
 
         spans   = [ (0,26,dataSource1.SubDataSource(0,26)) ]
-        spans   = InsertData(spans, 10,20,dataSource2 )
+        spans   = InsertSpan(spans, (10,20,dataSource2) )
 
         result  = GetData( spans, 0,36)
         self.assertEqual(result, 'abcdefghijABCDEFGHIJklmnopqrstuvwxyz' )
