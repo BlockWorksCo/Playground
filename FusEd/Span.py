@@ -134,18 +134,22 @@ def InsertSpan(spans, span):
     s,e,t = span
     spans   = SplitAtPosition(spans, s)
 
-    newSpans    = []
-    s,e,t0      = span
-    inserted    = False
-    offset      = 0
-    for tS,tE,t1 in spans:
+    if spans == []:
+        newSpans   = [span]
 
-        if s == tS and inserted == False:
-            newSpans.append(span)
-            offset      = e-s
-            inserted    = True
+    else:
+        newSpans    = []
+        s,e,t0      = span
+        inserted    = False
+        offset      = 0
+        for tS,tE,t1 in spans:
 
-        newSpans.append( (tS+offset,tE+offset,t1) )
+            if s == tS and inserted == False:
+                newSpans.append(span)
+                offset      = e-s
+                inserted    = True
+
+            newSpans.append( (tS+offset,tE+offset,t1) )
 
     return newSpans
 
@@ -435,6 +439,14 @@ class TestSpans(unittest.TestCase):
         spans=[(0,50,'A'),(50,100,'B')]
         spans   = InsertSpan(spans, (10,20,'C') )
         self.assertEqual(spans, [(0,10,'A'),(10,20,'C'),(20,60,'A'),(60,110,'B')] )
+
+
+
+    def test_twentyfive(self):
+
+        spans=[]
+        spans   = InsertSpan(spans, (10,20,'C') )
+        self.assertEqual(spans, [(10,20,'C')] )
 
 
 
