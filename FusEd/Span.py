@@ -384,6 +384,22 @@ class TestSpans(unittest.TestCase):
         self.assertEqual(result, 'abcdefghijpqrstuvwxyz' )
 
 
+    def test_twentytwo(self):
+
+        text1       = 'abcdefghijklmnopqrstuvwxyz'
+        dataSource1 = StringDataSource(text1, 0,len(text1))
+
+        text2       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        dataSource2 = StringDataSource(text2, 0,len(text2))
+
+        spans   = [ (0,13,dataSource1.SubDataSource(0,13)), (13,26,dataSource2.SubDataSource(13,26)) ]
+        spans   = RemoveData(spans, 10,20 )
+
+        result  = GetData( spans, 0,16 )
+        self.assertEqual(result, 'abcdefghijUVWXYZ' )
+
+
+
 
 
 
