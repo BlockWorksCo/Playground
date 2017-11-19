@@ -129,6 +129,28 @@ def AddSpan(spans, span):
 
 
 
+def InsertSpan(spans, span):
+
+    s,e,t = span
+    spans   = SplitAtPosition(spans, s)
+
+    newSpans    = []
+    s,e,t0      = span
+    inserted    = False
+    offset      = 0
+    for tS,tE,t1 in spans:
+
+        if s == tS and inserted == False:
+            newSpans.append(span)
+            offset      = e-s
+            inserted    = True
+
+        newSpans.append( (tS+offset,tE+offset,t1) )
+
+    return newSpans
+
+
+
 def RemoveSpan(spans, span):
 
     spans.remove(span)
@@ -159,13 +181,7 @@ def GetData(spans, rangeStart,rangeEnd):
 
 def InsertData(spans, rangeStart,rangeEnd, dataSource):
 
-    spans   = AddSpan( spans, rangeStart,rangeEnd, (rangeStart,rangeEnd,dataSource) )
-    return spans
-
-
-def AddData(spans, rangeStart,rangeEnd, dataSource):
-
-    spans   = InsertData( spans, rangeStart,rangeEnd, (rangeStart,rangeEnd,dataSource) )
+    spans   = InsertSpan( spans, (rangeStart,rangeEnd,dataSource) )
     return spans
 
 
@@ -379,7 +395,6 @@ class TestSpans(unittest.TestCase):
         spans   = [ (0,26,dataSource1.SubDataSource(0,26)) ]
         spans   = RemoveData(spans, 10,15 )
 
-        #print(spans)
         result  = GetData( spans, 0,15 )
         self.assertEqual(result, 'abcdefghijpqrstuvwxyz' )
 
@@ -397,6 +412,21 @@ class TestSpans(unittest.TestCase):
 
         result  = GetData( spans, 0,16 )
         self.assertEqual(result, 'abcdefghijUVWXYZ' )
+
+
+    def test_twentythree(self):
+
+        text1       = 'abcdefghijklmnopqrstuvwxyz'
+        dataSource1 = StringDataSource(text1, 0,len(text1))
+
+        text2       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        dataSource2 = StringDataSource(text2, 0,len(text2))
+
+        spans   = [ (0,26,dataSource1.SubDataSource(0,26)) ]
+        spans   = InsertData(spans, 10,20,dataSource2 )
+
+        result  = GetData( spans, 0,36)
+        self.assertEqual(result, 'abcdefghijABCDEFGHIJklmnopqrstuvwxyz' )
 
 
 
