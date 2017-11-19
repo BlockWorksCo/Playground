@@ -430,6 +430,13 @@ class TestSpans(unittest.TestCase):
 
 
 
+    def test_twentyfour(self):
+
+        spans=[(0,50,'A'),(50,100,'B')]
+        spans   = InsertSpan(spans, (10,20,'C') )
+        self.assertEqual(spans, [(0,10,'A'),(10,20,'C'),(20,60,'A'),(60,110,'B')] )
+
+
 
 
 
