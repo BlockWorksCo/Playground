@@ -81,7 +81,7 @@ class Passthrough(Operations):
         if os.path.isdir(full_path):
             dirents.extend(os.listdir(full_path))
         for r in dirents:
-            yield r
+            yield r,
 
     def readlink(self, path):
         pathname = os.readlink(self._full_path(path))
@@ -134,6 +134,21 @@ class Passthrough(Operations):
         dataSource              = FileDataSource(fh, 0,length)
         self.spansForFile[fh]   = [(0,length, dataSource)]
 
+        #
+        #
+        #
+        #text1    = 'Hello World'
+        #ds1 = StringDataSource(text1, 0,len(text1))
+        #self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (10,10+len(text1), ds1) )
+
+        #text2    = 'Hello Mars'
+        #ds2 = StringDataSource(text2, 0,len(text2))
+        #self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (100,100+len(text2), ds2) )
+
+        #text3    = 'Scooby Dooby Doo.'
+        #ds3 = StringDataSource(text3, 0,len(text3))
+        #self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (length-100,length-100+len(text3), ds3) )
+
         return fh
 
     def create(self, path, mode, fi=None):
@@ -145,11 +160,23 @@ class Passthrough(Operations):
         if length > self.BLOCK_SIZE:
             length  = self.BLOCK_SIZE
 
-        print('read %s from %d of %d bytes'%(path,offset,length))
+        full_path = self._full_path(path)
+        fileLength      = os.stat(full_path).st_size
+        if offset+length > fileLength:
+            length  = fileLength - offset
 
-        data    = GetData(self.spansForFile[fh], offset, length)
+        if length <= 0:
+            print('EOF @ %d'%(offset))
+            return None
+        else:
 
-        return data
+            print('read %s from %d of %d bytes'%(path,offset,length))
+
+            os.lseek(fh, offset, os.SEEK_SET)
+            data    = os.read(fh, length)
+            #data    = GetData(self.spansForFile[fh], offset, offset+length)
+
+            return data
 
     def write(self, path, buf, offset, fh):
         os.lseek(fh, offset, os.SEEK_SET)
