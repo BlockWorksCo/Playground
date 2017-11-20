@@ -6,13 +6,16 @@ import errno
 
 from fuse import FUSE, FuseOSError, Operations
 
+from Span import *
+
 
 
 class Passthrough(Operations):
 
 
     def __init__(self, root):
-        self.root = root
+        self.root           = root
+        self.spansForFile   = {}
 
     # Helpers
     # =======
@@ -126,7 +129,11 @@ class Passthrough(Operations):
     def open(self, path, flags):
         full_path = self._full_path(path)
         fh  = os.open(full_path, flags)
-        self.AddBlockListForFile(fh)
+    
+        length                  = os.stat(full_path).st_size
+        dataSource              = FileDataSource(fh, 0,length)
+        self.spansForFile[fh]   = [(0,length, dataSource)]
+
         return fh
 
     def create(self, path, mode, fi=None):
@@ -140,7 +147,9 @@ class Passthrough(Operations):
 
         print('read %s from %d of %d bytes'%(path,offset,length))
 
-        return self.GetBlockForFile(fh, blockNumber)
+        data    = GetData(self.spansForFile[fh], offset, length)
+
+        return data
 
     def write(self, path, buf, offset, fh):
         os.lseek(fh, offset, os.SEEK_SET)

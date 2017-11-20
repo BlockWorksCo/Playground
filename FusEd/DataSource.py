@@ -2,6 +2,32 @@
 
 
 import unittest
+import os
+
+
+class FileDataSource:
+
+    def __init__(self, fh, rangeStart,rangeEnd):
+        self.fh         = fh
+        self.rangeStart = rangeStart
+        self.rangeEnd   = rangeEnd
+
+
+    def Read(self, offset, numberOfBytes):
+
+        readStart   = self.rangeStart+offset
+        readEnd     = min(readStart+numberOfBytes, self.rangeEnd+offset)
+
+        os.lseek(self.fh, readStart, os.SEEK_SET)
+        data        = os.read(self.fh, readEnd-readStart)
+
+        return data
+        
+
+    def SubDataSource(self, rangeStart,rangeEnd):
+        
+        return FileDataSource(self.fh, self.rangeStart+rangeStart, self.rangeStart+rangeEnd)
+
 
 
 class StringDataSource:
@@ -16,10 +42,6 @@ class StringDataSource:
 
         readStart   = self.rangeStart+offset
         readEnd     = min(readStart+numberOfBytes, self.rangeEnd+offset)
-
-        #print('readStart=%d'%readStart)
-        #print('readEnd=%d'%readEnd)
-        #print('readData=%s'%self.text[readStart:readEnd])
 
         data        = self.text[readStart:readEnd]
 
