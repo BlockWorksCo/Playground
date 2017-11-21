@@ -206,16 +206,22 @@ class Passthrough(Operations):
         return self.flush(path, fh)
 
 
-def FUSEThread(editRoot,mountPoint):
-    print(editRoot)
-    print(mountPoint)
-    FUSE(Passthrough(editRoot), mountPoint, nothreads=True, foreground=True)
+def FUSEThread(fs,mountPoint):
+    FUSE(fs, mountPoint, nothreads=True, foreground=True)
 
 
 
 class TestSpans(unittest.TestCase):
 
     def test_one(self):
+
+        spans   = []
+        text    = open('tmp/SmallTestFile').read()
+        
+        self.assertEqual(text[:26], 'abcdefghijklmnopqrstuvwxyz' )
+
+
+    def test_two(self):
 
         spans   = []
         text    = open('tmp/SmallTestFile').read()
@@ -231,19 +237,32 @@ def ExitFunction():
 
 if __name__ == '__main__':
 
-    dirName = './TestFiles'
+    #
+    # Make the mount point if its not already there.
+    #
+    dirName = './tmp'
     try:
         os.mkdir(dirName)
     except OSError:
         pass
 
+    #
+    # Make sure we unmount on exit.
+    #
     signal.signal(signal.SIGINT, signal.default_int_handler)
     atexit.register(ExitFunction)
 
-    t = threading.Thread(target=FUSEThread, args=(dirName,'./tmp'))
+    #
+    # Create the fs object and the thread to run it.
+    #
+    fs  = Passthrough('./TestFiles')
+    t = threading.Thread(target=FUSEThread, args=(fs,'./tmp'))
     t.daemon    = True;
     t.start()
 
+    #
+    # Run the tests.
+    #
     try:
         time.sleep(1.0)
         #print(glob.glob('tmp/*'))
