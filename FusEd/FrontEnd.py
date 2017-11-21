@@ -2,6 +2,7 @@
 
 
 
+import atexit
 import signal
 import curses
 import curses.textpad
@@ -54,6 +55,9 @@ class FrontEnd:
 
 
 
+def ExitFunction():
+    subprocess.Popen(['fusermount','-uz','tmp'])
+    
 
 
 
@@ -68,6 +72,7 @@ if __name__ == '__main__':
     dirName,fileName    = os.path.split(sys.argv[1])
 
     signal.signal(signal.SIGINT, signal.default_int_handler)
+    atexit.register(ExitFunction)
 
     t = threading.Thread(target=FusEd.FUSEThread, args=(dirName,))
     t.daemon    = True;
@@ -81,8 +86,7 @@ if __name__ == '__main__':
             #print(open('./tmp/'+fileName).read())
 
     except KeyboardInterrupt:
-        subprocess.Popen(['fusermount','-uz','tmp'])
-
+        sys.exit(-1)
 
 
 
