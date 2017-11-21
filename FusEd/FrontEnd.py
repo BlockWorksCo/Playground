@@ -83,7 +83,6 @@ if __name__ == '__main__':
         while True:
             time.sleep(1)
             print('Tick...')
-            #print(open('./tmp/'+fileName).read())
 
     except KeyboardInterrupt:
         sys.exit(-1)

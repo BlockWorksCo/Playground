@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 
+import time
+import glob
+import sys
 import signal
 import atexit
 import subprocess
@@ -203,8 +206,10 @@ class Passthrough(Operations):
         return self.flush(path, fh)
 
 
-def FUSEThread(root):
-    FUSE(Passthrough(root), './tmp', nothreads=True, foreground=True)
+def FUSEThread(editRoot,mountPoint):
+    print(editRoot)
+    print(mountPoint)
+    FUSE(Passthrough(editRoot), mountPoint, nothreads=True, foreground=True)
 
 
 
@@ -213,7 +218,9 @@ class TestSpans(unittest.TestCase):
     def test_one(self):
 
         spans   = []
-        self.assertEqual(spans, [] )
+        text    = open('tmp/SmallTestFile').read()
+        
+        self.assertEqual(text[:26], 'abcdefghijklmnopqrstuvwxyz' )
 
 
 
@@ -224,7 +231,7 @@ def ExitFunction():
 
 if __name__ == '__main__':
 
-    dirName = './tmp'
+    dirName = './TestFiles'
     try:
         os.mkdir(dirName)
     except OSError:
@@ -233,11 +240,13 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal.default_int_handler)
     atexit.register(ExitFunction)
 
-    t = threading.Thread(target=FUSEThread, args=(dirName,))
+    t = threading.Thread(target=FUSEThread, args=(dirName,'./tmp'))
     t.daemon    = True;
     t.start()
 
     try:
+        time.sleep(1.0)
+        #print(glob.glob('tmp/*'))
         unittest.main()
 
     except KeyboardInterrupt:
