@@ -175,7 +175,7 @@ def GetData(spans, rangeStart,rangeEnd):
         spanStart,spanEnd,spanData  = SpanAtPoint(spans, position)
 
         numberOfBytesToCopy = min(numberOfBytes,spanEnd-spanStart)
-        data                += spanData.Read(0,numberOfBytesToCopy)
+        data                += spanData.Read(rangeStart,numberOfBytesToCopy)
         numberOfBytesCopied += numberOfBytesToCopy
         position            += numberOfBytesToCopy
 

@@ -156,7 +156,8 @@ class Passthrough(Operations):
         return os.open(full_path, os.O_WRONLY | os.O_CREAT, mode)
 
     def read(self, path, length, offset, fh):
-        blockNumber = int(offset / self.BLOCK_SIZE)
+
+        print('offset=%d'%offset)
         if length > self.BLOCK_SIZE:
             length  = self.BLOCK_SIZE
 
@@ -172,9 +173,10 @@ class Passthrough(Operations):
 
             print('read %s from %d of %d bytes'%(path,offset,length))
 
-            os.lseek(fh, offset, os.SEEK_SET)
-            data    = os.read(fh, length)
-            #data    = GetData(self.spansForFile[fh], offset, offset+length)
+            #os.lseek(fh, offset, os.SEEK_SET)
+            #data    = os.read(fh, length)
+            print(self.spansForFile[fh])
+            data    = GetData(self.spansForFile[fh], offset, offset+length)
 
             return data
 
