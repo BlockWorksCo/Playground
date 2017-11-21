@@ -24,6 +24,7 @@ class Passthrough(Operations):
     def __init__(self, root):
         self.root           = root
         self.spansForFile   = {}
+        self.fnMap          = {}
 
     # Helpers
     # =======
@@ -137,6 +138,7 @@ class Passthrough(Operations):
     def open(self, path, flags):
         full_path = self._full_path(path)
         fh  = os.open(full_path, flags)
+        self.fnMap[path]    = fh
     
         length                  = os.stat(full_path).st_size
         dataSource              = FileDataSource(fh, 0,length)
@@ -157,6 +159,7 @@ class Passthrough(Operations):
         ds3 = StringDataSource(text3, 0,len(text3))
         self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (2000,2000+len(text3), ds3) )
 
+        print('fileno=%d'%fh)
         return fh
 
     def create(self, path, mode, fi=None):
@@ -211,6 +214,10 @@ def FUSEThread(fs,mountPoint):
 
 
 
+
+
+
+
 class TestSpans(unittest.TestCase):
 
     def test_one(self):
@@ -223,10 +230,23 @@ class TestSpans(unittest.TestCase):
 
     def test_two(self):
 
-        spans   = []
-        text    = open('tmp/SmallTestFile').read()
+        fh      = open('tmp/SmallTestFile')
+        fn      = fs.fnMap['/SmallTestFile']
         
-        self.assertEqual(text[:26], 'abcdefghijklmnopqrstuvwxyz' )
+        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        ds1     = StringDataSource(text1, 0,len(text1))
+        fs.spansForFile[fn]   = InsertSpan(fs.spansForFile[fn], (10,14, ds1) )
+
+        fh.seek(0, os.SEEK_SET)
+        data    = fh.read(32)
+
+        self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz' )
+
+
+
+
+
+
 
 
 
@@ -255,6 +275,7 @@ if __name__ == '__main__':
     #
     # Create the fs object and the thread to run it.
     #
+    global fs
     fs  = Passthrough('./TestFiles')
     t = threading.Thread(target=FUSEThread, args=(fs,'./tmp'))
     t.daemon    = True;
