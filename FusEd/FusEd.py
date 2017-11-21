@@ -137,17 +137,17 @@ class Passthrough(Operations):
         #
         #
         #
-        #text1    = 'Hello World'
-        #ds1 = StringDataSource(text1, 0,len(text1))
-        #self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (10,10+len(text1), ds1) )
+        text1    = 'Hello World'
+        ds1 = StringDataSource(text1, 0,len(text1))
+        self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (10,10+len(text1), ds1) )
 
-        #text2    = 'Hello Mars'
-        #ds2 = StringDataSource(text2, 0,len(text2))
-        #self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (100,100+len(text2), ds2) )
+        text2    = 'Hello Mars'
+        ds2 = StringDataSource(text2, 0,len(text2))
+        self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (100,100+len(text2), ds2) )
 
-        #text3    = 'Scooby Dooby Doo.'
-        #ds3 = StringDataSource(text3, 0,len(text3))
-        #self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (length-100,length-100+len(text3), ds3) )
+        text3    = 'Scooby Dooby Doo.'
+        ds3 = StringDataSource(text3, 0,len(text3))
+        self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (2000,2000+len(text3), ds3) )
 
         return fh
 
