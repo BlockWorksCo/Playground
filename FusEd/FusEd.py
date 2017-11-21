@@ -137,13 +137,13 @@ class Passthrough(Operations):
         #
         #
         #
-        text1    = 'Hello World'
-        ds1 = StringDataSource(text1, 0,len(text1))
-        self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (10,10+len(text1), ds1) )
+        #text1    = 'Hello World'
+        #ds1 = StringDataSource(text1, 0,len(text1))
+        #self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (10,10+len(text1), ds1) )
 
-        text2    = 'Hello Mars'
-        ds2 = StringDataSource(text2, 0,len(text2))
-        self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (100,100+len(text2), ds2) )
+        #text2    = 'Hello Mars'
+        #ds2 = StringDataSource(text2, 0,len(text2))
+        #self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (100,100+len(text2), ds2) )
 
         text3    = 'Scooby Dooby Doo.'
         ds3 = StringDataSource(text3, 0,len(text3))
@@ -157,7 +157,7 @@ class Passthrough(Operations):
 
     def read(self, path, length, offset, fh):
 
-        print('offset=%d'%offset)
+        print('\noffset=%d'%offset)
         if length > self.BLOCK_SIZE:
             length  = self.BLOCK_SIZE
 
@@ -175,7 +175,6 @@ class Passthrough(Operations):
 
             #os.lseek(fh, offset, os.SEEK_SET)
             #data    = os.read(fh, length)
-            print(self.spansForFile[fh])
             data    = GetData(self.spansForFile[fh], offset, offset+length)
 
             return data

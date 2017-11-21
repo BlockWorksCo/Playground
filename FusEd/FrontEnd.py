@@ -2,6 +2,7 @@
 
 
 
+import signal
 import curses
 import curses.textpad
 import os
@@ -9,6 +10,7 @@ import time
 import FusEd
 import threading
 import sys
+import subprocess
 
 
 class FrontEnd:
@@ -65,15 +67,21 @@ if __name__ == '__main__':
 
     dirName,fileName    = os.path.split(sys.argv[1])
 
+    signal.signal(signal.SIGINT, signal.default_int_handler)
+
     t = threading.Thread(target=FusEd.FUSEThread, args=(dirName,))
     t.daemon    = True;
     t.start()
 
     #FrontEnd().Run()
-    while True:
-        time.sleep(1)
-        print('Tick...')
-        #print(open('./tmp/'+fileName).read())
+    try:
+        while True:
+            time.sleep(1)
+            print('Tick...')
+            #print(open('./tmp/'+fileName).read())
+
+    except KeyboardInterrupt:
+        subprocess.Popen(['fusermount','-uz','tmp'])
 
 
 
