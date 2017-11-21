@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 
 
+import signal
+import atexit
+import subprocess
+import threading
 import os
 import errno
 
 from fuse import FUSE, FuseOSError, Operations
 
 from Span import *
+import unittest
 
 
 
@@ -200,6 +205,43 @@ class Passthrough(Operations):
 
 def FUSEThread(root):
     FUSE(Passthrough(root), './tmp', nothreads=True, foreground=True)
+
+
+
+class TestSpans(unittest.TestCase):
+
+    def test_one(self):
+
+        spans   = []
+        self.assertEqual(spans, [] )
+
+
+
+
+def ExitFunction():
+    subprocess.Popen(['fusermount','-uz','tmp'])
+
+
+if __name__ == '__main__':
+
+    dirName = './tmp'
+    try:
+        os.mkdir(dirName)
+    except OSError:
+        pass
+
+    signal.signal(signal.SIGINT, signal.default_int_handler)
+    atexit.register(ExitFunction)
+
+    t = threading.Thread(target=FUSEThread, args=(dirName,))
+    t.daemon    = True;
+    t.start()
+
+    try:
+        unittest.main()
+
+    except KeyboardInterrupt:
+        sys.exit(-1)
 
 
 
