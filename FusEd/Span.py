@@ -25,6 +25,7 @@ def SpanAtPoint(spans, position):
 
 def SplitAtPosition(spans, position):
 
+    #print('splitting at position %d'%position)
     newSpans    = []
     for tS,tE,t in spans:
 

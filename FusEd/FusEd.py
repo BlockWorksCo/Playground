@@ -238,10 +238,9 @@ class TestSpans(unittest.TestCase):
         fs.spansForFile[fn]   = InsertSpan(fs.spansForFile[fn], (10,14, ds1) )
 
         fh.seek(0, os.SEEK_SET)
-        data    = fh.read(32)
+        data    = fh.read(30)
 
         self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz' )
-
 
 
 
