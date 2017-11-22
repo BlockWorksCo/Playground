@@ -19,8 +19,8 @@ class FileDataSource:
         readEnd     = min(readStart+numberOfBytes, self.rangeEnd+offset)
 
         os.lseek(self.fh, readStart, os.SEEK_SET)
-        print('offset=%d number=%d'%(offset,numberOfBytes))
-        print('reading %d bytes from %d (%d,%d)'%(numberOfBytes, os.lseek(self.fh,0,os.SEEK_CUR), readStart,readEnd ))
+        #print('offset=%d number=%d'%(offset,numberOfBytes))
+        #print('reading %d bytes from %d (%d,%d)'%(numberOfBytes, os.lseek(self.fh,0,os.SEEK_CUR), readStart,readEnd ))
         data        = os.read(self.fh, readEnd-readStart)
 
         return data
