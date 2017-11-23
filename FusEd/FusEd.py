@@ -89,6 +89,7 @@ class Passthrough(Operations):
             lastSpan    = spans[-1]
             start,end,t       = lastSpan
             s['st_size'] = end
+            #print(s)
 
         return s
 
@@ -126,6 +127,7 @@ class Passthrough(Operations):
         s=dict((key, getattr(stv, key)) for key in ('f_bavail', 'f_bfree',
             'f_blocks', 'f_bsize', 'f_favail', 'f_ffree', 'f_files', 'f_flag',
             'f_frsize', 'f_namemax'))
+        print('statfs on %s'%path)
 
         return s
 
@@ -185,6 +187,7 @@ class Passthrough(Operations):
 
         full_path = self._full_path(path)
         fileLength      = os.stat(full_path).st_size
+        #print('filelength = %d'%fileLength)
         if offset+length > fileLength:
             length  = fileLength - offset
 
@@ -257,6 +260,18 @@ class TestSpans(unittest.TestCase):
         #print(fs.spansForFile[fn][2][1])
 
         self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz' )
+
+
+    def test_three(self):
+
+        fh      = open('tmp/SmallTestFile')
+        fn      = fs.fnMap['/SmallTestFile']
+
+        #length  = os.path.getsize('tmp/SmallTestFile')
+        #length  = fh.seek(0,os.SEEK_END)
+        length  = os.lseek(fn, 0, os.SEEK_END)
+
+        self.assertEqual(length, 27)
 
 
 
