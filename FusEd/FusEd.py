@@ -83,7 +83,7 @@ class Passthrough(Operations):
         s= dict((key, getattr(st, key)) for key in ('st_atime', 'st_ctime',
                      'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))
 
-        s['st_size'] = 31
+        #s['st_size'] = 31
         #print(s)
         return s
 
