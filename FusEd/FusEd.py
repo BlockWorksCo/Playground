@@ -83,8 +83,13 @@ class Passthrough(Operations):
         s= dict((key, getattr(st, key)) for key in ('st_atime', 'st_ctime',
                      'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))
 
-        #s['st_size'] = 31
-        #print(s)
+        if path in self.fnMap.keys():
+            fh  = self.fnMap[path]
+            spans   = self.spansForFile[fh]
+            lastSpan    = spans[-1]
+            start,end,t       = lastSpan
+            s['st_size'] = end
+
         return s
 
     def readdir(self, path, fh):
@@ -193,7 +198,6 @@ class Passthrough(Operations):
             #os.lseek(fh, offset, os.SEEK_SET)
             #data    = os.read(fh, length)
             data    = GetData(self.spansForFile[fh], offset, offset+length)
-            print('++%s++'%data)
 
             return data
 
@@ -227,7 +231,7 @@ def FUSEThread(fs,mountPoint):
 
 class TestSpans(unittest.TestCase):
 
-    def _test_one(self):
+    def test_one(self):
 
         spans   = []
         text    = open('tmp/SmallTestFile').read()
@@ -245,14 +249,14 @@ class TestSpans(unittest.TestCase):
         fs.spansForFile[fn]   = InsertSpan(fs.spansForFile[fn], (10,14, ds1) )
 
         fh.seek(0, os.SEEK_SET)
-        data    = fh.read()
+        data    = fh.read(30)
 
         #print(fs.spansForFile[fn][2][2].rangeStart)
         #print(fs.spansForFile[fn][2][2].rangeEnd)
         #print(fs.spansForFile[fn][2][0])
         #print(fs.spansForFile[fn][2][1])
 
-        self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz\n' )
+        self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz' )
 
 
 
