@@ -78,18 +78,22 @@ class Passthrough(Operations):
         return os.chown(full_path, uid, gid)
 
     def getattr(self, path, fh=None):
+        print('getattr(%s,%s)'%(path,str(fh)))
         full_path = self._full_path(path)
         st = os.lstat(full_path)
         s= dict((key, getattr(st, key)) for key in ('st_atime', 'st_ctime',
                      'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))
 
+        print(self.fnMap.keys())
         if path in self.fnMap.keys():
             fh  = self.fnMap[path]
             spans   = self.spansForFile[fh]
             lastSpan    = spans[-1]
             start,end,t       = lastSpan
             s['st_size'] = end
-            #print(s)
+            print(s)
+        else:
+            print('not in map')
 
         return s
 
@@ -150,9 +154,12 @@ class Passthrough(Operations):
     # ============
 
     def open(self, path, flags):
+
+        print('open of %s'%path)
         full_path = self._full_path(path)
         fh  = os.open(full_path, flags)
         self.fnMap[path]    = fh
+        print(self.fnMap.keys())
     
         length                  = os.stat(full_path).st_size
         dataSource              = FileDataSource(fh, 0,length)
@@ -224,7 +231,7 @@ class Passthrough(Operations):
 
 
 def FUSEThread(fs,mountPoint):
-    FUSE(fs, mountPoint, nothreads=True, foreground=True)
+    FUSE(fs, mountPoint, nothreads=False, foreground=True)
 
 
 
@@ -234,7 +241,7 @@ def FUSEThread(fs,mountPoint):
 
 class TestSpans(unittest.TestCase):
 
-    def test_one(self):
+    def _test_one(self):
 
         spans   = []
         text    = open('tmp/SmallTestFile').read()
@@ -242,7 +249,7 @@ class TestSpans(unittest.TestCase):
         self.assertEqual(text[:26], 'abcdefghijklmnopqrstuvwxyz' )
 
 
-    def test_two(self):
+    def _test_two(self):
 
         fh      = open('tmp/SmallTestFile')
         fn      = fs.fnMap['/SmallTestFile']
@@ -262,16 +269,35 @@ class TestSpans(unittest.TestCase):
         self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz' )
 
 
-    def test_three(self):
+    def _test_three(self):
 
         fh      = open('tmp/SmallTestFile')
         fn      = fs.fnMap['/SmallTestFile']
 
         #length  = os.path.getsize('tmp/SmallTestFile')
-        #length  = fh.seek(0,os.SEEK_END)
         length  = os.lseek(fn, 0, os.SEEK_END)
 
         self.assertEqual(length, 27)
+
+
+
+    def test_four(self):
+
+        print('test four')
+        fh      = os.open('tmp/SmallTestFile', os.O_RDONLY)
+        #fh      = open('tmp/SmallTestFile','r')
+        print('test four end')
+        #fn      = fs.fnMap['/SmallTestFile']
+
+        #text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        #ds1     = StringDataSource(text1, 0,len(text1))
+        #fs.spansForFile[fn]   = InsertSpan(fs.spansForFile[fn], (10,14, ds1) )
+
+        #length  = os.path.getsize('tmp/SmallTestFile')
+        #length  = fh.seek(0, os.SEEK_END)
+        #length  = os.lseek(fn, 0, os.SEEK_END)
+
+        #self.assertEqual(length, 31)
 
 
 
@@ -283,6 +309,7 @@ class TestSpans(unittest.TestCase):
 
 def ExitFunction():
     subprocess.Popen(['fusermount','-uz','tmp'])
+    #pass
 
 
 if __name__ == '__main__':
