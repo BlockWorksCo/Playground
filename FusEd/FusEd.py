@@ -296,6 +296,7 @@ class TestSpans(unittest.TestCase):
         #length  = os.path.getsize('tmp/SmallTestFile')
         #length  = fh.seek(0, os.SEEK_END)
         #length  = os.lseek(fn, 0, os.SEEK_END)
+        os.close(fh)
 
         #self.assertEqual(length, 31)
 
