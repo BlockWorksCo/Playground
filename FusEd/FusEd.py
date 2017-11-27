@@ -23,8 +23,7 @@ class Passthrough(Operations):
 
     def __init__(self, root):
         self.root           = root
-        self.spansForFile   = {}
-        self.fnMap          = {}
+        self.handles        = {}
 
     # Helpers
     # =======
@@ -61,6 +60,13 @@ class Passthrough(Operations):
             return os.read(fh, self.BLOCK_SIZE)
              
 
+    def LengthOfSpans(self, spans):
+        lastSpan        = spans[-1]
+        start,end,t     = lastSpan
+
+        return end
+
+
     # Filesystem methods
     # ==================
 
@@ -84,13 +90,9 @@ class Passthrough(Operations):
         s= dict((key, getattr(st, key)) for key in ('st_atime', 'st_ctime',
                      'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))
 
-        print(self.fnMap.keys())
-        if path in self.fnMap.keys():
-            fh  = self.fnMap[path]
-            spans   = self.spansForFile[fh]
-            lastSpan    = spans[-1]
-            start,end,t       = lastSpan
-            s['st_size'] = end
+        if path in self.handles.keys():
+            fh,spans        = self.handles[path]
+            s['st_size']    = self.LengthOfSpans(spans)
             print(s)
         else:
             print('not in map')
@@ -125,6 +127,7 @@ class Passthrough(Operations):
         return os.mkdir(self._full_path(path), mode)
 
     def statfs(self, path):
+
         full_path = self._full_path(path)
         stv = os.statvfs(full_path)
         
@@ -158,56 +161,53 @@ class Passthrough(Operations):
         print('open of %s'%path)
         full_path = self._full_path(path)
         fh  = os.open(full_path, flags)
-        self.fnMap[path]    = fh
-        print(self.fnMap.keys())
     
-        length                  = os.stat(full_path).st_size
-        dataSource              = FileDataSource(fh, 0,length)
-        self.spansForFile[fh]   = [(0,length, dataSource)]
+        length      = os.stat(full_path).st_size
+        dataSource  = FileDataSource(fh, 0,length)
+        spans       = [(0,length, dataSource)]
 
-        #
-        #
-        #
-        #text1    = 'Hello World'
-        #ds1 = StringDataSource(text1, 0,len(text1))
-        #self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (10,10+len(text1), ds1) )
+        self.handles[path]    = (fh, spans)
 
-        #text2    = 'Hello Mars'
-        #ds2 = StringDataSource(text2, 0,len(text2))
-        #self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (100,100+len(text2), ds2) )
+        return 0
 
-        #text3    = 'Scooby Dooby Doo.'
-        #ds3 = StringDataSource(text3, 0,len(text3))
-        #self.spansForFile[fh]   = InsertSpan(self.spansForFile[fh], (2000,2000+len(text3), ds3) )
-
-        return fh
 
     def create(self, path, mode, fi=None):
         full_path = self._full_path(path)
         return os.open(full_path, os.O_WRONLY | os.O_CREAT, mode)
 
+
     def read(self, path, length, offset, fh):
 
-        #print('\noffset=%d'%offset)
+        fn,spans    = self.handles[path]
+
+        print(self.handles)
         if length > self.BLOCK_SIZE:
             length  = self.BLOCK_SIZE
 
-        full_path = self._full_path(path)
-        fileLength      = os.stat(full_path).st_size
-        #print('filelength = %d'%fileLength)
+        full_path   = self._full_path(path)
+        fileLength      = os.path.getsize(full_path)
+        fileLength  = self.LengthOfSpans(spans)
+        print('file length = %d'%fileLength)
+
         if offset+length > fileLength:
             length  = fileLength - offset
 
         if length <= 0:
             #print('EOF @ %d'%(offset))
             return None
+
         else:
 
-            #print('read %s from %d of %d bytes'%(path,offset,length))
+            print('read %s from %d of %d bytes'%(path,offset,length))
+            print(fh)
+            print( self.handles[path] )
 
             #os.lseek(fh, offset, os.SEEK_SET)
             #data    = os.read(fh, length)
-            data    = GetData(self.spansForFile[fh], offset, offset+length)
+            print('offset=%d'%(offset))
+            print('1) length=%d'%(length))
+            data    = GetData(spans, offset, offset+length)
+            print(data)
 
             return data
 
@@ -224,7 +224,8 @@ class Passthrough(Operations):
         return os.fsync(fh)
 
     def release(self, path, fh):
-        return os.close(fh)
+        fn,spans    = self.handles[path]
+        return os.close(fn)
 
     def fsync(self, path, fdatasync, fh):
         return self.flush(path, fh)
@@ -283,20 +284,29 @@ class TestSpans(unittest.TestCase):
 
     def test_four(self):
 
-        print('test four')
-        fh      = os.open('tmp/SmallTestFile', os.O_RDONLY)
-        #fh      = open('tmp/SmallTestFile','r')
-        print('test four end')
-        #fn      = fs.fnMap['/SmallTestFile']
+        #fh      = os.open('tmp/SmallTestFile', os.O_RDONLY)
+        f      = open('tmp/SmallTestFile','r')
 
-        #text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        #ds1     = StringDataSource(text1, 0,len(text1))
-        #fs.spansForFile[fn]   = InsertSpan(fs.spansForFile[fn], (10,14, ds1) )
+        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        ds1     = StringDataSource(text1, 0,len(text1))
+        fh,spans= fs.handles['/SmallTestFile']
+        spans   = InsertSpan(spans, (10,14, ds1) )
+        fs.handles['/SmallTestFile']    = (fh,spans)
+        print(fs.handles['/SmallTestFile'])
 
+        #print(os.stat('tmp/SmallTestFile'))
         #length  = os.path.getsize('tmp/SmallTestFile')
-        #length  = fh.seek(0, os.SEEK_END)
-        #length  = os.lseek(fn, 0, os.SEEK_END)
-        os.close(fh)
+        f.seek(0,os.SEEK_END)
+        length  = f.tell()
+        print('2) length=%d'%length)
+
+        #while True:
+            #print('.')
+            #time.sleep(1)
+        #os.close(fh)
+        f.seek(0,os.SEEK_SET)
+        print(f.read())
+        f.close()
 
         #self.assertEqual(length, 31)
 
