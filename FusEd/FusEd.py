@@ -10,6 +10,7 @@ import subprocess
 import threading
 import os
 import errno
+import multiprocessing
 
 from fuse import FUSE, FuseOSError, Operations
 
@@ -84,7 +85,7 @@ class Passthrough(Operations):
         return os.chown(full_path, uid, gid)
 
     def getattr(self, path, fh=None):
-        print('getattr(%s,%s)'%(path,str(fh)))
+        #print('getattr(%s,%s)'%(path,str(fh)))
         full_path = self._full_path(path)
         st = os.lstat(full_path)
         s= dict((key, getattr(st, key)) for key in ('st_atime', 'st_ctime',
@@ -92,17 +93,18 @@ class Passthrough(Operations):
 
         if path in self.handles.keys():
             fh,spans        = self.handles[path]
-            print(spans)
+            #print(spans)
             s['st_size']    = self.LengthOfSpans(spans)
-            print(s)
+            #print(s)
         else:
-            print('not in map')
+            #print('not in map')
+            pass
 
         return s
 
     def readdir(self, path, fh):
 
-        print('** readdir **')
+        #print('** readdir **')
         full_path = self._full_path(path)
 
         dirents = ['.', '..']
@@ -131,7 +133,7 @@ class Passthrough(Operations):
 
     def statfs(self, path):
 
-        print('** statfs on %s **'%path)
+        #print('** statfs on %s **'%path)
         full_path = self._full_path(path)
         stv = os.statvfs(full_path)
         
@@ -161,15 +163,25 @@ class Passthrough(Operations):
 
     def open(self, path, flags):
 
-        print('open of %s'%path)
+        #print('open of %s'%path)
         full_path = self._full_path(path)
         fh  = os.open(full_path, flags)
     
         length      = os.stat(full_path).st_size
         dataSource  = FileDataSource(fh, 0,length)
         if path in self.handles.keys():
+
+            #
+            # Already been opened, lets close the old handle but
+            # keep the spans.
+            #
             fhOld,spans        = self.handles[path]
+            os.close(fhOld)
         else:
+
+            #
+            # New file open, lets make spans for the whole file.
+            #
             spans       = [(0,length, dataSource)]
 
         self.handles[path]    = (fh, spans)
@@ -192,18 +204,18 @@ class Passthrough(Operations):
 
         full_path   = self._full_path(path)
         fileLength  = self.LengthOfSpans(spans)
-        print('file length = %d'%fileLength)
+        #print('file length = %d'%fileLength)
 
         if offset+length > fileLength:
             length  = fileLength - offset
 
         if length <= 0:
-            print('EOF @ %d'%(offset))
+            #print('EOF @ %d'%(offset))
             return None
 
         else:
 
-            print('read %s from %d of %d bytes'%(path,offset,length))
+            #print('read %s from %d of %d bytes'%(path,offset,length))
             #print(fh)
             #print( self.handles[path] )
 
@@ -230,9 +242,11 @@ class Passthrough(Operations):
 
     def release(self, path, fh):
         print('** release %s **'%path)
-        #fn,spans    = self.handles[path]
-        #return os.close(fn)
-        return 0
+        fn,spans    = self.handles[path]
+        print(fn)
+        print(spans)
+        os.close(fn)
+        return 1
 
     def fsync(self, path, fdatasync, fh):
         return self.flush(path, fh)
@@ -280,10 +294,9 @@ class TestSpans(unittest.TestCase):
     def _test_three(self):
 
         fh      = open('tmp/SmallTestFile')
-        fn      = fs.fnMap['/SmallTestFile']
 
-        #length  = os.path.getsize('tmp/SmallTestFile')
-        length  = os.lseek(fn, 0, os.SEEK_END)
+        fh.seek(0, os.SEEK_END)
+        length  = fh.tell()
 
         self.assertEqual(length, 27)
 
@@ -301,25 +314,25 @@ class TestSpans(unittest.TestCase):
         fs.handles['/SmallTestFile']    = (fh,spans)
         #print(fs.handles['/SmallTestFile'])
 
-        print(os.stat('tmp/SmallTestFile'))
+        #print(os.stat('tmp/SmallTestFile'))
 
         #length  = os.path.getsize('tmp/SmallTestFile')
         length  = os.stat('tmp/SmallTestFile').st_size
-        print('2) length=%d'%length)
+        #print('2) length=%d'%length)
 
-        f.seek(0,os.SEEK_SET)
+        f.seek(0,os.SEEK_END)
+        length  = f.tell()
+        #print('3) length=%d'%length)
 
-        #length  = f.tell()
-
-        while True:
-            print('.')
-            time.sleep(1)
+        #while True:
+            #print('.')
+            #time.sleep(1)
         #os.close(fh)
-        #f.seek(0,os.SEEK_SET)
-        data    = f.read(31)
-        print(data)
+        f.seek(0,os.SEEK_SET)
+        data    = f.read()
+        #print(data)
 
-        #f.close()
+        f.close()
 
         self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz\n')
 
@@ -358,7 +371,10 @@ if __name__ == '__main__':
     #
     global fs
     fs  = Passthrough('./TestFiles')
-    t = threading.Thread(target=FUSEThread, args=(fs,'./tmp'))
+    mgr = multiprocessing.Manager()
+    d   = mgr.dict()
+    fs.handles  = d
+    t = multiprocessing.Process(target=FUSEThread, args=(fs,'./tmp') )
     t.daemon    = True;
     t.start()
 
@@ -367,7 +383,6 @@ if __name__ == '__main__':
     #
     try:
         time.sleep(1.0)
-        #print(glob.glob('tmp/*'))
         unittest.main()
 
     except KeyboardInterrupt:
