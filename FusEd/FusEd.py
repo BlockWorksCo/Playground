@@ -92,6 +92,7 @@ class Passthrough(Operations):
 
         if path in self.handles.keys():
             fh,spans        = self.handles[path]
+            print(spans)
             s['st_size']    = self.LengthOfSpans(spans)
             print(s)
         else:
@@ -100,6 +101,8 @@ class Passthrough(Operations):
         return s
 
     def readdir(self, path, fh):
+
+        print('** readdir **')
         full_path = self._full_path(path)
 
         dirents = ['.', '..']
@@ -128,13 +131,13 @@ class Passthrough(Operations):
 
     def statfs(self, path):
 
+        print('** statfs on %s **'%path)
         full_path = self._full_path(path)
         stv = os.statvfs(full_path)
         
         s=dict((key, getattr(stv, key)) for key in ('f_bavail', 'f_bfree',
             'f_blocks', 'f_bsize', 'f_favail', 'f_ffree', 'f_files', 'f_flag',
             'f_frsize', 'f_namemax'))
-        print('statfs on %s'%path)
 
         return s
 
@@ -164,7 +167,10 @@ class Passthrough(Operations):
     
         length      = os.stat(full_path).st_size
         dataSource  = FileDataSource(fh, 0,length)
-        spans       = [(0,length, dataSource)]
+        if path in self.handles.keys():
+            fhOld,spans        = self.handles[path]
+        else:
+            spans       = [(0,length, dataSource)]
 
         self.handles[path]    = (fh, spans)
 
@@ -180,7 +186,7 @@ class Passthrough(Operations):
 
         fn,spans    = self.handles[path]
 
-        print(self.handles)
+        #print(self.handles)
         if length > self.BLOCK_SIZE:
             length  = self.BLOCK_SIZE
 
@@ -198,15 +204,15 @@ class Passthrough(Operations):
         else:
 
             print('read %s from %d of %d bytes'%(path,offset,length))
-            print(fh)
-            print( self.handles[path] )
+            #print(fh)
+            #print( self.handles[path] )
 
             #os.lseek(fh, offset, os.SEEK_SET)
             #data    = os.read(fh, length)
-            print('offset=%d'%(offset))
-            print('1) length=%d'%(length))
+            #print('offset=%d'%(offset))
+            #print('1) length=%d'%(length))
             data    = GetData(spans, offset, offset+length)
-            print(data)
+            #print(data)
 
             return data
 
@@ -293,17 +299,21 @@ class TestSpans(unittest.TestCase):
         fh,spans= fs.handles['/SmallTestFile']
         spans   = InsertSpan(spans, (10,14, ds1) )
         fs.handles['/SmallTestFile']    = (fh,spans)
-        print(fs.handles['/SmallTestFile'])
+        #print(fs.handles['/SmallTestFile'])
 
-        #print(os.stat('tmp/SmallTestFile'))
+        print(os.stat('tmp/SmallTestFile'))
+
         #length  = os.path.getsize('tmp/SmallTestFile')
-        f.seek(0,os.SEEK_SET)
-        #length  = f.tell()
-        #print('2) length=%d'%length)
+        length  = os.stat('tmp/SmallTestFile').st_size
+        print('2) length=%d'%length)
 
-        #while True:
-            #print('.')
-            #time.sleep(1)
+        f.seek(0,os.SEEK_SET)
+
+        #length  = f.tell()
+
+        while True:
+            print('.')
+            time.sleep(1)
         #os.close(fh)
         #f.seek(0,os.SEEK_SET)
         data    = f.read(31)
