@@ -224,6 +224,7 @@ class Passthrough(Operations):
         return os.fsync(fh)
 
     def release(self, path, fh):
+        print('** release %s **'%path)
         fn,spans    = self.handles[path]
         return os.close(fn)
 
