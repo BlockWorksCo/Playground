@@ -185,7 +185,6 @@ class Passthrough(Operations):
             length  = self.BLOCK_SIZE
 
         full_path   = self._full_path(path)
-        fileLength      = os.path.getsize(full_path)
         fileLength  = self.LengthOfSpans(spans)
         print('file length = %d'%fileLength)
 
@@ -193,7 +192,7 @@ class Passthrough(Operations):
             length  = fileLength - offset
 
         if length <= 0:
-            #print('EOF @ %d'%(offset))
+            print('EOF @ %d'%(offset))
             return None
 
         else:
@@ -225,8 +224,9 @@ class Passthrough(Operations):
 
     def release(self, path, fh):
         print('** release %s **'%path)
-        fn,spans    = self.handles[path]
-        return os.close(fn)
+        #fn,spans    = self.handles[path]
+        #return os.close(fn)
+        return 0
 
     def fsync(self, path, fdatasync, fh):
         return self.flush(path, fh)
@@ -297,19 +297,21 @@ class TestSpans(unittest.TestCase):
 
         #print(os.stat('tmp/SmallTestFile'))
         #length  = os.path.getsize('tmp/SmallTestFile')
-        f.seek(0,os.SEEK_END)
-        length  = f.tell()
-        print('2) length=%d'%length)
+        f.seek(0,os.SEEK_SET)
+        #length  = f.tell()
+        #print('2) length=%d'%length)
 
         #while True:
             #print('.')
             #time.sleep(1)
         #os.close(fh)
-        f.seek(0,os.SEEK_SET)
-        print(f.read())
-        f.close()
+        #f.seek(0,os.SEEK_SET)
+        data    = f.read(31)
+        print(data)
 
-        #self.assertEqual(length, 31)
+        #f.close()
+
+        self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz\n')
 
 
 
