@@ -11,6 +11,7 @@ import threading
 import os
 import errno
 import multiprocessing
+from multiprocessing.managers import BaseManager
 
 from fuse import FUSE, FuseOSError, Operations
 
@@ -19,7 +20,7 @@ import unittest
 
 
 
-class Passthrough(Operations):
+class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
 
     def __init__(self, root):
@@ -36,30 +37,6 @@ class Passthrough(Operations):
         return path
 
     BLOCK_SIZE  = 1024*4
-    openFiles   = {}
-
-    def AddBlockListForFile(self, fh):
-        """
-        The overlay block list contains blocks of data that overlay the on-disk data.
-        """
-        self.openFiles[fh]   = {} 
-
-    def AddBlockForFile(self, fh, blockIndex, data):
-        """
-        Add an overlay block for the file at the specified location.
-        """
-        self.openFiles[fh][blockIndex]  = data
-
-
-    def GetBlockForFile(self, fh, blockIndex):
-        """
-        """
-        if blockIndex in self.openFiles[fh]:
-            return self.openFiles[fh]
-        else:
-            os.lseek(fh, blockIndex*self.BLOCK_SIZE, os.SEEK_SET)
-            return os.read(fh, self.BLOCK_SIZE)
-             
 
     def LengthOfSpans(self, spans):
         lastSpan        = spans[-1]
@@ -256,12 +233,26 @@ class Passthrough(Operations):
     def fsync(self, path, fdatasync, fh):
         return self.flush(path, fh)
 
+    def SetHandles(self, handles):
+        print('** SetHandles **')
+        self.handles    = handles
+
+    def GetHandles(self, handles):
+        print('** GetHandles **')
+        return self.handles
+
 
 def FUSEThread(fs,mountPoint):
     FUSE(fs, mountPoint, nothreads=False, foreground=True)
 
 
 
+
+
+class MyManager(BaseManager):
+    pass
+
+MyManager.register('Passthrough', proxytype=Passthrough)
 
 
 
@@ -309,38 +300,26 @@ class TestSpans(unittest.TestCase):
 
     def test_four(self):
 
-        #fh      = os.open('tmp/SmallTestFile', os.O_RDONLY)
         f      = open('tmp/SmallTestFile','r')
-        #print('---- /open ----')
 
         text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         ds1     = StringDataSource(text1, 0,len(text1))
-        fh,spans= fs.handles['/SmallTestFile']
+        handles = fs.GetHandles()
+        fh,spans= handles['/SmallTestFile']
         spans   = InsertSpan(spans, (10,14, ds1) )
-        fs.handles['/SmallTestFile']    = (fh,spans)
-        #print(fs.handles['/SmallTestFile'])
+        handles['/SmallTestFile']    = (fh,spans)
+        fs.SetHandles(handles)
+
         time.sleep(1.0)
 
-        #print(os.stat('tmp/SmallTestFile'))
-
         length  = os.path.getsize('tmp/SmallTestFile')
-        #length  = os.stat('tmp/SmallTestFile').st_size
-        print('2) length=%d'%length)
 
         f.seek(0,os.SEEK_END)
         length  = f.tell()
-        print('3) length=%d'%length)
 
-        #while True:
-            #print('.')
-            #time.sleep(1)
-        #os.close(fh)
         f.seek(0,os.SEEK_SET)
         data    = f.read()
-        print(data)
 
-        #os.close(f.fileno())
-        #os.close(fh)
         f.close()
 
         self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz\n')
@@ -378,14 +357,13 @@ if __name__ == '__main__':
     #
     # Create the fs object and the thread to run it.
     #
-    global fs
-    fs  = Passthrough('./TestFiles')
-    mgr = multiprocessing.Manager()
-    d   = mgr.dict()
-    fs.handles  = d
-    t = multiprocessing.Process(target=FUSEThread, args=(fs,'./tmp') )
-    t.daemon    = True;
-    t.start()
+    with MyManager() as mgr:
+        global fs
+        fs  = mgr.Passthrough('./TestFiles')
+        fs.SetHandles({})
+        t = multiprocessing.Process(target=FUSEThread, args=(fs,'./tmp') )
+        t.daemon    = True;
+        t.start()
 
     #
     # Run the tests.
