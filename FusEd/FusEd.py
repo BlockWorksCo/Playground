@@ -238,15 +238,19 @@ class Passthrough(Operations):
             f.truncate(length)
 
     def flush(self, path, fh):
-        return os.fsync(fh)
+        #print('*** flush ****')
+        #return os.fsync(fh)
+        return 0
 
     def release(self, path, fh):
-        print('** release %s **'%path)
+        #print('** release %s **'%path)
         fn,spans    = self.handles[path]
-        print(fn)
-        print(spans)
+        #print(fn)
+        #print(fh)
+        #print(spans)
         os.close(fn)
-        return 1
+        #return 1
+        pass
 
     def fsync(self, path, fdatasync, fh):
         return self.flush(path, fh)
@@ -332,6 +336,8 @@ class TestSpans(unittest.TestCase):
         data    = f.read()
         #print(data)
 
+        #os.close(f.fileno())
+        #os.close(fh)
         f.close()
 
         self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz\n')
