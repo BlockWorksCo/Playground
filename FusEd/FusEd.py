@@ -92,14 +92,15 @@ class Passthrough(Operations):
                      'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))
 
         if path in self.handles.keys():
+            #print('in map')
             fh,spans        = self.handles[path]
             #print(spans)
             s['st_size']    = self.LengthOfSpans(spans)
-            #print(s)
         else:
-            #print('not in map')
+            #print('not in map [%s]'%(str(self.handles)))
             pass
 
+        #print(s)
         return s
 
     def readdir(self, path, fh):
@@ -310,6 +311,7 @@ class TestSpans(unittest.TestCase):
 
         #fh      = os.open('tmp/SmallTestFile', os.O_RDONLY)
         f      = open('tmp/SmallTestFile','r')
+        #print('---- /open ----')
 
         text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         ds1     = StringDataSource(text1, 0,len(text1))
@@ -317,16 +319,17 @@ class TestSpans(unittest.TestCase):
         spans   = InsertSpan(spans, (10,14, ds1) )
         fs.handles['/SmallTestFile']    = (fh,spans)
         #print(fs.handles['/SmallTestFile'])
+        time.sleep(1.0)
 
         #print(os.stat('tmp/SmallTestFile'))
 
-        #length  = os.path.getsize('tmp/SmallTestFile')
-        length  = os.stat('tmp/SmallTestFile').st_size
-        #print('2) length=%d'%length)
+        length  = os.path.getsize('tmp/SmallTestFile')
+        #length  = os.stat('tmp/SmallTestFile').st_size
+        print('2) length=%d'%length)
 
         f.seek(0,os.SEEK_END)
         length  = f.tell()
-        #print('3) length=%d'%length)
+        print('3) length=%d'%length)
 
         #while True:
             #print('.')
@@ -334,7 +337,7 @@ class TestSpans(unittest.TestCase):
         #os.close(fh)
         f.seek(0,os.SEEK_SET)
         data    = f.read()
-        #print(data)
+        print(data)
 
         #os.close(f.fileno())
         #os.close(fh)
