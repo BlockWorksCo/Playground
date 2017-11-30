@@ -11,7 +11,7 @@ import threading
 import os
 import errno
 import multiprocessing
-from multiprocessing.managers import BaseManager
+from multiprocessing.managers import BaseManager, NamespaceProxy
 
 from fuse import FUSE, FuseOSError, Operations
 
@@ -252,7 +252,22 @@ def FUSEThread(fs,mountPoint):
 class MyManager(BaseManager):
     pass
 
-MyManager.register('Passthrough', proxytype=Passthrough)
+class TestProxy(NamespaceProxy):
+    # We need to expose the same __dunder__ methods as NamespaceProxy,
+    # in addition to the b method.
+    _exposed_ = ('__getattribute__', '__setattr__', '__delattr__', 'SetHandles', 'GetHandles')
+
+    def SetHandles(self, handles):
+        callmethod = object.__getattribute__(self, '_callmethod')
+        return callmethod('SetHandles',(handles,))
+
+    def GetHandles(self, handles):
+        callmethod = object.__getattribute__(self, '_callmethod')
+        return callmethod('GetHandles')
+
+MyManager.register('Passthrough', Passthrough, TestProxy)
+
+
 
 
 

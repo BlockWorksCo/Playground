@@ -1,4 +1,11 @@
+
+
+
+
 from multiprocessing.managers import BaseManager, NamespaceProxy
+
+
+
 
 class TestClass(object):
     def __init__(self, a):
@@ -6,6 +13,8 @@ class TestClass(object):
 
     def b(self):
         print(self.a)
+
+
 
 class MyManager(BaseManager): pass
 
@@ -20,6 +29,10 @@ class TestProxy(NamespaceProxy):
 
 MyManager.register('test', TestClass, TestProxy)
 
+
+
+
+
 if __name__ == '__main__':
     manager = MyManager()
     manager.start()
@@ -29,4 +42,5 @@ if __name__ == '__main__':
     print(mt.a)
     mt.a = 5
     mt.b()
+    print( t.a)
 
