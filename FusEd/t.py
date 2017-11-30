@@ -37,8 +37,7 @@ def Process(fs):
 class MyManager(BaseManager): pass
 
 class TestProxy(NamespaceProxy):
-    # We need to expose the same __dunder__ methods as NamespaceProxy,
-    # in addition to the b method.
+
     _exposed_ = ('__getattribute__', '__setattr__', '__delattr__', 'SetHandles','GetHandles')
 
     def SetHandles(self, handles):
@@ -59,7 +58,6 @@ if __name__ == '__main__':
     manager.start()
 
     mt = manager.test()
-    mt.a = []
 
     t = multiprocessing.Process(target=Process, args=(mt,) )
     t.daemon    = True;
@@ -70,6 +68,6 @@ if __name__ == '__main__':
         time.sleep(1.0)
         print('tock...')
         ll  = mt.GetHandles()
-        ll.append(',')
+        ll.append('.')
         mt.SetHandles( ll )
 
