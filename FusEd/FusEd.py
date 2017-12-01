@@ -234,7 +234,8 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return self.flush(path, fh)
 
     def SetHandles(self, handles):
-        print('** SetHandles **')
+        print('** SetHandles [%s] **'%(multiprocessing.current_process().name))
+        print(handles)
         self.handles    = handles
 
     def GetHandles(self, handles):
@@ -242,28 +243,35 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return self.handles
 
 
-def FUSEThread(fs,mountPoint):
-    FUSE(fs, mountPoint, nothreads=False, foreground=True)
+    def RunFUSE(self, fs,mountPoint):
+        print('** RunFUSE [%s] **'%(multiprocessing.current_process().name))
+        #FUSE(fs, mountPoint, nothreads=False, foreground=True)
+        #while True:
+            #time.sleep(1.0)
+            #print('** FUSE process [%s] **'%(multiprocessing.current_process().name))
+        pass
 
 
 
 
-
-class MyManager(BaseManager):
-    pass
+class MyManager(BaseManager): pass
 
 class TestProxy(NamespaceProxy):
-    # We need to expose the same __dunder__ methods as NamespaceProxy,
-    # in addition to the b method.
-    _exposed_ = ('__getattribute__', '__setattr__', '__delattr__', 'SetHandles', 'GetHandles')
+
+    _exposed_ = ('__getattribute__', '__setattr__', '__delattr__', 'SetHandles','GetHandles','RunFUSE')
 
     def SetHandles(self, handles):
         callmethod = object.__getattribute__(self, '_callmethod')
-        return callmethod('SetHandles',(handles,))
+        return callmethod('SetHandles', (handles,))
 
-    def GetHandles(self, handles):
+    def GetHandles(self):
         callmethod = object.__getattribute__(self, '_callmethod')
         return callmethod('GetHandles')
+
+    def RunFUSE(self,fs,mountPoint):
+        callmethod = object.__getattribute__(fs, '_callmethod')
+        return callmethod('RunFUSE',(fs,mountPoint) )
+
 
 MyManager.register('Passthrough', Passthrough, TestProxy)
 
@@ -364,6 +372,15 @@ if __name__ == '__main__':
         pass
 
     #
+    #
+    #
+    manager = MyManager()
+    manager.start()
+
+    global fs
+    fs = manager.Passthrough('./TestFiles')
+
+    #
     # Make sure we unmount on exit.
     #
     signal.signal(signal.SIGINT, signal.default_int_handler)
@@ -372,13 +389,18 @@ if __name__ == '__main__':
     #
     # Create the fs object and the thread to run it.
     #
-    with MyManager() as mgr:
-        global fs
-        fs  = mgr.Passthrough('./TestFiles')
-        fs.SetHandles({})
-        t = multiprocessing.Process(target=FUSEThread, args=(fs,'./tmp') )
-        t.daemon    = True;
-        t.start()
+    fs.SetHandles({})
+    fs.RunFUSE(fs,'./tmp')
+    #t = multiprocessing.Process(target=FUSEThread, args=(fs,'./tmp') )
+    #t.daemon    = True;
+    #t.start()
+
+    ll  = []
+    while True:
+        ll.append('.')
+        fs.SetHandles(ll)
+        time.sleep(1)
+        print('** main [%s] **'%(multiprocessing.current_process().name))
 
     #
     # Run the tests.
