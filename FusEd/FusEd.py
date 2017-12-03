@@ -62,7 +62,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return os.chown(full_path, uid, gid)
 
     def getattr(self, path, fh=None):
-        #print('getattr(%s,%s)'%(path,str(fh)))
+        print('getattr(%s,%s)'%(path,str(fh)))
         full_path = self._full_path(path)
         st = os.lstat(full_path)
         s= dict((key, getattr(st, key)) for key in ('st_atime', 'st_ctime',
@@ -82,14 +82,14 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def readdir(self, path, fh):
 
-        #print('** readdir **')
         full_path = self._full_path(path)
+        #print('** readdir %s **'%(full_path))
 
         dirents = ['.', '..']
         if os.path.isdir(full_path):
             dirents.extend(os.listdir(full_path))
         for r in dirents:
-            yield r,
+            yield r
 
     def readlink(self, path):
         pathname = os.readlink(self._full_path(path))
@@ -111,7 +111,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def statfs(self, path):
 
-        #print('** statfs on %s **'%path)
+        print('** statfs on %s **'%path)
         full_path = self._full_path(path)
         stv = os.statvfs(full_path)
         
@@ -141,7 +141,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def open(self, path, flags):
 
-        #print('open of %s'%path)
+        print('open of %s'%path)
         full_path = self._full_path(path)
         fh  = os.open(full_path, flags)
     
@@ -176,13 +176,13 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
         fn,spans    = self.handles[path]
 
-        #print(self.handles)
+        print(self.handles)
         if length > self.BLOCK_SIZE:
             length  = self.BLOCK_SIZE
 
         full_path   = self._full_path(path)
         fileLength  = self.LengthOfSpans(spans)
-        #print('file length = %d'%fileLength)
+        print('file length = %d'%fileLength)
 
         if offset+length > fileLength:
             length  = fileLength - offset
@@ -221,7 +221,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return 0
 
     def release(self, path, fh):
-        #print('** release %s **'%path)
+        print('** release %s **'%path)
         fn,spans    = self.handles[path]
         #print(fn)
         #print(fh)
@@ -244,13 +244,24 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
 
     def RunFUSE(self, fs,mountPoint):
-        print('** RunFUSE [%s] **'%(multiprocessing.current_process().name))
-        #FUSE(fs, mountPoint, nothreads=False, foreground=True)
+        print('** RunFUSE [%s] %s, %s **'%(multiprocessing.current_process().name, fs.root, mountPoint))
+        FUSE(fs, mountPoint, nothreads=True, foreground=True)
         #while True:
             #time.sleep(1.0)
             #print('** FUSE process [%s] **'%(multiprocessing.current_process().name))
-        pass
+        #pass
 
+
+    def StartFUSEThread(self, fs,mountPoint):
+        t = threading.Thread(target=FUSEThread, args=(fs,mountPoint) )
+        t.daemon    = True;
+        t.start()
+        
+
+
+def FUSEThread(fs, mountPoint):
+    fs.handles  = {}
+    fs.RunFUSE(fs,mountPoint)
 
 
 
@@ -258,7 +269,7 @@ class MyManager(BaseManager): pass
 
 class TestProxy(NamespaceProxy):
 
-    _exposed_ = ('__getattribute__', '__setattr__', '__delattr__', 'SetHandles','GetHandles','RunFUSE')
+    _exposed_ = ('__getattribute__', '__setattr__', '__delattr__', 'SetHandles','GetHandles','StartFUSEThread')
 
     def SetHandles(self, handles):
         callmethod = object.__getattribute__(self, '_callmethod')
@@ -268,9 +279,9 @@ class TestProxy(NamespaceProxy):
         callmethod = object.__getattribute__(self, '_callmethod')
         return callmethod('GetHandles')
 
-    def RunFUSE(self,fs,mountPoint):
+    def StartFUSEThread(self,fs,mountPoint):
         callmethod = object.__getattribute__(fs, '_callmethod')
-        return callmethod('RunFUSE',(fs,mountPoint) )
+        return callmethod('StartFUSEThread',(fs,mountPoint) )
 
 
 MyManager.register('Passthrough', Passthrough, TestProxy)
@@ -390,15 +401,12 @@ if __name__ == '__main__':
     # Create the fs object and the thread to run it.
     #
     fs.SetHandles({})
-    fs.RunFUSE(fs,'./tmp')
+    fs.StartFUSEThread(fs,'./tmp')
     #t = multiprocessing.Process(target=FUSEThread, args=(fs,'./tmp') )
     #t.daemon    = True;
     #t.start()
 
-    ll  = []
     while True:
-        ll.append('.')
-        fs.SetHandles(ll)
         time.sleep(1)
         print('** main [%s] **'%(multiprocessing.current_process().name))
 
