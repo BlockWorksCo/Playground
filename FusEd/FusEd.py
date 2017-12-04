@@ -62,7 +62,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return os.chown(full_path, uid, gid)
 
     def getattr(self, path, fh=None):
-        print('getattr(%s,%s)'%(path,str(fh)))
+        #print('getattr(%s,%s)'%(path,str(fh)))
         full_path = self._full_path(path)
         st = os.lstat(full_path)
         s= dict((key, getattr(st, key)) for key in ('st_atime', 'st_ctime',
@@ -111,7 +111,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def statfs(self, path):
 
-        print('** statfs on %s **'%path)
+        #print('** statfs on %s **'%path)
         full_path = self._full_path(path)
         stv = os.statvfs(full_path)
         
@@ -141,7 +141,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def open(self, path, flags):
 
-        print('open of %s'%path)
+        #print('open of %s'%path)
         full_path = self._full_path(path)
         fh  = os.open(full_path, flags)
     
@@ -176,13 +176,13 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
         fn,spans    = self.handles[path]
 
-        print(self.handles)
+        #print(self.handles)
         if length > self.BLOCK_SIZE:
             length  = self.BLOCK_SIZE
 
         full_path   = self._full_path(path)
         fileLength  = self.LengthOfSpans(spans)
-        print('file length = %d'%fileLength)
+        #print('file length = %d'%fileLength)
 
         if offset+length > fileLength:
             length  = fileLength - offset
@@ -221,7 +221,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return 0
 
     def release(self, path, fh):
-        print('** release %s **'%path)
+        #print('** release %s **'%path)
         fn,spans    = self.handles[path]
         #print(fn)
         #print(fh)
@@ -234,17 +234,17 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return self.flush(path, fh)
 
     def SetHandles(self, handles):
-        print('** SetHandles [%s] **'%(multiprocessing.current_process().name))
-        print(handles)
+        #print('** SetHandles [%s] **'%(multiprocessing.current_process().name))
+        #print(handles)
         self.handles    = handles
 
     def GetHandles(self):
-        print('** GetHandles **')
+        #print('** GetHandles **')
         return self.handles
 
 
     def RunFUSE(self, fs,mountPoint):
-        print('** RunFUSE [%s] %s, %s **'%(multiprocessing.current_process().name, fs.root, mountPoint))
+        #print('** RunFUSE [%s] %s, %s **'%(multiprocessing.current_process().name, fs.root, mountPoint))
         FUSE(fs, mountPoint, nothreads=True, foreground=True)
         #while True:
             #time.sleep(1.0)
@@ -406,34 +406,36 @@ if __name__ == '__main__':
     #t.daemon    = True;
     #t.start()
 
+    #
+    # Wait until FUSE is up and running.
+    #
     dirContents = []
     while dirContents == []:
         try:
             dirContents = os.listdir('./tmp')
         except OSError:
             dirContents = []
-            print('waiting')
-            time.sleep(0.01)
+            #print('waiting')
+            time.sleep(0.1)
     
-    fh  = open('./tmp/SmallTestFile')
+    #fh  = open('./tmp/SmallTestFile')
 
-    text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    ds1     = StringDataSource(text1, 0,len(text1))
-    handles = fs.GetHandles()
-    fh,spans= handles['/SmallTestFile']
-    spans   = InsertSpan(spans, (10,14, ds1) )
-    handles['/SmallTestFile']    = (fh,spans)
-    fs.SetHandles(handles)
+    #text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    #ds1     = StringDataSource(text1, 0,len(text1))
+    #handles = fs.GetHandles()
+    #fh,spans= handles['/SmallTestFile']
+    #spans   = InsertSpan(spans, (10,14, ds1) )
+    #handles['/SmallTestFile']    = (fh,spans)
+    #fs.SetHandles(handles)
 
-    while True:
-        time.sleep(1)
-        print('** main [%s] **'%(multiprocessing.current_process().name))
+    #while True:
+        #time.sleep(1)
+        #print('** main [%s] **'%(multiprocessing.current_process().name))
 
     #
     # Run the tests.
     #
     try:
-        time.sleep(1.0)
         unittest.main()
 
     except KeyboardInterrupt:
