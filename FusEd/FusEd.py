@@ -223,10 +223,8 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
     def release(self, path, fh):
         #print('** release %s **'%path)
         fn,spans    = self.handles[path]
-        #print(fn)
-        #print(fh)
-        #print(spans)
         os.close(fn)
+        self.handles.pop(path)
         #return 1
         pass
 
@@ -293,12 +291,14 @@ MyManager.register('Passthrough', Passthrough, TestProxy)
 
 class TestSpans(unittest.TestCase):
 
-    def _test_one(self):
+    def test_one(self):
 
         spans   = []
-        text    = open('tmp/SmallTestFile').read()
+        f       = open('tmp/SmallTestFile')
+        text    = f.read()
+        f.close()
         
-        self.assertEqual(text[:26], 'abcdefghijklmnopqrstuvwxyz' )
+        self.assertEqual(text, 'abcdefghijklmnopqrstuvwxyz\n' )
 
 
     def _test_two(self):
