@@ -321,12 +321,13 @@ class TestSpans(unittest.TestCase):
         self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz' )
 
 
-    def _test_three(self):
+    def test_three(self):
 
-        fh      = open('tmp/SmallTestFile')
+        f      = open('tmp/SmallTestFile')
 
-        fh.seek(0, os.SEEK_END)
-        length  = fh.tell()
+        f.seek(0, os.SEEK_END)
+        length  = f.tell()
+        f.close()
 
         self.assertEqual(length, 27)
 
