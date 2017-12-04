@@ -406,7 +406,15 @@ if __name__ == '__main__':
     #t.daemon    = True;
     #t.start()
 
-    time.sleep(1)
+    dirContents = []
+    while dirContents == []:
+        try:
+            dirContents = os.listdir('./tmp')
+        except OSError:
+            dirContents = []
+            print('waiting')
+            time.sleep(0.01)
+    
     fh  = open('./tmp/SmallTestFile')
 
     text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
