@@ -69,15 +69,11 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
                      'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))
 
         if path in self.handles.keys():
-            #print('in map')
             fh,spans        = self.handles[path]
             #print(spans)
             s['st_size']    = self.LengthOfSpans(spans)
-        else:
-            #print('not in map [%s]'%(str(self.handles)))
-            pass
+            #print(s)
 
-        #print(s)
         return s
 
     def readdir(self, path, fh):
@@ -111,7 +107,6 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def statfs(self, path):
 
-        #print('** statfs on %s **'%path)
         full_path = self._full_path(path)
         stv = os.statvfs(full_path)
         
@@ -119,6 +114,8 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
             'f_blocks', 'f_bsize', 'f_favail', 'f_ffree', 'f_files', 'f_flag',
             'f_frsize', 'f_namemax'))
 
+        print('** statfs on %s **'%path)
+        print(s)
         return s
 
     def unlink(self, path):
@@ -235,6 +232,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         #print('** SetHandles [%s] **'%(multiprocessing.current_process().name))
         #print(handles)
         self.handles    = handles
+        time.sleep(1)
 
     def GetHandles(self):
         #print('** GetHandles **')
@@ -301,24 +299,29 @@ class TestSpans(unittest.TestCase):
         self.assertEqual(text, 'abcdefghijklmnopqrstuvwxyz\n' )
 
 
-    def _test_two(self):
+    def test_two(self):
 
-        fh      = open('tmp/SmallTestFile')
-        fn      = fs.fnMap['/SmallTestFile']
-        
+        f      = open('tmp/SmallTestFile','r')
+        time.sleep(1)
+
         text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         ds1     = StringDataSource(text1, 0,len(text1))
-        fs.spansForFile[fn]   = InsertSpan(fs.spansForFile[fn], (10,14, ds1) )
+        handles = fs.GetHandles()
+        fh,spans= handles['/SmallTestFile']
+        spans   = InsertSpan(spans, (10,14, ds1) )
+        handles['/SmallTestFile']    = (fh,spans)
+        fs.SetHandles(handles)
 
-        fh.seek(0, os.SEEK_SET)
-        data    = fh.read(30)
+        f.seek(0,os.SEEK_END)
+        length  = f.tell()
 
-        #print(fs.spansForFile[fn][2][2].rangeStart)
-        #print(fs.spansForFile[fn][2][2].rangeEnd)
-        #print(fs.spansForFile[fn][2][0])
-        #print(fs.spansForFile[fn][2][1])
+        f.seek(0,os.SEEK_SET)
+        data    = f.read()
 
-        self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz' )
+        f.close()
+
+        self.assertEqual(length, 31)
+
 
 
     def test_three(self):
@@ -345,8 +348,6 @@ class TestSpans(unittest.TestCase):
         handles['/SmallTestFile']    = (fh,spans)
         fs.SetHandles(handles)
 
-        time.sleep(1.0)
-
         length  = os.path.getsize('tmp/SmallTestFile')
 
         f.seek(0,os.SEEK_END)
@@ -358,6 +359,52 @@ class TestSpans(unittest.TestCase):
         f.close()
 
         self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz\n')
+
+
+
+    def test_five(self):
+
+        f      = open('tmp/SmallTestFile','r')
+
+        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        ds1     = StringDataSource(text1, 0,len(text1))
+        handles = fs.GetHandles()
+        fh,spans= handles['/SmallTestFile']
+        spans   = InsertSpan(spans, (10,14, ds1) )
+        handles['/SmallTestFile']    = (fh,spans)
+        fs.SetHandles(handles)
+
+        f.seek(0,os.SEEK_END)
+        length  = f.tell()
+
+        f.close()
+
+        self.assertEqual(length, 31)
+
+
+
+    def test_six(self):
+
+        f      = open('tmp/SmallTestFile','r')
+        time.sleep(1)
+
+        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        ds1     = StringDataSource(text1, 0,len(text1))
+        handles = fs.GetHandles()
+        fh,spans= handles['/SmallTestFile']
+        spans   = InsertSpan(spans, (10,14, ds1) )
+        handles['/SmallTestFile']    = (fh,spans)
+        fs.SetHandles(handles)
+
+        #handles = fs.GetHandles()
+        #print(handles)
+
+        f.seek(0,os.SEEK_END)
+        length  = f.tell()
+
+        f.close()
+
+        self.assertEqual(length, 31)
 
 
 
