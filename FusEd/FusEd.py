@@ -238,7 +238,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         print(handles)
         self.handles    = handles
 
-    def GetHandles(self, handles):
+    def GetHandles(self):
         print('** GetHandles **')
         return self.handles
 
@@ -405,6 +405,17 @@ if __name__ == '__main__':
     #t = multiprocessing.Process(target=FUSEThread, args=(fs,'./tmp') )
     #t.daemon    = True;
     #t.start()
+
+    time.sleep(1)
+    fh  = open('./tmp/SmallTestFile')
+
+    text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    ds1     = StringDataSource(text1, 0,len(text1))
+    handles = fs.GetHandles()
+    fh,spans= handles['/SmallTestFile']
+    spans   = InsertSpan(spans, (10,14, ds1) )
+    handles['/SmallTestFile']    = (fh,spans)
+    fs.SetHandles(handles)
 
     while True:
         time.sleep(1)
