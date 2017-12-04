@@ -407,7 +407,7 @@ if __name__ == '__main__':
     #t.start()
 
     time.sleep(1)
-    fz  = open('./tmp/SmallTestFile','r')
+    fh  = open('./tmp/SmallTestFile')
 
     text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     ds1     = StringDataSource(text1, 0,len(text1))
