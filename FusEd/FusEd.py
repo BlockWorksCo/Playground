@@ -154,7 +154,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
             # keep the spans.
             #
             fhOld,spans        = self.handles[path]
-            os.close(fhOld)
+            #os.close(fhOld)
         else:
 
             #
