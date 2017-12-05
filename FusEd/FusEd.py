@@ -38,25 +38,45 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
     # Helpers
     # =======
 
-    def SynchronousSend(self, value):
-        self.requestQ.put( value )
+
+    def TriggerQueueRead(self):
+
+        try:
+            f   = os.lstat('tmp/q')
+        except OSError:
+            pass
+
+
+    def SynchronousPut(self, rq):
+        self.requestQ.put( rq )
+        self.TriggerQueueRead()
+        self.TriggerQueueRead()
+        print('** waiting for response **')
         response    = self.responseQ.get()
+        print('** response is %s**'%(response))
 
         return response
 
-    def SynchronousGet(self):
-        try:
-            r   = self.requestQ.get_nowait()
-            self.responseQ.put(True)
-        except Queue.Empty:
-            r   = None
-        
-        return r
-
     def ProcessQ(self):
-        rq  = self.SynchronousGet()
-        if rq != None:
-            self.handles    = rq
+        try:
+            rq,data   = self.requestQ.get_nowait()
+        
+            if rq == 1:
+                self.handles    = data
+                rsp             = True
+
+            elif rq == 2:
+                rsp             = self.handles
+          
+            else:
+                print('** bad request [%s] **'%(rq))
+                sys.exit(-1)
+                rsp             = None
+
+            self.responseQ.put(rsp)
+
+        except Queue.Empty:
+            rq   = None
 
 
     def _full_path(self, partial):
@@ -99,7 +119,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
     def getattr(self, path, fh=None):
         self.ProcessQ()
 
-        #print('getattr(%s,%s)'%(path,str(fh)))
+        print('getattr(%s,%s)'%(path,str(fh)))
         full_path = self._full_path(path)
         st = os.lstat(full_path)
         s= dict((key, getattr(st, key)) for key in ('st_atime', 'st_ctime',
@@ -109,7 +129,9 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
             fh,spans        = self.handles[path]
             #print(spans)
             s['st_size']    = self.LengthOfSpans(spans)
-            #print(s)
+            print(s)
+        else:
+            print('--- not in handles ---')
 
         return s
 
@@ -155,6 +177,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
     def statfs(self, path):
         self.ProcessQ()
 
+        print('statfs')
 
         full_path = self._full_path(path)
         stv = os.statvfs(full_path)
@@ -304,14 +327,13 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return self.flush(path, fh)
 
     def SetHandles(self, handles):
-        #print('** SetHandles [%s] **'%(multiprocessing.current_process().name))
+        print('** SetHandles [%s] **'%(multiprocessing.current_process().name))
         #print(handles)
-        self.handles    = handles
-        time.sleep(1.0)
+        self.SynchronousPut( (1,handles) )
 
     def GetHandles(self):
-        #print('** GetHandles **')
-        return self.handles
+        print('** GetHandles **')
+        return self.SynchronousPut( (2,None) )
 
 
     def RunFUSE(self, fs,mountPoint):
@@ -326,7 +348,6 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
 
 def FUSEThread(fs, mountPoint):
-    fs.handles  = {}
     fs.RunFUSE(fs,mountPoint)
 
 
@@ -359,7 +380,7 @@ MyManager.register('Passthrough', Passthrough, TestProxy)
 
 class TestSpans(unittest.TestCase):
 
-    def test_one(self):
+    def _test_one(self):
 
         spans   = []
         f       = open('tmp/SmallTestFile')
@@ -369,10 +390,9 @@ class TestSpans(unittest.TestCase):
         self.assertEqual(text, 'abcdefghijklmnopqrstuvwxyz\n' )
 
 
-    def test_two(self):
+    def _test_two(self):
 
         f      = open('tmp/SmallTestFile','r')
-        time.sleep(1.0)
 
         text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         ds1     = StringDataSource(text1, 0,len(text1))
@@ -394,7 +414,7 @@ class TestSpans(unittest.TestCase):
 
 
 
-    def test_three(self):
+    def _test_three(self):
 
         f      = open('tmp/SmallTestFile')
 
@@ -408,7 +428,9 @@ class TestSpans(unittest.TestCase):
 
     def test_four(self):
 
+        print('** open **')
         f      = open('tmp/SmallTestFile','r')
+        print('** open done **')
 
         text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         ds1     = StringDataSource(text1, 0,len(text1))
@@ -418,24 +440,30 @@ class TestSpans(unittest.TestCase):
         handles['/SmallTestFile']    = (fh,spans)
         fs.SetHandles(handles)
 
+        print('** getsize **')
         length  = os.path.getsize('tmp/SmallTestFile')
+        print('** getsize done **')
 
-        f.seek(0,os.SEEK_END)
-        length  = f.tell()
+        #f.seek(0,os.SEEK_END)
+        #length  = f.tell()
 
+        print('** seek **')
         f.seek(0,os.SEEK_SET)
+        print('** seek done**')
+        print('** read **')
         data    = f.read()
+        print('** read done **')
 
         f.close()
 
         self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz\n')
+        self.assertEqual(length, 31)
 
 
 
-    def test_five(self):
+    def _test_five(self):
 
         f      = open('tmp/SmallTestFile','r')
-        time.sleep(1.0)
 
         text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         ds1     = StringDataSource(text1, 0,len(text1))
@@ -454,10 +482,9 @@ class TestSpans(unittest.TestCase):
 
 
 
-    def test_six(self):
+    def _test_six(self):
 
         f      = open('tmp/SmallTestFile','r')
-        time.sleep(1.0)
 
         text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         ds1     = StringDataSource(text1, 0,len(text1))
@@ -467,8 +494,8 @@ class TestSpans(unittest.TestCase):
         handles['/SmallTestFile']    = (fh,spans)
         fs.SetHandles(handles)
 
-        #handles = fs.GetHandles()
-        #print(handles)
+        handles = fs.GetHandles()
+        print('<<<%s>>>'%handles)
 
         f.seek(0,os.SEEK_END)
         length  = f.tell()
@@ -504,11 +531,12 @@ if __name__ == '__main__':
     #
     #
     #
-    manager = MyManager()
-    manager.start()
+    #manager = MyManager()
+    #manager.start()
 
     global fs
-    fs = manager.Passthrough('./TestFiles')
+    #fs = manager.Passthrough('./TestFiles')
+    fs = Passthrough('./TestFiles')
 
     #
     # Make sure we unmount on exit.
@@ -519,11 +547,11 @@ if __name__ == '__main__':
     #
     # Create the fs object and the thread to run it.
     #
-    fs.SetHandles({})
-    fs.StartFUSEThread(fs,'./tmp')
-    #t = multiprocessing.Process(target=FUSEThread, args=(fs,'./tmp') )
-    #t.daemon    = True;
-    #t.start()
+    #fs.SetHandles({})
+    #fs.StartFUSEThread(fs,'./tmp')
+    t = multiprocessing.Process(target=FUSEThread, args=(fs,'./tmp') )
+    t.daemon    = True;
+    t.start()
 
     #
     # Wait until FUSE is up and running.
@@ -548,8 +576,8 @@ if __name__ == '__main__':
     #fs.SetHandles(handles)
 
     #while True:
-        #time.sleep(1)
-        #print('** main [%s] **'%(multiprocessing.current_process().name))
+    #    time.sleep(1)
+    #    print('** main [%s] **'%(multiprocessing.current_process().name))
 
     #
     # Run the tests.
