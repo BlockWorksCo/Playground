@@ -232,7 +232,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         #print('** SetHandles [%s] **'%(multiprocessing.current_process().name))
         #print(handles)
         self.handles    = handles
-        time.sleep(1)
+        time.sleep(1.0)
 
     def GetHandles(self):
         #print('** GetHandles **')
@@ -240,12 +240,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
 
     def RunFUSE(self, fs,mountPoint):
-        #print('** RunFUSE [%s] %s, %s **'%(multiprocessing.current_process().name, fs.root, mountPoint))
         FUSE(fs, mountPoint, nothreads=True, foreground=True)
-        #while True:
-            #time.sleep(1.0)
-            #print('** FUSE process [%s] **'%(multiprocessing.current_process().name))
-        #pass
 
 
     def StartFUSEThread(self, fs,mountPoint):
@@ -302,7 +297,7 @@ class TestSpans(unittest.TestCase):
     def test_two(self):
 
         f      = open('tmp/SmallTestFile','r')
-        time.sleep(1)
+        time.sleep(1.0)
 
         text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         ds1     = StringDataSource(text1, 0,len(text1))
@@ -365,6 +360,7 @@ class TestSpans(unittest.TestCase):
     def test_five(self):
 
         f      = open('tmp/SmallTestFile','r')
+        time.sleep(1.0)
 
         text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         ds1     = StringDataSource(text1, 0,len(text1))
@@ -386,7 +382,7 @@ class TestSpans(unittest.TestCase):
     def test_six(self):
 
         f      = open('tmp/SmallTestFile','r')
-        time.sleep(1)
+        time.sleep(1.0)
 
         text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         ds1     = StringDataSource(text1, 0,len(text1))
