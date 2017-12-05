@@ -12,6 +12,7 @@ import os
 import errno
 import multiprocessing
 from multiprocessing.managers import BaseManager, NamespaceProxy
+import Queue
 
 from fuse import FUSE, FuseOSError, Operations
 
@@ -27,8 +28,36 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         self.root           = root
         self.handles        = {}
 
+        #
+        #
+        #
+        self.requestQ    = multiprocessing.Queue()
+        self.responseQ   = multiprocessing.Queue()
+
+
     # Helpers
     # =======
+
+    def SynchronousSend(self, value):
+        self.requestQ.put( value )
+        response    = self.responseQ.get()
+
+        return response
+
+    def SynchronousGet(self):
+        try:
+            r   = self.requestQ.get_nowait()
+            self.responseQ.put(True)
+        except Queue.Empty:
+            r   = None
+        
+        return r
+
+    def ProcessQ(self):
+        rq  = self.SynchronousGet()
+        if rq != None:
+            self.handles    = rq
+
 
     def _full_path(self, partial):
         if partial.startswith("/"):
@@ -49,19 +78,27 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
     # ==================
 
     def access(self, path, mode):
+        self.ProcessQ()
+
         full_path = self._full_path(path)
         if not os.access(full_path, mode):
             raise FuseOSError(errno.EACCES)
 
     def chmod(self, path, mode):
+        self.ProcessQ()
+
         full_path = self._full_path(path)
         return os.chmod(full_path, mode)
 
     def chown(self, path, uid, gid):
+        self.ProcessQ()
+
         full_path = self._full_path(path)
         return os.chown(full_path, uid, gid)
 
     def getattr(self, path, fh=None):
+        self.ProcessQ()
+
         #print('getattr(%s,%s)'%(path,str(fh)))
         full_path = self._full_path(path)
         st = os.lstat(full_path)
@@ -77,6 +114,8 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return s
 
     def readdir(self, path, fh):
+        self.ProcessQ()
+
 
         full_path = self._full_path(path)
         #print('** readdir %s **'%(full_path))
@@ -88,6 +127,8 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
             yield r
 
     def readlink(self, path):
+        self.ProcessQ()
+
         pathname = os.readlink(self._full_path(path))
         if pathname.startswith("/"):
             # Path name is absolute, sanitize it.
@@ -96,16 +137,24 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
             return pathname
 
     def mknod(self, path, mode, dev):
+        self.ProcessQ()
+
         return os.mknod(self._full_path(path), mode, dev)
 
     def rmdir(self, path):
+        self.ProcessQ()
+
         full_path = self._full_path(path)
         return os.rmdir(full_path)
 
     def mkdir(self, path, mode):
+        self.ProcessQ()
+
         return os.mkdir(self._full_path(path), mode)
 
     def statfs(self, path):
+        self.ProcessQ()
+
 
         full_path = self._full_path(path)
         stv = os.statvfs(full_path)
@@ -119,24 +168,36 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return s
 
     def unlink(self, path):
+        self.ProcessQ()
+
         return os.unlink(self._full_path(path))
 
     def symlink(self, name, target):
+        self.ProcessQ()
+
         return os.symlink(target, self._full_path(name))
 
     def rename(self, old, new):
+        self.ProcessQ()
+
         return os.rename(self._full_path(old), self._full_path(new))
 
     def link(self, target, name):
+        self.ProcessQ()
+
         return os.link(self._full_path(name), self._full_path(target))
 
     def utimens(self, path, times=None):
+        self.ProcessQ()
+
         return os.utime(self._full_path(path), times)
 
     # File methods
     # ============
 
     def open(self, path, flags):
+        self.ProcessQ()
+
 
         #print('open of %s'%path)
         full_path = self._full_path(path)
@@ -165,11 +226,15 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
 
     def create(self, path, mode, fi=None):
+        self.ProcessQ()
+
         full_path = self._full_path(path)
         return os.open(full_path, os.O_WRONLY | os.O_CREAT, mode)
 
 
     def read(self, path, length, offset, fh):
+        self.ProcessQ()
+
 
         fn,spans    = self.handles[path]
 
@@ -204,20 +269,28 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
             return data
 
     def write(self, path, buf, offset, fh):
+        self.ProcessQ()
+
         os.lseek(fh, offset, os.SEEK_SET)
         return os.write(fh, buf)
 
     def truncate(self, path, length, fh=None):
+        self.ProcessQ()
+
         full_path = self._full_path(path)
         with open(full_path, 'r+') as f:
             f.truncate(length)
 
     def flush(self, path, fh):
+        self.ProcessQ()
+
         #print('*** flush ****')
         #return os.fsync(fh)
         return 0
 
     def release(self, path, fh):
+        self.ProcessQ()
+
         #print('** release %s **'%path)
         fn,spans    = self.handles[path]
         os.close(fn)
@@ -226,6 +299,8 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         pass
 
     def fsync(self, path, fdatasync, fh):
+        self.ProcessQ()
+
         return self.flush(path, fh)
 
     def SetHandles(self, handles):
