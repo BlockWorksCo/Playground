@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
 import time
@@ -12,7 +12,6 @@ import os
 import errno
 import multiprocessing
 from multiprocessing.managers import BaseManager, NamespaceProxy
-import Queue
 
 from fuse import FUSE, FuseOSError, Operations
 
