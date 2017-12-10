@@ -42,7 +42,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         self.requestQ.put( rq )
         #print('** triggering **')
         try:
-            os.statvfs('tmp/q')
+            os.stat('tmp/q')
         except OSError:
             pass
         #print('** waiting for response **')
@@ -51,11 +51,10 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
         return response
 
+
     def ProcessQ(self):
         try:
-            time.sleep(0.001)
             rq,data   = self.requestQ.get_nowait()
-
         
             if rq == 1:
                 #print('setting %s'%(data))
@@ -77,7 +76,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
         except Queue.Empty:
 
-            print('trigger with no data')
+            #print('trigger with no data')
             pass
 
 
@@ -543,7 +542,7 @@ if __name__ == '__main__':
     #
     try:
         unittest.main()
-        print('unittest done')
+        #print('unittest done')
 
     except KeyboardInterrupt:
         sys.exit(-1)
