@@ -53,7 +53,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def ProcessQ(self):
         try:
-            time.sleep(0.2)
+            time.sleep(0.001)
             rq,data   = self.requestQ.get_nowait()
 
         
@@ -77,7 +77,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
         except Queue.Empty:
 
-            #print('trigger with no data')
+            print('trigger with no data')
             pass
 
 
