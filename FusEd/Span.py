@@ -29,7 +29,7 @@ def SplitAtPosition(spans, position):
     newSpans    = []
     for tS,tE,t in spans:
 
-        if tS<=position and tE>position:
+        if tS<=position and tE>=position:
             if type(t).__name__ == 'str':
                 tA    = t
                 tB    = t
@@ -443,6 +443,21 @@ class TestSpans(unittest.TestCase):
         spans   = InsertSpan(spans, (10,20,'C') )
         self.assertEqual(spans, [(10,20,'C')] )
 
+
+
+    def test_twentysix(self):
+
+        text1       = 'abcdefghijklmnopqrstuvwxyz'
+        dataSource1 = StringDataSource(text1, 0,len(text1))
+
+        text2       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        dataSource2 = StringDataSource(text2, 0,len(text2))
+
+        spans   = [ (0,26,dataSource1.SubDataSource(0,26)) ]
+        spans   = InsertSpan(spans, (26,30,dataSource2) )
+
+        result  = GetData( spans, 0,30)
+        self.assertEqual(result, 'abcdefghijklmnopqrstuvwxyzABCD' )
 
 
 

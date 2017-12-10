@@ -483,7 +483,7 @@ class TestSpans(unittest.TestCase):
         ds2     = StringDataSource(text2, 0,len(text2))
         handles = fs.GetHandles()
         fh,spans= handles['/SmallTestFile']
-        spans   = AddSpan(spans, (10,14, ds2) )
+        spans   = InsertSpan(spans, (31,35, ds2) )
         handles['/SmallTestFile']    = (fh,spans)
         fs.SetHandles(handles)
 
@@ -491,12 +491,12 @@ class TestSpans(unittest.TestCase):
 
         f.seek(0,os.SEEK_SET)
         data    = f.read()
-        print(data)
+        #print(data)
 
         f.close()
 
-        self.assertEqual(data, 'ABCDabcdef0123klmnopqrstuvwxyz\n')
-        self.assertEqual(length, 31)
+        self.assertEqual(data, 'ABCDabcdefghijklmnopqrstuvwxyz\n0123')
+        self.assertEqual(length, 35)
 
 
 
