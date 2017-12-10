@@ -449,17 +449,53 @@ class TestSpans(unittest.TestCase):
         ds1     = StringDataSource(text1, 0,len(text1))
         handles = fs.GetHandles()
         fh,spans= handles['/SmallTestFile']
-        spans   = InsertSpan(spans, (10,14, ds1) )
+        spans   = InsertSpan(spans, (0,4, ds1) )
         handles['/SmallTestFile']    = (fh,spans)
         fs.SetHandles(handles)
 
-        handles = fs.GetHandles()
+        length  = os.path.getsize('tmp/SmallTestFile')
 
-        f.seek(0,os.SEEK_END)
-        length  = f.tell()
+        f.seek(0,os.SEEK_SET)
+        data    = f.read()
+        #print(data)
 
         f.close()
 
+        self.assertEqual(data, 'ABCDabcdefghijklmnopqrstuvwxyz\n')
+        self.assertEqual(length, 31)
+
+
+
+
+    def test_six(self):
+
+        f      = open('tmp/SmallTestFile','r')
+
+        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        ds1     = StringDataSource(text1, 0,len(text1))
+        handles = fs.GetHandles()
+        fh,spans= handles['/SmallTestFile']
+        spans   = InsertSpan(spans, (0,4, ds1) )
+        handles['/SmallTestFile']    = (fh,spans)
+        fs.SetHandles(handles)
+
+        text2   = '0123456789'
+        ds2     = StringDataSource(text2, 0,len(text2))
+        handles = fs.GetHandles()
+        fh,spans= handles['/SmallTestFile']
+        spans   = AddSpan(spans, (10,14, ds2) )
+        handles['/SmallTestFile']    = (fh,spans)
+        fs.SetHandles(handles)
+
+        length  = os.path.getsize('tmp/SmallTestFile')
+
+        f.seek(0,os.SEEK_SET)
+        data    = f.read()
+        print(data)
+
+        f.close()
+
+        self.assertEqual(data, 'ABCDabcdef0123klmnopqrstuvwxyz\n')
         self.assertEqual(length, 31)
 
 
@@ -524,7 +560,6 @@ if __name__ == '__main__':
             time.sleep(0.1)
     
     #fh  = open('./tmp/SmallTestFile')
-
     #text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     #ds1     = StringDataSource(text1, 0,len(text1))
     #handles = fs.GetHandles()
@@ -534,8 +569,8 @@ if __name__ == '__main__':
     #fs.SetHandles(handles)
 
     #while True:
-    #    time.sleep(1)
-    #    print('** main [%s] **'%(multiprocessing.current_process().name))
+        #time.sleep(1)
+        #print('** main [%s] **'%(multiprocessing.current_process().name))
 
     #
     # Run the tests.
