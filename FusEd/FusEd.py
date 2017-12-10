@@ -345,7 +345,7 @@ MyManager.register('Passthrough', Passthrough, TestProxy)
 
 class TestSpans(unittest.TestCase):
 
-    def _test_one(self):
+    def test_one(self):
 
         spans   = []
         f       = open('tmp/SmallTestFile')
@@ -355,7 +355,7 @@ class TestSpans(unittest.TestCase):
         self.assertEqual(text, 'abcdefghijklmnopqrstuvwxyz\n' )
 
 
-    def _test_two(self):
+    def test_two(self):
 
         f      = open('tmp/SmallTestFile','r')
 
@@ -379,7 +379,7 @@ class TestSpans(unittest.TestCase):
 
 
 
-    def _test_three(self):
+    def test_three(self):
 
         f      = open('tmp/SmallTestFile')
 
@@ -431,7 +431,7 @@ class TestSpans(unittest.TestCase):
 
 
 
-    def _test_five(self):
+    def test_five(self):
 
         f      = open('tmp/SmallTestFile','r')
 
@@ -452,7 +452,7 @@ class TestSpans(unittest.TestCase):
 
 
 
-    def _test_six(self):
+    def test_six(self):
 
         f      = open('tmp/SmallTestFile','r')
 
