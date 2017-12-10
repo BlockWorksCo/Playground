@@ -500,6 +500,37 @@ class TestSpans(unittest.TestCase):
 
 
 
+    def test_seven(self):
+
+        f      = open('tmp/EmptyFile','r')
+
+        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        ds1     = StringDataSource(text1, 0,len(text1))
+        handles = fs.GetHandles()
+        fh,spans= handles['/EmptyFile']
+        spans   = InsertSpan(spans, (0,4, ds1) )
+        handles['/EmptyFile']    = (fh,spans)
+        fs.SetHandles(handles)
+
+        handles = fs.GetHandles()
+        fh,spans= handles['/EmptyFile']
+        spans   = InsertSpan(spans, (4,8, ds1) )
+        handles['/EmptyFile']    = (fh,spans)
+        fs.SetHandles(handles)
+
+        length  = os.path.getsize('tmp/EmptyFile')
+
+        f.seek(0,os.SEEK_SET)
+        data    = f.read()
+        print(data)
+
+        f.close()
+
+        self.assertEqual(data, 'ABCDABCD')
+        self.assertEqual(length, 8)
+
+
+
 
 
 
