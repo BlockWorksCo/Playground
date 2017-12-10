@@ -522,7 +522,7 @@ class TestSpans(unittest.TestCase):
 
         f.seek(0,os.SEEK_SET)
         data    = f.read()
-        print(data)
+        #print(data)
 
         f.close()
 
