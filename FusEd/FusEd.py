@@ -40,43 +40,45 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def SynchronousPut(self, rq):
         self.requestQ.put( rq )
-        print('** triggering **')
+        #print('** triggering **')
         try:
             os.statvfs('tmp/q')
         except OSError:
             pass
-        print('** waiting for response **')
+        #print('** waiting for response **')
         response    = self.responseQ.get()
-        print('** response is %s**'%(response))
+        #print('** response is %s**'%(response))
 
         return response
 
     def ProcessQ(self):
         try:
+            time.sleep(0.2)
             rq,data   = self.requestQ.get_nowait()
 
         
             if rq == 1:
-                print('setting %s'%(data))
+                #print('setting %s'%(data))
                 self.handles    = data
                 rsp             = True
 
             elif rq == 2:
-                print('rq 2')
+                #print('rq 2')
                 rsp             = self.handles
-                print('getting %s'%(rsp))
+                #print('getting %s'%(rsp))
           
             else:
-                print('** bad request [%s] **'%(rq))
+                #print('** bad request [%s] **'%(rq))
                 sys.exit(-1)
                 rsp             = None
 
             self.responseQ.put(rsp)
-            print('put response on responseQ %s'%rsp)
+            #print('put response on responseQ %s'%rsp)
 
         except Queue.Empty:
 
-            print('trigger with no data')
+            #print('trigger with no data')
+            pass
 
 
 
@@ -114,7 +116,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
     def getattr(self, path, fh=None):
 
         if path == '/q':
-            print('Trigger')
+            #print('Trigger')
             self.ProcessQ()
             return {'st_mode':33204, 'st_ino':2, 'st_dev':62, 'st_nlink':1, 'st_uid':1000, 'st_gid':1000, 'st_size':27, 'st_atime':int(time.time()), 'st_mtime':int(time.time()), 'st_ctime':1511394708}
         else:
@@ -126,13 +128,14 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
                          'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))
 
             if path in self.handles.keys():
-                print('--- in handles ---')
+                #print('--- in handles ---')
                 fh,spans        = self.handles[path]
                 #print(spans)
                 s['st_size']    = self.LengthOfSpans(spans)
-                print(s)
+                #print(s)
             else:
-                print('--- not in handles ---')
+                #print('--- not in handles ---')
+                pass
 
             return s
 
@@ -167,7 +170,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return os.mkdir(self._full_path(path), mode)
 
     def statfs(self, path):
-        print('statfs')
+        #print('statfs')
 
         full_path = self._full_path(path)
         stv = os.statvfs(full_path)
@@ -280,9 +283,9 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return 0
 
     def release(self, path, fh):
-        print('** release %s **'%path)
+        #print('** release %s **'%path)
         fn,spans    = self.handles[path]
-        print('close')
+        #print('close')
         os.close(fn)
         self.handles.pop(path)
         return 1
@@ -292,13 +295,15 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return self.flush(path, fh)
 
     def SetHandles(self, handles):
-        print('** SetHandles [%s] **'%(multiprocessing.current_process().name))
+        #print('** SetHandles [%s] **'%(multiprocessing.current_process().name))
         #print(handles)
         self.SynchronousPut( (1,handles) )
 
     def GetHandles(self):
-        print('** GetHandles **')
-        return self.SynchronousPut( (2,None) )
+        #print('** GetHandles **')
+        handles = self.SynchronousPut( (2,None) )
+        #print('** GetHandles are %s **'%handles)
+        return handles
 
 
     def RunFUSE(self, fs,mountPoint):
@@ -393,36 +398,21 @@ class TestSpans(unittest.TestCase):
 
     def test_four(self):
 
-        print('** open **')
         f      = open('tmp/SmallTestFile','r')
-        print('** open done **')
 
         text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         ds1     = StringDataSource(text1, 0,len(text1))
         handles = fs.GetHandles()
-        print('** open **')
-        print('GetHandles returns %s'%handles)
         fh,spans= handles['/SmallTestFile']
         spans   = InsertSpan(spans, (10,14, ds1) )
         handles['/SmallTestFile']    = (fh,spans)
         fs.SetHandles(handles)
 
-        print('** getsize **')
-        #length  = os.stat('tmp/SmallTestFile').st_size
-        #time.sleep(1.5)
         length  = os.path.getsize('tmp/SmallTestFile')
-        print('** getsize done (%d) **'%(length))
 
-        #f.seek(0,os.SEEK_END)
-        #length  = f.tell()
-
-        print('** seek **')
         f.seek(0,os.SEEK_SET)
-        print('** seek done**')
-        print('** read **')
         data    = f.read()
-        print(data)
-        print('** read done **')
+        #print(data)
 
         f.close()
 
@@ -465,7 +455,6 @@ class TestSpans(unittest.TestCase):
         fs.SetHandles(handles)
 
         handles = fs.GetHandles()
-        print('<<<%s>>>'%handles)
 
         f.seek(0,os.SEEK_END)
         length  = f.tell()
