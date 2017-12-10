@@ -39,6 +39,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def SynchronousPut(self, rq):
         self.requestQ.put( rq )
+        os.stat('tmp/q')
         #print('** waiting for response **')
         response    = self.responseQ.get()
         #print('** response is %s**'%(response))
@@ -98,30 +99,38 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return os.chown(full_path, uid, gid)
 
     def getattr(self, path, fh=None):
-        #print('getattr(%s,%s)'%(path,str(fh)))
-        full_path = self._full_path(path)
-        st = os.lstat(full_path)
-        s= dict((key, getattr(st, key)) for key in ('st_atime', 'st_ctime',
-                     'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))
 
-        if path in self.handles.keys():
-            fh,spans        = self.handles[path]
-            #print(spans)
-            s['st_size']    = self.LengthOfSpans(spans)
-            print(s)
+        if path == '/q':
+            print('Trigger')
+            self.ProcessQ()
+            return {'st_mode':33204, 'st_ino':2, 'st_dev':62, 'st_nlink':1, 'st_uid':1000, 'st_gid':1000, 'st_size':27, 'st_atime':int(time.time()), 'st_mtime':int(time.time()), 'st_ctime':1511394708}
         else:
-            print('--- not in handles ---')
+            
+            #print('getattr(%s,%s)'%(path,str(fh)))
+            full_path = self._full_path(path)
+            st = os.lstat(full_path)
+            s= dict((key, getattr(st, key)) for key in ('st_atime', 'st_ctime',
+                         'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))
 
-        return s
+            if path in self.handles.keys():
+                fh,spans        = self.handles[path]
+                #print(spans)
+                s['st_size']    = self.LengthOfSpans(spans)
+                print(s)
+            else:
+                print('--- not in handles ---')
+
+            return s
 
     def readdir(self, path, fh):
 
         full_path = self._full_path(path)
         #print('** readdir %s **'%(full_path))
 
-        dirents = ['.', '..']
+        dirents = ['.', '..','q']
         if os.path.isdir(full_path):
             dirents.extend(os.listdir(full_path))
+
         for r in dirents:
             yield r
 
@@ -144,17 +153,21 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return os.mkdir(self._full_path(path), mode)
 
     def statfs(self, path):
-        #print('statfs')
+        print('statfs')
 
-        full_path = self._full_path(path)
-        stv = os.statvfs(full_path)
-        
-        s=dict((key, getattr(stv, key)) for key in ('f_bavail', 'f_bfree',
-            'f_blocks', 'f_bsize', 'f_favail', 'f_ffree', 'f_files', 'f_flag',
-            'f_frsize', 'f_namemax'))
+        if path == '/q':
+            print('Trigger')
+            s = {'f_bsize':4096, 'f_frsize':4096, 'f_blocks':26780168, 'f_bfree':3486730, 'f_bavail':2120599, 'f_files':6815744, 'f_ffree':5545997, 'f_favail':5545997, 'f_flag':4102, 'f_namemax':255}
+        else:
+            full_path = self._full_path(path)
+            stv = os.statvfs(full_path)
+            
+            s=dict((key, getattr(stv, key)) for key in ('f_bavail', 'f_bfree',
+                'f_blocks', 'f_bsize', 'f_favail', 'f_ffree', 'f_files', 'f_flag',
+                'f_frsize', 'f_namemax'))
 
-        #print('** statfs on %s **'%path)
-        print(s)
+            #print('** statfs on %s **'%path)
+
         return s
 
     def unlink(self, path):
@@ -257,12 +270,13 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return 0
 
     def release(self, path, fh):
-        #print('** release %s **'%path)
+        print('** release %s **'%path)
         fn,spans    = self.handles[path]
+        print('close')
         os.close(fn)
         self.handles.pop(path)
-        #return 1
-        pass
+        return 1
+        #pass
 
     def fsync(self, path, fdatasync, fh):
         return self.flush(path, fh)
@@ -278,19 +292,23 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
 
     def RunFUSE(self, fs,mountPoint):
-        FUSE(fs, mountPoint, nothreads=True, foreground=True)
+        # nolocalcaches
+        FUSE(fs, mountPoint, nothreads=True, foreground=True, attr_timeout=0, entry_timeout=0, negative_timeout=0, direct_io=True)
 
 
 
 def StartFUSEThread(fs,mountPoint):
+
+    fs.RunFUSE(fs, mountPoint)
+
     t = threading.Thread(target=FUSEThread, args=(fs,mountPoint) )
     t.daemon    = True;
     t.start()
 
     while True:
-        fs.ProcessQ()
+        #fs.ProcessQ()
         print('tick...')
-        #time.sleep(1)
+        time.sleep(1)
     
 
 
@@ -389,7 +407,7 @@ class TestSpans(unittest.TestCase):
 
         print('** getsize **')
         #length  = os.stat('tmp/SmallTestFile').st_size
-        time.sleep(0.9)
+        #time.sleep(1.5)
         length  = os.path.getsize('tmp/SmallTestFile')
         print('** getsize done (%d) **'%(length))
 
@@ -407,7 +425,6 @@ class TestSpans(unittest.TestCase):
 
         #self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz\n')
         self.assertEqual(length, 31)
-        print('unittest done')
 
 
 
@@ -534,6 +551,7 @@ if __name__ == '__main__':
     #
     try:
         unittest.main()
+        print('unittest done')
 
     except KeyboardInterrupt:
         sys.exit(-1)
