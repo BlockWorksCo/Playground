@@ -11,6 +11,7 @@ import threading
 import os
 import errno
 import multiprocessing
+import Queue
 from multiprocessing.managers import BaseManager, NamespaceProxy
 
 from fuse import FUSE, FuseOSError, Operations
@@ -39,32 +40,44 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def SynchronousPut(self, rq):
         self.requestQ.put( rq )
-        os.stat('tmp/q')
-        #print('** waiting for response **')
+        print('** triggering **')
+        try:
+            os.statvfs('tmp/q')
+        except OSError:
+            pass
+        print('** waiting for response **')
         response    = self.responseQ.get()
-        #print('** response is %s**'%(response))
+        print('** response is %s**'%(response))
 
         return response
 
     def ProcessQ(self):
-        rq,data   = self.requestQ.get()
-    
-        if rq == 1:
-            print('setting %s'%(data))
-            self.handles    = data
-            rsp             = True
+        try:
+            rq,data   = self.requestQ.get_nowait()
 
-        elif rq == 2:
-            print('rq 2')
-            rsp             = self.handles
-            print('getting %s'%(rsp))
-      
-        else:
-            print('** bad request [%s] **'%(rq))
-            sys.exit(-1)
-            rsp             = None
+        
+            if rq == 1:
+                print('setting %s'%(data))
+                self.handles    = data
+                rsp             = True
 
-        self.responseQ.put(rsp)
+            elif rq == 2:
+                print('rq 2')
+                rsp             = self.handles
+                print('getting %s'%(rsp))
+          
+            else:
+                print('** bad request [%s] **'%(rq))
+                sys.exit(-1)
+                rsp             = None
+
+            self.responseQ.put(rsp)
+            print('put response on responseQ %s'%rsp)
+
+        except Queue.Empty:
+
+            print('trigger with no data')
+
 
 
     def _full_path(self, partial):
@@ -113,6 +126,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
                          'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))
 
             if path in self.handles.keys():
+                print('--- in handles ---')
                 fh,spans        = self.handles[path]
                 #print(spans)
                 s['st_size']    = self.LengthOfSpans(spans)
@@ -155,18 +169,14 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
     def statfs(self, path):
         print('statfs')
 
-        if path == '/q':
-            print('Trigger')
-            s = {'f_bsize':4096, 'f_frsize':4096, 'f_blocks':26780168, 'f_bfree':3486730, 'f_bavail':2120599, 'f_files':6815744, 'f_ffree':5545997, 'f_favail':5545997, 'f_flag':4102, 'f_namemax':255}
-        else:
-            full_path = self._full_path(path)
-            stv = os.statvfs(full_path)
-            
-            s=dict((key, getattr(stv, key)) for key in ('f_bavail', 'f_bfree',
-                'f_blocks', 'f_bsize', 'f_favail', 'f_ffree', 'f_files', 'f_flag',
-                'f_frsize', 'f_namemax'))
+        full_path = self._full_path(path)
+        stv = os.statvfs(full_path)
+        
+        s=dict((key, getattr(stv, key)) for key in ('f_bavail', 'f_bfree',
+            'f_blocks', 'f_bsize', 'f_favail', 'f_ffree', 'f_files', 'f_flag',
+            'f_frsize', 'f_namemax'))
 
-            #print('** statfs on %s **'%path)
+        #print('** statfs on %s **'%path)
 
         return s
 
@@ -301,16 +311,6 @@ def StartFUSEThread(fs,mountPoint):
 
     fs.RunFUSE(fs, mountPoint)
 
-    t = threading.Thread(target=FUSEThread, args=(fs,mountPoint) )
-    t.daemon    = True;
-    t.start()
-
-    while True:
-        #fs.ProcessQ()
-        print('tick...')
-        time.sleep(1)
-    
-
 
 def FUSEThread(fs, mountPoint):
     fs.RunFUSE(fs,mountPoint)
@@ -400,6 +400,8 @@ class TestSpans(unittest.TestCase):
         text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         ds1     = StringDataSource(text1, 0,len(text1))
         handles = fs.GetHandles()
+        print('** open **')
+        print('GetHandles returns %s'%handles)
         fh,spans= handles['/SmallTestFile']
         spans   = InsertSpan(spans, (10,14, ds1) )
         handles['/SmallTestFile']    = (fh,spans)
@@ -415,15 +417,16 @@ class TestSpans(unittest.TestCase):
         #length  = f.tell()
 
         print('** seek **')
-        #f.seek(0,os.SEEK_SET)
+        f.seek(0,os.SEEK_SET)
         print('** seek done**')
         print('** read **')
-        #data    = f.read()
+        data    = f.read()
+        print(data)
         print('** read done **')
 
         f.close()
 
-        #self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz\n')
+        self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz\n')
         self.assertEqual(length, 31)
 
 
