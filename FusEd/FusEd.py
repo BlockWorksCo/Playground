@@ -237,9 +237,9 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
         fn,spans    = self.handles[path]
 
-        print('')
-        print('read %s from %d of %d bytes'%(path,offset,length))
-        print(self.handles)
+        #print('')
+        #print('read %s from %d of %d bytes'%(path,offset,length))
+        #print(self.handles)
         #if length > self.BLOCK_SIZE:
             #length  = self.BLOCK_SIZE
 
@@ -543,23 +543,21 @@ class TestFUSE(unittest.TestCase):
         ds1     = StringDataSource(text1, 0,len(text1))
         handles = fs.GetHandles()
         fh,spans= handles['/MediumSizeFile']
-        spans   = InsertSpan(spans, (33130,33133, ds1) )
+        spans   = InsertSpan(spans, (33133,33138, ds1) )
         handles['/MediumSizeFile']    = (fh,spans)
         fs.SetHandles(handles)
 
         length2  = os.path.getsize('tmp/MediumSizeFile')
 
-        f.seek(33100,os.SEEK_SET)
-        print('*** read ***')
+        f.seek(33112,os.SEEK_SET)
         data    = f.read()
-        print('*** read done ***')
-        print('[%s]'%data)
+        #print('[%s]'%data)
 
         f.close()
 
-        #self.assertEqual(data, 'ABCD')
+        self.assertEqual(data, '<End Of original fileABCDE>\n')
         self.assertEqual(length1, 33135)
-        self.assertEqual(length2, 33138)
+        self.assertEqual(length2, 33140)
 
 
 
