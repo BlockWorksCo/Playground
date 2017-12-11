@@ -179,10 +179,10 @@ def GetData(spans, rangeStart,rangeEnd):
         if span != None:
             spanStart,spanEnd,spanData  = span
 
-            numberOfBytesToCopy = min(numberOfBytes,spanEnd-spanStart)
+            numberOfBytesToCopy = min(numberOfBytes,spanEnd-position)
             print('numberOfBytesToCopy = %d'%numberOfBytesToCopy)
-            data                += spanData.Read(rangeStart,numberOfBytesToCopy)
-            print('reading %d bytes from %d = [%s]'%(numberOfBytesToCopy,rangeStart,data))
+            data                += spanData.Read(position-spanStart,numberOfBytesToCopy)
+            print('reading %d bytes from %d = [%s]'%(numberOfBytesToCopy,position,data))
             numberOfBytesCopied += numberOfBytesToCopy
             position            += numberOfBytesToCopy
 
@@ -477,10 +477,10 @@ class TestSpans(unittest.TestCase):
     def test_twentyseven(self):
 
         text1       = '*'*32768
-        dataSource1 = StringDataSource(text1, 0,len(text1))
+        dataSource1 = StringDataSource(text1, 0,0+len(text1))
 
         text2       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        dataSource2 = StringDataSource(text2, 0,len(text2))
+        dataSource2 = StringDataSource(text2, 0,0+len(text2))
 
         spans   = [ (0,32768,dataSource1.SubDataSource(0,32768)) ]
         spans   = InsertSpan(spans, (32768,32778,dataSource2) )
