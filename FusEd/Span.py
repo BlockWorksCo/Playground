@@ -20,6 +20,7 @@ def SpanAtPoint(spans, position):
         if tS<=position and tE>position:
             return (tS,tE,t)
 
+    #print('SpanAtPoint returning None for position %d in %s'%(position,spans))
     return None
 
 
@@ -173,12 +174,23 @@ def GetData(spans, rangeStart,rangeEnd):
     position            = rangeStart
     data                = ''
     while numberOfBytesCopied < numberOfBytes:
-        spanStart,spanEnd,spanData  = SpanAtPoint(spans, position)
+        span                        = SpanAtPoint(spans, position)
+        print(' (%d/%d) span at position %d == [%s]'%(numberOfBytesCopied, numberOfBytes,position,span))
+        if span != None:
+            spanStart,spanEnd,spanData  = span
 
-        numberOfBytesToCopy = min(numberOfBytes,spanEnd-spanStart)
-        data                += spanData.Read(rangeStart,numberOfBytesToCopy)
-        numberOfBytesCopied += numberOfBytesToCopy
-        position            += numberOfBytesToCopy
+            numberOfBytesToCopy = min(numberOfBytes,spanEnd-spanStart)
+            print('numberOfBytesToCopy = %d'%numberOfBytesToCopy)
+            data                += spanData.Read(rangeStart,numberOfBytesToCopy)
+            print('reading %d bytes from %d = [%s]'%(numberOfBytesToCopy,rangeStart,data))
+            numberOfBytesCopied += numberOfBytesToCopy
+            position            += numberOfBytesToCopy
+
+        else:
+            print('**hit the end***')
+            print(spans)
+            print(position)
+            return data
 
     return data
     
@@ -458,6 +470,23 @@ class TestSpans(unittest.TestCase):
 
         result  = GetData( spans, 0,30)
         self.assertEqual(result, 'abcdefghijklmnopqrstuvwxyzABCD' )
+
+
+
+
+    def test_twentyseven(self):
+
+        text1       = '*'*32768
+        dataSource1 = StringDataSource(text1, 0,len(text1))
+
+        text2       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        dataSource2 = StringDataSource(text2, 0,len(text2))
+
+        spans   = [ (0,32768,dataSource1.SubDataSource(0,32768)) ]
+        spans   = InsertSpan(spans, (32768,32778,dataSource2) )
+
+        result  = GetData( spans, 32765,32778)
+        self.assertEqual(result, '***ABCDEFGHIJ' )
 
 
 

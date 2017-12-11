@@ -88,8 +88,6 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         path = os.path.join(self.root, partial)
         return path
 
-    BLOCK_SIZE  = 1024*4
-
     def LengthOfSpans(self, spans):
         lastSpan        = spans[-1]
         start,end,t     = lastSpan
@@ -171,7 +169,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return os.mkdir(self._full_path(path), mode)
 
     def statfs(self, path):
-        print('statfs')
+        #print('statfs')
 
         full_path = self._full_path(path)
         stv = os.statvfs(full_path)
@@ -239,35 +237,36 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
         fn,spans    = self.handles[path]
 
-        #print(self.handles)
-        if length > self.BLOCK_SIZE:
-            length  = self.BLOCK_SIZE
+        print('')
+        print('read %s from %d of %d bytes'%(path,offset,length))
+        print(self.handles)
+        #if length > self.BLOCK_SIZE:
+            #length  = self.BLOCK_SIZE
 
-        full_path   = self._full_path(path)
-        fileLength  = self.LengthOfSpans(spans)
+        #full_path   = self._full_path(path)
+        #fileLength  = self.LengthOfSpans(spans)
         #print('file length = %d'%fileLength)
 
-        if offset+length > fileLength:
-            length  = fileLength - offset
+        #if offset+length > fileLength:
+            #length  = fileLength - offset
 
-        if length <= 0:
+        #if length <= 0:
             #print('EOF @ %d'%(offset))
-            return None
+            #return None
 
-        else:
+        #else:
 
-            #print('read %s from %d of %d bytes'%(path,offset,length))
-            #print(fh)
-            #print( self.handles[path] )
+        #print(fh)
+        #print( self.handles[path] )
 
-            #os.lseek(fh, offset, os.SEEK_SET)
-            #data    = os.read(fh, length)
-            #print('offset=%d'%(offset))
-            #print('1) length=%d'%(length))
-            data    = GetData(spans, offset, offset+length)
-            #print(data)
+        #os.lseek(fh, offset, os.SEEK_SET)
+        #data    = os.read(fh, length)
+        #print('offset=%d'%(offset))
+        #print('1) length=%d'%(length))
+        data    = GetData(spans, offset, offset+length)
+        #print(data)
 
-            return data
+        return data
 
     def write(self, path, buf, offset, fh):
         os.lseek(fh, offset, os.SEEK_SET)
@@ -349,7 +348,7 @@ MyManager.register('Passthrough', Passthrough, TestProxy)
 
 
 
-class TestSpans(unittest.TestCase):
+class TestFUSE(unittest.TestCase):
 
     def test_one(self):
 
@@ -530,6 +529,38 @@ class TestSpans(unittest.TestCase):
 
         self.assertEqual(data, 'ABCDABCD')
         self.assertEqual(length, 8)
+
+
+
+
+    def test_eight(self):
+
+        f      = open('tmp/MediumSizeFile','r')
+
+        #length1  = os.path.getsize('tmp/MediumSizeFile')
+
+        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        ds1     = StringDataSource(text1, 0,len(text1))
+        handles = fs.GetHandles()
+        fh,spans= handles['/MediumSizeFile']
+        spans   = AddSpan(spans, (33130,33133, ds1) )
+        handles['/MediumSizeFile']    = (fh,spans)
+        fs.SetHandles(handles)
+
+        #length2  = os.path.getsize('tmp/MediumSizeFile')
+
+        f.seek(33100,os.SEEK_SET)
+        print('*** read ***')
+        #data    = GetData(spans, 33100, 33135)
+        data    = f.read()
+        print('*** read done ***')
+        print('[%s]'%data)
+
+        f.close()
+
+        #self.assertEqual(data, 'ABCD')
+        #self.assertEqual(length1, 33135)
+        #self.assertEqual(length2, 33140)
 
 
 
