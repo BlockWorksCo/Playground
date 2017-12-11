@@ -31,30 +31,31 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         #
         #
         #
-        self.requestQ    = multiprocessing.Queue()
-        self.responseQ   = multiprocessing.Queue()
+        self.requestQsend,self.requestQrecv     = multiprocessing.Pipe()
+        self.responseQsend,self.responseQrecv   = multiprocessing.Pipe()
 
 
     # Helpers
     # =======
 
     def SynchronousPut(self, rq):
-        self.requestQ.put( rq )
+        self.requestQsend.send( rq )
         #print('** triggering **')
         try:
+            #time.sleep(0.01)
             os.stat('tmp/q')
         except OSError:
             pass
         #print('** waiting for response **')
-        response    = self.responseQ.get()
-        #print('** response is %s**'%(response))
+        response    = self.responseQrecv.recv()
+        #print('** response is %s**'%(str(response)))
 
         return response
 
 
     def ProcessQ(self):
-        try:
-            rq,data   = self.requestQ.get_nowait()
+        if self.requestQrecv.poll() == True:
+            rq,data   = self.requestQrecv.recv()
         
             if rq == 1:
                 #print('setting %s'%(data))
@@ -71,10 +72,10 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
                 sys.exit(-1)
                 rsp             = None
 
-            self.responseQ.put(rsp)
+            self.responseQsend.send(rsp)
             #print('put response on responseQ %s'%rsp)
 
-        except Queue.Empty:
+        else:
 
             #print('trigger with no data')
             pass
@@ -118,6 +119,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
             #print('Trigger')
             self.ProcessQ()
             return {'st_mode':33204, 'st_ino':2, 'st_dev':62, 'st_nlink':1, 'st_uid':1000, 'st_gid':1000, 'st_size':27, 'st_atime':int(time.time()), 'st_mtime':int(time.time()), 'st_ctime':1511394708}
+
         else:
             
             #print('getattr(%s,%s)'%(path,str(fh)))
@@ -169,7 +171,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return os.mkdir(self._full_path(path), mode)
 
     def statfs(self, path):
-        #print('statfs')
+        print('statfs')
 
         full_path = self._full_path(path)
         stv = os.statvfs(full_path)
