@@ -537,21 +537,20 @@ class TestFUSE(unittest.TestCase):
 
         f      = open('tmp/MediumSizeFile','r')
 
-        #length1  = os.path.getsize('tmp/MediumSizeFile')
+        length1  = os.path.getsize('tmp/MediumSizeFile')
 
         text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         ds1     = StringDataSource(text1, 0,len(text1))
         handles = fs.GetHandles()
         fh,spans= handles['/MediumSizeFile']
-        spans   = AddSpan(spans, (33130,33133, ds1) )
+        spans   = InsertSpan(spans, (33130,33133, ds1) )
         handles['/MediumSizeFile']    = (fh,spans)
         fs.SetHandles(handles)
 
-        #length2  = os.path.getsize('tmp/MediumSizeFile')
+        length2  = os.path.getsize('tmp/MediumSizeFile')
 
         f.seek(33100,os.SEEK_SET)
         print('*** read ***')
-        #data    = GetData(spans, 33100, 33135)
         data    = f.read()
         print('*** read done ***')
         print('[%s]'%data)
@@ -559,8 +558,8 @@ class TestFUSE(unittest.TestCase):
         f.close()
 
         #self.assertEqual(data, 'ABCD')
-        #self.assertEqual(length1, 33135)
-        #self.assertEqual(length2, 33140)
+        self.assertEqual(length1, 33135)
+        self.assertEqual(length2, 33138)
 
 
 
