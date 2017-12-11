@@ -175,21 +175,21 @@ def GetData(spans, rangeStart,rangeEnd):
     data                = ''
     while numberOfBytesCopied < numberOfBytes:
         span                        = SpanAtPoint(spans, position)
-        print(' (%d/%d) span at position %d == [%s]'%(numberOfBytesCopied, numberOfBytes,position,span))
+        #print(' (%d/%d) span at position %d == [%s]'%(numberOfBytesCopied, numberOfBytes,position,span))
         if span != None:
             spanStart,spanEnd,spanData  = span
 
             numberOfBytesToCopy = min(numberOfBytes,spanEnd-position)
-            print('numberOfBytesToCopy = %d'%numberOfBytesToCopy)
+            #print('numberOfBytesToCopy = %d'%numberOfBytesToCopy)
             data                += spanData.Read(position-spanStart,numberOfBytesToCopy)
-            print('reading %d bytes from %d = [%s]'%(numberOfBytesToCopy,position,data))
+            #print('reading %d bytes from %d = [%s]'%(numberOfBytesToCopy,position,data))
             numberOfBytesCopied += numberOfBytesToCopy
             position            += numberOfBytesToCopy
 
         else:
-            print('**hit the end***')
-            print(spans)
-            print(position)
+            #print('**hit the end***')
+            #print(spans)
+            #print(position)
             return data
 
     return data
