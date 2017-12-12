@@ -264,6 +264,8 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         #print('offset=%d'%(offset))
         #print('1) length=%d'%(length))
         data    = GetData(spans, offset, offset+length)
+        if len(data) > length:
+            data    = data[:length]
         #print(data)
 
         return data
@@ -587,6 +589,48 @@ class TestFUSE(unittest.TestCase):
         self.assertEqual(data, '<End Of original fABC>\n')
         self.assertEqual(length1, 33135)
         self.assertEqual(length2, 33135)
+
+
+
+
+    def test_ten(self):
+
+        f      = open('tmp/MediumSizeFile','r')
+
+        length1  = os.path.getsize('tmp/MediumSizeFile')
+
+        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        ds1     = StringDataSource(text1, 0,len(text1))
+        handles = fs.GetHandles()
+        fh,spans= handles['/MediumSizeFile']
+        spans   = AddSpan(spans, (33130,33133, ds1) )
+        handles['/MediumSizeFile']    = (fh,spans)
+        fs.SetHandles(handles)
+
+        text2   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        ds2     = StringDataSource(text2, 0,len(text2))
+        handles = fs.GetHandles()
+        fh,spans= handles['/MediumSizeFile']
+        spans   = InsertSpan(spans, (100,110, ds2) )
+        handles['/MediumSizeFile']    = (fh,spans)
+        fs.SetHandles(handles)
+
+        length2  = os.path.getsize('tmp/MediumSizeFile')
+
+        f.seek(33122,os.SEEK_SET)
+        data1    = f.read()
+        #print('[%s]'%data)
+
+        f.seek(95,os.SEEK_SET)
+        data2    = f.read(20)
+        #print('[%s]'%data)
+
+        f.close()
+
+        self.assertEqual(data1, '<End Of original fABC>\n')
+        self.assertEqual(data2, 'orbi ABCDEFGHIJet vi')
+        self.assertEqual(length1, 33135)
+        self.assertEqual(length2, 33145)
 
 
 
