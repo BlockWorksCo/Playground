@@ -34,8 +34,8 @@ class FrontEnd:
         width = 40
         win = curses.newwin(height, width, begin_y, begin_x)
         tb = curses.textpad.Textbox(win)
-        text = tb.edit()
-        curses.addstr(4,1,text.encode('utf_8'))
+        #text = tb.edit()
+        #curses.addstr(4,1,text.encode('utf_8'))
 
     
     def Iterate(self):
@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
     frontEnd    = FrontEnd()
     try:
-        while FrontEnd.Iterate() == True:
+        while frontEnd.Iterate() == True:
             pass
 
         curses.endwin()
