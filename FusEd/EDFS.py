@@ -13,6 +13,7 @@ import errno
 import multiprocessing
 import queue
 from multiprocessing.managers import BaseManager, NamespaceProxy
+import LineIndex
 
 from fuse import FUSE, FuseOSError, Operations
 
@@ -225,6 +226,11 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
         self.handles[path]    = (fh, spans)
 
+        #
+        # Generate the line index
+        #
+        LineIndex.GenerateLineIndex(full_path)
+
         return 0
 
 
@@ -324,26 +330,8 @@ def FUSEThread(fs, mountPoint):
 
 
 
-class MyManager(BaseManager): pass
-
-class TestProxy(NamespaceProxy):
-
-    _exposed_ = ('__getattribute__', '__setattr__', '__delattr__', 'SetHandles','GetHandles','StartFUSEThread')
-
-    def SetHandles(self, handles):
-        callmethod = object.__getattribute__(self, '_callmethod')
-        return callmethod('SetHandles', (handles,))
-
-    def GetHandles(self):
-        callmethod = object.__getattribute__(self, '_callmethod')
-        return callmethod('GetHandles')
-
-    def StartFUSEThread(self,fs,mountPoint):
-        callmethod = object.__getattribute__(fs, '_callmethod')
-        return callmethod('StartFUSEThread',(fs,mountPoint) )
 
 
-MyManager.register('Passthrough', Passthrough, TestProxy)
 
 
 
@@ -711,10 +699,10 @@ class TestFUSE(unittest.TestCase):
 
 def ExitFunction():
     subprocess.Popen(['fusermount','-uz','tmp'])
-    #pass
 
 
-if __name__ == '__main__':
+
+def RunEDFS():
 
     #
     # Make the mount point if its not already there.
@@ -725,14 +713,7 @@ if __name__ == '__main__':
     except OSError:
         pass
 
-    #
-    #
-    #
-    #manager = MyManager()
-    #manager.start()
-
     global fs
-    #fs = manager.Passthrough('./TestFiles')
     fs = Passthrough('./TestFiles')
 
     #
@@ -744,8 +725,6 @@ if __name__ == '__main__':
     #
     # Create the fs object and the thread to run it.
     #
-    #fs.SetHandles({})
-    #fs.StartFUSEThread(fs,'./tmp')
     t = multiprocessing.Process(target=StartFUSEThread, args=(fs,'./tmp') )
     t.daemon    = True;
     t.start()
@@ -759,21 +738,13 @@ if __name__ == '__main__':
             dirContents = os.listdir('./tmp')
         except OSError:
             dirContents = []
-            #print('waiting')
             time.sleep(0.1)
     
-    #fh  = open('./tmp/SmallTestFile')
-    #text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    #ds1     = StringDataSource(text1, 0,len(text1))
-    #handles = fs.GetHandles()
-    #fh,spans= handles['/SmallTestFile']
-    #spans   = InsertSpan(spans, (10,14, ds1) )
-    #handles['/SmallTestFile']    = (fh,spans)
-    #fs.SetHandles(handles)
 
-    #while True:
-        #time.sleep(1)
-        #print('** main [%s] **'%(multiprocessing.current_process().name))
+
+if __name__ == '__main__':
+
+    RunEDFS()
 
     #
     # Run the tests.

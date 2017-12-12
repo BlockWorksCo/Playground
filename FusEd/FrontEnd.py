@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 
 
@@ -8,7 +9,7 @@ import curses
 import curses.textpad
 import os
 import time
-import FusEd
+import EDFS
 import threading
 import sys
 import subprocess
@@ -37,21 +38,20 @@ class FrontEnd:
         curses.addstr(4,1,text.encode('utf_8'))
 
     
-    def MainLoop(self):
+    def Iterate(self):
         """
         """
 
-        hw = "Hello world!"
-        while 1:
-            c = stdscr.getch()
-            if c == ord('p'): 
-                pass
-            elif c == ord('q'): 
-                break # Exit the while()
-            elif c == curses.KEY_HOME: 
-                x = y = 0
+        c = stdscr.getch()
+        if c == ord('p'): 
+            pass
+        elif c == ord('q'): 
+            return False
+        elif c == curses.KEY_HOME: 
+            x = y = 0
 
-        curses.endwin()
+        return True
+
 
 
 
@@ -71,18 +71,14 @@ if __name__ == '__main__':
 
     dirName,fileName    = os.path.split(sys.argv[1])
 
-    signal.signal(signal.SIGINT, signal.default_int_handler)
-    atexit.register(ExitFunction)
+    EDFS.RunEDFS()
 
-    t = threading.Thread(target=FusEd.FUSEThread, args=(dirName,))
-    t.daemon    = True;
-    t.start()
-
-    #FrontEnd().Run()
+    frontEnd    = FrontEnd()
     try:
-        while True:
-            time.sleep(1)
-            print('Tick...')
+        while FrontEnd.Iterate() == True:
+            pass
+
+        curses.endwin()
 
     except KeyboardInterrupt:
         sys.exit(-1)
