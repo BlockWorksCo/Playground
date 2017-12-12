@@ -670,6 +670,41 @@ class TestFUSE(unittest.TestCase):
 
 
 
+    def test_twelve(self):
+
+        f      = open('tmp/MediumSizeFile','r')
+
+        length1  = os.path.getsize('tmp/MediumSizeFile')
+
+        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        ds1     = StringDataSource(text1, 0,len(text1))
+        handles = fs.GetHandles()
+        fh,spans= handles['/MediumSizeFile']
+        spans   = AddSpan(spans, (33130,33133, ds1) )
+        handles['/MediumSizeFile']    = (fh,spans)
+        fs.SetHandles(handles)
+
+        text2   = '0123456789'
+        ds2     = StringDataSource(text2, 0,len(text2))
+        handles = fs.GetHandles()
+        fh,spans= handles['/MediumSizeFile']
+        spans   = InsertSpan(spans, (33131,33141, ds2) )
+        handles['/MediumSizeFile']    = (fh,spans)
+        fs.SetHandles(handles)
+
+        length2  = os.path.getsize('tmp/MediumSizeFile')
+
+        f.seek(33125,os.SEEK_SET)
+        data1    = f.read()
+
+        f.close()
+
+        self.assertEqual(data1, 'nal fA0123456789BC>\n')
+        self.assertEqual(length1, 33135)
+        self.assertEqual(length2, 33145)
+
+
+
 
 
 
