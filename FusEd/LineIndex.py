@@ -39,6 +39,15 @@ class TestLineIndex(unittest.TestCase):
         GenerateLineIndex( fileName )
 
         self.assertEqual( IndexOfLine(fileName, 0), 0)
+        self.assertEqual( IndexOfLine(fileName, 1), 809)
+        self.assertEqual( IndexOfLine(fileName, 2), 810)
+        self.assertEqual( IndexOfLine(fileName, 3), 1379)
+        self.assertEqual( IndexOfLine(fileName, 4), 1380)
+        self.assertEqual( IndexOfLine(fileName, 5), 1769)
+        self.assertEqual( IndexOfLine(fileName, 6), 1770)
+        self.assertEqual( IndexOfLine(fileName, 7), 2293)
+        self.assertEqual( IndexOfLine(fileName, 8), 2294)
+        self.assertEqual( IndexOfLine(fileName, 9), 3028)
 
 
 
