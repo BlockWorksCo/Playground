@@ -11,7 +11,7 @@ import threading
 import os
 import errno
 import multiprocessing
-import Queue
+import queue
 from multiprocessing.managers import BaseManager, NamespaceProxy
 
 from fuse import FUSE, FuseOSError, Operations
@@ -126,7 +126,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
             s= dict((key, getattr(st, key)) for key in ('st_atime', 'st_ctime',
                          'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))
 
-            if path in self.handles.keys():
+            if path in list(self.handles.keys()):
                 #print('--- in handles ---')
                 fh,spans        = self.handles[path]
                 #print(spans)
@@ -208,7 +208,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
     
         length      = os.stat(full_path).st_size
         dataSource  = FileDataSource(fh, 0,length)
-        if path in self.handles.keys():
+        if path in list(self.handles.keys()):
 
             #
             # Already been opened, lets close the old handle but
@@ -354,356 +354,354 @@ class TestFUSE(unittest.TestCase):
 
     def test_one(self):
 
-        spans   = []
-        f       = open('tmp/SmallTestFile')
-        text    = f.read()
-        f.close()
-        
-        self.assertEqual(text, 'abcdefghijklmnopqrstuvwxyz\n' )
+        with open('tmp/SmallTestFile','rb') as f:
+
+            spans   = []
+            text    = f.read()
+            f.close()
+            
+            self.assertEqual(text, b'abcdefghijklmnopqrstuvwxyz\n' )
 
 
     def test_two(self):
 
-        f      = open('tmp/SmallTestFile','r')
+        with open('tmp/SmallTestFile','rb') as f:
 
-        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        ds1     = StringDataSource(text1, 0,len(text1))
-        handles = fs.GetHandles()
-        fh,spans= handles['/SmallTestFile']
-        spans   = InsertSpan(spans, (10,14, ds1) )
-        handles['/SmallTestFile']    = (fh,spans)
-        fs.SetHandles(handles)
+            text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            ds1     = StringDataSource(text1, 0,len(text1))
+            handles = fs.GetHandles()
+            fh,spans= handles['/SmallTestFile']
+            spans   = InsertSpan(spans, (10,14, ds1) )
+            handles['/SmallTestFile']    = (fh,spans)
+            fs.SetHandles(handles)
 
-        f.seek(0,os.SEEK_END)
-        length  = f.tell()
+            f.seek(0,os.SEEK_END)
+            length  = f.tell()
 
-        f.seek(0,os.SEEK_SET)
-        data    = f.read()
+            f.seek(0,os.SEEK_SET)
+            data    = f.read()
 
-        f.close()
+            f.close()
 
-        self.assertEqual(length, 31)
+            self.assertEqual(length, 31)
 
 
 
     def test_three(self):
 
-        f      = open('tmp/SmallTestFile')
+        with open('tmp/SmallTestFile','rb') as f:
 
-        f.seek(0, os.SEEK_END)
-        length  = f.tell()
-        f.close()
+            f.seek(0, os.SEEK_END)
+            length  = f.tell()
+            f.close()
 
-        self.assertEqual(length, 27)
+            self.assertEqual(length, 27)
 
 
 
     def test_four(self):
 
-        f      = open('tmp/SmallTestFile','r')
+        with open('tmp/SmallTestFile','rb') as f:
 
-        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        ds1     = StringDataSource(text1, 0,len(text1))
-        handles = fs.GetHandles()
-        fh,spans= handles['/SmallTestFile']
-        spans   = InsertSpan(spans, (10,14, ds1) )
-        handles['/SmallTestFile']    = (fh,spans)
-        fs.SetHandles(handles)
+            text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            ds1     = StringDataSource(text1, 0,len(text1))
+            handles = fs.GetHandles()
+            fh,spans= handles['/SmallTestFile']
+            spans   = InsertSpan(spans, (10,14, ds1) )
+            handles['/SmallTestFile']    = (fh,spans)
+            fs.SetHandles(handles)
 
-        length  = os.path.getsize('tmp/SmallTestFile')
+            length  = os.path.getsize('tmp/SmallTestFile')
 
-        f.seek(0,os.SEEK_SET)
-        data    = f.read()
-        #print(data)
+            f.seek(0,os.SEEK_SET)
+            data    = f.read()
+            #print(data)
 
-        f.close()
+            f.close()
 
-        self.assertEqual(data, 'abcdefghijABCDklmnopqrstuvwxyz\n')
-        self.assertEqual(length, 31)
+            self.assertEqual(data, b'abcdefghijABCDklmnopqrstuvwxyz\n')
+            self.assertEqual(length, 31)
 
 
 
     def test_five(self):
 
-        f      = open('tmp/SmallTestFile','r')
+        with open('tmp/SmallTestFile','rb') as f:
 
-        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        ds1     = StringDataSource(text1, 0,len(text1))
-        handles = fs.GetHandles()
-        fh,spans= handles['/SmallTestFile']
-        spans   = InsertSpan(spans, (10,14, ds1) )
-        handles['/SmallTestFile']    = (fh,spans)
-        fs.SetHandles(handles)
+            text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            ds1     = StringDataSource(text1, 0,len(text1))
+            handles = fs.GetHandles()
+            fh,spans= handles['/SmallTestFile']
+            spans   = InsertSpan(spans, (10,14, ds1) )
+            handles['/SmallTestFile']    = (fh,spans)
+            fs.SetHandles(handles)
 
-        f.seek(0,os.SEEK_END)
-        length  = f.tell()
+            f.seek(0,os.SEEK_END)
+            length  = f.tell()
 
-        f.close()
+            f.close()
 
-        self.assertEqual(length, 31)
-
-
-
-    def test_six(self):
-
-        f      = open('tmp/SmallTestFile','r')
-
-        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        ds1     = StringDataSource(text1, 0,len(text1))
-        handles = fs.GetHandles()
-        fh,spans= handles['/SmallTestFile']
-        spans   = InsertSpan(spans, (0,4, ds1) )
-        handles['/SmallTestFile']    = (fh,spans)
-        fs.SetHandles(handles)
-
-        length  = os.path.getsize('tmp/SmallTestFile')
-
-        f.seek(0,os.SEEK_SET)
-        data    = f.read()
-        #print(data)
-
-        f.close()
-
-        self.assertEqual(data, 'ABCDabcdefghijklmnopqrstuvwxyz\n')
-        self.assertEqual(length, 31)
-
+            self.assertEqual(length, 31)
 
 
 
     def test_six(self):
 
-        f      = open('tmp/SmallTestFile','r')
+        with open('tmp/SmallTestFile','rb') as f:
 
-        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        ds1     = StringDataSource(text1, 0,len(text1))
-        handles = fs.GetHandles()
-        fh,spans= handles['/SmallTestFile']
-        spans   = InsertSpan(spans, (0,4, ds1) )
-        handles['/SmallTestFile']    = (fh,spans)
-        fs.SetHandles(handles)
+            text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            ds1     = StringDataSource(text1, 0,len(text1))
+            handles = fs.GetHandles()
+            fh,spans= handles['/SmallTestFile']
+            spans   = InsertSpan(spans, (0,4, ds1) )
+            handles['/SmallTestFile']    = (fh,spans)
+            fs.SetHandles(handles)
 
-        text2   = '0123456789'
-        ds2     = StringDataSource(text2, 0,len(text2))
-        handles = fs.GetHandles()
-        fh,spans= handles['/SmallTestFile']
-        spans   = InsertSpan(spans, (31,35, ds2) )
-        handles['/SmallTestFile']    = (fh,spans)
-        fs.SetHandles(handles)
+            length  = os.path.getsize('tmp/SmallTestFile')
 
-        length  = os.path.getsize('tmp/SmallTestFile')
+            f.seek(0,os.SEEK_SET)
+            data    = f.read()
+            #print(data)
 
-        f.seek(0,os.SEEK_SET)
-        data    = f.read()
-        #print(data)
+            f.close()
 
-        f.close()
+            self.assertEqual(data, b'ABCDabcdefghijklmnopqrstuvwxyz\n')
+            self.assertEqual(length, 31)
 
-        self.assertEqual(data, 'ABCDabcdefghijklmnopqrstuvwxyz\n0123')
-        self.assertEqual(length, 35)
 
 
 
     def test_seven(self):
 
-        f      = open('tmp/EmptyFile','r')
+        with open('tmp/EmptyFile','rb') as f:
 
-        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        ds1     = StringDataSource(text1, 0,len(text1))
-        handles = fs.GetHandles()
-        fh,spans= handles['/EmptyFile']
-        spans   = InsertSpan(spans, (0,4, ds1) )
-        handles['/EmptyFile']    = (fh,spans)
-        fs.SetHandles(handles)
+            text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            ds1     = StringDataSource(text1, 0,len(text1))
+            handles = fs.GetHandles()
+            fh,spans= handles['/EmptyFile']
+            spans   = InsertSpan(spans, (0,4, ds1) )
+            handles['/EmptyFile']    = (fh,spans)
+            fs.SetHandles(handles)
 
-        handles = fs.GetHandles()
-        fh,spans= handles['/EmptyFile']
-        spans   = InsertSpan(spans, (4,8, ds1) )
-        handles['/EmptyFile']    = (fh,spans)
-        fs.SetHandles(handles)
+            handles = fs.GetHandles()
+            fh,spans= handles['/EmptyFile']
+            spans   = InsertSpan(spans, (4,8, ds1) )
+            handles['/EmptyFile']    = (fh,spans)
+            fs.SetHandles(handles)
 
-        length  = os.path.getsize('tmp/EmptyFile')
+            length  = os.path.getsize('tmp/EmptyFile')
 
-        f.seek(0,os.SEEK_SET)
-        data    = f.read()
-        #print(data)
+            f.seek(0,os.SEEK_SET)
+            data    = f.read()
+            #print(data)
 
-        f.close()
+            f.close()
 
-        self.assertEqual(data, 'ABCDABCD')
-        self.assertEqual(length, 8)
+            self.assertEqual(data, b'ABCDABCD')
+            self.assertEqual(length, 8)
 
 
 
 
     def test_eight(self):
 
-        f      = open('tmp/MediumSizeFile','r')
+        with open('tmp/MediumSizeFile','rb') as f:
 
-        length1  = os.path.getsize('tmp/MediumSizeFile')
+            length1  = os.path.getsize('tmp/MediumSizeFile')
 
-        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        ds1     = StringDataSource(text1, 0,len(text1))
-        handles = fs.GetHandles()
-        fh,spans= handles['/MediumSizeFile']
-        spans   = InsertSpan(spans, (33133,33138, ds1) )
-        handles['/MediumSizeFile']    = (fh,spans)
-        fs.SetHandles(handles)
+            text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            ds1     = StringDataSource(text1, 0,len(text1))
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            spans   = InsertSpan(spans, (33133,33138, ds1) )
+            handles['/MediumSizeFile']    = (fh,spans)
+            fs.SetHandles(handles)
 
-        length2  = os.path.getsize('tmp/MediumSizeFile')
+            length2  = os.path.getsize('tmp/MediumSizeFile')
 
-        f.seek(33112,os.SEEK_SET)
-        data    = f.read()
-        #print('[%s]'%data)
+            f.seek(33112,os.SEEK_SET)
+            data    = f.read()
 
-        f.close()
+            f.close()
 
-        self.assertEqual(data, '<End Of original fileABCDE>\n')
-        self.assertEqual(length1, 33135)
-        self.assertEqual(length2, 33140)
+            self.assertEqual(data, b'<End Of original fileABCDE>\n')
+            self.assertEqual(length1, 33135)
+            self.assertEqual(length2, 33140)
 
 
 
 
     def test_nine(self):
 
-        f      = open('tmp/MediumSizeFile','r')
+        with open('tmp/MediumSizeFile','rb') as f:
 
-        length1  = os.path.getsize('tmp/MediumSizeFile')
+            length1  = os.path.getsize('tmp/MediumSizeFile')
 
-        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        ds1     = StringDataSource(text1, 0,len(text1))
-        handles = fs.GetHandles()
-        fh,spans= handles['/MediumSizeFile']
-        spans   = AddSpan(spans, (33130,33133, ds1) )
-        handles['/MediumSizeFile']    = (fh,spans)
-        fs.SetHandles(handles)
+            text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            ds1     = StringDataSource(text1, 0,len(text1))
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            spans   = AddSpan(spans, (33130,33133, ds1) )
+            handles['/MediumSizeFile']    = (fh,spans)
+            fs.SetHandles(handles)
 
-        length2  = os.path.getsize('tmp/MediumSizeFile')
+            length2  = os.path.getsize('tmp/MediumSizeFile')
 
-        f.seek(33112,os.SEEK_SET)
-        data    = f.read()
-        #print('[%s]'%data)
+            f.seek(33112,os.SEEK_SET)
+            data    = f.read()
+            #print('[%s]'%data)
 
-        f.close()
+            f.close()
 
-        self.assertEqual(data, '<End Of original fABC>\n')
-        self.assertEqual(length1, 33135)
-        self.assertEqual(length2, 33135)
+            self.assertEqual(data, b'<End Of original fABC>\n')
+            self.assertEqual(length1, 33135)
+            self.assertEqual(length2, 33135)
 
 
 
 
     def test_ten(self):
 
-        f      = open('tmp/MediumSizeFile','r')
+        with open('tmp/MediumSizeFile','rb') as f:
 
-        length1  = os.path.getsize('tmp/MediumSizeFile')
+            length1  = os.path.getsize('tmp/MediumSizeFile')
 
-        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        ds1     = StringDataSource(text1, 0,len(text1))
-        handles = fs.GetHandles()
-        fh,spans= handles['/MediumSizeFile']
-        spans   = AddSpan(spans, (33130,33133, ds1) )
-        handles['/MediumSizeFile']    = (fh,spans)
-        fs.SetHandles(handles)
+            text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            ds1     = StringDataSource(text1, 0,len(text1))
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            spans   = AddSpan(spans, (33130,33133, ds1) )
+            handles['/MediumSizeFile']    = (fh,spans)
+            fs.SetHandles(handles)
 
-        text2   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        ds2     = StringDataSource(text2, 0,len(text2))
-        handles = fs.GetHandles()
-        fh,spans= handles['/MediumSizeFile']
-        spans   = InsertSpan(spans, (100,110, ds2) )
-        handles['/MediumSizeFile']    = (fh,spans)
-        fs.SetHandles(handles)
+            text2   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            ds2     = StringDataSource(text2, 0,len(text2))
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            spans   = InsertSpan(spans, (100,110, ds2) )
+            handles['/MediumSizeFile']    = (fh,spans)
+            fs.SetHandles(handles)
 
-        length2  = os.path.getsize('tmp/MediumSizeFile')
+            length2  = os.path.getsize('tmp/MediumSizeFile')
 
-        f.seek(33122,os.SEEK_SET)
-        data1    = f.read()
-        #print('[%s]'%data)
+            f.seek(33122,os.SEEK_SET)
+            data1    = f.read()
 
-        f.seek(95,os.SEEK_SET)
-        data2    = f.read(20)
-        #print('[%s]'%data)
+            f.seek(95,os.SEEK_SET)
+            data2    = f.read(20)
 
-        f.close()
+            f.close()
 
-        self.assertEqual(data1, '<End Of original fABC>\n')
-        self.assertEqual(data2, 'orbi ABCDEFGHIJet vi')
-        self.assertEqual(length1, 33135)
-        self.assertEqual(length2, 33145)
+            self.assertEqual(data1, b'<End Of original fABC>\n')
+            self.assertEqual(data2, b'orbi ABCDEFGHIJet vi')
+            self.assertEqual(length1, 33135)
+            self.assertEqual(length2, 33145)
 
 
 
 
     def test_eleven(self):
 
-        f      = open('tmp/MediumSizeFile','r')
+        with open('tmp/MediumSizeFile','rb') as f:
 
-        length1  = os.path.getsize('tmp/MediumSizeFile')
+            length1  = os.path.getsize('tmp/MediumSizeFile')
 
-        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        ds1     = StringDataSource(text1, 0,len(text1))
-        handles = fs.GetHandles()
-        fh,spans= handles['/MediumSizeFile']
-        spans   = AddSpan(spans, (33130,33133, ds1) )
-        handles['/MediumSizeFile']    = (fh,spans)
-        fs.SetHandles(handles)
+            text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            ds1     = StringDataSource(text1, 0,len(text1))
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            spans   = AddSpan(spans, (33130,33133, ds1) )
+            handles['/MediumSizeFile']    = (fh,spans)
+            fs.SetHandles(handles)
 
-        text2   = '0123456789'
-        ds2     = StringDataSource(text2, 0,len(text2))
-        handles = fs.GetHandles()
-        fh,spans= handles['/MediumSizeFile']
-        spans   = InsertSpan(spans, (33131,33135, ds2) )
-        handles['/MediumSizeFile']    = (fh,spans)
-        fs.SetHandles(handles)
+            text2   = b'0123456789'
+            ds2     = StringDataSource(text2, 0,len(text2))
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            spans   = InsertSpan(spans, (33131,33135, ds2) )
+            handles['/MediumSizeFile']    = (fh,spans)
+            fs.SetHandles(handles)
 
-        length2  = os.path.getsize('tmp/MediumSizeFile')
+            length2  = os.path.getsize('tmp/MediumSizeFile')
 
-        f.seek(33125,os.SEEK_SET)
-        data1    = f.read()
+            f.seek(33125,os.SEEK_SET)
+            data1    = f.read()
 
-        f.close()
+            f.close()
 
-        self.assertEqual(data1, 'nal fA0123BC>\n')
-        self.assertEqual(length1, 33135)
-        self.assertEqual(length2, 33139)
+            self.assertEqual(data1, b'nal fA0123BC>\n')
+            self.assertEqual(length1, 33135)
+            self.assertEqual(length2, 33139)
 
 
 
     def test_twelve(self):
 
-        f      = open('tmp/MediumSizeFile','r')
+        with open('tmp/MediumSizeFile','rb') as f:
 
-        length1  = os.path.getsize('tmp/MediumSizeFile')
+            length1  = os.path.getsize('tmp/MediumSizeFile')
 
-        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        ds1     = StringDataSource(text1, 0,len(text1))
-        handles = fs.GetHandles()
-        fh,spans= handles['/MediumSizeFile']
-        spans   = AddSpan(spans, (33130,33133, ds1) )
-        handles['/MediumSizeFile']    = (fh,spans)
-        fs.SetHandles(handles)
+            text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            ds1     = StringDataSource(text1, 0,len(text1))
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            spans   = AddSpan(spans, (33130,33133, ds1) )
+            handles['/MediumSizeFile']    = (fh,spans)
+            fs.SetHandles(handles)
 
-        text2   = '0123456789'
-        ds2     = StringDataSource(text2, 0,len(text2))
-        handles = fs.GetHandles()
-        fh,spans= handles['/MediumSizeFile']
-        spans   = InsertSpan(spans, (33131,33141, ds2) )
-        handles['/MediumSizeFile']    = (fh,spans)
-        fs.SetHandles(handles)
+            text2   = b'0123456789'
+            ds2     = StringDataSource(text2, 0,len(text2))
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            spans   = InsertSpan(spans, (33131,33141, ds2) )
+            handles['/MediumSizeFile']    = (fh,spans)
+            fs.SetHandles(handles)
 
-        length2  = os.path.getsize('tmp/MediumSizeFile')
+            length2  = os.path.getsize('tmp/MediumSizeFile')
 
-        f.seek(33125,os.SEEK_SET)
-        data1    = f.read()
+            f.seek(33125,os.SEEK_SET)
+            data1    = f.read()
 
-        f.close()
+            f.close()
 
-        self.assertEqual(data1, 'nal fA0123456789BC>\n')
-        self.assertEqual(length1, 33135)
-        self.assertEqual(length2, 33145)
+            self.assertEqual(data1, b'nal fA0123456789BC>\n')
+            self.assertEqual(length1, 33135)
+            self.assertEqual(length2, 33145)
 
 
+
+
+
+    def test_thirteen(self):
+
+        with open('tmp/SmallTestFile','rb') as f:
+
+            text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            ds1     = StringDataSource(text1, 0,len(text1))
+            handles = fs.GetHandles()
+            fh,spans= handles['/SmallTestFile']
+            spans   = InsertSpan(spans, (0,4, ds1) )
+            handles['/SmallTestFile']    = (fh,spans)
+            fs.SetHandles(handles)
+
+            text2   = b'0123456789'
+            ds2     = StringDataSource(text2, 0,len(text2))
+            handles = fs.GetHandles()
+            fh,spans= handles['/SmallTestFile']
+            spans   = InsertSpan(spans, (31,35, ds2) )
+            handles['/SmallTestFile']    = (fh,spans)
+            fs.SetHandles(handles)
+
+            length  = os.path.getsize('tmp/SmallTestFile')
+
+            f.seek(0,os.SEEK_SET)
+            data    = f.read()
+            #print(data)
+
+            f.close()
+
+            self.assertEqual(data, b'ABCDabcdefghijklmnopqrstuvwxyz\n0123')
+            self.assertEqual(length, 35)
 
 
 
