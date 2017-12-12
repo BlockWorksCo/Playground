@@ -562,6 +562,35 @@ class TestFUSE(unittest.TestCase):
 
 
 
+    def test_nine(self):
+
+        f      = open('tmp/MediumSizeFile','r')
+
+        length1  = os.path.getsize('tmp/MediumSizeFile')
+
+        text1   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        ds1     = StringDataSource(text1, 0,len(text1))
+        handles = fs.GetHandles()
+        fh,spans= handles['/MediumSizeFile']
+        spans   = AddSpan(spans, (33130,33133, ds1) )
+        handles['/MediumSizeFile']    = (fh,spans)
+        fs.SetHandles(handles)
+
+        length2  = os.path.getsize('tmp/MediumSizeFile')
+
+        f.seek(33112,os.SEEK_SET)
+        data    = f.read()
+        #print('[%s]'%data)
+
+        f.close()
+
+        self.assertEqual(data, '<End Of original fABC>\n')
+        self.assertEqual(length1, 33135)
+        self.assertEqual(length2, 33135)
+
+
+
+
 
 
 
