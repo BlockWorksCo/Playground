@@ -13,6 +13,10 @@ import EDFS
 import threading
 import sys
 import subprocess
+import LineIndex
+
+
+count   = 0
 
 
 class FrontEnd:
@@ -23,9 +27,11 @@ class FrontEnd:
     def __init__(self):
         """
         """
-        stdscr = curses.initscr()
+        self.stdscr = curses.initscr()
+        self.top    = 10
+        self.left   = 0
 
-        #curses.noecho()
+        curses.noecho()
         #curses.echo()
 
         begin_x = 20
@@ -37,18 +43,50 @@ class FrontEnd:
         #text = tb.edit()
         #curses.addstr(4,1,text.encode('utf_8'))
 
+        self.stdscr.clear()
+        self.stdscr.keypad(True)
+
+
+    def RedrawBuffer(self):
     
+        fileName    = 'tmp/MediumSizeFile'
+        with open(fileName,'rb') as f:
+            self.stdscr.clear()
+            height,width = self.stdscr.getmaxyx()
+            for i in range(0, height-1):
+
+                index   = LineIndex.IndexOfLine(fileName, self.top+i)
+                f.seek(index, os.SEEK_SET)
+                line    = f.readline().decode('utf-8').replace('\n','')
+
+                displayLine = '%3d %s'%(i+self.top,line)
+                self.stdscr.addstr(i, 0, displayLine[:width])
+
+
+        status  = '%d %d'%(self.left, self.top)
+        self.stdscr.addstr(height-1, 1, status)
+
+        self.stdscr.refresh()
+
+
     def Iterate(self):
         """
         """
 
-        c = stdscr.getch()
+        self.RedrawBuffer()
+
+        c = self.stdscr.getch()
         if c == ord('p'): 
             pass
         elif c == ord('q'): 
             return False
-        elif c == curses.KEY_HOME: 
-            x = y = 0
+        elif c == curses.KEY_UP:
+            self.top   = self.top - 1
+        elif c == curses.KEY_DOWN:
+            self.top   = self.top + 1
+
+        if self.top < 0:
+            self.top    = 0
 
         return True
 
@@ -57,6 +95,7 @@ class FrontEnd:
 
 def ExitFunction():
     subprocess.Popen(['fusermount','-uz','tmp'])
+    curses.endwin()
     
 
 
