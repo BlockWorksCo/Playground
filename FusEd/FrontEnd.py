@@ -28,8 +28,11 @@ class FrontEnd:
         """
         """
         self.stdscr = curses.initscr()
-        self.top    = 10
+        self.top    = 0
         self.left   = 0
+        self.x      = 0
+        self.y      = 0
+        self.fileName    = 'tmp/MediumSizeFile'
 
         curses.noecho()
         #curses.echo()
@@ -54,12 +57,11 @@ class FrontEnd:
 
     def RedrawBuffer(self):
     
-        fileName    = 'tmp/MediumSizeFile'
-        with open(fileName,'rb') as f:
+        with open(self.fileName,'rb') as f:
             self.stdscr.clear()
             for i in range(0, self.height-1):
 
-                index   = LineIndex.IndexOfLine(fileName, self.top+i)
+                index   = LineIndex.IndexOfLine(self.fileName, self.top+i)
                 f.seek(index, os.SEEK_SET)
                 line    = f.readline().decode('utf-8').replace('\n','')
 
@@ -67,7 +69,7 @@ class FrontEnd:
                 self.stdscr.addstr(i, 0, displayLine[:self.width])
 
 
-        status  = '%d %d'%(self.left, self.top)
+        status  = 'pos: %d %d lines: %d'%(self.left, self.top,LineIndex.NumberOfLines(self.fileName))
         self.stdscr.addstr(self.height-1, 1, status)
 
         self.stdscr.refresh()
@@ -97,7 +99,8 @@ class FrontEnd:
         if self.top < 0:
             self.top    = 0
 
-        self.maxLines   = 114
+        self.maxLines   = LineIndex.NumberOfLines(self.fileName)
+
         if self.top+self.height > self.maxLines:
             self.top    = self.maxLines-self.height
 

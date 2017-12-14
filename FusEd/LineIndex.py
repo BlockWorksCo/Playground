@@ -8,12 +8,17 @@ import unittest
 
 
 
+def NumberOfLines(fileName):
+
+    return os.path.getsize(fileName+'.LineIndex')/9
+
+
 def IndexOfLine(fileName, lineNumber):
 
     indexFileName   = fileName+'.LineIndex'
 
     with open(indexFileName,'rb') as inF:
-        inF.seek(lineNumber*9, os.SEEK_SET)
+        inF.seek(int(lineNumber*9), os.SEEK_SET)
         line    = inF.readline()
         return int(line, 16)
 
