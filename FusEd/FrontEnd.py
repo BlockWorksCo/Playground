@@ -46,6 +46,11 @@ class FrontEnd:
         self.stdscr.clear()
         self.stdscr.keypad(True)
 
+        if curses.can_change_color():
+            # init_color(n, r, g, b)
+            # n=0 is background
+            curses.start_color()
+            curses.init_color(0, 255, 255, 255)
 
     def RedrawBuffer(self):
     
