@@ -37,12 +37,10 @@ class FrontEnd:
         curses.noecho()
         #curses.echo()
 
-        begin_x = 20
-        begin_y = 7
-        height = 5
-        width = 40
-        win = curses.newwin(height, width, begin_y, begin_x)
-        tb = curses.textpad.Textbox(win)
+        self.height, self.width = self.stdscr.getmaxyx()
+
+        self.win = curses.newwin(self.height-1, self.width-3, 0,3)
+        tb = curses.textpad.Textbox(self.win)
         #text = tb.edit()
         #curses.addstr(4,1,text.encode('utf_8'))
 
@@ -66,7 +64,7 @@ class FrontEnd:
                 line    = f.readline().decode('utf-8').replace('\n','')
 
                 displayLine = '%3d %s'%(i+self.top,line)
-                self.stdscr.addstr(i, 0, displayLine[:self.width])
+                self.win.addstr(i, 0, displayLine[:self.width])
 
 
         status  = 'pos: %d %d lines: %d'%(self.left, self.top,LineIndex.NumberOfLines(self.fileName))
