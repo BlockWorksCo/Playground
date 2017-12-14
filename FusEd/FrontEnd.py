@@ -39,8 +39,8 @@ class FrontEnd:
         screenHeight, screenWidth = self.stdscr.getmaxyx()
 
         self.statusWin  = curses.newwin( 1,screenWidth, screenHeight-1,0)
-        self.leftBorder = curses.newwin( screenHeight-0,3, 0,0)
-        self.contentWin = curses.newwin( screenHeight, screenWidth-3, 0,3)
+        self.leftBorder = curses.newwin( screenHeight-0,4, 0,0)
+        self.contentWin = curses.newwin( screenHeight, screenWidth-3, 0,4)
 
         self.height, self.width = self.contentWin.getmaxyx()
 
@@ -70,7 +70,7 @@ class FrontEnd:
 
                 self.leftBorder.addstr(i,0, '%3d'%(i+self.top) )                
 
-                displayLine = ' %s'%(line)
+                displayLine = '%s'%(line)
                 self.contentWin.addstr(i, 0, displayLine[:self.width])
 
 
@@ -89,6 +89,8 @@ class FrontEnd:
         """
 
         self.height, self.width = self.contentWin.getmaxyx()
+        bY,bX   = self.contentWin.getbegyx()
+
         self.RedrawBuffer()
 
         c = self.stdscr.getch()
@@ -97,9 +99,15 @@ class FrontEnd:
         elif c == ord('q'): 
             return False
         elif c == curses.KEY_UP:
-            self.top   = self.top - 1
+            if self.y > 0:
+                self.y      = self.y - 1
+            else:
+                self.top    = self.top - 1
         elif c == curses.KEY_DOWN:
-            self.top   = self.top + 1
+            if self.y < self.height-2:
+                self.y      = self.y + 1
+            else:
+                self.top    = self.top + 1
         elif c == curses.KEY_NPAGE:
             self.top   = self.top + self.height
         elif c == curses.KEY_PPAGE:
@@ -112,6 +120,8 @@ class FrontEnd:
 
         if self.top+self.height > self.maxLines:
             self.top    = self.maxLines-self.height
+
+        self.stdscr.move(bY+self.y, bX+self.x)
 
         return True
 
