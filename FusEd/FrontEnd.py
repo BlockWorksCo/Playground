@@ -35,14 +35,14 @@ class FrontEnd:
         self.fileName    = 'tmp/MediumSizeFile'
 
         curses.noecho()
-        #curses.echo()
 
-        self.height, self.width = self.stdscr.getmaxyx()
+        screenHeight, screenWidth = self.stdscr.getmaxyx()
 
-        self.win = curses.newwin(self.height-1, self.width-3, 0,3)
-        tb = curses.textpad.Textbox(self.win)
-        #text = tb.edit()
-        #curses.addstr(4,1,text.encode('utf_8'))
+        self.statusWin  = curses.newwin( 1,screenWidth, screenHeight-1,0)
+        self.leftBorder = curses.newwin( screenHeight-0,3, 0,0)
+        self.contentWin = curses.newwin( screenHeight, screenWidth-3, 0,3)
+
+        self.height, self.width = self.contentWin.getmaxyx()
 
         self.stdscr.clear()
         self.stdscr.keypad(True)
@@ -53,23 +53,34 @@ class FrontEnd:
             curses.start_color()
             curses.init_color(0, 255, 255, 255)
 
+        self.RedrawBuffer()
+
+
     def RedrawBuffer(self):
     
         with open(self.fileName,'rb') as f:
-            self.stdscr.clear()
+
+            self.contentWin.clear()
+
             for i in range(0, self.height-1):
 
                 index   = LineIndex.IndexOfLine(self.fileName, self.top+i)
                 f.seek(index, os.SEEK_SET)
                 line    = f.readline().decode('utf-8').replace('\n','')
 
-                displayLine = '%3d %s'%(i+self.top,line)
-                self.win.addstr(i, 0, displayLine[:self.width])
+                self.leftBorder.addstr(i,0, '%3d'%(i+self.top) )                
+
+                displayLine = ' %s'%(line)
+                self.contentWin.addstr(i, 0, displayLine[:self.width])
 
 
+        self.statusWin.clear()
         status  = 'pos: %d %d lines: %d'%(self.left, self.top,LineIndex.NumberOfLines(self.fileName))
-        self.stdscr.addstr(self.height-1, 1, status)
+        self.statusWin.addstr(0,0, status)
 
+        self.leftBorder.refresh()
+        self.contentWin.refresh()
+        self.statusWin.refresh()
         self.stdscr.refresh()
 
 
@@ -77,7 +88,7 @@ class FrontEnd:
         """
         """
 
-        self.height, self.width = self.stdscr.getmaxyx()
+        self.height, self.width = self.contentWin.getmaxyx()
         self.RedrawBuffer()
 
         c = self.stdscr.getch()
