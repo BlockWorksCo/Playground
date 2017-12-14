@@ -14,6 +14,7 @@ import threading
 import sys
 import subprocess
 import LineIndex
+from DataSource import *
 
 
 count   = 0
@@ -33,6 +34,7 @@ class FrontEnd:
         self.x      = 0
         self.y      = 0
         self.fileName    = 'tmp/MediumSizeFile'
+        self.fh         = open('tmp/MediumSizeFile')
 
         curses.noecho()
 
@@ -118,6 +120,15 @@ class FrontEnd:
             self.top   = self.top + self.height
         elif c == curses.KEY_PPAGE:
             self.top   = self.top - self.height
+        else:
+            text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            ds1     = StringDataSource(text1, 0,len(text1))
+            handles = EDFS.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            spans   = InsertSpan(spans, (0,4, ds1) )
+            handles['/MediumSizeFile']    = (fh,spans)
+            EDFS.SetHandles(handles)
+
 
         if self.top < 0:
             self.top    = 0

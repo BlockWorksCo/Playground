@@ -330,6 +330,14 @@ def FUSEThread(fs, mountPoint):
 
 
 
+def SetHandles(handles):
+    fs.SynchronousPut( (1,handles) )
+
+def GetHandles():
+    handles = fs.SynchronousPut( (2,None) )
+    return handles
+
+
 
 
 
@@ -690,6 +698,7 @@ class TestFUSE(unittest.TestCase):
 
             self.assertEqual(data, b'ABCDabcdefghijklmnopqrstuvwxyz\n0123')
             self.assertEqual(length, 35)
+
 
 
 
