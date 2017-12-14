@@ -75,7 +75,7 @@ class FrontEnd:
 
 
         self.statusWin.clear()
-        status  = 'pos: %d %d lines: %d'%(self.left, self.top,LineIndex.NumberOfLines(self.fileName))
+        status  = 'pos: %d %d lines: %d'%(self.left+self.x, self.top+self.y,LineIndex.NumberOfLines(self.fileName))
         self.statusWin.addstr(0,0, status)
 
         self.leftBorder.refresh()
@@ -98,6 +98,12 @@ class FrontEnd:
             pass
         elif c == ord('q'): 
             return False
+        elif c == curses.KEY_LEFT:
+            if self.x > 0:
+                self.x          = self.x - 1
+        elif c == curses.KEY_RIGHT:
+            if self.x < self.width-2:
+                self.x          = self.x + 1
         elif c == curses.KEY_UP:
             if self.y > 0:
                 self.y      = self.y - 1
