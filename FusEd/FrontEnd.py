@@ -57,19 +57,18 @@ class FrontEnd:
         fileName    = 'tmp/MediumSizeFile'
         with open(fileName,'rb') as f:
             self.stdscr.clear()
-            height,width = self.stdscr.getmaxyx()
-            for i in range(0, height-1):
+            for i in range(0, self.height-1):
 
                 index   = LineIndex.IndexOfLine(fileName, self.top+i)
                 f.seek(index, os.SEEK_SET)
                 line    = f.readline().decode('utf-8').replace('\n','')
 
                 displayLine = '%3d %s'%(i+self.top,line)
-                self.stdscr.addstr(i, 0, displayLine[:width])
+                self.stdscr.addstr(i, 0, displayLine[:self.width])
 
 
         status  = '%d %d'%(self.left, self.top)
-        self.stdscr.addstr(height-1, 1, status)
+        self.stdscr.addstr(self.height-1, 1, status)
 
         self.stdscr.refresh()
 
@@ -78,6 +77,7 @@ class FrontEnd:
         """
         """
 
+        self.height, self.width = self.stdscr.getmaxyx()
         self.RedrawBuffer()
 
         c = self.stdscr.getch()
@@ -89,9 +89,17 @@ class FrontEnd:
             self.top   = self.top - 1
         elif c == curses.KEY_DOWN:
             self.top   = self.top + 1
+        elif c == curses.KEY_NPAGE:
+            self.top   = self.top + self.height
+        elif c == curses.KEY_PPAGE:
+            self.top   = self.top - self.height
 
         if self.top < 0:
             self.top    = 0
+
+        self.maxLines   = 114
+        if self.top+self.height > self.maxLines:
+            self.top    = self.maxLines-self.height
 
         return True
 
