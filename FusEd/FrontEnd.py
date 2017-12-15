@@ -71,6 +71,7 @@ class FrontEnd:
             self.leftBorder.addstr(i,0, '%3d'%(i+self.top) )                
 
             displayLine = '%s'%(line)
+            #displayLine = '%08x'%(index)
             self.contentWin.addstr(i, 0, displayLine[:self.width])
 
 
@@ -126,10 +127,7 @@ class FrontEnd:
             spans   = EDFS.InsertSpan(spans, (0,4, ds1) )
             handles['/MediumSizeFile']    = (fh,spans)
             EDFS.SetHandles(handles)
-            print('[regen]')
             EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
-            print('[regen done]')
-
 
         if self.top < 0:
             self.top    = 0

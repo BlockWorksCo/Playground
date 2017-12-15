@@ -341,7 +341,8 @@ def SetHandles(handles):
     fs.SynchronousPut( (1,handles) )
 
 def RegenerateLineIndex(fileName):
-    fs.SynchronousPut( (3,fileName) )
+    LineIndex.GenerateLineIndex(fileName)
+    #fs.SynchronousPut( (3,fileName) )
 
 def GetHandles():
     handles = fs.SynchronousPut( (2,None) )

@@ -11,12 +11,15 @@ import tempfile
 
 def NumberOfLines(fileName):
 
-    return os.path.getsize(fileName+'.LineIndex')/9
+    dirName,fn    = os.path.split(fileName)
+    indexFileName   = tempfile.gettempdir()+'/'+fn+'.LineIndex'
+    return os.path.getsize(indexFileName)/9
 
 
 def IndexOfLine(fileName, lineNumber):
 
-    indexFileName   = fileName+'.LineIndex'
+    dirName,fn    = os.path.split(fileName)
+    indexFileName   = tempfile.gettempdir()+'/'+fn+'.LineIndex'
 
     with open(indexFileName,'rb') as inF:
         inF.seek(int(lineNumber*9), os.SEEK_SET)
@@ -27,9 +30,7 @@ def IndexOfLine(fileName, lineNumber):
 def GenerateLineIndex( fileName ):
 
     dirName,fn    = os.path.split(fileName)
-
     indexFileName   = tempfile.gettempdir()+'/'+fn+'.LineIndex'
-    #print('[%s]'%indexFileName)
 
     with open(fileName,'rb') as inF, open(indexFileName,'wb') as outF:
 
