@@ -25,7 +25,7 @@ class FrontEnd:
     """
 
 
-    def __init__(self):
+    def __init__(self, fileName):
         """
         """
         self.stdscr = curses.initscr()
@@ -34,7 +34,6 @@ class FrontEnd:
         self.x      = 0
         self.y      = 0
         self.fileName    = 'tmp/MediumSizeFile'
-        self.fh         = open('tmp/MediumSizeFile')
 
         curses.noecho()
 
@@ -55,25 +54,24 @@ class FrontEnd:
             curses.start_color()
             curses.init_color(0, 255, 255, 255)
 
+        self.fh         = open('./tmp/MediumSizeFile', 'rb')
         self.RedrawBuffer()
 
 
     def RedrawBuffer(self):
     
-        with open(self.fileName,'rb') as f:
+        self.contentWin.clear()
 
-            self.contentWin.clear()
+        for i in range(0, self.height-1):
 
-            for i in range(0, self.height-1):
+            index   = LineIndex.IndexOfLine(self.fileName, self.top+i)
+            self.fh.seek(index, os.SEEK_SET)
+            line    = self.fh.readline().decode('utf-8').replace('\n','')
 
-                index   = LineIndex.IndexOfLine(self.fileName, self.top+i)
-                f.seek(index, os.SEEK_SET)
-                line    = f.readline().decode('utf-8').replace('\n','')
+            self.leftBorder.addstr(i,0, '%3d'%(i+self.top) )                
 
-                self.leftBorder.addstr(i,0, '%3d'%(i+self.top) )                
-
-                displayLine = '%s'%(line)
-                self.contentWin.addstr(i, 0, displayLine[:self.width])
+            displayLine = '%s'%(line)
+            self.contentWin.addstr(i, 0, displayLine[:self.width])
 
 
         self.statusWin.clear()
@@ -124,8 +122,9 @@ class FrontEnd:
             text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
             ds1     = StringDataSource(text1, 0,len(text1))
             handles = EDFS.GetHandles()
+            print(handles)
             fh,spans= handles['/MediumSizeFile']
-            spans   = InsertSpan(spans, (0,4, ds1) )
+            spans   = EDFS.InsertSpan(spans, (0,4, ds1) )
             handles['/MediumSizeFile']    = (fh,spans)
             EDFS.SetHandles(handles)
 
@@ -162,9 +161,11 @@ if __name__ == '__main__':
 
     dirName,fileName    = os.path.split(sys.argv[1])
 
+
     EDFS.RunEDFS()
 
-    frontEnd    = FrontEnd()
+    frontEnd    = FrontEnd(fileName)
+
     try:
         while frontEnd.Iterate() == True:
             pass
