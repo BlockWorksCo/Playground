@@ -68,6 +68,10 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
                 rsp             = self.handles
                 #print('getting %s'%(rsp))
           
+            elif rq == 3:
+                LineIndex.GenerateLineIndex(data)
+                rsp             = True
+                  
             else:
                 #print('** bad request [%s] **'%(rq))
                 sys.exit(-1)
@@ -295,7 +299,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         fn,spans    = self.handles[path]
         #print('close')
         os.close(fn)
-        self.handles.pop(path)
+        #self.handles.pop(path)
         return 1
         #pass
 
@@ -306,6 +310,9 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         #print('** SetHandles [%s] **'%(multiprocessing.current_process().name))
         #print(handles)
         self.SynchronousPut( (1,handles) )
+
+    def RegenerateLineIndex(self, fileName):
+        self.SynchronousPut( (3,fileName) )
 
     def GetHandles(self):
         #print('** GetHandles **')
@@ -332,6 +339,9 @@ def FUSEThread(fs, mountPoint):
 
 def SetHandles(handles):
     fs.SynchronousPut( (1,handles) )
+
+def RegenerateLineIndex(fileName):
+    fs.SynchronousPut( (3,fileName) )
 
 def GetHandles():
     handles = fs.SynchronousPut( (2,None) )

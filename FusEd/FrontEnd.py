@@ -122,11 +122,13 @@ class FrontEnd:
             text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
             ds1     = StringDataSource(text1, 0,len(text1))
             handles = EDFS.GetHandles()
-            print(handles)
             fh,spans= handles['/MediumSizeFile']
             spans   = EDFS.InsertSpan(spans, (0,4, ds1) )
             handles['/MediumSizeFile']    = (fh,spans)
             EDFS.SetHandles(handles)
+            print('[regen]')
+            EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
+            print('[regen done]')
 
 
         if self.top < 0:

@@ -5,6 +5,7 @@
 import sys
 import os
 import unittest
+import tempfile
 
 
 
@@ -25,13 +26,17 @@ def IndexOfLine(fileName, lineNumber):
 
 def GenerateLineIndex( fileName ):
 
-    indexFileName   = fileName+'.LineIndex'
+    dirName,fn    = os.path.split(fileName)
+
+    indexFileName   = tempfile.gettempdir()+'/'+fn+'.LineIndex'
+    #print('[%s]'%indexFileName)
 
     with open(fileName,'rb') as inF, open(indexFileName,'wb') as outF:
 
         outF.write(b'%08x\n'%(0))
         for line in inF:
             offset  = inF.tell()
+            #print('[%d]'%offset)
             outF.write(b'%08x\n'%(offset))
 
 
