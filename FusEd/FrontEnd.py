@@ -71,8 +71,7 @@ class FrontEnd:
             self.leftBorder.addstr(i,0, '%3d'%(i+self.top) )                
 
             displayLine = '%s'%(line)
-            #displayLine = '%08x'%(index)
-            self.contentWin.addstr(i, 0, displayLine[:self.width])
+            self.contentWin.addstr(i, 0, displayLine[self.left:self.left+self.width])
 
 
         self.statusWin.clear()
@@ -92,8 +91,15 @@ class FrontEnd:
         self.height, self.width = self.contentWin.getmaxyx()
         bY,bX   = self.contentWin.getbegyx()
 
+        #
+        #
+        #
         self.RedrawBuffer()
+        self.stdscr.move(bY+self.y, bX+self.x)
 
+        #
+        #
+        #
         c = self.stdscr.getch()
         if c == ord('p'): 
             pass
@@ -102,9 +108,13 @@ class FrontEnd:
         elif c == curses.KEY_LEFT:
             if self.x > 0:
                 self.x          = self.x - 1
+            else:
+                self.left       = self.left - 1
         elif c == curses.KEY_RIGHT:
             if self.x < self.width-2:
                 self.x          = self.x + 1
+            else:
+                self.left       = self.left + 1
         elif c == curses.KEY_UP:
             if self.y > 0:
                 self.y      = self.y - 1
@@ -119,22 +129,35 @@ class FrontEnd:
             self.top   = self.top + self.height
         elif c == curses.KEY_PPAGE:
             self.top   = self.top - self.height
+        elif c == curses.KEY_HOME:
+            self.x      = 0
+        elif c == curses.KEY_END:
+            index   = LineIndex.IndexOfLine(self.fileName, self.top+self.y)
+            self.fh.seek(index, os.SEEK_SET)
+            line    = self.fh.readline().decode('utf-8').replace('\n','')
+            self.x      = len(line)
         else:
-            text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            #text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            text1   = ('%c'%c).encode('utf-8')
             ds1     = StringDataSource(text1, 0,len(text1))
             handles = EDFS.GetHandles()
             fh,spans= handles['/MediumSizeFile']
-            offset  = LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.top+self.y ) + self.x
-            spans   = EDFS.InsertSpan(spans, (offset,offset+4, ds1) )
+            offset  = LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.top+self.y ) + self.x + self.left
+            spans   = EDFS.InsertSpan(spans, (offset,offset+1, ds1) )
             handles['/MediumSizeFile']    = (fh,spans)
             EDFS.SetHandles(handles)
             EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
+
+            self.x  = self.x + 1
 
         #
         #
         #
         if self.top < 0:
             self.top    = 0
+
+        if self.left < 0:
+            self.left    = 0
 
         self.maxLines   = LineIndex.NumberOfLines(self.fileName)
 
@@ -147,10 +170,6 @@ class FrontEnd:
         if self.x > len(line):
             self.x  = len(line)
 
-        #
-        #
-        #
-        self.stdscr.move(bY+self.y, bX+self.x)
 
         return True
 
