@@ -124,11 +124,15 @@ class FrontEnd:
             ds1     = StringDataSource(text1, 0,len(text1))
             handles = EDFS.GetHandles()
             fh,spans= handles['/MediumSizeFile']
-            spans   = EDFS.InsertSpan(spans, (0,4, ds1) )
+            offset  = LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.top+self.y ) + self.x
+            spans   = EDFS.InsertSpan(spans, (offset,offset+4, ds1) )
             handles['/MediumSizeFile']    = (fh,spans)
             EDFS.SetHandles(handles)
             EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
 
+        #
+        #
+        #
         if self.top < 0:
             self.top    = 0
 
@@ -137,6 +141,15 @@ class FrontEnd:
         if self.top+self.height > self.maxLines:
             self.top    = self.maxLines-self.height
 
+        index   = LineIndex.IndexOfLine(self.fileName, self.top+self.y)
+        self.fh.seek(index, os.SEEK_SET)
+        line    = self.fh.readline().decode('utf-8').replace('\n','')
+        if self.x > len(line):
+            self.x  = len(line)
+
+        #
+        #
+        #
         self.stdscr.move(bY+self.y, bX+self.x)
 
         return True
