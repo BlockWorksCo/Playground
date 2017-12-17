@@ -714,6 +714,33 @@ class TestFUSE(unittest.TestCase):
 
 
 
+    def test_fourteen(self):
+
+        with open('tmp/MediumSizeFile','rb') as f:
+
+            for i in range(10):
+                text1   = b'[a]'
+                ds1     = StringDataSource(text1, 0,len(text1))
+                handles = fs.GetHandles()
+                fh,spans= handles['/SmallTestFile']
+                spans   = InsertSpan(spans, (0,4, ds1) )
+                handles['/SmallTestFile']    = (fh,spans)
+                fs.SetHandles(handles)
+
+            f.seek(0,os.SEEK_SET)
+            data    = f.read()
+            print(fs.SetHandles(handles))
+            #print(data)
+
+            f.close()
+
+            #self.assertEqual(data, b'ABCDabcdefghijklmnopqrstuvwxyz\n0123')
+            #self.assertEqual(length, 35)
+
+
+
+
+
 
 
 

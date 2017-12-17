@@ -137,18 +137,20 @@ class FrontEnd:
             line    = self.fh.readline().decode('utf-8').replace('\n','')
             self.x      = len(line)
         else:
-            #text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-            text1   = ('%c'%c).encode('utf-8')
+            text1   = ('[%c]'%c).encode('utf-8')
             ds1     = StringDataSource(text1, 0,len(text1))
             handles = EDFS.GetHandles()
             fh,spans= handles['/MediumSizeFile']
             offset  = LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.top+self.y ) + self.x + self.left
-            spans   = EDFS.InsertSpan(spans, (offset,offset+1, ds1) )
+            spans   = EDFS.InsertSpan(spans, (offset,offset+len(text1), ds1) )
             handles['/MediumSizeFile']    = (fh,spans)
+            open('Debug.log','w+').write('[1 %s]'%handles)
             EDFS.SetHandles(handles)
+            print('[2]')
             EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
+            print('[3]')
 
-            self.x  = self.x + 1
+            self.x  = self.x + len(text1)
 
         #
         #
