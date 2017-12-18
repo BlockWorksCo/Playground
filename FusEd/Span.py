@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 
           ----- -------- --------     ---------
@@ -152,6 +153,8 @@ def InsertSpan(spans, span):
                 inserted    = True
 
             newSpans.append( (tS+offset,tE+offset,t1) )
+
+    newSpans    = ReduceSpans(newSpans)
 
     return newSpans
 

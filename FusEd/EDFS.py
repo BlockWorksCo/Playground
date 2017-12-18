@@ -744,25 +744,29 @@ class TestFUSE(unittest.TestCase):
 
 
 
-    def _test_fourteen(self):
+    def test_fourteen(self):
 
         self.ResetState()
 
         with open('tmp/MediumSizeFile','rb') as f:
 
-            for i in range(10):
+            for i in range(15):
                 text1   = b'[a]'
                 ds1     = StringDataSource(text1, 0,len(text1))
                 handles = fs.GetHandles()
-                fh,spans= handles['/SmallTestFile']
-                spans   = InsertSpan(spans, (0,4, ds1) )
-                handles['/SmallTestFile']    = (fh,spans)
+                fh,spans= handles['/MediumSizeFile']
+                spans   = InsertSpan(spans, (0,3, ds1) )
+                handles['/MediumSizeFile']    = (fh,spans)
                 fs.SetHandles(handles)
 
             f.seek(0,os.SEEK_SET)
             data    = f.read()
-            print(fs.SetHandles(handles))
             #print(data)
+
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            for span in spans:
+                print(span)
 
             f.close()
 
