@@ -33,7 +33,7 @@ def GenerateLineIndex( fileName ):
     indexFileName   = tempfile.gettempdir()+'/'+fn+'.LineIndex'
 
     with open(fileName,'rb') as inF, open(indexFileName,'wb') as outF:
-
+        inF.seek(0,os.SEEK_SET)
         outF.write(b'%08x\n'%(0))
         for line in inF:
             offset  = inF.tell()
