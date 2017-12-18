@@ -529,6 +529,28 @@ class TestSpans(unittest.TestCase):
 
 
 
+    def test_twentyeight(self):
+
+        text1       = b'*'*32768
+        dataSource1 = StringDataSource(text1, 0,0+len(text1))
+
+        text2       = b'a'
+        dataSource2 = StringDataSource(text2, 0,0+len(text2))
+
+        text3       = b'a'
+        dataSource3 = StringDataSource(text3, 0,0+len(text2))
+
+        spans   = [ (0,32768,dataSource1.SubDataSource(0,32768)) ]
+        spans   = InsertSpan(spans, (0,1,dataSource2) )
+        spans   = InsertSpan(spans, (1,2,dataSource3) )
+
+        result  = GetData( spans, 0,10)
+        print(result)
+        self.assertEqual(result, b'***ABCDEFGHIJ' )
+
+
+
+
 
 
 

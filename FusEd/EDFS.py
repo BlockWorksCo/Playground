@@ -717,6 +717,45 @@ class TestFUSE(unittest.TestCase):
 
 
 
+    def test_fifteen(self):
+
+        self.ResetState()
+
+        with open('tmp/MediumSizeFile','rb') as f:
+
+            text1   = b'a'
+            ds1     = StringDataSource(text1, 0,len(text1))
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            spans   = InsertSpan(spans, (0,1, ds1) )
+            handles['/MediumSizeFile']    = (fh,spans)
+            fs.SetHandles(handles)
+
+            text2   = b'a'
+            ds2     = StringDataSource(text2, 0,len(text2))
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            spans   = InsertSpan(spans, (1,2, ds1) )
+            handles['/MediumSizeFile']    = (fh,spans)
+            fs.SetHandles(handles)
+
+            f.seek(0,os.SEEK_SET)
+            data    = f.read(50)
+            print(data)
+
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            #for span in spans:
+                #print(span[2].rangeStart)
+
+            f.close()
+
+            #self.assertEqual(data, b'[a][a][a][a][a][a][a][a][a][a][a][a][a][a][a]Lorem')
+            #self.assertEqual(length, 35)
+
+
+
+
 
 
 

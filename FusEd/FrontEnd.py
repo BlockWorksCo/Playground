@@ -29,6 +29,7 @@ class FrontEnd:
         """
         """
         self.stdscr = curses.initscr()
+        curses.def_shell_mode()
         self.top    = 0
         self.left   = 0
         self.x      = 0
@@ -60,6 +61,9 @@ class FrontEnd:
 
     def RedrawBuffer(self):
     
+        handles  = EDFS.GetHandles()
+        print(handles)
+        print('NumberOfLinesInFile = %d'%(LineIndex.NumberOfLines(self.fileName)))
         EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
 
         self.contentWin.clear()
@@ -146,11 +150,9 @@ class FrontEnd:
             offset  = LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.top+self.y ) + self.x + self.left
             spans   = EDFS.InsertSpan(spans, (offset,offset+len(text1), ds1) )
             handles['/MediumSizeFile']    = (fh,spans)
-            open('Debug.log','w+').write('[1 %s]'%handles)
+            #open('Debug.log','w+').write('[1 %s]'%handles)
             EDFS.SetHandles(handles)
-            print('[2]')
             EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
-            print('[3]')
 
             self.x  = self.x + len(text1)
 
@@ -211,10 +213,13 @@ if __name__ == '__main__':
             pass
 
         curses.endwin()
+        curses.reset_shell_mode()
 
     except KeyboardInterrupt:
         sys.exit(-1)
+        curses.reset_shell_mode()
 
+    curses.reset_shell_mode()
 
 
 
