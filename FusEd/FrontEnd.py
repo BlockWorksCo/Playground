@@ -137,7 +137,7 @@ class FrontEnd:
             line    = self.fh.readline().decode('utf-8').replace('\n','')
             self.x      = len(line)
         else:
-            text1   = ('[%c]'%c).encode('utf-8')
+            text1   = ('%c'%c).encode('utf-8')
             ds1     = StringDataSource(text1, 0,len(text1))
             handles = EDFS.GetHandles()
             fh,spans= handles['/MediumSizeFile']

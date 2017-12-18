@@ -41,15 +41,12 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def SynchronousPut(self, rq):
         self.requestQsend.send( rq )
-        #print('** triggering **')
         try:
             #time.sleep(0.01)
             os.stat('tmp/q')
         except OSError:
             pass
-        #print('** waiting for response **')
         response    = self.responseQrecv.recv()
-        #print('** response is %s**'%(str(response)))
 
         return response
 
@@ -59,30 +56,24 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
             rq,data   = self.requestQrecv.recv()
         
             if rq == 1:
-                #print('setting %s'%(data))
                 self.handles    = data
                 rsp             = True
 
             elif rq == 2:
-                #print('rq 2')
                 rsp             = self.handles
-                #print('getting %s'%(rsp))
           
             elif rq == 3:
                 LineIndex.GenerateLineIndex(data)
                 rsp             = True
                   
             else:
-                #print('** bad request [%s] **'%(rq))
                 sys.exit(-1)
                 rsp             = None
 
             self.responseQsend.send(rsp)
-            #print('put response on responseQ %s'%rsp)
 
         else:
 
-            #print('trigger with no data')
             pass
 
 
@@ -119,26 +110,20 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
     def getattr(self, path, fh=None):
 
         if path == '/q':
-            #print('Trigger')
             self.ProcessQ()
             return {'st_mode':33204, 'st_ino':2, 'st_dev':62, 'st_nlink':1, 'st_uid':1000, 'st_gid':1000, 'st_size':27, 'st_atime':int(time.time()), 'st_mtime':int(time.time()), 'st_ctime':1511394708}
 
         else:
             
-            #print('getattr(%s,%s)'%(path,str(fh)))
             full_path = self._full_path(path)
             st = os.lstat(full_path)
             s= dict((key, getattr(st, key)) for key in ('st_atime', 'st_ctime',
                          'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))
 
             if path in list(self.handles.keys()):
-                #print('--- in handles ---')
                 fh,spans        = self.handles[path]
-                #print(spans)
                 s['st_size']    = self.LengthOfSpans(spans)
-                #print(s)
             else:
-                #print('--- not in handles ---')
                 pass
 
             return s
@@ -146,7 +131,6 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
     def readdir(self, path, fh):
 
         full_path = self._full_path(path)
-        #print('** readdir %s **'%(full_path))
 
         dirents = ['.', '..','q']
         if os.path.isdir(full_path):
@@ -174,7 +158,6 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return os.mkdir(self._full_path(path), mode)
 
     def statfs(self, path):
-        #print('statfs')
 
         full_path = self._full_path(path)
         stv = os.statvfs(full_path)
@@ -183,7 +166,6 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
             'f_blocks', 'f_bsize', 'f_favail', 'f_ffree', 'f_files', 'f_flag',
             'f_frsize', 'f_namemax'))
 
-        #print('** statfs on %s **'%path)
 
         return s
 
@@ -207,7 +189,6 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def open(self, path, flags):
 
-        #print('open of %s'%path)
         full_path = self._full_path(path)
         fh  = os.open(full_path, flags)
     
@@ -247,36 +228,9 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
         fn,spans    = self.handles[path]
 
-        #print('')
-        #print('read %s from %d of %d bytes'%(path,offset,length))
-        #print(self.handles)
-        #if length > self.BLOCK_SIZE:
-            #length  = self.BLOCK_SIZE
-
-        #full_path   = self._full_path(path)
-        #fileLength  = self.LengthOfSpans(spans)
-        #print('file length = %d'%fileLength)
-
-        #if offset+length > fileLength:
-            #length  = fileLength - offset
-
-        #if length <= 0:
-            #print('EOF @ %d'%(offset))
-            #return None
-
-        #else:
-
-        #print(fh)
-        #print( self.handles[path] )
-
-        #os.lseek(fh, offset, os.SEEK_SET)
-        #data    = os.read(fh, length)
-        #print('offset=%d'%(offset))
-        #print('1) length=%d'%(length))
         data    = GetData(spans, offset, offset+length)
         if len(data) > length:
             data    = data[:length]
-        #print(data)
 
         return data
 
@@ -290,14 +244,10 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
             f.truncate(length)
 
     def flush(self, path, fh):
-        #print('*** flush ****')
-        #return os.fsync(fh)
         return 0
 
     def release(self, path, fh):
-        #print('** release %s **'%path)
         fn,spans    = self.handles[path]
-        #print('close')
         os.close(fn)
         #self.handles.pop(path)
         return 1
@@ -307,17 +257,13 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return self.flush(path, fh)
 
     def SetHandles(self, handles):
-        #print('** SetHandles [%s] **'%(multiprocessing.current_process().name))
-        #print(handles)
         self.SynchronousPut( (1,handles) )
 
     def RegenerateLineIndex(self, fileName):
         self.SynchronousPut( (3,fileName) )
 
     def GetHandles(self):
-        #print('** GetHandles **')
         handles = self.SynchronousPut( (2,None) )
-        #print('** GetHandles are %s **'%handles)
         return handles
 
 
@@ -434,7 +380,6 @@ class TestFUSE(unittest.TestCase):
 
             f.seek(0,os.SEEK_SET)
             data    = f.read()
-            #print(data)
 
             f.close()
 
@@ -484,7 +429,6 @@ class TestFUSE(unittest.TestCase):
 
             f.seek(0,os.SEEK_SET)
             data    = f.read()
-            #print(data)
 
             f.close()
 
@@ -518,7 +462,6 @@ class TestFUSE(unittest.TestCase):
 
             f.seek(0,os.SEEK_SET)
             data    = f.read()
-            #print(data)
 
             f.close()
 
@@ -578,7 +521,6 @@ class TestFUSE(unittest.TestCase):
 
             f.seek(33112,os.SEEK_SET)
             data    = f.read()
-            #print('[%s]'%data)
 
             f.close()
 
@@ -733,7 +675,6 @@ class TestFUSE(unittest.TestCase):
 
             f.seek(0,os.SEEK_SET)
             data    = f.read()
-            #print(data)
 
             f.close()
 
@@ -760,17 +701,17 @@ class TestFUSE(unittest.TestCase):
                 fs.SetHandles(handles)
 
             f.seek(0,os.SEEK_SET)
-            data    = f.read()
+            data    = f.read(50)
             #print(data)
 
             handles = fs.GetHandles()
             fh,spans= handles['/MediumSizeFile']
-            for span in spans:
-                print(span)
+            #for span in spans:
+                #print(span[2].rangeStart)
 
             f.close()
 
-            #self.assertEqual(data, b'ABCDabcdefghijklmnopqrstuvwxyz\n0123')
+            self.assertEqual(data, b'[a][a][a][a][a][a][a][a][a][a][a][a][a][a][a]Lorem')
             #self.assertEqual(length, 35)
 
 

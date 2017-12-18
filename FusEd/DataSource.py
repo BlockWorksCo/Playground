@@ -20,11 +20,12 @@ class FileDataSource:
         readEnd     = min(readStart+numberOfBytes, self.rangeEnd+offset)
 
         os.lseek(self.fh, readStart, os.SEEK_SET)
-        #print('offset=%d number=%d'%(offset,numberOfBytes))
-        #print('reading %d bytes from %d (%d,%d)'%(numberOfBytes, os.lseek(self.fh,0,os.SEEK_CUR), readStart,readEnd ))
         data        = os.read(self.fh, readEnd-readStart)
 
         return data
+
+    def CombineWith(self, other):
+        return self
         
 
     def SubDataSource(self, rangeStart,rangeEnd):
@@ -50,10 +51,19 @@ class StringDataSource:
 
         return data
         
+    def CombineWith(self, other):
+        self.text        = self.text[self.rangeStart:self.rangeEnd] + other.text[other.rangeStart:other.rangeEnd]
+        self.rangeEnd    = self.rangeEnd + (other.rangeEnd-other.rangeStart)
+
+        self.text       = self.text[self.rangeStart:self.rangeEnd]
+        self.rangeStart = 0
+        self.rangeEnd   = len(self.text)
+
+        return self
 
     def SubDataSource(self, rangeStart,rangeEnd):
         
-        return StringDataSource(self.text, self.rangeStart+rangeStart, self.rangeStart+rangeEnd)
+        return StringDataSource( self.text[rangeStart:rangeEnd], 0, rangeEnd-rangeStart )
 
 
 
@@ -85,7 +95,7 @@ class Tests(unittest.TestCase):
         dataSource      = StringDataSource(text, 5,len(text)-5)
         subDataSource   = dataSource.SubDataSource(5,15)
         data            = subDataSource.Read(0,10)
-        self.assertEqual(data, 'klmnopqrst' )
+        self.assertEqual(data, 'fghijklmno' )
 
 
 
