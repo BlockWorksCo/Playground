@@ -359,7 +359,13 @@ def GetHandles():
 
 class TestFUSE(unittest.TestCase):
 
+
+    def ResetState(self):
+        fs.SetHandles({})
+
     def test_one(self):
+
+        self.ResetState()
 
         with open('tmp/SmallTestFile','rb') as f:
 
@@ -371,6 +377,8 @@ class TestFUSE(unittest.TestCase):
 
 
     def test_two(self):
+
+        self.ResetState()
 
         with open('tmp/SmallTestFile','rb') as f:
 
@@ -396,6 +404,8 @@ class TestFUSE(unittest.TestCase):
 
     def test_three(self):
 
+        self.ResetState()
+
         with open('tmp/SmallTestFile','rb') as f:
 
             f.seek(0, os.SEEK_END)
@@ -407,6 +417,8 @@ class TestFUSE(unittest.TestCase):
 
 
     def test_four(self):
+
+        self.ResetState()
 
         with open('tmp/SmallTestFile','rb') as f:
 
@@ -433,6 +445,8 @@ class TestFUSE(unittest.TestCase):
 
     def test_five(self):
 
+        self.ResetState()
+
         with open('tmp/SmallTestFile','rb') as f:
 
             text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -453,6 +467,8 @@ class TestFUSE(unittest.TestCase):
 
 
     def test_six(self):
+
+        self.ResetState()
 
         with open('tmp/SmallTestFile','rb') as f:
 
@@ -479,6 +495,8 @@ class TestFUSE(unittest.TestCase):
 
 
     def test_seven(self):
+
+        self.ResetState()
 
         with open('tmp/EmptyFile','rb') as f:
 
@@ -512,6 +530,8 @@ class TestFUSE(unittest.TestCase):
 
     def test_eight(self):
 
+        self.ResetState()
+
         with open('tmp/MediumSizeFile','rb') as f:
 
             length1  = os.path.getsize('tmp/MediumSizeFile')
@@ -539,6 +559,8 @@ class TestFUSE(unittest.TestCase):
 
 
     def test_nine(self):
+
+        self.ResetState()
 
         with open('tmp/MediumSizeFile','rb') as f:
 
@@ -568,6 +590,8 @@ class TestFUSE(unittest.TestCase):
 
 
     def test_ten(self):
+
+        self.ResetState()
 
         with open('tmp/MediumSizeFile','rb') as f:
 
@@ -609,6 +633,8 @@ class TestFUSE(unittest.TestCase):
 
     def test_eleven(self):
 
+        self.ResetState()
+
         with open('tmp/MediumSizeFile','rb') as f:
 
             length1  = os.path.getsize('tmp/MediumSizeFile')
@@ -643,6 +669,8 @@ class TestFUSE(unittest.TestCase):
 
 
     def test_twelve(self):
+
+        self.ResetState()
 
         with open('tmp/MediumSizeFile','rb') as f:
 
@@ -681,6 +709,8 @@ class TestFUSE(unittest.TestCase):
 
     def test_thirteen(self):
 
+        self.ResetState()
+
         with open('tmp/SmallTestFile','rb') as f:
 
             text1   = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -714,7 +744,9 @@ class TestFUSE(unittest.TestCase):
 
 
 
-    def test_fourteen(self):
+    def _test_fourteen(self):
+
+        self.ResetState()
 
         with open('tmp/MediumSizeFile','rb') as f:
 
