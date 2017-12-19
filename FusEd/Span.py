@@ -222,9 +222,12 @@ def GetData(spans, rangeStart,rangeEnd):
         if span != None:
             spanStart,spanEnd,spanData  = span
 
+            print('pos %d numberOfBytes: %d span: %s'%(position,numberOfBytes, str(span)))
             numberOfBytesToCopy = min(numberOfBytes,spanEnd-position)
             data                += spanData.Read(position-spanStart,numberOfBytesToCopy)
+            print('reading offset %d, %d bytes'%(position-spanStart,numberOfBytesToCopy))
             numberOfBytesCopied += numberOfBytesToCopy
+            print('read result = [%s]'%data)
             position            += numberOfBytesToCopy
 
         else:

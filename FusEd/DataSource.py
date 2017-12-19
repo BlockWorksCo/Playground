@@ -4,6 +4,7 @@
 
 import unittest
 import os
+import time
 
 
 class FileDataSource:
@@ -19,8 +20,12 @@ class FileDataSource:
         readStart   = self.rangeStart+offset
         readEnd     = min(readStart+numberOfBytes, self.rangeEnd+offset)
 
-        os.lseek(self.fh, readStart, os.SEEK_SET)
+        position    = os.lseek(self.fh, readStart, os.SEEK_SET)
         data        = os.read(self.fh, readEnd-readStart)
+        if len(data) != numberOfBytes:
+            print('%d) could only read %d bytes of %d pos %d/%d'%(self.fh, len(data),numberOfBytes, position,offset))
+            while True:
+                time.sleep(1)
 
         return data
 
