@@ -115,6 +115,10 @@ def ReduceSpans(spans):
                     else:
                         p1              = t1.SubDataSource(0,tE1-tS1)
                         p2              = t2.SubDataSource(0,tE2-tS2)
+                        if p1.rangeStart == p1.rangeEnd:
+                            print('p1!!!')
+                        if p2.rangeStart == p2.rangeEnd:
+                            print('p2!!!')
                         combinedSpan    = p1.CombineWith(p2)
                         newSpans.append( (tS1,tE2, combinedSpan) )
                     #
@@ -224,10 +228,12 @@ def GetData(spans, rangeStart,rangeEnd):
 
             print('pos %d numberOfBytes: %d span: %s'%(position,numberOfBytes, str(span)))
             numberOfBytesToCopy = min(numberOfBytes,spanEnd-position)
+            if spanData.rangeStart == spanData.rangeEnd:
+                print('No Data: [%d -> %d]'%(spanData.rangeStart,spanData.rangeEnd))
             data                += spanData.Read(position-spanStart,numberOfBytesToCopy)
-            print('reading offset %d, %d bytes'%(position-spanStart,numberOfBytesToCopy))
+            #print('reading offset %d, %d bytes'%(position-spanStart,numberOfBytesToCopy))
             numberOfBytesCopied += numberOfBytesToCopy
-            print('read result = [%s]'%data)
+            #print('read result = [%s]'%data)
             position            += numberOfBytesToCopy
 
         else:

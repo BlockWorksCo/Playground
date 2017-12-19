@@ -22,20 +22,19 @@ class FileDataSource:
 
         position    = os.lseek(self.fh, readStart, os.SEEK_SET)
         data        = os.read(self.fh, readEnd-readStart)
-        if len(data) != numberOfBytes:
-            print('%d) could only read %d bytes of %d pos %d/%d'%(self.fh, len(data),numberOfBytes, position,offset))
-            while True:
-                time.sleep(1)
 
         return data
 
     def CombineWith(self, other):
+        self.rangeEnd    = other.rangeEnd
+
         return self
         
 
     def SubDataSource(self, rangeStart,rangeEnd):
         
-        return FileDataSource(self.fh, self.rangeStart+rangeStart, self.rangeStart+rangeEnd)
+        newSource   = FileDataSource(self.fh, self.rangeStart+rangeStart, self.rangeStart+rangeEnd)
+        return newSource
 
 
 
