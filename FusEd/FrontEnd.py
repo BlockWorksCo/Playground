@@ -70,6 +70,7 @@ class FrontEnd:
 
         for i in range(0, self.height-1):
 
+            print('--- %d, %d ---'%(self.top,i))
             index   = LineIndex.IndexOfLine(self.fileName, self.top+i)
             self.fh.seek(index, os.SEEK_SET)
             line    = self.fh.readline().decode('utf-8').replace('\n','')
@@ -112,14 +113,14 @@ class FrontEnd:
         elif c == ord('q'): 
             return False
         elif c == curses.KEY_DC:
-            if True:
-                handles = EDFS.GetHandles()
-                fh,spans= handles['/MediumSizeFile']
-                offset  = LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.top+self.y ) + self.x + self.left
-                spans   = EDFS.RemoveData(spans, offset,offset+1 )
-                handles['/MediumSizeFile']    = (fh,spans)
-                EDFS.SetHandles(handles)
-                EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
+            handles = EDFS.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            offset  = LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.top+self.y ) + self.x + self.left
+            spans   = EDFS.RemoveData(spans, offset,offset+1 )
+            handles['/MediumSizeFile']    = (fh,spans)
+            EDFS.SetHandles(handles)
+            #print(handles)
+            EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
 
         elif c == curses.KEY_BACKSPACE:
             if self.x > 0:

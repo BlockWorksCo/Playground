@@ -205,6 +205,7 @@ def RemoveSpan(spans, span):
 
     spans.remove(span)
     spans   = RemoveGaps(spans)
+    spans   = ReduceSpans(spans)
 
     return spans
 
@@ -448,7 +449,7 @@ class TestSpans(unittest.TestCase):
         spans   = RemoveData(spans, 10,15 )
 
         result  = GetData( spans, 0,15 )
-        self.assertEqual(result, b'abcdefghijpqrstuvwxyz' )
+        self.assertEqual(result, b'abcdefghijpqrst' )
 
 
     def test_twentytwo(self):
@@ -548,7 +549,7 @@ class TestSpans(unittest.TestCase):
         spans   = InsertSpan(spans, (1,2,dataSource3) )
 
         result  = GetData( spans, 0,10)
-        self.assertEqual(result, b'***ABCDEFGHIJ' )
+        self.assertEqual(result, b'aa********' )
 
 
 
