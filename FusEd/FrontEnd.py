@@ -70,7 +70,7 @@ class FrontEnd:
 
         for i in range(0, self.height-1):
 
-            print('--- %d, %d ---'%(self.top,i))
+            #print('--- %d, %d ---'%(self.top,i))
             index   = LineIndex.IndexOfLine(self.fileName, self.top+i)
             self.fh.seek(index, os.SEEK_SET)
             line    = self.fh.readline().decode('utf-8').replace('\n','')
@@ -108,9 +108,7 @@ class FrontEnd:
         #
         #
         c = self.stdscr.getch()
-        if c == ord('p'): 
-            pass
-        elif c == ord('q'): 
+        if c == 0x1b: 
             return False
         elif c == curses.KEY_DC:
             handles = EDFS.GetHandles()

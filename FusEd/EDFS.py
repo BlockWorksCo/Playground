@@ -702,12 +702,9 @@ class TestFUSE(unittest.TestCase):
 
             f.seek(0,os.SEEK_SET)
             data    = f.read(50)
-            #print(data)
 
             handles = fs.GetHandles()
             fh,spans= handles['/MediumSizeFile']
-            #for span in spans:
-                #print(span[2].rangeStart)
 
             f.close()
 
@@ -741,13 +738,9 @@ class TestFUSE(unittest.TestCase):
 
             f.seek(0,os.SEEK_SET)
             data    = f.read(50)
-            #print(handles)
-            #print(data)
 
             handles = fs.GetHandles()
             fh,spans= handles['/MediumSizeFile']
-            #for span in spans:
-                #print(span[2].rangeStart)
 
             f.close()
 
@@ -815,7 +808,6 @@ if __name__ == '__main__':
     #
     try:
         unittest.main()
-        #print('unittest done')
 
     except KeyboardInterrupt:
         sys.exit(-1)
