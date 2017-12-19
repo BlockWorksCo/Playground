@@ -741,8 +741,8 @@ class TestFUSE(unittest.TestCase):
 
             f.seek(0,os.SEEK_SET)
             data    = f.read(50)
-            print(handles)
-            print(data)
+            #print(handles)
+            #print(data)
 
             handles = fs.GetHandles()
             fh,spans= handles['/MediumSizeFile']

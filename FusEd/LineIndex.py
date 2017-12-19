@@ -33,28 +33,17 @@ def GenerateLineIndex( fileName ):
     dirName,fn    = os.path.split(fileName)
     indexFileName   = tempfile.gettempdir()+'/'+fn+'.LineIndex'
 
-    try:
-        with open(fileName,'rb') as inF, open(indexFileName,'wb') as outF:
-            inF.seek(0,os.SEEK_SET)
-            outF.seek(0,os.SEEK_SET)
-            outF.write(b'%08x\n'%(0))
-            lineCount   = 0
-            for line in inF:
-                offset  = inF.tell()
-                #print('[%d]'%offset)
-                outF.write(b'%08x\n'%(offset))
-                lineCount   = lineCount+1
-    except:
-        print('**** AARGH ****')
+    with open(fileName,'rb') as inF, open(indexFileName,'wb') as outF:
+        inF.seek(0,os.SEEK_SET)
+        outF.seek(0,os.SEEK_SET)
+        outF.write(b'%08x\n'%(0))
+        lineCount   = 0
+        for line in inF:
+            offset  = inF.tell()
+            #print('[%d]'%offset)
+            outF.write(b'%08x\n'%(offset))
+            lineCount   = lineCount+1
 
-    inF.close()
-    outF.close()
-
-    print('>>>> lineCount = %d <<<<'%(lineCount))
-    #if lineCount != 113:
-    #    while True:
-    #        time.sleep(1.0)
-    #    raise Exception("bad linecount %d"%lineCount)
 
 
 

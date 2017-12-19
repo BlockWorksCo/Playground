@@ -62,8 +62,8 @@ class FrontEnd:
     def RedrawBuffer(self):
     
         handles  = EDFS.GetHandles()
-        print(handles)
-        print('NumberOfLinesInFile = %d'%(LineIndex.NumberOfLines(self.fileName)))
+        #print(handles)
+        #print('NumberOfLinesInFile = %d'%(LineIndex.NumberOfLines(self.fileName)))
         EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
 
         self.contentWin.clear()
@@ -173,7 +173,7 @@ class FrontEnd:
         if self.top < 0:
             self.top    = 0
 
-        print('** LineNumber %d + %d, %d **'%(self.top,self.y, self.maxLines))
+        #print('** LineNumber %d + %d, %d **'%(self.top,self.y, self.maxLines))
         index   = LineIndex.IndexOfLine(self.fileName, self.top+self.y)
         self.fh.seek(index, os.SEEK_SET)
         line    = self.fh.readline().decode('utf-8').replace('\n','')
