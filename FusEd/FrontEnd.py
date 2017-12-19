@@ -111,6 +111,30 @@ class FrontEnd:
             pass
         elif c == ord('q'): 
             return False
+        elif c == curses.KEY_DC:
+            if True:
+                handles = EDFS.GetHandles()
+                fh,spans= handles['/MediumSizeFile']
+                offset  = LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.top+self.y ) + self.x + self.left
+                spans   = EDFS.RemoveData(spans, offset,offset+1 )
+                handles['/MediumSizeFile']    = (fh,spans)
+                EDFS.SetHandles(handles)
+                EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
+
+        elif c == curses.KEY_BACKSPACE:
+            if self.x > 0:
+                self.x          = self.x - 1
+
+                handles = EDFS.GetHandles()
+                fh,spans= handles['/MediumSizeFile']
+                offset  = LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.top+self.y ) + self.x + self.left
+                spans   = EDFS.RemoveData(spans, offset,offset+1 )
+                handles['/MediumSizeFile']    = (fh,spans)
+                EDFS.SetHandles(handles)
+                EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
+
+            else:
+                self.left       = self.left - 1
         elif c == curses.KEY_LEFT:
             if self.x > 0:
                 self.x          = self.x - 1
