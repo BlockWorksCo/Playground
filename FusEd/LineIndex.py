@@ -7,8 +7,10 @@ import os
 import unittest
 import tempfile
 import time
+import logging
 
 
+logger         = logging.getLogger('LineIndex')
 
 def NumberOfLines(fileName):
 

@@ -12,8 +12,10 @@
 
 import unittest
 from DataSource import *
+import logging
 
 
+logger         = logging.getLogger('Span')
 
 def SpanAtPoint(spans, position):
 
@@ -157,7 +159,7 @@ def RemoveGaps(spans):
 
 
 
-def AddSpan(spans, span):
+def AddSpan(spans, span, reduceFlag=True):
 
     newSpans    = []
 
@@ -165,7 +167,8 @@ def AddSpan(spans, span):
     spans   = SplitAtPosition(spans, s)
     spans   = SplitAtPosition(spans, e)
     spans   = RemoveSpansCoveredBy(spans, s,e)
-    spans   = ReduceSpans(spans)
+    if reduceFlag == False:
+        spans   = ReduceSpans(spans)
     spans   = OrderedInsert( spans, span )
     spans   = RemoveGaps(spans)
 
@@ -239,7 +242,7 @@ def GetData(spans, rangeStart,rangeEnd):
 def RemoveData(spans, rangeStart,rangeEnd):
 
     span    = (rangeStart,rangeEnd,None)
-    spans   = AddSpan(spans, span)
+    spans   = AddSpan(spans, span, reduceFlag=False)
     spans   = RemoveSpan(spans, span)
 
     return spans

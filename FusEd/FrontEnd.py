@@ -15,6 +15,7 @@ import sys
 import subprocess
 import LineIndex
 from DataSource import *
+import logging
 
 
 count   = 0
@@ -28,6 +29,8 @@ class FrontEnd:
     def __init__(self, fileName):
         """
         """
+        self.logger         = logging.getLogger('FrontEnd')
+
         self.stdscr = curses.initscr()
         curses.def_shell_mode()
         self.top    = 0
@@ -230,6 +233,19 @@ if __name__ == '__main__':
     EDFS.RunEDFS()
 
     frontEnd    = FrontEnd(fileName)
+
+    logging.getLogger('FrontEnd').addHandler(logging.FileHandler('FrontEnd.log'))
+    logging.getLogger('Spans').addHandler(logging.FileHandler('Spans.log'))
+    logging.getLogger('FileDataSource').addHandler(logging.FileHandler('FileDataSource.log'))
+    logging.getLogger('StringDataSource').addHandler(logging.FileHandler('StringDataSource.log'))
+    logging.getLogger('EDFS').addHandler(logging.FileHandler('EDFS.log'))
+
+    logging.getLogger('FrontEnd').setLevel(logging.DEBUG)
+    logging.getLogger('Spans').setLevel(logging.DEBUG)
+    logging.getLogger('FileDataSource').setLevel(logging.DEBUG)
+    logging.getLogger('StringDataSource').setLevel(logging.DEBUG)
+
+    logging.getLogger('FrontEnd').info('Starting up')
 
     try:
         while frontEnd.Iterate() == True:

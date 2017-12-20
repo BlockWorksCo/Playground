@@ -14,6 +14,7 @@ import multiprocessing
 import queue
 from multiprocessing.managers import BaseManager, NamespaceProxy
 import LineIndex
+import logging
 
 from fuse import FUSE, FuseOSError, Operations
 
@@ -26,6 +27,8 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
 
     def __init__(self, root):
+
+        self.logger         = logging.getLogger('EDFS')
         self.root           = root
         self.handles        = {}
 

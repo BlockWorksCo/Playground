@@ -5,11 +5,13 @@
 import unittest
 import os
 import time
+import logging
 
 
 class FileDataSource:
 
     def __init__(self, fh, rangeStart,rangeEnd):
+        #self.logger     = logging.getLogger('FileDataSource')
         self.fh         = fh
         self.rangeStart = rangeStart
         self.rangeEnd   = rangeEnd
@@ -41,6 +43,7 @@ class FileDataSource:
 class StringDataSource:
 
     def __init__(self, text, rangeStart,rangeEnd):
+        #self.logger     = logging.getLogger('StringDataSource')
         self.text       = text
         self.rangeStart = rangeStart
         self.rangeEnd   = rangeEnd
