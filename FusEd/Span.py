@@ -15,7 +15,7 @@ from DataSource import *
 import logging
 
 
-logger         = logging.getLogger('Span')
+logger         = logging.getLogger('Spans')
 
 def SpanAtPoint(spans, position):
 
@@ -107,7 +107,7 @@ def ReduceSpans(spans):
             if i<numberOfSpans-1:
                 tS2,tE2,t2 = spans[i+1]
                 
-                if tE1 == tS2 and type(t1) == type(t2) and i<numberOfSpans-1:
+                if tE1 == tS2 and type(t1) == type(t2) and i<numberOfSpans-1 and t1.CanCombineWith(t2) == True:
 
                     #
                     # Adjoining spans with the same type of data Source
@@ -241,9 +241,12 @@ def GetData(spans, rangeStart,rangeEnd):
 
 def RemoveData(spans, rangeStart,rangeEnd):
 
+    logger.debug('spans 1: %s'%(str(spans)))
     span    = (rangeStart,rangeEnd,None)
     spans   = AddSpan(spans, span, reduceFlag=False)
+    logger.debug('spans 2: %s'%(str(spans)))
     spans   = RemoveSpan(spans, span)
+    logger.debug('spans 3: %s'%(str(spans)))
 
     return spans
 

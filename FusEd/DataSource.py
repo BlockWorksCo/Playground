@@ -33,6 +33,12 @@ class FileDataSource:
         return self
         
 
+    def CanCombineWith(self, other):
+        if self.rangeEnd == other.rangeStart and type(self) == type(other):
+            return True
+
+        return False
+
     def SubDataSource(self, rangeStart,rangeEnd):
         
         newSource   = FileDataSource(self.fh, self.rangeStart+rangeStart, self.rangeStart+rangeEnd)
@@ -67,6 +73,9 @@ class StringDataSource:
         self.rangeEnd   = len(self.text)
 
         return self
+
+    def CanCombineWith(self, other):
+        return True
 
     def SubDataSource(self, rangeStart,rangeEnd):
         
