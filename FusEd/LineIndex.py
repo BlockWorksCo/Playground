@@ -35,6 +35,8 @@ def GenerateLineIndex( fileName ):
     dirName,fn    = os.path.split(fileName)
     indexFileName   = tempfile.gettempdir()+'/'+fn+'.LineIndex'
 
+    logger.debug('Generating line index for %s'%(fileName))
+
     with open(fileName,'rb') as inF, open(indexFileName,'wb') as outF:
         inF.seek(0,os.SEEK_SET)
         outF.seek(0,os.SEEK_SET)

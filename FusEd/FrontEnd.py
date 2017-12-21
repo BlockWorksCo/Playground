@@ -239,11 +239,13 @@ if __name__ == '__main__':
     logging.getLogger('FileDataSource').addHandler(logging.FileHandler('FileDataSource.log'))
     logging.getLogger('StringDataSource').addHandler(logging.FileHandler('StringDataSource.log'))
     logging.getLogger('EDFS').addHandler(logging.FileHandler('EDFS.log'))
+    logging.getLogger('LineIndex').addHandler(logging.FileHandler('LineIndex.log'))
 
     logging.getLogger('FrontEnd').setLevel(logging.DEBUG)
     logging.getLogger('Spans').setLevel(logging.DEBUG)
     logging.getLogger('FileDataSource').setLevel(logging.DEBUG)
     logging.getLogger('StringDataSource').setLevel(logging.DEBUG)
+    logging.getLogger('LineIndex').setLevel(logging.DEBUG)
 
     logging.getLogger('FrontEnd').info('Starting up')
 
