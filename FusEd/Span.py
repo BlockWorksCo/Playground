@@ -557,6 +557,20 @@ class TestSpans(unittest.TestCase):
 
 
 
+    def test_thirty(self):
+
+        text1       = b'abcdefghijklmnopqrstuvwxyz'
+        dataSource1 = StringDataSource(text1, 0,0+len(text1))
+
+        spans   = [ (0,len(text1),dataSource1.SubDataSource(0,len(text1))) ]
+        spans   = RemoveData(spans, 0,1 )
+
+        result  = GetData( spans, 1,10)
+        self.assertEqual(result, b'bcdefghij' )
+
+
+
+
 
 
 

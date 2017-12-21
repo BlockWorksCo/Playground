@@ -755,6 +755,45 @@ class TestFUSE(unittest.TestCase):
 
 
 
+    def test_sixteen(self):
+
+        self.ResetState()
+
+        with open('tmp/MediumSizeFile','rb') as f:
+
+            text1   = b' '
+            ds1     = StringDataSource(text1, 0,len(text1))
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            spans   = InsertSpan(spans, (-1,0, ds1) )
+            handles['/MediumSizeFile']    = (fh,spans)
+            fs.SetHandles(handles)
+
+            print(spans)
+
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            spans   = RemoveData(spans, 0,1 )
+            handles['/MediumSizeFile']    = (fh,spans)
+            fs.SetHandles(handles)
+
+            print(spans)
+            f.seek(0,os.SEEK_SET)
+            data    = f.read(10)
+
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+
+            f.close()
+
+            self.assertEqual(data, b'orem ipsum')
+            #self.assertEqual(length, 10)
+
+
+
+
+
+
 
 
 def ExitFunction():
