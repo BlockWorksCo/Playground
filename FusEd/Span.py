@@ -221,8 +221,10 @@ def GetData(spans, rangeStart,rangeEnd):
     numberOfBytesCopied = 0
     position            = rangeStart
     data                = b''
+    #print('%d->%d'%(rangeStart,rangeEnd))
     while numberOfBytesCopied < numberOfBytes:
         span                        = SpanAtPoint(spans, position)
+        #print('span at %d is %s'%(position,str(span)))
         if span != None:
             spanStart,spanEnd,spanData  = span
 

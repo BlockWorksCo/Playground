@@ -48,6 +48,7 @@ def GenerateLineIndex( fileName ):
             outF.write(b'%08x\n'%(offset))
             lineCount   = lineCount+1
 
+    logger.debug('%d lines'%(lineCount))
 
 
 

@@ -231,7 +231,14 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
         fn,spans    = self.handles[path]
 
-        data    = GetData(spans, offset, offset+length)
+        origin      = spans[0][0]
+        #print('origin = %d'%origin)
+
+        #print(offset)
+        #print(length)
+        #print(spans)
+        data    = GetData(spans, offset+origin, offset+length+origin)
+        #print(data)
         if len(data) > length:
             data    = data[:length]
 
@@ -761,23 +768,12 @@ class TestFUSE(unittest.TestCase):
 
         with open('tmp/MediumSizeFile','rb') as f:
 
-            text1   = b' '
-            ds1     = StringDataSource(text1, 0,len(text1))
-            handles = fs.GetHandles()
-            fh,spans= handles['/MediumSizeFile']
-            spans   = InsertSpan(spans, (-1,0, ds1) )
-            handles['/MediumSizeFile']    = (fh,spans)
-            fs.SetHandles(handles)
-
-            print(spans)
-
             handles = fs.GetHandles()
             fh,spans= handles['/MediumSizeFile']
             spans   = RemoveData(spans, 0,1 )
             handles['/MediumSizeFile']    = (fh,spans)
             fs.SetHandles(handles)
 
-            print(spans)
             f.seek(0,os.SEEK_SET)
             data    = f.read(10)
 
