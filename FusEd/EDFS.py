@@ -788,6 +788,47 @@ class TestFUSE(unittest.TestCase):
 
 
 
+    def test_seventeen(self):
+
+        self.ResetState()
+
+        with open('tmp/MediumSizeFile','rb') as f:
+
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            spans   = RemoveData(spans, 0,1 )
+            handles['/MediumSizeFile']    = (fh,spans)
+            fs.SetHandles(handles)
+
+            text2   = b'a'
+            ds2     = StringDataSource(text2, 0,len(text2))
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            spans   = InsertSpan(spans, (1,2, ds2) )
+            handles['/MediumSizeFile']    = (fh,spans)
+            fs.SetHandles(handles)
+
+            text2   = b'a'
+            ds2     = StringDataSource(text2, 0,len(text2))
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+            spans   = InsertSpan(spans, (1,2, ds2) )
+            handles['/MediumSizeFile']    = (fh,spans)
+            fs.SetHandles(handles)
+
+            f.seek(0,os.SEEK_SET)
+            data    = f.read(10)
+
+            handles = fs.GetHandles()
+            fh,spans= handles['/MediumSizeFile']
+
+            f.close()
+
+            self.assertEqual(data, b'aaorem ips')
+
+
+
+
 
 
 

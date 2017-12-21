@@ -129,8 +129,9 @@ class FrontEnd:
 
                 handles = EDFS.GetHandles()
                 fh,spans= handles['/MediumSizeFile']
+                origin  = spans[0][0]
                 offset  = LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.top+self.y ) + self.x + self.left
-                spans   = EDFS.RemoveData(spans, offset,offset+1 )
+                spans   = EDFS.RemoveData(spans, origin+offset,origin+offset+1 )
                 handles['/MediumSizeFile']    = (fh,spans)
                 EDFS.SetHandles(handles)
                 EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
@@ -173,8 +174,9 @@ class FrontEnd:
             ds1     = StringDataSource(text1, 0,len(text1))
             handles = EDFS.GetHandles()
             fh,spans= handles['/MediumSizeFile']
+            origin  = spans[0][0]
             offset  = LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.top+self.y ) + self.x + self.left
-            spans   = EDFS.InsertSpan(spans, (offset,offset+len(text1), ds1) )
+            spans   = EDFS.InsertSpan(spans, (origin+offset,origin+offset+len(text1), ds1) )
             handles['/MediumSizeFile']    = (fh,spans)
             #open('Debug.log','w+').write('[1 %s]'%handles)
             EDFS.SetHandles(handles)
