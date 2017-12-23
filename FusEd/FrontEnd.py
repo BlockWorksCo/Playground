@@ -14,6 +14,7 @@ import threading
 import sys
 import subprocess
 import LineIndex
+import Cursor
 from DataSource import *
 import logging
 
@@ -30,6 +31,7 @@ class FrontEnd:
         """
         """
         self.logger         = logging.getLogger('FrontEnd')
+        self.cursor         = Cursor.Cursor(fileName)
 
         self.stdscr = curses.initscr()
         curses.def_shell_mode()
@@ -99,12 +101,17 @@ class FrontEnd:
         """
 
         self.height, self.width = self.contentWin.getmaxyx()
-        bY,bX   = self.contentWin.getbegyx()
+        bY,bX                   = self.contentWin.getbegyx()
 
         #
         #
         #
+        if (self.x+self.left) > (self.width-1):
+            self.left   = (self.x+self.left) - (self.width)
+            self.x      = self.width-1
+
         self.RedrawBuffer()
+        self.logger.debug('%d %d %d   %d %d %d'%(self.y,self.top,self.height,self.x,self.left,self.width))
         self.stdscr.move(bY+self.y, bX+self.x)
 
         #
@@ -144,10 +151,7 @@ class FrontEnd:
             else:
                 self.left       = self.left - 1
         elif c == curses.KEY_RIGHT:
-            if self.x < self.width-2:
-                self.x          = self.x + 1
-            else:
-                self.left       = self.left + 1
+            self.x          = self.x + 1
         elif c == curses.KEY_UP:
             if self.y > 0:
                 self.y      = self.y - 1
@@ -164,6 +168,7 @@ class FrontEnd:
             self.top   = self.top - self.height
         elif c == curses.KEY_HOME:
             self.x      = 0
+            self.left   = 0
         elif c == curses.KEY_END:
             index   = LineIndex.IndexOfLine(self.fileName, self.top+self.y)
             self.fh.seek(index, os.SEEK_SET)
