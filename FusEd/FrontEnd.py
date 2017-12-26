@@ -67,15 +67,12 @@ class FrontEnd:
     def RedrawBuffer(self):
     
         handles  = EDFS.GetHandles()
-        #print(handles)
-        #print('NumberOfLinesInFile = %d'%(LineIndex.NumberOfLines(self.fileName)))
         EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
 
         self.contentWin.clear()
 
         for i in range(0, self.height-1):
 
-            #print('--- %d, %d ---'%(self.top,i))
             index   = LineIndex.IndexOfLine(self.fileName, self.top+i)
             self.fh.seek(index, os.SEEK_SET)
             line    = self.fh.readline().decode('utf-8').replace('\n','')
@@ -95,6 +92,8 @@ class FrontEnd:
         self.statusWin.refresh()
         self.stdscr.refresh()
 
+        self.contentWin.move(4,0)
+
 
     def Iterate(self):
         """
@@ -103,116 +102,83 @@ class FrontEnd:
         self.height, self.width = self.contentWin.getmaxyx()
         bY,bX                   = self.contentWin.getbegyx()
 
-        #
-        #
-        #
-        if (self.x+self.left) > (self.width-1):
-            self.left   = (self.x+self.left) - (self.width)
-            self.x      = self.width-1
+        #self.y, self.x   = self.stdscr.getyx()
 
+        if self.x < bX:
+            if self.left > 0:
+                self.left   -= (bX - self.x)
+            self.x  = bX
+
+        if self.x >= self.width+2:
+            self.logger.debug('Limit-x')
+            self.left   += (self.x - (self.width+2))
+            self.x      = self.width+2
+
+        if self.y <= bY:
+            self.logger.debug('Limit-y')
+            if self.top > 0:
+                self.top    -= (bY - self.y)
+            self.y  = bY
+
+        if self.y >= self.height-2:
+            self.logger.debug('Limit-y')
+            self.top   += (self.y - (self.height-2))
+            self.y      = self.height-2
+
+        #
+        #
+        #
+        self.logger.debug('%d %d %d   %d %d %d '%(self.y,self.top,self.height, self.x,self.left,self.width))
         self.RedrawBuffer()
-        self.logger.debug('%d %d %d   %d %d %d'%(self.y,self.top,self.height,self.x,self.left,self.width))
-        self.stdscr.move(bY+self.y, bX+self.x)
+        self.stdscr.move(self.y, self.x)
 
         #
         #
         #
+        self.logger.debug('waiting for keypress.')
         c = self.stdscr.getch()
+        self.logger.debug('got keypress %d'%(c))
+
         if c == 0x1b: 
+            self.logger.debug('escape pressed... exiting.')
             return False
+
         elif c == curses.KEY_DC:
-            handles = EDFS.GetHandles()
-            fh,spans= handles['/MediumSizeFile']
-            offset  = LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.top+self.y ) + self.x + self.left
-            spans   = EDFS.RemoveData(spans, offset,offset+1 )
-            handles['/MediumSizeFile']    = (fh,spans)
-            EDFS.SetHandles(handles)
-            #print(handles)
-            EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
+            self.cursor.Delete()
 
         elif c == curses.KEY_BACKSPACE:
-            if self.x > 0:
-                self.x          = self.x - 1
+            self.cursor.Backspace()
 
-                handles = EDFS.GetHandles()
-                fh,spans= handles['/MediumSizeFile']
-                origin  = spans[0][0]
-                offset  = LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.top+self.y ) + self.x + self.left
-                spans   = EDFS.RemoveData(spans, origin+offset,origin+offset+1 )
-                handles['/MediumSizeFile']    = (fh,spans)
-                EDFS.SetHandles(handles)
-                EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
-
-            else:
-                self.left       = self.left - 1
         elif c == curses.KEY_LEFT:
-            if self.x > 0:
-                self.x          = self.x - 1
-            else:
-                self.left       = self.left - 1
+            self.cursor.Left()
+            self.x  -= 1
+
         elif c == curses.KEY_RIGHT:
-            self.x          = self.x + 1
+            self.cursor.Right()
+            self.x  += 1
+
         elif c == curses.KEY_UP:
-            if self.y > 0:
-                self.y      = self.y - 1
-            else:
-                self.top    = self.top - 1
+            self.cursor.Up()
+            self.y  -= 1
+
         elif c == curses.KEY_DOWN:
-            if self.y < self.height-2:
-                self.y      = self.y + 1
-            else:
-                self.top    = self.top + 1
+            self.cursor.Down()
+            self.y  += 1
+
         elif c == curses.KEY_NPAGE:
             self.top   = self.top + self.height
+
         elif c == curses.KEY_PPAGE:
             self.top   = self.top - self.height
+
         elif c == curses.KEY_HOME:
-            self.x      = 0
-            self.left   = 0
+            self.cursor.Home()
+
         elif c == curses.KEY_END:
-            index   = LineIndex.IndexOfLine(self.fileName, self.top+self.y)
-            self.fh.seek(index, os.SEEK_SET)
-            line    = self.fh.readline().decode('utf-8').replace('\n','')
-            self.x      = len(line)
+            self.cursor.End()
+
         else:
-            text1   = ('%c'%c).encode('utf-8')
-            ds1     = StringDataSource(text1, 0,len(text1))
-            handles = EDFS.GetHandles()
-            fh,spans= handles['/MediumSizeFile']
-            origin  = spans[0][0]
-            offset  = LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.top+self.y ) + self.x + self.left
-            spans   = EDFS.InsertSpan(spans, (origin+offset,origin+offset+len(text1), ds1) )
-            handles['/MediumSizeFile']    = (fh,spans)
-            #open('Debug.log','w+').write('[1 %s]'%handles)
-            EDFS.SetHandles(handles)
-            EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
-
-            self.x  = self.x + len(text1)
-
-        #
-        #
-        #
-        if self.top < 0:
-            self.top    = 0
-
-        if self.left < 0:
-            self.left    = 0
-
-        self.maxLines   = LineIndex.NumberOfLines(self.fileName)
-
-        if self.top+self.height > self.maxLines:
-            self.top    = self.maxLines-self.height
-
-        if self.top < 0:
-            self.top    = 0
-
-        #print('** LineNumber %d + %d, %d **'%(self.top,self.y, self.maxLines))
-        index   = LineIndex.IndexOfLine(self.fileName, self.top+self.y)
-        self.fh.seek(index, os.SEEK_SET)
-        line    = self.fh.readline().decode('utf-8').replace('\n','')
-        if self.x > len(line):
-            self.x  = len(line)
-
+            self.cursor.Insert()
 
         return True
 
@@ -221,7 +187,8 @@ class FrontEnd:
 
 def ExitFunction():
     subprocess.Popen(['fusermount','-uz','tmp'])
-    curses.endwin()
+    #curses.endwin()
+    pass
     
 
 
@@ -260,14 +227,14 @@ if __name__ == '__main__':
         while frontEnd.Iterate() == True:
             pass
 
-        curses.endwin()
-        curses.reset_shell_mode()
+        #curses.endwin()
+        #curses.reset_shell_mode()
 
     except KeyboardInterrupt:
         sys.exit(-1)
-        curses.reset_shell_mode()
+        #curses.reset_shell_mode()
 
-    curses.reset_shell_mode()
+    #curses.reset_shell_mode()
 
 
 
