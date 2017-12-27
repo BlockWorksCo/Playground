@@ -3,6 +3,7 @@
 import logging
 import EDFS
 import LineIndex
+import os
 
 
 
@@ -11,6 +12,7 @@ class Cursor:
 
     def __init__(self, fileName):
         self.logger         = logging.getLogger('Cursor')
+        self.logger.debug('startup')
         self.fileName       = fileName
         self.x              = 0
         self.y              = 0
@@ -44,14 +46,16 @@ class Cursor:
 
 
     def Home(self):
+        self.logger.debug('x = %d'%(self.x))
         self.x      = 0
-        self.left   = 0
 
 
     def End(self):
-        index   = LineIndex.IndexOfLine(self.fileName, self.top+self.y)
-        self.fh.seek(index, os.SEEK_SET)
-        line    = self.fh.readline().decode('utf-8').replace('\n','')
+        index   = LineIndex.IndexOfLine(self.fileName, self.y)
+        with open('./tmp/MediumSizeFile', 'rb') as fh:
+            fh.seek(index, os.SEEK_SET)
+            line    = fh.readline().decode('utf-8').replace('\n','')
+            self.logger.debug('line length = %d'%(len(line)))
         self.x      = len(line)
 
 

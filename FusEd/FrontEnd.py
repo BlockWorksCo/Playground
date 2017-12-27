@@ -101,8 +101,8 @@ class FrontEnd:
 
         self.height, self.width = self.contentWin.getmaxyx()
         bY,bX                   = self.contentWin.getbegyx()
-
-        #self.y, self.x   = self.stdscr.getyx()
+        self.x                  = self.cursor.x
+        self.y                  = self.cursor.y
 
         if self.x < bX:
             if self.left > 0:
@@ -122,7 +122,8 @@ class FrontEnd:
 
         if self.y >= self.height-2:
             self.logger.debug('Limit-y')
-            self.top   += (self.y - (self.height-2))
+            if self.top < LineIndex.NumberOfLines(self.fileName) - (self.height-0):
+                self.top   += (self.y - (self.height-2))
             self.y      = self.height-2
 
         #
@@ -214,12 +215,14 @@ if __name__ == '__main__':
     logging.getLogger('StringDataSource').addHandler(logging.FileHandler('StringDataSource.log'))
     logging.getLogger('EDFS').addHandler(logging.FileHandler('EDFS.log'))
     logging.getLogger('LineIndex').addHandler(logging.FileHandler('LineIndex.log'))
+    logging.getLogger('Cursor').addHandler(logging.FileHandler('Cursor.log'))
 
     logging.getLogger('FrontEnd').setLevel(logging.DEBUG)
     logging.getLogger('Spans').setLevel(logging.DEBUG)
     logging.getLogger('FileDataSource').setLevel(logging.DEBUG)
     logging.getLogger('StringDataSource').setLevel(logging.DEBUG)
     logging.getLogger('LineIndex').setLevel(logging.DEBUG)
+    logging.getLogger('Cursor').setLevel(logging.DEBUG)
 
     logging.getLogger('FrontEnd').info('Starting up')
 
