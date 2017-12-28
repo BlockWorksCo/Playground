@@ -4,6 +4,7 @@ import logging
 import EDFS
 import LineIndex
 import os
+from DataSource import *
 
 
 
@@ -16,6 +17,10 @@ class Cursor:
         self.fileName       = fileName
         self.x              = 0
         self.y              = 0
+
+    def SetXY(self, x, y):
+        self.x  = x
+        self.y  = y
 
 
     def Left(self):
@@ -59,7 +64,7 @@ class Cursor:
         self.x      = len(line)
 
 
-    def Insert(self):
+    def Insert(self, c):
         text    = ('%c'%c).encode('utf-8')
         ds      = StringDataSource(text, 0,len(text))
 
@@ -72,7 +77,7 @@ class Cursor:
         EDFS.SetHandles(handles)
         EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
 
-        self.x  = self.x + len(text1)
+        self.x  = self.x + len(text)
 
 
     def Add(self):

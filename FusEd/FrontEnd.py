@@ -101,8 +101,8 @@ class FrontEnd:
 
         self.height, self.width = self.contentWin.getmaxyx()
         bY,bX                   = self.contentWin.getbegyx()
-        self.x                  = self.cursor.x
-        self.y                  = self.cursor.y
+        #self.x                  = self.cursor.x
+        #self.y                  = self.cursor.y
 
         if self.x < bX:
             if self.left > 0:
@@ -120,8 +120,8 @@ class FrontEnd:
                 self.top    -= (bY - self.y)
             self.y  = bY
 
-        if self.y >= self.height-2:
-            self.logger.debug('Limit-y')
+        if self.y > self.height-2:
+            self.logger.debug('Limit-y %d %d'%(self.y,self.height-2))
             if self.top < LineIndex.NumberOfLines(self.fileName) - (self.height-0):
                 self.top   += (self.y - (self.height-2))
             self.y      = self.height-2
@@ -132,6 +132,7 @@ class FrontEnd:
         self.logger.debug('%d %d %d   %d %d %d '%(self.y,self.top,self.height, self.x,self.left,self.width))
         self.RedrawBuffer()
         self.stdscr.move(self.y, self.x)
+        self.cursor.SetXY(self.left+self.x, self.top+self.y)
 
         #
         #
@@ -179,7 +180,7 @@ class FrontEnd:
             self.cursor.End()
 
         else:
-            self.cursor.Insert()
+            self.cursor.Insert(c)
 
         return True
 
