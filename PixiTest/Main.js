@@ -16,25 +16,65 @@ app.renderer.autoResize = true;
 app.renderer.resize(window.innerWidth, window.innerHeight);
 
 
+let bunny;
 
-function HandleKeyDown(keyCode)
+
+function HandleUpKeyPress()
 {
-    console.log('down: '+keyCode);
+    bunny.vy   = -1;
+    console.log('Up press');
 }
 
-function HandleKeyUp(keyCode)
+function HandleUpKeyRelease(keyCode)
 {
-    console.log('Up: '+keyCode);
+    bunny.vy   = 0;
+    console.log('Up release');
 }
 
-function keyboard(keyCode) 
+function HandleDownKeyPress()
+{
+    bunny.vy   = 1;
+    console.log('Down press');
+}
+
+function HandleDownKeyRelease(keyCode)
+{
+    bunny.vy   = 0;
+    console.log('Down release');
+}
+
+function HandleLeftKeyPress()
+{
+    bunny.vx   = -1;
+    console.log('Left press');
+}
+
+function HandleLeftKeyRelease(keyCode)
+{
+    bunny.vx   = 0;
+    console.log('Left release');
+}
+
+function HandleRightKeyPress()
+{
+    bunny.vx   = 1;
+    console.log('Right press');
+}
+
+function HandleRightKeyRelease(keyCode)
+{
+    bunny.vx   = 0;
+    console.log('Right release');
+}
+
+function keyboard(keyCode, press, release) 
 {
   let key = {};
   key.code = keyCode;
   key.isDown = false;
   key.isUp = true;
-  key.press = undefined;
-  key.release = undefined;
+  key.press = press;
+  key.release = release;
 
   //The `downHandler`
   key.downHandler = event => {
@@ -42,7 +82,7 @@ function keyboard(keyCode)
       if (key.isUp && key.press) key.press();
       key.isDown = true;
       key.isUp = false;
-        HandleKeyDown(key.code);
+      key.press();
     }
     event.preventDefault();
   };
@@ -53,7 +93,7 @@ function keyboard(keyCode)
       if (key.isDown && key.release) key.release();
       key.isDown = false;
       key.isUp = true;
-    HandleKeyUp(key.code);
+      key.release();
     }
     event.preventDefault();
   };
@@ -76,37 +116,38 @@ function keyboard(keyCode)
 //
 function Iterate(app)
 {
-    app.bunny.rotation += 0.01;
-    app.bunny.x         += app.bunny.vx
-    app.bunny.y         += app.bunny.vy
+    bunny.rotation  += bunny.vr;
+    bunny.x         += bunny.vx;
+    bunny.y         += bunny.vy;
 }
 
 //
 //
 //
-let keyObjectUp     = keyboard(38);
-let keyObjectDown   = keyboard(40);
-let keyObjectLeft   = keyboard(37);
-let keyObjectRight  = keyboard(39);
+let keyObjectUp     = keyboard(38, HandleUpKeyPress, HandleUpKeyRelease);
+let keyObjectDown   = keyboard(40, HandleDownKeyPress, HandleDownKeyRelease);
+let keyObjectLeft   = keyboard(37, HandleLeftKeyPress, HandleLeftKeyRelease);
+let keyObjectRight  = keyboard(39, HandleRightKeyPress, HandleRightKeyRelease);
 
 // load the texture we need
 PIXI.loader.add('bunny', 'Bunny.jpg').load((loader, resources) => {
     // This creates a texture from a 'bunny.png' image
-    this.bunny = new PIXI.Sprite(resources.bunny.texture);
+    bunny = new PIXI.Sprite(resources.bunny.texture);
 
     // Setup the position of the bunny
-    this.bunny.x = app.renderer.width / 2;
-    this.bunny.y = app.renderer.height / 2;
+    bunny.x = app.renderer.width / 2;
+    bunny.y = app.renderer.height / 2;
 
     // Rotate around the center
-    this.bunny.anchor.x = 0.5;
-    this.bunny.anchor.y = 0.5;
+    bunny.anchor.x = 0.5;
+    bunny.anchor.y = 0.5;
 
-    this.bunny.vx   = 0
-    this.bunny.vy   = 0
+    bunny.vx   = 0;
+    bunny.vy   = 0;
+    bunny.vr   = 0.01;
 
     // Add the bunny to the scene we are building
-    app.stage.addChild(this.bunny);
+    app.stage.addChild(bunny);
 
     // Listen for frame updates
     app.ticker.add(() => {
