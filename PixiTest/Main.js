@@ -16,6 +16,61 @@ app.renderer.autoResize = true;
 app.renderer.resize(window.innerWidth, window.innerHeight);
 
 
+
+function HandleKeyDown(keyCode)
+{
+    console.log('down: '+keyCode);
+}
+
+function HandleKeyUp(keyCode)
+{
+    console.log('Up: '+keyCode);
+}
+
+function keyboard(keyCode) 
+{
+  let key = {};
+  key.code = keyCode;
+  key.isDown = false;
+  key.isUp = true;
+  key.press = undefined;
+  key.release = undefined;
+
+  //The `downHandler`
+  key.downHandler = event => {
+    if (event.keyCode === key.code) {
+      if (key.isUp && key.press) key.press();
+      key.isDown = true;
+      key.isUp = false;
+        HandleKeyDown(key.code);
+    }
+    event.preventDefault();
+  };
+
+  //The `upHandler`
+  key.upHandler = event => {
+    if (event.keyCode === key.code) {
+      if (key.isDown && key.release) key.release();
+      key.isDown = false;
+      key.isUp = true;
+    HandleKeyUp(key.code);
+    }
+    event.preventDefault();
+  };
+
+  //Attach event listeners
+  window.addEventListener(
+    "keydown", key.downHandler.bind(key), false
+  );
+  window.addEventListener(
+    "keyup", key.upHandler.bind(key), false
+  );
+  return key;
+}
+
+
+
+
 //
 //
 //
@@ -25,6 +80,14 @@ function Iterate(app)
     app.bunny.x         += app.bunny.vx
     app.bunny.y         += app.bunny.vy
 }
+
+//
+//
+//
+let keyObjectUp     = keyboard(38);
+let keyObjectDown   = keyboard(40);
+let keyObjectLeft   = keyboard(37);
+let keyObjectRight  = keyboard(39);
 
 // load the texture we need
 PIXI.loader.add('bunny', 'Bunny.jpg').load((loader, resources) => {
@@ -39,8 +102,8 @@ PIXI.loader.add('bunny', 'Bunny.jpg').load((loader, resources) => {
     this.bunny.anchor.x = 0.5;
     this.bunny.anchor.y = 0.5;
 
-    this.bunny.vx   = 1
-    this.bunny.vy   = 1
+    this.bunny.vx   = 0
+    this.bunny.vy   = 0
 
     // Add the bunny to the scene we are building
     app.stage.addChild(this.bunny);
