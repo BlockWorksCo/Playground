@@ -109,6 +109,10 @@ class FrontEnd:
                 self.left   -= (bX - self.x)
             self.x  = bX
 
+        if self.x > LineIndex.LengthOfLine(self.fileName, self.top+self.y):
+            self.logger.debug('Limit-end')
+            self.x  = LineIndex.LengthOfLine(self.fileName, self.top+self.y)
+
         if self.x >= self.width+2:
             self.logger.debug('Limit-x')
             self.left   += (self.x - (self.width+2))
@@ -178,6 +182,7 @@ class FrontEnd:
 
         elif c == curses.KEY_END:
             self.cursor.End()
+            self.x      = LineIndex.LengthOfLine(self.fileName, self.y)
 
         else:
             self.cursor.Insert(c)

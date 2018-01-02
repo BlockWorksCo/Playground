@@ -56,12 +56,7 @@ class Cursor:
 
 
     def End(self):
-        index   = LineIndex.IndexOfLine(self.fileName, self.y)
-        with open('./tmp/MediumSizeFile', 'rb') as fh:
-            fh.seek(index, os.SEEK_SET)
-            line    = fh.readline().decode('utf-8').replace('\n','')
-            self.logger.debug('line length = %d'%(len(line)))
-        self.x      = len(line)
+        self.x      = LineIndex.LengthOfLine('./tmp/'+self.fileName, self.y)
 
 
     def Insert(self, c):

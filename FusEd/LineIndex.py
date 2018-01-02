@@ -30,6 +30,14 @@ def IndexOfLine(fileName, lineNumber):
         return int(line, 16)
 
 
+def LengthOfLine(fileName, lineNumber):
+    index   = IndexOfLine(fileName, lineNumber)
+    with open(fileName, 'rb') as fh:
+        fh.seek(index, os.SEEK_SET)
+        line    = fh.readline().decode('utf-8').replace('\n','')
+    return len(line)
+
+
 def GenerateLineIndex( fileName ):
 
     dirName,fn    = os.path.split(fileName)
