@@ -1,7 +1,7 @@
 // The application will create a renderer using WebGL, if possible,
 // with a fallback to a canvas render. It will also setup the ticker
 // and the root stage PIXI.Container
-const app = new PIXI.Application({ transparent: false, backgroundColor : 0x1099bb });
+const app = new PIXI.Application({ transparent: false, backgroundColor : 0xbbbbbb });
 app.backgroundColor = 0x061639;
 
 // The application will create a canvas element for you that you
@@ -110,6 +110,26 @@ function keyboard(keyCode, press, release)
 }
 
 
+function SetupLevel()
+{
+    levelData   = 
+    [
+        {"Name":"BlockOne.png", "X":10,"Y":10, "SX":0.2,"SY":0.2},    
+        {"Name":"BlockTwo.png", "X":120,"Y":10, "SX":0.2,"SY":0.2},    
+        {"Name":"BlockOne.png", "X":220,"Y":10, "SX":0.2,"SY":0.2},    
+        {"Name":"BlockThree.png", "X":320,"Y":10, "SX":0.2,"SY":0.2},    
+    ];
+
+    for(i=0; i<levelData.length; i++)
+    {
+        sprite = new PIXI.Sprite.fromImage(levelData[i]["Name"]);
+        sprite.x        = levelData[i]["X"];
+        sprite.y        = levelData[i]["Y"];
+        sprite.scale.x  = levelData[i]["SX"];
+        sprite.scale.y  = levelData[i]["SY"];
+        app.stage.addChild(sprite);
+    }
+}
 
 
 //
@@ -137,12 +157,7 @@ stickMan.scale.x    = 0.2;
 stickMan.scale.y    = 0.2;
 app.stage.addChild(stickMan);
 
-blockOne = new PIXI.Sprite.fromImage("BlockOne.png");
-blockOne.x  = 100;
-blockOne.y  = 100;
-blockOne.scale.x    = 0.2;
-blockOne.scale.y    = 0.2;
-app.stage.addChild(blockOne);
+SetupLevel();
 
 bunny = new PIXI.Sprite.fromImage("Bunny.png");
 // Setup the position of the bunny
