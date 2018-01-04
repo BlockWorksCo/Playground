@@ -130,15 +130,21 @@ let keyObjectDown   = keyboard(40, HandleDownKeyPress, HandleDownKeyRelease);
 let keyObjectLeft   = keyboard(37, HandleLeftKeyPress, HandleLeftKeyRelease);
 let keyObjectRight  = keyboard(39, HandleRightKeyPress, HandleRightKeyRelease);
 
-bunny = new PIXI.Sprite.fromImage("Bunny.png");
 stickMan = new PIXI.Sprite.fromImage("StickMan.png");
-
 stickMan.x  = 10;
 stickMan.y  = 10;
 stickMan.scale.x    = 0.2;
 stickMan.scale.y    = 0.2;
 app.stage.addChild(stickMan);
 
+blockOne = new PIXI.Sprite.fromImage("BlockOne.png");
+blockOne.x  = 100;
+blockOne.y  = 100;
+blockOne.scale.x    = 0.2;
+blockOne.scale.y    = 0.2;
+app.stage.addChild(blockOne);
+
+bunny = new PIXI.Sprite.fromImage("Bunny.png");
 // Setup the position of the bunny
 bunny.x = app.renderer.width / 2;
 bunny.y = app.renderer.height / 2;
