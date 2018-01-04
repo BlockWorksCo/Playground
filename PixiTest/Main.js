@@ -1,7 +1,8 @@
 // The application will create a renderer using WebGL, if possible,
 // with a fallback to a canvas render. It will also setup the ticker
 // and the root stage PIXI.Container
-const app = new PIXI.Application();
+const app = new PIXI.Application({ transparent: false, backgroundColor : 0x1099bb });
+app.backgroundColor = 0x061639;
 
 // The application will create a canvas element for you that you
 // can then insert into the DOM
@@ -129,31 +130,34 @@ let keyObjectDown   = keyboard(40, HandleDownKeyPress, HandleDownKeyRelease);
 let keyObjectLeft   = keyboard(37, HandleLeftKeyPress, HandleLeftKeyRelease);
 let keyObjectRight  = keyboard(39, HandleRightKeyPress, HandleRightKeyRelease);
 
-// load the texture we need
-PIXI.loader.add('bunny', 'Bunny.jpg').load((loader, resources) => {
-    // This creates a texture from a 'bunny.png' image
-    bunny = new PIXI.Sprite(resources.bunny.texture);
+bunny = new PIXI.Sprite.fromImage("Bunny.png");
+stickMan = new PIXI.Sprite.fromImage("StickMan.png");
 
-    // Setup the position of the bunny
-    bunny.x = app.renderer.width / 2;
-    bunny.y = app.renderer.height / 2;
+stickMan.x  = 10;
+stickMan.y  = 10;
+stickMan.scale.x    = 0.2;
+stickMan.scale.y    = 0.2;
+app.stage.addChild(stickMan);
 
-    // Rotate around the center
-    bunny.anchor.x = 0.5;
-    bunny.anchor.y = 0.5;
+// Setup the position of the bunny
+bunny.x = app.renderer.width / 2;
+bunny.y = app.renderer.height / 2;
 
-    bunny.vx   = 0;
-    bunny.vy   = 0;
-    bunny.vr   = 0.01;
+// Rotate around the center
+bunny.anchor.x = 0.5;
+bunny.anchor.y = 0.5;
 
-    // Add the bunny to the scene we are building
-    app.stage.addChild(bunny);
+bunny.vx   = 0;
+bunny.vy   = 0;
+bunny.vr   = 0.01;
 
-    // Listen for frame updates
-    app.ticker.add(() => {
-         // each frame we spin the bunny around a bit
-        Iterate(this)
-    });
+// Add the bunny to the scene we are building
+app.stage.addChild(bunny);
+
+// Listen for frame updates
+app.ticker.add(() => {
+     // each frame we spin the bunny around a bit
+    Iterate(this)
 });
 
 
