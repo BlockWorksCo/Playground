@@ -37,8 +37,6 @@ class FrontEnd:
         curses.def_shell_mode()
         self.top    = 0
         self.left   = 0
-        self.x      = 0
-        self.y      = 0
         self.fileName    = 'tmp/MediumSizeFile'
 
         curses.noecho()
@@ -63,6 +61,8 @@ class FrontEnd:
         self.fh         = open('./tmp/MediumSizeFile', 'rb')
         self.RedrawBuffer()
 
+        self.stdscr.move(0,4)
+
 
     def RedrawBuffer(self):
     
@@ -84,6 +84,7 @@ class FrontEnd:
 
 
         self.statusWin.clear()
+        self.y, self.x          = self.stdscr.getyx()
         status  = 'pos: %d %d lines: %d'%(self.left+self.x, self.top+self.y,LineIndex.NumberOfLines(self.fileName))
         self.statusWin.addstr(0,0, status)
 
@@ -92,8 +93,6 @@ class FrontEnd:
         self.statusWin.refresh()
         self.stdscr.refresh()
 
-        self.contentWin.move(4,0)
-
 
     def Iterate(self):
         """
@@ -101,42 +100,18 @@ class FrontEnd:
 
         self.height, self.width = self.contentWin.getmaxyx()
         bY,bX                   = self.contentWin.getbegyx()
-        #self.x                  = self.cursor.x
-        #self.y                  = self.cursor.y
+        self.y, self.x          = self.stdscr.getyx()
 
-        if self.x < bX:
-            if self.left > 0:
-                self.left   -= (bX - self.x)
-            self.x  = bX
-
-        if self.x > LineIndex.LengthOfLine(self.fileName, self.top+self.y):
-            self.logger.debug('Limit-end')
-            self.x  = LineIndex.LengthOfLine(self.fileName, self.top+self.y)
-
-        if self.x >= self.width+2:
-            self.logger.debug('Limit-x')
-            self.left   += (self.x - (self.width+2))
-            self.x      = self.width+2
-
-        if self.y <= bY:
-            self.logger.debug('Limit-y')
-            if self.top > 0:
-                self.top    -= (bY - self.y)
-            self.y  = bY
-
-        if self.y > self.height-2:
-            self.logger.debug('Limit-y %d %d'%(self.y,self.height-2))
-            if self.top < LineIndex.NumberOfLines(self.fileName) - (self.height-0):
-                self.top   += (self.y - (self.height-2))
-            self.y      = self.height-2
+        #if self.x > LineIndex.LengthOfLine(self.fileName, self.top+self.y):
+            #self.logger.debug('Limit-end')
+            #self.x  = LineIndex.LengthOfLine(self.fileName, self.top+self.y)
 
         #
         #
         #
         self.logger.debug('%d %d %d   %d %d %d '%(self.y,self.top,self.height, self.x,self.left,self.width))
         self.RedrawBuffer()
-        self.stdscr.move(self.y, self.x)
-        self.cursor.SetXY(self.left+self.x, self.top+self.y)
+        self.cursor.SetXY(self.left+self.x-bX, self.top+self.y-bY)
 
         #
         #
@@ -156,20 +131,33 @@ class FrontEnd:
             self.cursor.Backspace()
 
         elif c == curses.KEY_LEFT:
-            self.cursor.Left()
-            self.x  -= 1
+            if self.x >  bX:
+                self.x  -= 1
+            else:
+                if self.left > 0:
+                    self.left   -= 1
 
         elif c == curses.KEY_RIGHT:
-            self.cursor.Right()
-            self.x  += 1
+            if self.x < self.width+2:
+                self.x  += 1
+            else:
+                self.left   += 1
+                self.x      = self.width+2
 
         elif c == curses.KEY_UP:
-            self.cursor.Up()
-            self.y  -= 1
+            if self.y >  bY:
+                self.y  -= 1
+            else:
+                if self.top > 0:
+                    self.top    -= 1
 
         elif c == curses.KEY_DOWN:
-            self.cursor.Down()
-            self.y  += 1
+            if self.y < self.height-2:
+                self.y  += 1
+            else:
+                if self.top < LineIndex.NumberOfLines(self.fileName) - self.height:
+                    self.top   += 1
+                    self.y      = self.height-2
 
         elif c == curses.KEY_NPAGE:
             self.top   = self.top + self.height
@@ -186,6 +174,9 @@ class FrontEnd:
 
         else:
             self.cursor.Insert(c)
+            self.x      += 1
+
+        self.stdscr.move(self.y, self.x)
 
         return True
 
@@ -194,7 +185,7 @@ class FrontEnd:
 
 def ExitFunction():
     subprocess.Popen(['fusermount','-uz','tmp'])
-    #curses.endwin()
+    curses.endwin()
     pass
     
 
@@ -236,14 +227,14 @@ if __name__ == '__main__':
         while frontEnd.Iterate() == True:
             pass
 
-        #curses.endwin()
-        #curses.reset_shell_mode()
+        curses.endwin()
+        curses.reset_shell_mode()
 
     except KeyboardInterrupt:
         sys.exit(-1)
-        #curses.reset_shell_mode()
+        curses.reset_shell_mode()
 
-    #curses.reset_shell_mode()
+    curses.reset_shell_mode()
 
 
 
