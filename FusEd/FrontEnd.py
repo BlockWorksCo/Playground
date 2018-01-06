@@ -70,8 +70,15 @@ class FrontEnd:
         EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
 
         self.contentWin.clear()
+        numberOfLines   = LineIndex.NumberOfLines(self.fileName)
 
         for i in range(0, self.height-1):
+
+            if self.top+i < 0:
+                break
+
+            if self.top+i >= numberOfLines:
+                break
 
             index   = LineIndex.IndexOfLine(self.fileName, self.top+i)
             self.fh.seek(index, os.SEEK_SET)
@@ -160,13 +167,24 @@ class FrontEnd:
                     self.y      = self.height-2
 
         elif c == curses.KEY_NPAGE:
-            self.top   = self.top + self.height
+            self.top   += self.height-1
+            if self.top+self.y+(self.height-1) > LineIndex.NumberOfLines(self.fileName):
+                self.top    = LineIndex.NumberOfLines(self.fileName) - (self.height-1)
+                if self.top < 0:
+                    self.top    = 0
+            self.y      = self.height-2
 
         elif c == curses.KEY_PPAGE:
-            self.top   = self.top - self.height
+            self.top    -= self.height-1
+            if self.top < 0:
+                self.top    = 0
+            if self.top+self.y < 0:
+                self.top    = 0
+            self.y      = 0
 
         elif c == curses.KEY_HOME:
-            self.cursor.Home()
+            self.x      = bX
+            self.left   = 0
 
         elif c == curses.KEY_END:
             self.cursor.End()
