@@ -109,9 +109,6 @@ class FrontEnd:
         bY,bX                   = self.contentWin.getbegyx()
         self.y, self.x          = self.stdscr.getyx()
 
-        #if self.x > LineIndex.LengthOfLine(self.fileName, self.top+self.y):
-            #self.logger.debug('Limit-end')
-            #self.x  = LineIndex.LengthOfLine(self.fileName, self.top+self.y)
 
         #
         #
@@ -193,6 +190,14 @@ class FrontEnd:
         else:
             self.cursor.Insert(c)
             self.x      += 1
+
+        lineLength  = LineIndex.LengthOfLine(self.fileName, self.top+self.y)
+        if self.left+self.x > lineLength+bX:
+            self.x  = lineLength+bX
+
+        if bX+self.x > self.width+2:
+            self.left   = self.x - (self.width+2)
+            self.x  = self.width+2 + bX
 
         self.stdscr.move(self.y, self.x)
 
