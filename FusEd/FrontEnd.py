@@ -109,7 +109,6 @@ class FrontEnd:
         bY,bX                   = self.contentWin.getbegyx()
         self.y, self.x          = self.stdscr.getyx()
 
-
         #
         #
         #
@@ -191,6 +190,12 @@ class FrontEnd:
             self.cursor.Insert(c)
             self.x      += 1
 
+
+        #
+        #
+        #
+        self.logger.debug('0) %d %d %d   %d %d %d '%(self.y,self.top,self.height, self.x,self.left,self.width))
+
         lineLength  = LineIndex.LengthOfLine(self.fileName, self.top+self.y)
         if self.left+self.x > lineLength+bX:
             self.x  = lineLength+bX
@@ -199,7 +204,9 @@ class FrontEnd:
             self.left   = self.x - (self.width+2)
             self.x  = self.width+2 + bX
 
+        self.logger.debug('1) %d %d %d   %d %d %d '%(self.y,self.top,self.height, self.x,self.left,self.width))
         self.stdscr.move(self.y, self.x)
+        self.logger.debug('2) %d %d %d   %d %d %d '%(self.y,self.top,self.height, self.x,self.left,self.width))
 
         return True
 
@@ -227,8 +234,6 @@ if __name__ == '__main__':
 
     EDFS.RunEDFS()
 
-    frontEnd    = FrontEnd(fileName)
-
     logging.getLogger('FrontEnd').addHandler(logging.FileHandler('FrontEnd.log'))
     logging.getLogger('Spans').addHandler(logging.FileHandler('Spans.log'))
     logging.getLogger('FileDataSource').addHandler(logging.FileHandler('FileDataSource.log'))
@@ -245,6 +250,8 @@ if __name__ == '__main__':
     logging.getLogger('Cursor').setLevel(logging.DEBUG)
 
     logging.getLogger('FrontEnd').info('Starting up')
+
+    frontEnd    = FrontEnd(fileName)
 
     try:
         while frontEnd.Iterate() == True:
