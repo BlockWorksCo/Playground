@@ -72,6 +72,8 @@ class FrontEnd:
         self.contentWin.clear()
         numberOfLines   = LineIndex.NumberOfLines(self.fileName)
 
+        bY,bX                   = self.contentWin.getbegyx()
+
         for i in range(0, self.height-1):
 
             if self.top+i < 0:
@@ -92,7 +94,7 @@ class FrontEnd:
 
         self.statusWin.clear()
         self.y, self.x          = self.stdscr.getyx()
-        status  = 'pos: %d %d lines: %d'%(self.left+self.x, self.top+self.y,LineIndex.NumberOfLines(self.fileName))
+        status  = 'pos: %d %d lines: %d'%(self.left+self.x-bX, self.top+self.y-bY,LineIndex.NumberOfLines(self.fileName))
         self.statusWin.addstr(0,0, status)
 
         self.leftBorder.refresh()
@@ -112,9 +114,14 @@ class FrontEnd:
         #
         #
         #
-        self.logger.debug('%d %d %d   %d %d %d '%(self.y,self.top,self.height, self.x,self.left,self.width))
         self.RedrawBuffer()
         self.cursor.SetXY(self.left+self.x-bX, self.top+self.y-bY)
+
+        #
+        #
+        #
+        self.y, self.x          = self.stdscr.getyx()
+        self.logger.debug('%d %d %d   %d %d %d '%(self.y,self.top,self.height, self.x,self.left,self.width))
 
         #
         #
@@ -184,7 +191,10 @@ class FrontEnd:
 
         elif c == curses.KEY_END:
             self.cursor.End()
-            self.x      = LineIndex.LengthOfLine(self.fileName, self.y)
+            EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
+            lineLength  = LineIndex.LengthOfLine(self.fileName, self.top+self.y)
+            self.x      = lineLength
+            self.logger.debug('<< %d >>'%(lineLength))
 
         else:
             self.cursor.Insert(c)
@@ -197,12 +207,16 @@ class FrontEnd:
         self.logger.debug('0) %d %d %d   %d %d %d '%(self.y,self.top,self.height, self.x,self.left,self.width))
 
         lineLength  = LineIndex.LengthOfLine(self.fileName, self.top+self.y)
-        if self.left+self.x > lineLength+bX:
-            self.x  = lineLength+bX
+        if self.left+self.x-bX > lineLength:
+            self.left   = lineLength
+            self.x      = bX
 
-        if bX+self.x > self.width+2:
-            self.left   = self.x - (self.width+2)
-            self.x  = self.width+2 + bX
+
+        if self.x-bX > self.width:
+            self.logger.debug('%d > %d '%(self.x-bX,self.width))
+            self.left   = (self.x-bX) - (self.width-6)
+            self.x  = self.width+bX-2
+            self.logger.debug('-- %d --'%(self.x))
 
         self.logger.debug('1) %d %d %d   %d %d %d '%(self.y,self.top,self.height, self.x,self.left,self.width))
         self.stdscr.move(self.y, self.x)
