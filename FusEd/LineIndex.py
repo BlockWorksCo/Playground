@@ -66,9 +66,9 @@ def GenerateLineIndex( fileName ):
 
     logger.debug(open(IndexFileNameFromFileName(fileName)).read() )
 
-    logger.debug('0: %08x'%(IndexOfLine(fileName, 110)))
-    logger.debug('1: %08x'%(IndexOfLine(fileName, 111)))
-    logger.debug('2: %08x'%(IndexOfLine(fileName, 112)))
+    logger.debug('0: %08x'%(IndexOfLine(fileName, 111)))
+    logger.debug('1: %08x'%(IndexOfLine(fileName, 112)))
+    logger.debug('2: %08x'%(IndexOfLine(fileName, 113)))
     
 
 
