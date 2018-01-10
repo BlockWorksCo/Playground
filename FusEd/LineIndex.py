@@ -12,20 +12,25 @@ import logging
 
 logger         = logging.getLogger('LineIndex')
 
-def NumberOfLines(fileName):
 
+def IndexFileNameFromFileName(fileName):
     dirName,fn    = os.path.split(fileName)
     indexFileName   = tempfile.gettempdir()+'/'+fn+'.LineIndex'
-    return os.path.getsize(indexFileName)/9
+
+    return indexFileName
+
+
+def NumberOfLines(fileName):
+
+    return os.path.getsize(IndexFileNameFromFileName(fileName))/9
 
 
 def IndexOfLine(fileName, lineNumber):
 
-    dirName,fn    = os.path.split(fileName)
-    indexFileName   = tempfile.gettempdir()+'/'+fn+'.LineIndex'
+    #logger.debug(open(IndexFileNameFromFileName(fileName)).read() )
 
-    with open(indexFileName,'rb') as inF:
-        inF.seek(int(lineNumber*9), os.SEEK_SET)
+    with open(IndexFileNameFromFileName(fileName),'rb') as inF:
+        inF.seek(lineNumber*9, os.SEEK_SET)
         line    = inF.readline()
         return int(line, 16)
 
@@ -40,10 +45,9 @@ def LengthOfLine(fileName, lineNumber):
 
 def GenerateLineIndex( fileName ):
 
-    dirName,fn    = os.path.split(fileName)
-    indexFileName   = tempfile.gettempdir()+'/'+fn+'.LineIndex'
+    indexFileName   = IndexFileNameFromFileName(fileName)
 
-    logger.debug('Generating line index for %s'%(fileName))
+    logger.debug('Generating line index for %s into %s'%(fileName, indexFileName))
 
     with open(fileName,'rb') as inF, open(indexFileName,'wb') as outF:
         inF.seek(0,os.SEEK_SET)
@@ -52,11 +56,20 @@ def GenerateLineIndex( fileName ):
         lineCount   = 0
         for line in inF:
             offset  = inF.tell()
-            #print('[%d]'%offset)
             outF.write(b'%08x\n'%(offset))
             lineCount   = lineCount+1
 
+        outF.flush()
+        outF.close()
+
     logger.debug('%d lines'%(lineCount))
+
+    logger.debug(open(IndexFileNameFromFileName(fileName)).read() )
+
+    logger.debug('0: %08x'%(IndexOfLine(fileName, 110)))
+    logger.debug('1: %08x'%(IndexOfLine(fileName, 111)))
+    logger.debug('2: %08x'%(IndexOfLine(fileName, 112)))
+    
 
 
 

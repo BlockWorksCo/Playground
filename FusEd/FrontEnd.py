@@ -94,7 +94,8 @@ class FrontEnd:
 
         self.statusWin.clear()
         self.y, self.x          = self.stdscr.getyx()
-        status  = 'pos: %d %d lines: %d'%(self.left+self.x-bX, self.top+self.y-bY,LineIndex.NumberOfLines(self.fileName))
+        lineLength  = LineIndex.LengthOfLine(self.fileName, self.top+self.y-bY)
+        status  = 'pos: %d %d lines: %d length: %d index: %d '%(self.left+self.x-bX, self.top+self.y-bY,LineIndex.NumberOfLines(self.fileName),lineLength, LineIndex.IndexOfLine(self.fileName, self.top+self.y-bY) )
         self.statusWin.addstr(0,0, status)
 
         self.leftBorder.refresh()
@@ -193,7 +194,7 @@ class FrontEnd:
             self.cursor.End()
             EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
             lineLength  = LineIndex.LengthOfLine(self.fileName, self.top+self.y)
-            self.x      = lineLength
+            self.x      = lineLength+bX
             self.logger.debug('<< %d >>'%(lineLength))
 
         else:
