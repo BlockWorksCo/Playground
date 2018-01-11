@@ -6,7 +6,6 @@
 import atexit
 import signal
 import curses
-import curses.textpad
 import os
 import time
 import EDFS
@@ -15,11 +14,7 @@ import sys
 import subprocess
 import LineIndex
 import Cursor
-from DataSource import *
 import logging
-
-
-count   = 0
 
 
 class FrontEnd:
@@ -69,6 +64,8 @@ class FrontEnd:
         handles  = EDFS.GetHandles()
         EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
 
+        self.logger.debug(open('MediumSizeFile.LineIndex').read() )
+
         self.contentWin.clear()
         numberOfLines   = LineIndex.NumberOfLines(self.fileName)
 
@@ -94,7 +91,7 @@ class FrontEnd:
 
         self.statusWin.clear()
         self.y, self.x          = self.stdscr.getyx()
-        lineLength  = LineIndex.LengthOfLine(self.fileName, self.top+self.y-bY)
+        lineLength  = LineIndex.LengthOfLine('tmp/MediumSizeFile', self.top+self.y-bY)
         status  = 'pos: %d %d lines: %d length: %d index: %d '%(self.left+self.x-bX, self.top+self.y-bY,LineIndex.NumberOfLines(self.fileName),lineLength, LineIndex.IndexOfLine(self.fileName, self.top+self.y-bY) )
         self.statusWin.addstr(0,0, status)
 
@@ -107,6 +104,7 @@ class FrontEnd:
     def Iterate(self):
         """
         """
+
 
         self.height, self.width = self.contentWin.getmaxyx()
         bY,bX                   = self.contentWin.getbegyx()
@@ -191,8 +189,6 @@ class FrontEnd:
             self.left   = 0
 
         elif c == curses.KEY_END:
-            self.cursor.End()
-            EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
             lineLength  = LineIndex.LengthOfLine(self.fileName, self.top+self.y)
             self.x      = lineLength+bX
             self.logger.debug('<< %d >>'%(lineLength))

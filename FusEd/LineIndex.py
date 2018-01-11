@@ -16,6 +16,7 @@ logger         = logging.getLogger('LineIndex')
 def IndexFileNameFromFileName(fileName):
     dirName,fn    = os.path.split(fileName)
     indexFileName   = tempfile.gettempdir()+'/'+fn+'.LineIndex'
+    indexFileName   = fn+'.LineIndex'
 
     return indexFileName
 
@@ -37,10 +38,8 @@ def IndexOfLine(fileName, lineNumber):
 
 def LengthOfLine(fileName, lineNumber):
     index   = IndexOfLine(fileName, lineNumber)
-    with open(fileName, 'rb') as fh:
-        fh.seek(index, os.SEEK_SET)
-        line    = fh.readline().decode('utf-8').replace('\n','')
-    return len(line)
+    index2  = IndexOfLine(fileName, lineNumber+1)
+    return index2-index-1
 
 
 def GenerateLineIndex( fileName ):
@@ -49,7 +48,7 @@ def GenerateLineIndex( fileName ):
 
     logger.debug('Generating line index for %s into %s'%(fileName, indexFileName))
 
-    with open(fileName,'rb') as inF, open(indexFileName,'wb') as outF:
+    with open(fileName,'rb') as inF, open(indexFileName,'wb',0) as outF:
         inF.seek(0,os.SEEK_SET)
         outF.seek(0,os.SEEK_SET)
         outF.write(b'%08x\n'%(0))
@@ -64,8 +63,9 @@ def GenerateLineIndex( fileName ):
 
     logger.debug('%d lines'%(lineCount))
 
-    logger.debug(open(IndexFileNameFromFileName(fileName)).read() )
+    #logger.debug(open(IndexFileNameFromFileName(fileName)).read() )
 
+    logger.debug('name: %s'%(IndexFileNameFromFileName(fileName)))
     logger.debug('0: %08x'%(IndexOfLine(fileName, 111)))
     logger.debug('1: %08x'%(IndexOfLine(fileName, 112)))
     logger.debug('2: %08x'%(IndexOfLine(fileName, 113)))
