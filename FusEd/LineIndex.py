@@ -38,7 +38,10 @@ def IndexOfLine(fileName, lineNumber):
 
 def LengthOfLine(fileName, lineNumber):
     index   = IndexOfLine(fileName, lineNumber)
-    index2  = IndexOfLine(fileName, lineNumber+1)
+    if lineNumber < NumberOfLines(fileName):
+        index2  = IndexOfLine(fileName, lineNumber+1)
+    else:
+        index2  = os.path.getsize(fileName)
     return index2-index-1
 
 
