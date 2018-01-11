@@ -256,6 +256,7 @@ if __name__ == '__main__':
     logging.getLogger('EDFS').addHandler(logging.FileHandler('EDFS.log'))
     logging.getLogger('LineIndex').addHandler(logging.FileHandler('LineIndex.log'))
     logging.getLogger('Cursor').addHandler(logging.FileHandler('Cursor.log'))
+    logging.getLogger('CursorWindow').addHandler(logging.FileHandler('CursorWindow.log'))
 
     logging.getLogger('FrontEnd').setLevel(logging.DEBUG)
     logging.getLogger('Spans').setLevel(logging.DEBUG)
@@ -263,6 +264,7 @@ if __name__ == '__main__':
     logging.getLogger('StringDataSource').setLevel(logging.DEBUG)
     logging.getLogger('LineIndex').setLevel(logging.DEBUG)
     logging.getLogger('Cursor').setLevel(logging.DEBUG)
+    logging.getLogger('CursorWindow').setLevel(logging.DEBUG)
 
     logging.getLogger('FrontEnd').info('Starting up')
 
