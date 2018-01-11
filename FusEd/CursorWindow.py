@@ -18,7 +18,7 @@ class CursorWindow:
 class Tests(unittest.TestCase):
 
     def test_one(self):
-        self.assertEqual(true, 'klmno' )
+        self.assertEqual(True, True )
 
 
 
