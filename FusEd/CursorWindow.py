@@ -88,13 +88,6 @@ class Tests(unittest.TestCase):
     def test_three(self):
 
         window  = CursorWindow(10,10,100,100)
-        window.MoveAbsolute(15,15)
-
-        self.assertEqual( window.left,  10 )
-        self.assertEqual( window.top,   10 )
-        self.assertEqual( window.cx,    5 )
-        self.assertEqual( window.cy,    5 )
-
         window.MoveAbsolute(5,15)
 
         self.assertEqual( window.left,  5 )
@@ -117,8 +110,6 @@ class Tests(unittest.TestCase):
     def test_five(self):
 
         window  = CursorWindow(10,10,100,100)
-        window.MoveAbsolute(15,15)
-        print(window.cx,window.cy)
         window.MoveAbsolute(15,5)
 
         self.assertEqual( window.left,  10 )
