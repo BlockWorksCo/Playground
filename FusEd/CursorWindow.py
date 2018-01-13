@@ -34,6 +34,10 @@ class CursorWindow:
 
 
     def MoveAbsolute(self, x,y):
+        """
+        (x,y) are the desired absolute coordinates.
+        This function produces modifies left,top,cx,cy such that (left+cx,top+cy) == (x,y)
+        """
 
         self.cx = x - self.left
         self.cy = y - self.top

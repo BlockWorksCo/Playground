@@ -15,6 +15,7 @@ import subprocess
 import LineIndex
 import Cursor
 import logging
+import CursorWindow
 
 
 class FrontEnd:
@@ -43,6 +44,8 @@ class FrontEnd:
         self.contentWin = curses.newwin( screenHeight, screenWidth-3, 0,4)
 
         self.height, self.width = self.contentWin.getmaxyx()
+        bY,bX                   = self.contentWin.getbegyx()
+        self.cursorWindow       = CursorWindow.CursorWindow(bX,bY,self.width,self.height)
 
         self.stdscr.clear()
         self.stdscr.keypad(True)
