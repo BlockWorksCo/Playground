@@ -45,7 +45,7 @@ class FrontEnd:
 
         self.height, self.width = self.contentWin.getmaxyx()
         bY,bX                   = self.contentWin.getbegyx()
-        self.cursorWindow       = CursorWindow.CursorWindow(bX,bY,self.width,self.height)
+        self.cursorWindow       = CursorWindow.CursorWindow(0,0,self.width-2,self.height-5)
 
         self.stdscr.clear()
         self.stdscr.keypad(True)
@@ -67,7 +67,7 @@ class FrontEnd:
         handles  = EDFS.GetHandles()
         EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
 
-        self.logger.debug(open('MediumSizeFile.LineIndex').read() )
+        #self.logger.debug(open('MediumSizeFile.LineIndex').read() )
 
         self.contentWin.clear()
         numberOfLines   = LineIndex.NumberOfLines(self.fileName)
@@ -118,19 +118,20 @@ class FrontEnd:
         #
         self.RedrawBuffer()
         self.cursor.SetXY(self.left+self.x-bX, self.top+self.y-bY)
+        #self.cursorWindow.MoveAbsolute(self.left+self.x-bX, self.top+self.y-bY)
 
         #
         #
         #
         self.y, self.x          = self.stdscr.getyx()
-        self.logger.debug('%d %d %d   %d %d %d '%(self.y,self.top,self.height, self.x,self.left,self.width))
+        ax,ay   = self.cursorWindow.GetAbsolutePosition()
 
         #
         #
         #
-        self.logger.debug('waiting for keypress.')
+        #self.logger.debug('waiting for keypress.')
         c = self.stdscr.getch()
-        self.logger.debug('got keypress %d'%(c))
+        #self.logger.debug('got keypress %d'%(c))
 
         if c == 0x1b: 
             self.logger.debug('escape pressed... exiting.')
@@ -141,8 +142,10 @@ class FrontEnd:
 
         elif c == curses.KEY_BACKSPACE:
             self.cursor.Backspace()
+            ax  -= 1
 
         elif c == curses.KEY_LEFT:
+            ax  -= 1
             if self.x >  bX:
                 self.x  -= 1
             else:
@@ -150,6 +153,7 @@ class FrontEnd:
                     self.left   -= 1
 
         elif c == curses.KEY_RIGHT:
+            ax  += 1
             if self.x < self.width+2:
                 self.x  += 1
             else:
@@ -157,6 +161,7 @@ class FrontEnd:
                 self.x      = self.width+2
 
         elif c == curses.KEY_UP:
+            ay  -= 1
             if self.y >  bY:
                 self.y  -= 1
             else:
@@ -164,6 +169,7 @@ class FrontEnd:
                     self.top    -= 1
 
         elif c == curses.KEY_DOWN:
+            ay  += 1
             if self.y < self.height-2:
                 self.y  += 1
             else:
@@ -172,6 +178,7 @@ class FrontEnd:
                     self.y      = self.height-2
 
         elif c == curses.KEY_NPAGE:
+            ay  += self.height
             self.top   += self.height-1
             if self.top+self.y+(self.height-1) > LineIndex.NumberOfLines(self.fileName):
                 self.top    = LineIndex.NumberOfLines(self.fileName) - (self.height-1)
@@ -180,6 +187,7 @@ class FrontEnd:
             self.y      = self.height-2
 
         elif c == curses.KEY_PPAGE:
+            ay  -= self.height
             self.top    -= self.height-1
             if self.top < 0:
                 self.top    = 0
@@ -188,15 +196,18 @@ class FrontEnd:
             self.y      = 0
 
         elif c == curses.KEY_HOME:
+            ax  = 0
             self.x      = bX
             self.left   = 0
 
         elif c == curses.KEY_END:
             lineLength  = LineIndex.LengthOfLine(self.fileName, self.top+self.y)
+            ax      = lineLength
             self.x      = lineLength+bX
             self.logger.debug('<< %d >>'%(lineLength))
 
         else:
+            ax  += 1
             self.cursor.Insert(c)
             self.x      += 1
 
@@ -204,8 +215,6 @@ class FrontEnd:
         #
         #
         #
-        self.logger.debug('0) %d %d %d   %d %d %d '%(self.y,self.top,self.height, self.x,self.left,self.width))
-
         lineLength  = LineIndex.LengthOfLine(self.fileName, self.top+self.y)
         if self.left+self.x-bX > lineLength:
             self.left   = lineLength
@@ -213,14 +222,15 @@ class FrontEnd:
 
 
         if self.x-bX > self.width:
-            self.logger.debug('%d > %d '%(self.x-bX,self.width))
             self.left   = (self.x-bX) - (self.width-6)
             self.x  = self.width+bX-2
-            self.logger.debug('-- %d --'%(self.x))
 
-        self.logger.debug('1) %d %d %d   %d %d %d '%(self.y,self.top,self.height, self.x,self.left,self.width))
-        self.stdscr.move(self.y, self.x)
-        self.logger.debug('2) %d %d %d   %d %d %d '%(self.y,self.top,self.height, self.x,self.left,self.width))
+        self.cursorWindow.MoveAbsolute(ax,ay)
+        cx,cy   = self.cursorWindow.GetCursorPosition()
+        #self.logger.debug('%d %d %d   %d %d %d '%(self.y,self.top,self.height, self.x,self.left,self.width))
+        self.logger.debug('%d %d   %d %d   %d %d '%(cx,cy,self.cursorWindow.left,self.cursorWindow.top,self.cursorWindow.width,self.cursorWindow.height))
+        self.stdscr.move(cy+bY,cx+bX)
+        #self.stdscr.move(self.y, self.x)
 
         return True
 

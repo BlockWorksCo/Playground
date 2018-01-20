@@ -59,6 +59,19 @@ class CursorWindow:
             self.cy     = 0
 
 
+    def GetAbsolutePosition(self):
+
+        return (self.left+self.cx, self.top+self.cy)
+
+
+    def GetCursorPosition(self):
+
+        return (self.cx, self.cy)
+
+
+    def GetOriginPosition(self):
+
+        return (self.left, self.top)
 
 
 
