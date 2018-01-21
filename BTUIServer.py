@@ -279,13 +279,14 @@ class BatteryLevelCharacteristic(Characteristic):
         Characteristic.__init__(
                 self, bus, index,
                 self.BATTERY_LVL_UUID,
-                ['read', 'notify'],
+                ['read'],
                 service)
         self.notifying = False
         self.battery_lvl = 100
         GObject.timeout_add(5000, self.drain_battery)
 
     def notify_battery_level(self):
+        print('<notify of battery level change>')
         if not self.notifying:
             return
         self.PropertiesChanged(
@@ -298,7 +299,7 @@ class BatteryLevelCharacteristic(Characteristic):
             if self.battery_lvl < 0:
                 self.battery_lvl = 0
         print('Battery Level drained: ' + repr(self.battery_lvl))
-        self.notify_battery_level()
+        #self.notify_battery_level()
         return True
 
     def ReadValue(self, options):
