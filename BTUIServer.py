@@ -264,11 +264,11 @@ class BatteryService(Service):
 
     def __init__(self, bus, index):
         Service.__init__(self, bus, index, self.BATTERY_UUID, True)
-        self.add_characteristic(BatteryLevelCharacteristic_TX(bus, 0, self))
-        self.add_characteristic(BatteryLevelCharacteristic_RX(bus, 1, self))
+        self.add_characteristic(UART_TX(bus, 0, self))
+        self.add_characteristic(UART_RX(bus, 1, self))
 
 
-class BatteryLevelCharacteristic_TX(Characteristic):
+class UART_TX(Characteristic):
     """
     Fake Battery Level characteristic. The battery level is drained by 2 points
     every 5 seconds.
@@ -283,52 +283,14 @@ class BatteryLevelCharacteristic_TX(Characteristic):
                 ['read', 'write', 'notify'],
                 service)
         self.notifying = False
-        self.battery_lvl = 0
-        #GObject.timeout_add(1000, self.drain_battery)
-
-    def notify_battery_level(self):
-        print('<notify of battery level change>')
-        if not self.notifying:
-            return
-        self.PropertiesChanged(
-                GATT_CHRC_IFACE,
-                { 'Value': [dbus.Byte(self.battery_lvl)] }, [])
-
-    def drain_battery(self):
-        if self.battery_lvl > 0:
-            self.battery_lvl += 1
-            if self.battery_lvl < 0:
-                self.battery_lvl = 0
-        print('Battery Level drained: ' + repr(self.battery_lvl))
-        self.notify_battery_level()
-        return True
-
-    def ReadValue(self, options):
-        print('Battery Level read: ' + repr(self.battery_lvl))
-        return [dbus.Byte(self.battery_lvl)]
 
     def WriteValue(self, value, options):
         print('WriteValue tx [%s]'%(str(value)))
 
-    def StartNotify(self):
-        if self.notifying:
-            print('Already notifying, nothing to do')
-            return
-
-        self.notifying = True
-        self.notify_battery_level()
-
-    def StopNotify(self):
-        if not self.notifying:
-            print('Not notifying, nothing to do')
-            return
-
-        self.notifying = False
 
 
 
-
-class BatteryLevelCharacteristic_RX(Characteristic):
+class UART_RX(Characteristic):
     """
     Fake Battery Level characteristic. The battery level is drained by 2 points
     every 5 seconds.
@@ -343,7 +305,7 @@ class BatteryLevelCharacteristic_RX(Characteristic):
                 ['read', 'write', 'notify'],
                 service)
         self.notifying = False
-        self.battery_lvl = 100
+        self.battery_lvl = 0
         GObject.timeout_add(1000, self.drain_battery)
 
     def notify_battery_level(self):
@@ -355,19 +317,13 @@ class BatteryLevelCharacteristic_RX(Characteristic):
                 { 'Value': [dbus.Byte(self.battery_lvl)] }, [])
 
     def drain_battery(self):
-        if self.battery_lvl > 0:
-            self.battery_lvl -= 2
-            if self.battery_lvl < 0:
-                self.battery_lvl = 0
+        self.battery_lvl += 1
         self.notify_battery_level()
         return True
 
     def ReadValue(self, options):
         print('Battery Level read: ' + repr(self.battery_lvl))
         return [dbus.Byte(self.battery_lvl)]
-
-    def WriteValue(self, value, options):
-        print('WriteValue rx [%s]'%(str(value)))
 
     def StartNotify(self):
         if self.notifying:
