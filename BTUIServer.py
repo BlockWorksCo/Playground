@@ -52,7 +52,7 @@ class Application(dbus.service.Object):
         self.path = '/'
         self.services = []
         dbus.service.Object.__init__(self, bus, self.path)
-        self.add_service(BatteryService(bus, 1))
+        self.add_service(UARTService(bus, 1))
 
     def get_path(self):
         return dbus.ObjectPath(self.path)
@@ -255,7 +255,7 @@ class Descriptor(dbus.service.Object):
 
 
 
-class BatteryService(Service):
+class UARTService(Service):
     """
     Fake Battery service that emulates a draining battery.
 
@@ -309,12 +309,12 @@ class UART_RX(Characteristic):
         GObject.timeout_add(1000, self.drain_battery)
 
     def notify_battery_level(self):
-        print('<notify of battery level change>')
+        print('<notify of change>')
         if not self.notifying:
             return
         self.PropertiesChanged(
                 GATT_CHRC_IFACE,
-                { 'Value': [dbus.Byte(self.battery_lvl)] }, [])
+                { 'Value': [dbus.Byte(ord('<')),dbus.Byte(self.battery_lvl),dbus.Byte(ord('>'))] }, [])
 
     def drain_battery(self):
         self.battery_lvl += 1
@@ -323,7 +323,7 @@ class UART_RX(Characteristic):
 
     def ReadValue(self, options):
         print('Battery Level read: ' + repr(self.battery_lvl))
-        return [dbus.Byte(self.battery_lvl)]
+        return [dbus.Byte(ord('<')),dbus.Byte(self.battery_lvl),dbus.Byte(ord('>'))]
 
     def StartNotify(self):
         if self.notifying:
@@ -339,6 +339,9 @@ class UART_RX(Characteristic):
             return
 
         self.notifying = False
+
+
+
 
 
 
