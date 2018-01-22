@@ -7,6 +7,8 @@ AS 			= arm-none-eabi-gcc
 RM 			= rm
 
 
+NRF51SDK    = ./nRF5_SDK_14.2.0_17b948a
+#NRF51SDK    = ./NRF51SDK
 
 DEFINES 	+= -DBOARD_PCA10001
 DEFINES 	+= -DSOFTDEVICE_PRESENT
@@ -25,31 +27,31 @@ CFLAGS 		+= -Werror
 CFLAGS 		+= -g3
 CFLAGS 		+= -mfloat-abi=soft
 
-INCLUDES 	+= -I./NRF51SDK/components/ble/common
-INCLUDES 	+= -I./NRF51SDK/components/ble/ble_advertising
-INCLUDES 	+= -I./NRF51SDK/components/ble/ble_services/ble_nus
-INCLUDES 	+= -I./NRF51SDK/components/softdevice/s110/headers
-INCLUDES	+= -I./NRF51SDK/components/libraries/util
-INCLUDES	+= -I./NRF51SDK/components/libraries/uart
-INCLUDES	+= -I./NRF51SDK/components/libraries/fifo
-INCLUDES	+= -I./NRF51SDK/components/libraries/trace
-INCLUDES 	+= -I./NRF51SDK/components/device
-INCLUDES 	+= -I./NRF51SDK/components/softdevice/common/softdevice_handler
-INCLUDES 	+= -I./NRF51SDK/components/toolchain/gcc
-INCLUDES 	+= -I./NRF51SDK/components/toolchain
-INCLUDES 	+= -I./NRF51SDK/examples/bsp
-INCLUDES 	+= -I./NRF51SDK/components/drivers_nrf/hal
-INCLUDES 	+= -I./NRF51SDK/components/libraries/button
-INCLUDES 	+= -I./NRF51SDK/components/libraries/timer
-INCLUDES 	+= -I./NRF51SDK/components/drivers_nrf/delay
-INCLUDES 	+= -I./NRF51SDK/components/drivers_nrf/gpiote
-INCLUDES 	+= -I./NRF51SDK/components/drivers_nrf/config
-INCLUDES 	+= -I./NRF51SDK/components/drivers_nrf/common
-INCLUDES 	+= -I./NRF51SDK/components/drivers_nrf/uart
-INCLUDES 	+= -I./NRF51SDK/components/drivers_nrf/pstorage
-INCLUDES 	+= -I./NRF51SDK/examples/ble_peripheral/ble_app_uart/config
+INCLUDES 	+= -I$(NRF51SDK)/components/ble/common
+INCLUDES 	+= -I$(NRF51SDK)/components/ble/ble_advertising
+INCLUDES 	+= -I$(NRF51SDK)/components/ble/ble_services/ble_nus
+INCLUDES 	+= -I$(NRF51SDK)/components/softdevice/s110/headers
+INCLUDES	+= -I$(NRF51SDK)/components/libraries/util
+INCLUDES	+= -I$(NRF51SDK)/components/libraries/uart
+INCLUDES	+= -I$(NRF51SDK)/components/libraries/fifo
+INCLUDES	+= -I$(NRF51SDK)/components/libraries/trace
+INCLUDES 	+= -I$(NRF51SDK)/components/device
+INCLUDES 	+= -I$(NRF51SDK)/components/softdevice/common/softdevice_handler
+INCLUDES 	+= -I$(NRF51SDK)/components/toolchain/gcc
+INCLUDES 	+= -I$(NRF51SDK)/components/toolchain
+INCLUDES 	+= -I$(NRF51SDK)/examples/bsp
+INCLUDES 	+= -I$(NRF51SDK)/components/drivers_nrf/hal
+INCLUDES 	+= -I$(NRF51SDK)/components/libraries/button
+INCLUDES 	+= -I$(NRF51SDK)/components/libraries/timer
+INCLUDES 	+= -I$(NRF51SDK)/components/drivers_nrf/delay
+INCLUDES 	+= -I$(NRF51SDK)/components/drivers_nrf/gpiote
+INCLUDES 	+= -I$(NRF51SDK)/components/drivers_nrf/config
+INCLUDES 	+= -I$(NRF51SDK)/components/drivers_nrf/common
+INCLUDES 	+= -I$(NRF51SDK)/components/drivers_nrf/uart
+INCLUDES 	+= -I$(NRF51SDK)/components/drivers_nrf/pstorage
+INCLUDES 	+= -I$(NRF51SDK)/examples/ble_peripheral/ble_app_uart/config
 
-LIBDIRS 	+= -L./NRF51SDK/components/toolchain/gcc
+LIBDIRS 	+= -L$(NRF51SDK)/components/toolchain/gcc
 
 LDFLAGS 	+= -mthumb
 LDFLAGS 	+= -mabi=aapcs
@@ -88,24 +90,24 @@ OBJECTS 	+= ble_srv_common.o
 
 
 
-VPATH 		+= ./NRF51SDK/components/softdevice/common/softdevice_handler
-VPATH 		+= ./NRF51SDK/components/libraries/timer
-VPATH 		+= ./NRF51SDK/components/libraries/button
-VPATH 		+= ./NRF51SDK/components/libraries/uart
-VPATH 		+= ./NRF51SDK/components/libraries/fifo
-VPATH 		+= ./NRF51SDK/components/libraries/trace
-VPATH 		+= ./NRF51SDK/examples/bsp
-VPATH 		+= ./NRF51SDK/components/ble/common
-VPATH 		+= ./NRF51SDK/components/ble/ble_advertising
-VPATH 		+= ./NRF51SDK/components/ble/ble_services/ble_nus
-VPATH 		+= ./NRF51SDK/components/drivers_nrf/gpiote
-VPATH 		+= ./NRF51SDK/components/drivers_nrf/common
-VPATH 		+= ./NRF51SDK/components/libraries/util
-VPATH 		+= ./NRF51SDK/components/toolchain/gcc
-VPATH 		+= ./NRF51SDK/components/toolchain
-VPATH 		+= ./NRF51SDK/components/drivers_nrf/delay
-VPATH 		+= ./NRF51SDK/components/drivers_nrf/uart
-VPATH 		+= ./NRF51SDK/components/drivers_nrf/pstorage
+VPATH 		+= $(NRF51SDK)/components/softdevice/common/softdevice_handler
+VPATH 		+= $(NRF51SDK)/components/libraries/timer
+VPATH 		+= $(NRF51SDK)/components/libraries/button
+VPATH 		+= $(NRF51SDK)/components/libraries/uart
+VPATH 		+= $(NRF51SDK)/components/libraries/fifo
+VPATH 		+= $(NRF51SDK)/components/libraries/trace
+VPATH 		+= $(NRF51SDK)/examples/bsp
+VPATH 		+= $(NRF51SDK)/components/ble/common
+VPATH 		+= $(NRF51SDK)/components/ble/ble_advertising
+VPATH 		+= $(NRF51SDK)/components/ble/ble_services/ble_nus
+VPATH 		+= $(NRF51SDK)/components/drivers_nrf/gpiote
+VPATH 		+= $(NRF51SDK)/components/drivers_nrf/common
+VPATH 		+= $(NRF51SDK)/components/libraries/util
+VPATH 		+= $(NRF51SDK)/components/toolchain/gcc
+VPATH 		+= $(NRF51SDK)/components/toolchain
+VPATH 		+= $(NRF51SDK)/components/drivers_nrf/delay
+VPATH 		+= $(NRF51SDK)/components/drivers_nrf/uart
+VPATH 		+= $(NRF51SDK)/components/drivers_nrf/pstorage
 
 clean:
 	- $(RM) *.o
