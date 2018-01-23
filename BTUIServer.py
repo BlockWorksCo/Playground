@@ -1,5 +1,24 @@
 #!/usr/bin/env python3
 
+#
+# apt-get install python3 python3-pip python3-gi
+# pip3 install pybluez
+# pip3 install dbus-python
+# modify vi /lib/systemd/system/bluetooth.service to have blutoothd --experimental
+# wget http://www.kernel.org/pub/linux/bluetooth/bluez-5.43.tar.xz 
+# apt-get install -y libusb-dev libdbus-1-dev libglib2.0-dev libudev-dev libical-dev libreadline-dev 
+# tar xvf bluez-5.43.tar.xz 
+# cd bluez-5.43
+# ./configure
+# make
+# sudo make install
+# sudo systemctl enable bluetooth
+# systemctl daemon-reload
+# systemctl restart bluetooth
+# sudo hcitool -i hci0 cmd 0x08 0x0008 1e 02 01 16 1a ff 4c 00 02 15 e2 c5 6d b5 df fb 48 d2 b0 60 d0 f5 a7 10 96 e0 00 00 00 00 c5 00 00 00 00 00 00 00 00 00 00 00 00 00
+# sudo hciconfig hci0 leadv 0
+#
+
 import dbus
 import dbus.exceptions
 import dbus.mainloop.glib
