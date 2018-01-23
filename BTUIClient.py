@@ -19,6 +19,7 @@ DBUS_PROP_IFACE =    'org.freedesktop.DBus.Properties'
 GATT_SERVICE_IFACE = 'org.bluez.GattService1'
 GATT_CHRC_IFACE =    'org.bluez.GattCharacteristic1'
 
+UART_UUID =          '6E400001-B5A3-F393-E0A9-E50E24DCCA9E'
 HR_SVC_UUID =        '0000180d-0000-1000-8000-00805f9b34fb'
 HR_MSRMT_UUID =      '00002a37-0000-1000-8000-00805f9b34fb'
 BODY_SNSR_LOC_UUID = '00002a38-0000-1000-8000-00805f9b34fb'
@@ -158,10 +159,10 @@ def process_hr_service(service_path, chrc_paths):
 
     uuid = service_props['UUID']
 
-    if uuid != HR_SVC_UUID:
+    if uuid != UART_UUID:
         return False
 
-    print('Heart Rate Service found: ' + service_path)
+    print('UART Service found: ' + service_path)
 
     # Process the characteristics.
     for chrc_path in chrc_paths:
@@ -199,12 +200,16 @@ def main():
 
     # List characteristics found
     for path, interfaces in objects.items():
+        print(path)
+        print(interfaces)
         if GATT_CHRC_IFACE not in interfaces.keys():
             continue
         chrcs.append(path)
 
     # List sevices found
+    #print(objects)
     for path, interfaces in objects.items():
+
         if GATT_SERVICE_IFACE not in interfaces.keys():
             continue
 
