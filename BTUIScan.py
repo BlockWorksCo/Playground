@@ -21,6 +21,7 @@ class Server(object):
         self.app = Flask(__name__)
         self.scanner    = scanner
         self.app.add_url_rule('/DeviceList','DeviceList',self.DeviceList)
+        self.app.add_url_rule('/Connection','Connection',self.Connection)
         p = multiprocessing.Process(target=self.app.run, args=(None,))
         p.start()
 
@@ -29,7 +30,9 @@ class Server(object):
         return json.dumps(self.scanner.uiDevices.copy())
 
 
-
+    def Connection(self):
+        address = request.args.get('address')
+        return 'connect to [%s]'%address
 
 
 class Scanner:
