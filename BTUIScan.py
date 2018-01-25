@@ -8,6 +8,7 @@ import gobject as GObject
 from flask import Flask, render_template, send_from_directory, request
 import syslog
 import multiprocessing
+import json
 
 
 
@@ -30,7 +31,7 @@ class Server(object):
         return 'Index'
 
     def main(self,):
-        return "Welcome! [%s]"%self.scanner.devices
+        return "Welcome! [%s]"%json.dumps(self.scanner.uiDevices.copy())
 
 
 
@@ -39,7 +40,9 @@ class Server(object):
 class Scanner:
     """ """
 
-    devices = {}
+    manager     = multiprocessing.Manager()
+    devices     = {}
+    uiDevices   = manager.dict()
 
     ADAPTER_INTERFACE = "org.bluez.Adapter1"
     DEVICE_INTERFACE = "org.bluez.Device1"
@@ -114,6 +117,11 @@ class Scanner:
 
         print()
 
+        name    = str(properties['Name'])
+        rssi    = str(properties['RSSI'])
+        self.uiDevices[str(address)] = {'Name':name, 'RSSI':rssi}
+        print(self.uiDevices)
+
         properties["Logged"] = True
 
 
@@ -169,6 +177,7 @@ if __name__ == '__main__':
 
     scanner = Scanner()
     server  = Server(scanner)
+    server.daemon   = True
 
     mainloop = GObject.MainLoop()
     mainloop.run()
