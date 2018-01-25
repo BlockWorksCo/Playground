@@ -5,6 +5,34 @@ from __future__ import absolute_import, print_function, unicode_literals
 import dbus
 import dbus.mainloop.glib
 import gobject as GObject
+from flask import Flask, render_template, send_from_directory, request
+import syslog
+import multiprocessing
+
+
+
+
+
+class Server(object):
+    """ """
+
+    def __init__(self, scanner):
+        self.app = Flask(__name__)
+        self.scanner    = scanner
+        self.app.add_url_rule('/Index','index',self.Index)
+        self.app.add_url_rule('/Main','main',self.main)
+        p = multiprocessing.Process(target=self.app.run, args=(None,))
+        p.start()
+
+
+    def Index(self,):
+        print('Index')
+        return 'Index'
+
+    def main(self,):
+        return "Welcome! [%s]"%self.scanner.devices
+
+
 
 
 
@@ -140,6 +168,7 @@ class Scanner:
 if __name__ == '__main__':
 
     scanner = Scanner()
+    server  = Server(scanner)
 
     mainloop = GObject.MainLoop()
     mainloop.run()
