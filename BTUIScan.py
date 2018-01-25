@@ -20,18 +20,13 @@ class Server(object):
     def __init__(self, scanner):
         self.app = Flask(__name__)
         self.scanner    = scanner
-        self.app.add_url_rule('/Index','index',self.Index)
-        self.app.add_url_rule('/Main','main',self.main)
+        self.app.add_url_rule('/DeviceList','DeviceList',self.DeviceList)
         p = multiprocessing.Process(target=self.app.run, args=(None,))
         p.start()
 
 
-    def Index(self,):
-        print('Index')
-        return 'Index'
-
-    def main(self,):
-        return "Welcome! [%s]"%json.dumps(self.scanner.uiDevices.copy())
+    def DeviceList(self,):
+        return json.dumps(self.scanner.uiDevices.copy())
 
 
 
