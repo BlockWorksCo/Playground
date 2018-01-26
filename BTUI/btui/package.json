@@ -1,0 +1,13 @@
+{
+  "name": "btui",
+  "version": "1.0.0",
+  "description": "bluetooth UI",
+  "main": "index.html",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Steve Tickle",
+  "license": "ISC"
+}
