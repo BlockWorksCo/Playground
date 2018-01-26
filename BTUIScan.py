@@ -6,6 +6,7 @@ import dbus
 import dbus.mainloop.glib
 import gobject as GObject
 from flask import Flask, render_template, send_from_directory, request
+from flask_cors import CORS 
 import syslog
 import multiprocessing
 import json
@@ -19,15 +20,25 @@ class Server(object):
 
     def __init__(self, scanner):
         self.app = Flask(__name__)
+        CORS(self.app)
         self.scanner    = scanner
         self.app.add_url_rule('/DeviceList','DeviceList',self.DeviceList)
         self.app.add_url_rule('/Connection','Connection',self.Connection)
+        self.app.add_url_rule('/Counter','Counter',self.Counter)
+        self.counter    = 0
         p = multiprocessing.Process(target=self.app.run, args=(None,))
         p.start()
 
 
     def DeviceList(self,):
         return json.dumps(self.scanner.uiDevices.copy())
+
+
+    def Counter(self,):
+        self.counter    += 1
+        response = json.dumps( {'Counter':self.counter} )
+        #response.headers.add('Access-Control-Allow-Origin', 'localhost')
+        return response
 
 
     def Connection(self):

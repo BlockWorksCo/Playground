@@ -10,20 +10,7 @@
 
     <h1>axios.all</h1>
 
-    <div>
-      <h3>User</h3>
-      <div class="row">
-        <img id="useravatar" src="" class="col-md-1"/>
-        <div class="col-md-3">
-          <strong id="username"></strong>
-        </div>
-      </div>
-      <hr/>
-      <h3>Orgs</h3>
-      <ul id="orgs" class="list-unstyled"></ul>
-    </div>
-
-
+    <div>{{ message }}</div>
     <img src="https://vuejs.org/images/logo.png" alt="Vue logo">
     <h1>{{ greeting }}</h1>
     <ul>
@@ -51,24 +38,6 @@
   <script>
 
 
-    axios.all([
-            axios.get('https://api.github.com/users/mzabriskie'),
-            axios.get('https://api.github.com/users/mzabriskie/orgs')
-          ]).then(axios.spread(function (user, orgs) {
-            document.getElementById('useravatar').src = user.data.avatar_url;
-            document.getElementById('username').innerHTML = user.data.name;
-            document.getElementById('orgs').innerHTML = orgs.data.map(function (org) {
-              return (
-                '<li class="row">' +
-                  '<img src="' + org.avatar_url + '" class="col-md-1"/>' +
-                  '<div class="col-md-3">' +
-                    '<strong>' + org.login + '</strong>' +
-                  '</div>' +
-                '</li>'
-              );
-            }).join('');
-          }));
-
 
 
     var app = new Vue({
@@ -77,15 +46,39 @@
         greeting: 'Welcome to your Vue.js app!',
         docsURL: 'http://vuejs.org/guide/',
         discordURL: 'https://chat.vuejs.org',
-        forumURL: 'http://forum.vuejs.org/'
+        forumURL: 'http://forum.vuejs.org/',
+        message: 'x'
       },
       methods: {
+
+
+        timerTick(){
+              axios
+              .get(`http://127.0.0.1:5000/Counter`)
+              .then(response => {
+                console.log(response.data);
+                app.message = response.data
+                window.setTimeout(this.timerTick, 1000);
+              })
+              .catch(e => {
+                console.log(e)
+                app.message = "OOps"
+              })
+            },
+
         humanizeURL: function (url) {
           return url
             .replace(/^https?:\/\//, '')
             .replace(/\/$/, '')
         }
-      }
+      },
+
+        mounted: function() {
+            window.setTimeout(this.timerTick, 1000);
+        },
+
+
+
     })
   </script>
 </body>
