@@ -11,43 +11,56 @@
 <body>
   <div id="app">
 
-    <h1>axios.all</h1>
-
-
-  <div id="app">
-    <v-app>
-      <v-content>
-        <v-container>
-          Hello world
+<template>
+  <v-app id="inspire" dark>
+    <v-navigation-drawer
+      clipped
+      fixed
+      v-model="drawer"
+      app
+    >
+      <v-list dense>
+        <v-list-tile @click="">
+          <v-list-tile-action>
+            <v-icon>dashboard</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Dashboard</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile @click="">
+          <v-list-tile-action>
+            <v-icon>settings</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Settings</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </v-navigation-drawer>
+    <v-toolbar app fixed clipped-left>
+      <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+      <v-toolbar-title>Application</v-toolbar-title>
+    </v-toolbar>
+    <v-content>
+      <v-container fluid fill-height>
+        <v-layout justify-center align-center>
           <div>{{ message }}</div>
-        </v-container>
-      </v-content>
-    </v-app>
-  </div>
+          <v-tooltip right>
+            <v-btn icon large :href="source" target="_blank" slot="activator">
+              <v-icon large>code</v-icon>
+            </v-btn>
+            <span>Source</span>
+          </v-tooltip>
+        </v-layout>
+      </v-container>
+    </v-content>
+    <v-footer app fixed>
+      <span>&copy; 2017</span>
+    </v-footer>
+  </v-app>
+</template>
 
-
-    <img src="https://vuejs.org/images/logo.png" alt="Vue logo">
-    <h1>{{ greeting }}</h1>
-    <ul>
-      <li>
-        To learn more about Vue, visit
-        <a :href="docsURL" target="_blank">
-          {{ humanizeURL(docsURL) }}
-        </a>
-      </li>
-      <li>
-        For live help with simple questions, check out
-        <a :href="discordURL" target="_blank">
-          the Discord chat
-        </a>
-      </li>
-      <li>
-        For more complex questions, post to
-        <a :href="forumURL" target="_blank">
-          the forum
-        </a>
-      </li>
-    </ul>
   </div>
 
   <script>
@@ -58,11 +71,15 @@
     var app = new Vue({
       el: '#app',
       data: {
+        drawer: null,
         greeting: 'Welcome to your Vue.js app!',
         docsURL: 'http://vuejs.org/guide/',
         discordURL: 'https://chat.vuejs.org',
         forumURL: 'http://forum.vuejs.org/',
         message: 'x'
+      },
+      props: {
+        source: String
       },
       methods: {
 
