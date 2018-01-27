@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "bluetooth UI",
   "main": "index.html",
-  "dependencies": {},
+  "dependencies": {
+    "axios": "^0.17.1",
+    "vue": "^2.5.13",
+    "vuetify": "^0.17.6"
+  },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
