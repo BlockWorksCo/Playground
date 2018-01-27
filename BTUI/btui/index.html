@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Welcome to Vue</title>
+  <title>Device List</title>
   <script src="https://unpkg.com/vue"></script>
   <script src="node_modules/axios/dist/axios.min.js"></script>
   <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
@@ -55,8 +55,8 @@
                 hide-actions
                 dark
                 >
-                <template slot="items" slot-scope="props" @click="showAlert">
-                <tr @click="showAlert">
+                <template slot="items" slot-scope="props">
+                <tr @click="dialog=true">
                 <td >{{ props.item.name }}</td>
                 <td class="text-xs-right">{{ props.item.address }}</td>
                 <td class="text-xs-right">{{ props.item.rssi }}</td>
@@ -70,8 +70,87 @@
       </v-container>
     </v-content>
     <v-footer app fixed>
-      <span>&copy; 2017</span>
+      <span>&copy; 2018</span>
     </v-footer>
+
+
+     <v-dialog
+        v-model="dialog"
+        fullscreen
+        transition="dialog-bottom-transition"
+        :overlay=false
+        scrollable
+      >
+        <v-card>
+            <v-toolbar style="flex: 0 0 auto;" dark class="primary">
+            <v-btn icon @click.native="dialog = false" dark>
+              <v-icon>close</v-icon>
+            </v-btn>
+            <v-toolbar-title>Settings</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-toolbar-items>
+              <v-btn dark flat @click.native="dialog = false">Save</v-btn>
+              <v-menu bottom right offset-y>
+                <v-btn slot="activator" dark icon>
+                  <v-icon>more_vert</v-icon>
+                </v-btn>
+                <v-list>
+                  <v-list-tile v-for="item in items" :key="item.title" @click="">
+                    <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                  </v-list-tile>
+                </v-list>
+              </v-menu>
+            </v-toolbar-items>
+          </v-toolbar>
+          <v-card-text>
+            <v-tooltip right>
+            <v-btn slot="activator">Tool Tip Activator</v-btn>
+              Tool Tip
+            </v-tooltip>
+          <v-list three-line subheader>
+            <v-subheader>User Controls</v-subheader>
+            <v-list-tile avatar>
+              <v-list-tile-content>
+                <v-list-tile-title>Content filtering</v-list-tile-title>
+                <v-list-tile-sub-title>Set the content filtering level to restrict apps that can be downloaded</v-list-tile-sub-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile avatar>
+              <v-list-tile-content>
+                <v-list-tile-title>Password</v-list-tile-title>
+                <v-list-tile-sub-title>Require password for purchase or use password to restrict purchase</v-list-tile-sub-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </v-list>
+          <v-divider></v-divider>
+          <v-list three-line subheader>
+            <v-subheader>General</v-subheader>
+            <v-list-tile avatar>
+              <v-list-tile-content>
+                <v-list-tile-title>Notifications</v-list-tile-title>
+                <v-list-tile-sub-title>Notify me about updates to apps or games that I downloaded</v-list-tile-sub-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile avatar>
+              <v-list-tile-content>
+                <v-list-tile-title>Sound</v-list-tile-title>
+                <v-list-tile-sub-title>Auto-update apps at any time. Data charges may apply</v-list-tile-sub-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile avatar>
+              <v-list-tile-content>
+                <v-list-tile-title>Auto-add widgets</v-list-tile-title>
+                <v-list-tile-sub-title>Automatically add home screen widgets</v-list-tile-sub-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </v-list>
+          </v-card-text>
+  
+            <div style="flex: 1 1 auto;"></div>
+        </v-card>
+      </v-dialog>
+ 
+
   </v-app>
 </template>
 
@@ -85,6 +164,7 @@
     var app = new Vue({
       el: '#app',
       data: {
+        dialog: false,
         drawer: null,
         greeting: 'Welcome to your Vue.js app!',
         docsURL: 'http://vuejs.org/guide/',
@@ -116,10 +196,11 @@
 
         timerTick(){
               axios
-              .get(`http://127.0.0.1:5000/DeviceList`)
+              .get(`http://localhost:5000/DeviceList`)
               .then(response => {
-                console.log(response.data);
+                //console.log(response.data);
                 //app.message = response.data
+                //alert('vvv');
 
                 var value;
                 var deviceList  = [];
@@ -135,18 +216,21 @@
                 });
                 app.items   = deviceList;
 
-                window.setTimeout(this.timerTick, 1000);
+                //window.setTimeout(this.timerTick, 1000);
               })
               .catch(e => {
-                console.log(e)
-                window.setTimeout(this.timerTick, 1000);
+                alert(e)
+                //console.log(e)
+                //window.setTimeout(this.timerTick, 1000);
               })
             },
 
       },
 
         mounted: function() {
-            window.setTimeout(this.timerTick, 1000);
+            console.log("started inital timertick");
+            //window.setTimeout(this.timerTick, 100);
+            window.setInterval(this.timerTick, 1000);
         },
 
 
