@@ -4,6 +4,8 @@
   <title>Welcome to Vue</title>
   <script src="https://unpkg.com/vue"></script>
   <script src="node_modules/axios/dist/axios.min.js"></script>
+  <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+  <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
   <script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
 </head>
 <body>
@@ -11,7 +13,19 @@
 
     <h1>axios.all</h1>
 
-    <div>{{ message }}</div>
+
+  <div id="app">
+    <v-app>
+      <v-content>
+        <v-container>
+          Hello world
+          <div>{{ message }}</div>
+        </v-container>
+      </v-content>
+    </v-app>
+  </div>
+
+
     <img src="https://vuejs.org/images/logo.png" alt="Vue logo">
     <h1>{{ greeting }}</h1>
     <ul>
