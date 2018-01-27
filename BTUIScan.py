@@ -176,9 +176,10 @@ class Scanner:
         else:
             address = "<unknown>"
 
-        if '6e400001-b5a3-f393-e0a9-e50e24dcca9e' in self.devices[path]['UUIDs']:
-            print('<changed>')
-            self.print_normal(address, self.devices[path])
+        #if '6e400001-b5a3-f393-e0a9-e50e24dcca9e' in self.devices[path]['UUIDs']:
+            #print('<changed>')
+            #self.print_normal(address, self.devices[path])
+        self.print_normal(address, self.devices[path])
 
 
 
