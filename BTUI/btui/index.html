@@ -40,7 +40,7 @@
     </v-navigation-drawer>
     <v-toolbar app fixed clipped-left>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-toolbar-title>Application</v-toolbar-title>
+      <v-toolbar-title>Device List</v-toolbar-title>
     </v-toolbar>
     <v-content>
       <v-container fluid fill-height>
@@ -55,10 +55,12 @@
                 hide-actions
                 dark
                 >
-                <template slot="items" slot-scope="props">
-                <td>{{ props.item.name }}</td>
+                <template slot="items" slot-scope="props" @click="showAlert">
+                <tr @click="showAlert">
+                <td >{{ props.item.name }}</td>
                 <td class="text-xs-right">{{ props.item.address }}</td>
                 <td class="text-xs-right">{{ props.item.rssi }}</td>
+                </tr>
                 </template>
             </v-data-table>
             </template>
@@ -107,6 +109,9 @@
         source: String
       },
       methods: {
+        showAlert(){
+        alert('Alert!')
+        },
 
 
         timerTick(){
