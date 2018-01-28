@@ -56,7 +56,7 @@
                 dark
                 >
                 <template slot="items" slot-scope="props">
-                <tr @click="dialog=true">
+                <tr @click="rowClick(props.item.address)">
                 <td >{{ props.item.name }}</td>
                 <td class="text-xs-right">{{ props.item.address }}</td>
                 <td class="text-xs-right">{{ props.item.rssi }}</td>
@@ -70,7 +70,7 @@
       </v-container>
     </v-content>
     <v-footer app fixed>
-      <span>&copy; 2018</span>
+      <span>&copy; BlockWorks 2018</span>
     </v-footer>
 
 
@@ -86,7 +86,7 @@
             <v-btn icon @click.native="dialog = false" dark>
               <v-icon>close</v-icon>
             </v-btn>
-            <v-toolbar-title>Settings</v-toolbar-title>
+            <v-toolbar-title>{{ dialogTitle }}</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-toolbar-items>
               <v-btn dark flat @click.native="dialog = false">Save</v-btn>
@@ -170,6 +170,7 @@
         docsURL: 'http://vuejs.org/guide/',
         discordURL: 'https://chat.vuejs.org',
         forumURL: 'http://forum.vuejs.org/',
+        dialogTitle: '<empty>',
 
 
         headers: [
@@ -189,8 +190,10 @@
         source: String
       },
       methods: {
-        showAlert(){
-        alert('Alert!')
+
+        rowClick(address){
+            app.dialogTitle = address;
+            app.dialog=true;
         },
 
 
