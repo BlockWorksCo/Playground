@@ -1,4 +1,5 @@
 
+hciconfig hci0 up
 hcitool -i hci0 cmd 0x08 0x0008 15 02 01 1a 11 07 9e ca dc 24 0e e5 a9 e0 93 f3 a3 b5 01 00 40 6e
 hciconfig hci0 leadv 0
 
