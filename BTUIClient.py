@@ -19,7 +19,10 @@ DBUS_PROP_IFACE =    'org.freedesktop.DBus.Properties'
 GATT_SERVICE_IFACE = 'org.bluez.GattService1'
 GATT_CHRC_IFACE =    'org.bluez.GattCharacteristic1'
 
-UART_UUID =          '6E400001-B5A3-F393-E0A9-E50E24DCCA9E'
+UART_TX_UUID        = '6E400002-B5A3-F393-E0A9-E50E24DCCA9E'
+UART_RX_UUID        = '6E400003-B5A3-F393-E0A9-E50E24DCCA9E'
+UART_UUID           = '6E400001-B5A3-F393-E0A9-E50E24DCCA9E'
+
 HR_SVC_UUID =        '0000180d-0000-1000-8000-00805f9b34fb'
 HR_MSRMT_UUID =      '00002a37-0000-1000-8000-00805f9b34fb'
 BODY_SNSR_LOC_UUID = '00002a38-0000-1000-8000-00805f9b34fb'
@@ -183,6 +186,9 @@ def interfaces_removed_cb(object_path, interfaces):
         mainloop.quit()
 
 
+def cb(value):
+    print('cb [%s]'%(str(value)))
+
 def main():
     # Set up the main loop.
     DBusGMainLoop(set_as_default=True)
@@ -196,33 +202,86 @@ def main():
 
     print('Getting objects...')
     objects = om.GetManagedObjects()
-    chrcs = []
+    #chrcs = []
 
     # List characteristics found
-    for path, interfaces in objects.items():
-        print(path)
-        print(interfaces)
-        if GATT_CHRC_IFACE not in interfaces.keys():
-            continue
-        chrcs.append(path)
+    #for path, interfaces in objects.items():
+        #print(path)
+        #print(interfaces)
+        #if GATT_CHRC_IFACE not in interfaces.keys():
+            #continue
+        #chrcs.append(str(path))
 
-    # List sevices found
-    #print(objects)
+    #print()
+    #for c in sorted(chrcs):
+        #print(c)
+    #print()
+
+    #print('Objects:')
+    #for o in objects.keys():
+        #try:
+            #uuid    = objects[o]['UUID']
+        #except KeyError:
+            #uuid    = ''
+        #print(o + ' ' + uuid)
+    #print()
+
+    #
+    # Find all object paths that have a matching UUID and make a list of them.
+    #
+    objectPathsForUUID  = []
     for path, interfaces in objects.items():
 
         if GATT_SERVICE_IFACE not in interfaces.keys():
             continue
 
-        chrc_paths = [d for d in chrcs if d.startswith(path + "/")]
+        if UART_UUID in interfaces['org.bluez.GattService1']['UUID'].upper():
+            objectPathsForUUID.append(str(path))
 
-        if process_hr_service(path, chrc_paths):
-            break
 
-    if not hr_service:
-        print('No Heart Rate Service found')
-        sys.exit(1)
+    print()
+    print(objectPathsForUUID)
+    print()
 
-    start_client()
+    #
+    # Find all characteristics that belong to the list of objects from above.
+    #
+    characteristicPathsForUUID  = []
+    characteristicInterfacesForUUID  = {}
+    for path, interfaces in objects.items():
+
+        for p in objectPathsForUUID:
+            if path.startswith(p+'/'):
+                characteristicPathsForUUID.append(str(path))
+                characteristicInterfacesForUUID[str(path)]  = interfaces
+
+
+    for c in characteristicPathsForUUID:
+        if 'org.bluez.GattCharacteristic1' in characteristicInterfacesForUUID[c]:
+            print()
+            print(c)
+            d   = characteristicInterfacesForUUID[c]['org.bluez.GattCharacteristic1']
+            print(d)
+            for k in d:
+                print('\t%s = %s'%(k,d[k]))
+
+
+    # write to  /org/bluez/hci0/dev_B8_27_EB_12_E5_84/service0049/char004d
+    # read from /org/bluez/hci0/dev_B8_27_EB_12_E5_84/service0049/char004a
+
+    #chrObj=bus.get_object('org.bluez','/org/bluez/hci0/dev_B8_27_EB_12_E5_84/service0049/char004d')
+    chrObj=bus.get_object('org.bluez','/org/bluez/hci0/dev_B8_27_EB_12_E5_84/service0057/char005b')
+    propIf=dbus.Interface(chrObj, 'org.bluez.GattCharacteristic1')
+    print('trying to write...')
+    #propIf.ReadValue({}, reply_handler=cb, error_handler=cb, dbus_interface='org.bluez.GattCharacteristic1')
+    #propIf.WriteValue([1,2,3], {}, reply_handler=cb, error_handler=cb, dbus_interface='org.bluez.GattCharacteristic1', mainloop=mainloop)
+    #propIf.WriteValue(dbus.Array(dbus.Byte(1)), {} )
+    propIf.WriteValue([1,2,3], {} )
+    #interface = dbus.Interface(chrObj, 'org.freedesktop.DBus.Properties')
+    print('Done')
+
+
+    #start_client()
 
     mainloop.run()
 
