@@ -348,7 +348,7 @@ class UART_RX(Characteristic):
             return
         self.PropertiesChanged(
                 GATT_CHRC_IFACE,
-                { 'Value': [dbus.Byte(ord('<')),dbus.Byte(self.battery_lvl),dbus.Byte(ord('>'))] }, [])
+                { 'Value': [dbus.Byte(ord('<')),dbus.Byte(self.battery_lvl%200),dbus.Byte(ord('>'))] }, [])
 
     def drain_battery(self):
         self.battery_lvl += 1

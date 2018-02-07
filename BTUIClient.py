@@ -269,19 +269,17 @@ def main():
     # write to  /org/bluez/hci0/dev_B8_27_EB_12_E5_84/service0049/char004d
     # read from /org/bluez/hci0/dev_B8_27_EB_12_E5_84/service0049/char004a
 
-    #chrObj=bus.get_object('org.bluez','/org/bluez/hci0/dev_B8_27_EB_12_E5_84/service0049/char004d')
+    chrObj=bus.get_object('org.bluez','/org/bluez/hci0/dev_B8_27_EB_12_E5_84/service0057/char0058')
+    propIf=dbus.Interface(chrObj, 'org.bluez.GattCharacteristic1')
+    propIf.StartNotify()
+    value   = propIf.ReadValue( {}, reply_handler=cb, error_handler=cb, dbus_interface=GATT_CHRC_IFACE )
+    print('value read = %s'%(str(value)))
+
     chrObj=bus.get_object('org.bluez','/org/bluez/hci0/dev_B8_27_EB_12_E5_84/service0057/char005b')
     propIf=dbus.Interface(chrObj, 'org.bluez.GattCharacteristic1')
-    print('trying to write...')
-    #propIf.ReadValue({}, reply_handler=cb, error_handler=cb, dbus_interface='org.bluez.GattCharacteristic1')
-    #propIf.WriteValue([1,2,3], {}, reply_handler=cb, error_handler=cb, dbus_interface='org.bluez.GattCharacteristic1', mainloop=mainloop)
-    #propIf.WriteValue(dbus.Array(dbus.Byte(1)), {} )
     propIf.WriteValue([1,2,3], {} )
-    #interface = dbus.Interface(chrObj, 'org.freedesktop.DBus.Properties')
+
     print('Done')
-
-
-    #start_client()
 
     mainloop.run()
 
