@@ -189,6 +189,21 @@ def interfaces_removed_cb(object_path, interfaces):
 def cb(value):
     print('cb [%s]'%(str(value)))
 
+
+def tickEvent():
+    print('tick...')
+
+    chrObj=bus.get_object('org.bluez','/org/bluez/hci0/dev_B8_27_EB_12_E5_84/service002d/char002e')
+    propIf=dbus.Interface(chrObj, 'org.bluez.GattCharacteristic1')
+    propIf.WriteValue([1,2,3], {} )
+
+    return True
+
+
+def Notification(value):
+    print('Notification [%s]'%(str(value)))
+
+
 def main():
     # Set up the main loop.
     DBusGMainLoop(set_as_default=True)
@@ -269,17 +284,25 @@ def main():
     # write to  /org/bluez/hci0/dev_B8_27_EB_12_E5_84/service0049/char004d
     # read from /org/bluez/hci0/dev_B8_27_EB_12_E5_84/service0049/char004a
 
-    chrObj=bus.get_object('org.bluez','/org/bluez/hci0/dev_B8_27_EB_12_E5_84/service0057/char0058')
+    chrObj=bus.get_object('org.bluez','/org/bluez/hci0/dev_B8_27_EB_12_E5_84/service002d/char0031')
     propIf=dbus.Interface(chrObj, 'org.bluez.GattCharacteristic1')
-    propIf.StartNotify()
-    value   = propIf.ReadValue( {}, reply_handler=cb, error_handler=cb, dbus_interface=GATT_CHRC_IFACE )
-    print('value read = %s'%(str(value)))
+    #value   = propIf.ReadValue( {}, reply_handler=cb, error_handler=cb, dbus_interface=GATT_CHRC_IFACE )
+    #print('value read = %s'%(str(value)))
 
-    chrObj=bus.get_object('org.bluez','/org/bluez/hci0/dev_B8_27_EB_12_E5_84/service0057/char005b')
+    chrObj.StartNotify(reply_handler=Notification,
+                       error_handler=cb,
+                       dbus_interface=GATT_CHRC_IFACE)
+
+    chrObj=bus.get_object('org.bluez','/org/bluez/hci0/dev_B8_27_EB_12_E5_84/service002d/char002e')
+    #propIf.StartNotify()
     propIf=dbus.Interface(chrObj, 'org.bluez.GattCharacteristic1')
     propIf.WriteValue([1,2,3], {} )
 
+
+
     print('Done')
+
+    GObject.timeout_add(4000, tickEvent)
 
     mainloop.run()
 
