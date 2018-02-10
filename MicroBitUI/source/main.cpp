@@ -39,6 +39,19 @@ void onDisconnected(MicroBitEvent)
     uBit.display.print("D");
 }
 
+
+void testFiber()
+{
+    while(true)
+    {
+        uBit.display.print("X");
+        fiber_sleep(1000);
+
+        uBit.display.print("O");
+        fiber_sleep(1000);
+    }
+}
+
 int main()
 {
     // Initialise the micro:bit runtime.
@@ -99,6 +112,12 @@ int main()
     //new MicroBitMagnetometerService(*uBit.ble, uBit.compass);
     //new MicroBitTemperatureService(*uBit.ble, uBit.thermometer);
     new UserInterfaceService(*uBit.ble);
+
+
+    //
+    //
+    //
+    create_fiber( testFiber );
 
     // If main exits, there may still be other fibers running or registered event handlers etc.
     // Simply release this fiber, which will mean we enter the scheduler. Worse case, we then
