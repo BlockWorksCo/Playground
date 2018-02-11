@@ -26,7 +26,8 @@ DEALINGS IN THE SOFTWARE.
 #include "MicroBit.h"
 #include "UserInterfaceService.h"
 
-MicroBit uBit;
+MicroBit                uBit;
+UserInterfaceService*   uiService;
 
 // we use events abd the 'connected' variable to keep track of the status of the Bluetooth connection
 void onConnected(MicroBitEvent)
@@ -49,6 +50,11 @@ void testFiber()
 
         uBit.display.print("O");
         fiber_sleep(1000);
+
+        static uint8_t  counter = 0;
+        static uint8_t     data[]  = {0x01, 0x02, 0x03};
+        data[1]++;
+        uiService->send( data, sizeof(data) );
     }
 }
 
@@ -111,7 +117,7 @@ int main()
     //new MicroBitLEDService(*uBit.ble, uBit.display);
     //new MicroBitMagnetometerService(*uBit.ble, uBit.compass);
     //new MicroBitTemperatureService(*uBit.ble, uBit.thermometer);
-    new UserInterfaceService(*uBit.ble);
+    uiService   = new UserInterfaceService(*uBit.ble);
 
 
     //
