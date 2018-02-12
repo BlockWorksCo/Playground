@@ -110,6 +110,9 @@ void UserInterfaceService::onDataWritten(const GattWriteCallbackParams *params) 
             {
                 char c = params->data[byteIterator];
 
+                extern uint8_t data[3];
+                data[1] = c;
+
                 int delimeterOffset = 0;
                 int delimLength = this->delimeters.length();
 

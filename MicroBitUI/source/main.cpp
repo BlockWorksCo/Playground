@@ -40,6 +40,7 @@ void onDisconnected(MicroBitEvent)
     uBit.display.print("D");
 }
 
+uint8_t     data[]  = {'<', 0x02, '>'};
 
 void testFiber()
 {
@@ -51,9 +52,6 @@ void testFiber()
         uBit.display.print("O");
         fiber_sleep(1000);
 
-        static uint8_t  counter = 0;
-        static uint8_t     data[]  = {0x01, 0x02, 0x03};
-        data[1]++;
         uiService->send( data, sizeof(data) );
     }
 }
