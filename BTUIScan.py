@@ -19,14 +19,14 @@ class Server(object):
     """ """
 
     def __init__(self, scanner):
-        self.app = Flask(__name__)
+        self.app = Flask( __name__ )
         CORS(self.app)
         self.scanner    = scanner
         self.app.add_url_rule('/DeviceList','DeviceList',self.DeviceList)
         self.app.add_url_rule('/Connection','Connection',self.Connection)
         self.app.add_url_rule('/Counter','Counter',self.Counter)
         self.counter    = 0
-        p = multiprocessing.Process(target=self.app.run, args=(None,))
+        p = multiprocessing.Process(target=self.app.run, args=('0.0.0.0',5555))
         p.start()
 
 
@@ -82,7 +82,9 @@ class Scanner:
             if "org.bluez.Device1" in interfaces:
                 self.devices[path] = interfaces["org.bluez.Device1"]
 
-        adapter.SetDiscoveryFilter({})
+        #adapter.SetDiscoveryFilter({'UUIDs':["6e400001-b5a3-f393-e0a9-e50e24dcca9e"]})
+        adapter.SetDiscoveryFilter({'UUIDs':["0000feaa-0000-1000-8000-00805f9b34fb"]})
+        #adapter.SetDiscoveryFilter({})
         adapter.StartDiscovery()
 
 
@@ -142,6 +144,8 @@ class Scanner:
                 return
         else:
             print('<not a bluez interface>')
+            print(path)
+            print(interfaces)
             return
 
         if path in self.devices:
@@ -155,9 +159,11 @@ class Scanner:
         else:
             address = "<unknown>"
 
-        if '6e400001-b5a3-f393-e0a9-e50e24dcca9e' in self.devices[path]['UUIDs']:
-            print('<added>')
-            self.print_normal(address, self.devices[path])
+        #if '6e400001-b5a3-f393-e0a9-e50e24dcca9e' in self.devices[path]['UUIDs']:
+            #print('<added>')
+            #self.print_normal(address, self.devices[path])
+        print('add:')
+        self.print_normal(address, self.devices[path])
 
 
 
@@ -179,6 +185,7 @@ class Scanner:
         #if '6e400001-b5a3-f393-e0a9-e50e24dcca9e' in self.devices[path]['UUIDs']:
             #print('<changed>')
             #self.print_normal(address, self.devices[path])
+        print('change:')
         self.print_normal(address, self.devices[path])
 
 

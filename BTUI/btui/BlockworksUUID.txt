@@ -1,0 +1,16 @@
+as described in https://www.beaconzone.co.uk/choosinguuidmajorminor:
+
+blockworks.co SHA-1 hash:
+4db90ef2f9d6fdc9717a72278c0a42667e9c24f9
+
+first 20 characters:
+4db90ef2f9d6fdc9717a
+
+
+
+example namespace-instance
+8b0ca750095477cb3e77-123456789abc
+
+blockworks.co:
+4db90ef2f9d6fdc9717a-000000000000
+
