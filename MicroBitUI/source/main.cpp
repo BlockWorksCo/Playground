@@ -33,27 +33,10 @@ UserInterfaceService*   uiService;
 
 
 
-char UID_NAMESPACE[] = {0x0E,0x67,0x47,0x04,0x42,0xD0,0x14,0x06,0xD5,0x83}; // sha-1 hash of "com.bittysoftware" 
+//char UID_NAMESPACE[] = {0x0E,0x67,0x47,0x04,0x42,0xD0,0x14,0x06,0xD5,0x83}; // sha-1 hash of "com.bittysoftware" 
+char UID_NAMESPACE[] = {0x4d,0xb9,0x0e,0xf2,0xf9,0xd6,0xfd,0xc9,0x71,0x7a}; // sha-1 hash of "blockworks.co" 
 char UID_INSTANCE[]  = {0x00 , 0x00, 0x00, 0x00, 0x00, 0x01};
 const int8_t CALIBRATED_POWERS[] = {-49, -37, -33, -28, -25, -20, -15, -10};
-
-uint8_t advertising = 0;
-uint8_t tx_power_level = 6;
-
-/*
-void startAdvertising() {
-    uBit.bleManager.advertiseEddystoneUid(UID_NAMESPACE, UID_INSTANCE, CALIBRATED_POWERS[tx_power_level-1], false);
-    uBit.bleManager.setTransmitPower(6);
-    uBit.display.scroll("ADV");
-    advertising = 1;
-}
-
-void stopAdvertising() {
-    uBit.bleManager.stopAdvertising();
-    uBit.display.scroll("OFF");
-    advertising = 0;
-}
-*/
 
 
 // we use events abd the 'connected' variable to keep track of the status of the Bluetooth connection
@@ -74,10 +57,10 @@ void testFiber()
     while(true)
     {
         uBit.display.print("X");
-        fiber_sleep(1000);
+        fiber_sleep(500);
 
         uBit.display.print("O");
-        fiber_sleep(1000);
+        fiber_sleep(500);
 
         uiService->send( data, sizeof(data) );
     }
@@ -105,64 +88,55 @@ int main()
     // MicrobitConfig.h in yotta_modules\microbit-dal\inc\core contains MICROBIT_BLE_SECURITY_LEVEL which can be set to SECURITY_MODE_ENCRYPTION_WITH_MITM for passkey authentication when
     // pairing or SECURITY_MODE_ENCRYPTION_NO_MITM to use Just Works pairing.
 
-    // A cunning code to indicate during start-up the particular Bluetooth configuration in the build
-    //
-    // SERVICE CODES
-    // A: Accelerometer Service
-    // B: Button Service
-    // D: Device Information Service
-    // E: Event Service
-    // F: DFU Service
-    // I: IO Pin Service
-    // L: LED Service
-    // M: Magnetometer Service
-    // T: Temperature Service
-    // U: UART Service
-    //
-    // PAIRING CONFIG
-    // Note that switching pairing on or off is achieved by setting "open" in config.json to 1 or 0 respectively
-
-    // P: PASSKEY
-    // J: Just Works
-    // N: No Pairing Required
-    //
-    // TX Power Level
-    // 0-7 taken from tx_power in config.json
-
 
     // Services/Pairing Config/Power Level
-    uBit.display.scroll("BLE U/N/0");
+    uBit.display.scroll("BlockWorks  ");
 
     uBit.messageBus.listen(MICROBIT_ID_BLE, MICROBIT_BLE_EVT_CONNECTED, onConnected);
     uBit.messageBus.listen(MICROBIT_ID_BLE, MICROBIT_BLE_EVT_DISCONNECTED, onDisconnected);
 
-    //new MicroBitAccelerometerService(*uBit.ble, uBit.accelerometer);
-    //new MicroBitButtonService(*uBit.ble);
-    //new MicroBitIOPinService(*uBit.ble, uBit.io);
-    //new MicroBitLEDService(*uBit.ble, uBit.display);
-    //new MicroBitMagnetometerService(*uBit.ble, uBit.compass);
-    //new MicroBitTemperatureService(*uBit.ble, uBit.thermometer);
+    //
+    //
+    //
     uiService   = new UserInterfaceService(*uBit.ble);
 
     //
     //
     //
     const GapAdvertisingData    advertisingData;
-    uBit.ble->setAdvertisingData(advertisingData);
 
-    //uBit.ble->clearAdvertisingPayload();
-    //uBit.ble->setAdvertisingType(GapAdvertisingParams::ADV_NON_CONNECTABLE_UNDIRECTED);
-    uBit.ble->setAdvertisingInterval(100);
-    //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::BREDR_NOT_SUPPORTED | GapAdvertisingData::LE_GENERAL_DISCOVERABLE);
+    uBit.ble->clearAdvertisingPayload();
+    uBit.ble->setAdvertisingType(GapAdvertisingParams::ADV_CONNECTABLE_UNDIRECTED);
+
+    uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::BREDR_NOT_SUPPORTED | GapAdvertisingData::LE_GENERAL_DISCOVERABLE);
+
     //uint16_t    shortUID    = 0x1234;
     //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LIST_16BIT_SERVICE_IDS, (uint8_t*)&shortUID, sizeof(shortUID));
 
-    //uint8_t serviceData[]   = {0x00,0x012};
-    //uint32_t    serviceDataLen  = sizeof(serviceData);
-    //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::SERVICE_DATA, serviceData, serviceDataLen);
+    uint8_t serviceData[]   = {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07};
+    uint32_t    serviceDataLen  = sizeof(serviceData);
+    uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::SERVICE_DATA, serviceData, serviceDataLen);
 
-    uBit.bleManager.advertiseEddystoneUid(UID_NAMESPACE, UID_INSTANCE, CALIBRATED_POWERS[tx_power_level-1], false);
+    uint8_t nameData[]   = "BlockWorks Demo1";
+    uint32_t    nameDataLen  = sizeof(nameData);
+    uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LOCAL_NAME, nameData, nameDataLen);
+
+    uBit.ble->setAdvertisingInterval(100);
+    uBit.ble->setAdvertisingData(advertisingData);
     uBit.ble->startAdvertising();
+
+    //
+    //
+    //
+    uBit.ble->clearScanResponse();
+    //uBit.ble->accumulateScanResponse(GapAdvertisingData::BREDR_NOT_SUPPORTED | GapAdvertisingData::LE_GENERAL_DISCOVERABLE);
+    uBit.ble->accumulateScanResponse(GapAdvertisingData::SERVICE_DATA, serviceData, serviceDataLen);
+    uBit.ble->accumulateScanResponse(GapAdvertisingData::COMPLETE_LOCAL_NAME, nameData, nameDataLen);
+
+    //
+    //
+    //
+    //uBit.bleManager.advertiseEddystoneUid(UID_NAMESPACE, UID_INSTANCE, CALIBRATED_POWERS[tx_power_level-1], false);
 
     //
     //

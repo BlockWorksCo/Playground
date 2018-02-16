@@ -42,6 +42,34 @@ static uint8_t txBufferTail = 0;
 
 static GattCharacteristic* txCharacteristic = NULL;
 
+
+
+const uint8_t  UIServiceBaseUUID[UUID::LENGTH_OF_LONG_UUID] = {
+    0x6E, 0x40, 0x00, 0x00, 0xB5, 0xA3, 0xF3, 0x93,
+    0xE0, 0xA9, 0xE5, 0x0E, 0x24, 0xDC, 0xCA, 0x9E,
+};
+const uint16_t UIServiceShortUUID                 = 0x0001;
+const uint16_t UIServiceTXCharacteristicShortUUID = 0x0002;
+const uint16_t UIServiceRXCharacteristicShortUUID = 0x0003;
+const uint8_t  UIServiceUUID[UUID::LENGTH_OF_LONG_UUID] = {
+    0x6E, 0x40, (uint8_t)(UIServiceShortUUID >> 8), (uint8_t)(UIServiceShortUUID & 0xFF), 0xB5, 0xA3, 0xF3, 0x93,
+    0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11,
+};
+//const uint8_t  UIServiceUUID_reversed[UUID::LENGTH_OF_LONG_UUID] = {
+    //0x9E, 0xCA, 0xDC, 0x24, 0x0E, 0xE5, 0xA9, 0xE0,
+    //0x93, 0xF3, 0xA3, 0xB5, (uint8_t)(UIServiceShortUUID & 0xFF), (uint8_t)(UIServiceShortUUID >> 8), 0x40, 0x6E
+//};
+const uint8_t  UIServiceTXCharacteristicUUID[UUID::LENGTH_OF_LONG_UUID] = {
+    0x6E, 0x40, (uint8_t)(UIServiceTXCharacteristicShortUUID >> 8), (uint8_t)(UIServiceTXCharacteristicShortUUID & 0xFF), 0xB5, 0xA3, 0xF3, 0x93,
+    0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11,
+};
+const uint8_t  UIServiceRXCharacteristicUUID[UUID::LENGTH_OF_LONG_UUID] = {
+    0x6E, 0x40, (uint8_t)(UIServiceRXCharacteristicShortUUID >> 8), (uint8_t)(UIServiceRXCharacteristicShortUUID & 0xFF), 0xB5, 0xA3, 0xF3, 0x93,
+    0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11,
+};
+
+
+
 /**
   * A callback function for whenever a Bluetooth device consumes our TX Buffer
   */
@@ -55,7 +83,7 @@ void on_confirmation(uint16_t handle)
 }
 
 /**
- * Constructor for the UARTService.
+ * Constructor for the UIService.
  * @param _ble an instance of BLEDevice
  * @param rxBufferSize the size of the rxBuffer
  * @param txBufferSize the size of the txBuffer
@@ -78,13 +106,13 @@ UserInterfaceService::UserInterfaceService(BLEDevice &_ble, uint8_t rxBufferSize
     txBufferTail = 0;
     this->txBufferSize = txBufferSize;
 
-    GattCharacteristic rxCharacteristic(UARTServiceRXCharacteristicUUID, rxBuffer, 1, rxBufferSize, GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE | GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE_WITHOUT_RESPONSE);
+    GattCharacteristic rxCharacteristic(UIServiceRXCharacteristicUUID, rxBuffer, 1, rxBufferSize, GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE | GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE_WITHOUT_RESPONSE);
 
-    txCharacteristic = new GattCharacteristic(UARTServiceTXCharacteristicUUID, txBuffer, 1, txBufferSize, GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_INDICATE);
+    txCharacteristic = new GattCharacteristic(UIServiceTXCharacteristicUUID, txBuffer, 1, txBufferSize, GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_INDICATE);
 
     GattCharacteristic *charTable[] = {txCharacteristic, &rxCharacteristic};
 
-    GattService uartService(UARTServiceUUID, charTable, sizeof(charTable) / sizeof(GattCharacteristic *));
+    GattService uartService(UIServiceUUID, charTable, sizeof(charTable) / sizeof(GattCharacteristic *));
 
     _ble.addService(uartService);
 
