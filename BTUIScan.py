@@ -85,10 +85,10 @@ class Scanner:
         #adapter.SetDiscoveryFilter({'UUIDs':["6e400001-b5a3-f393-e0a9-e50e24dcca9e"]})
         #adapter.SetDiscoveryFilter({'UUIDs':["0000feaa-0000-1000-8000-00805f9b34fb"]})
         #adapter.SetDiscoveryFilter({'UUIDs':["6e400001-b5a3-f393-8877-665544332211"]})
-        adapter.SetDiscoveryFilter({'UUIDs':["0001"]})
+        adapter.SetDiscoveryFilter({'UUIDs': ["0f0e0d0c-0b0a-0908-0706-050403020100"]})
                                             #4db9-0ef2-f9d6-fdc9-717a-000000000000
 
-        #adapter.SetDiscoveryFilter({})
+        adapter.SetDiscoveryFilter({})
         adapter.StartDiscovery()
 
 

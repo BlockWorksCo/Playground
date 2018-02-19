@@ -108,18 +108,22 @@ int main()
     uBit.ble->clearAdvertisingPayload();
     uBit.ble->setAdvertisingType(GapAdvertisingParams::ADV_CONNECTABLE_UNDIRECTED);
 
-    uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::BREDR_NOT_SUPPORTED | GapAdvertisingData::LE_GENERAL_DISCOVERABLE);
+    //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::BREDR_NOT_SUPPORTED | GapAdvertisingData::LE_GENERAL_DISCOVERABLE);
 
     //uint16_t    shortUID    = 0x1234;
     //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LIST_16BIT_SERVICE_IDS, (uint8_t*)&shortUID, sizeof(shortUID));
 
-    uint8_t serviceData[]   = {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07};
-    uint32_t    serviceDataLen  = sizeof(serviceData);
-    uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::SERVICE_DATA, serviceData, serviceDataLen);
+    uint8_t     nameData[]      = "BW1";
+    uint8_t     serviceData[]   = {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f};
+    uint8_t     mfgData[]       = {0x0d,0x0e,0x0f};
+    //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::DEVICE_ID, nameData, nameDataLen);
 
-    uint8_t nameData[]   = "BlockWorks Demo1";
-    uint32_t    nameDataLen  = sizeof(nameData);
-    uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LOCAL_NAME, nameData, nameDataLen);
+    uBit.ble->clearAdvertisingPayload();
+    uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LOCAL_NAME, nameData, sizeof(nameData));
+    uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LIST_128BIT_SERVICE_IDS, serviceData, sizeof(serviceData));
+    uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::MANUFACTURER_SPECIFIC_DATA, mfgData, sizeof(mfgData));
+
+    //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::SHORTENED_LOCAL_NAME, nameData, nameDataLen);
 
     uBit.ble->setAdvertisingInterval(100);
     uBit.ble->setAdvertisingData(advertisingData);
@@ -128,10 +132,13 @@ int main()
     //
     //
     //
-    uBit.ble->clearScanResponse();
+    //uBit.ble->clearScanResponse();
     //uBit.ble->accumulateScanResponse(GapAdvertisingData::BREDR_NOT_SUPPORTED | GapAdvertisingData::LE_GENERAL_DISCOVERABLE);
-    uBit.ble->accumulateScanResponse(GapAdvertisingData::SERVICE_DATA, serviceData, serviceDataLen);
-    uBit.ble->accumulateScanResponse(GapAdvertisingData::COMPLETE_LOCAL_NAME, nameData, nameDataLen);
+    //uBit.ble->accumulateScanResponse(GapAdvertisingData::SERVICE_DATA, serviceData, serviceDataLen);
+    //uBit.ble->accumulateScanResponse(GapAdvertisingData::DEVICE_ID, nameData, nameDataLen);
+    //uBit.ble->accumulateScanResponse(GapAdvertisingData::COMPLETE_LIST_128BIT_SERVICE_IDS, serviceData, serviceDataLen);
+    //uBit.ble->accumulateScanResponse(GapAdvertisingData::COMPLETE_LOCAL_NAME, nameData, nameDataLen);
+    //uBit.ble->accumulateScanResponse(GapAdvertisingData::SHORTENED_LOCAL_NAME, nameData, nameDataLen);
 
     //
     //
