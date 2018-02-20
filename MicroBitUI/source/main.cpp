@@ -122,7 +122,6 @@ int main()
     uBit.ble->clearAdvertisingPayload();
     uBit.ble->setAdvertisingType(GapAdvertisingParams::ADV_CONNECTABLE_UNDIRECTED);
 
-    //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::BREDR_NOT_SUPPORTED | GapAdvertisingData::LE_GENERAL_DISCOVERABLE);
 
     //uint16_t    shortUID    = 0x1234;
     //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LIST_16BIT_SERVICE_IDS, (uint8_t*)&shortUID, sizeof(shortUID));
@@ -135,6 +134,7 @@ int main()
     //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::DEVICE_ID, nameData, nameDataLen);
 
     uBit.ble->clearAdvertisingPayload();
+    uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::BREDR_NOT_SUPPORTED | GapAdvertisingData::LE_GENERAL_DISCOVERABLE);
     uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LOCAL_NAME, nameData, sizeof(nameData));
     //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LIST_128BIT_SERVICE_IDS, serviceData128, sizeof(serviceData128));
     //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LIST_32BIT_SERVICE_IDS, serviceData32, sizeof(serviceData32));
