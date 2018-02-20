@@ -31,6 +31,10 @@ UserInterfaceService*   uiService;
 
 
 
+MicroBitSerial serial(USBTX,USBRX);
+
+
+
 
 
 //char UID_NAMESPACE[] = {0x0E,0x67,0x47,0x04,0x42,0xD0,0x14,0x06,0xD5,0x83}; // sha-1 hash of "com.bittysoftware" 
@@ -56,8 +60,15 @@ void testFiber()
 {
     while(true)
     {
+    
+        uint8_t text[]    = "Tick\r\n";
+        serial.send( &text[0], strlen((char*)text) );
+
         uBit.display.print("X");
         fiber_sleep(500);
+
+        uint8_t text2[]    = "Tock\r\n";
+        serial.send( &text2[0], strlen((char*)text2) );
 
         uBit.display.print("O");
         fiber_sleep(500);
@@ -88,6 +99,9 @@ int main()
     // MicrobitConfig.h in yotta_modules\microbit-dal\inc\core contains MICROBIT_BLE_SECURITY_LEVEL which can be set to SECURITY_MODE_ENCRYPTION_WITH_MITM for passkey authentication when
     // pairing or SECURITY_MODE_ENCRYPTION_NO_MITM to use Just Works pairing.
 
+    uint8_t text[]    = "\r\nBlockWorks demo one.\r\n";
+    serial.send( &text[0], strlen((char*)text) );
+
 
     // Services/Pairing Config/Power Level
     uBit.display.scroll("BlockWorks  ");
@@ -114,8 +128,8 @@ int main()
     //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LIST_16BIT_SERVICE_IDS, (uint8_t*)&shortUID, sizeof(shortUID));
 
     uint8_t     nameData[]      = "BW1";
-    uint8_t     serviceData128[]= {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f};
-    uint8_t     serviceData32[] = {0x00,0x01,0x02,0x03};
+    //uint8_t     serviceData128[]= {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f};
+    //uint8_t     serviceData32[] = {0x00,0x01,0x02,0x03};
     uint8_t     serviceData[]   = {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f};
     uint8_t     mfgData[]       = {0x0d,0x0e,0x0f};
     //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::DEVICE_ID, nameData, nameDataLen);
