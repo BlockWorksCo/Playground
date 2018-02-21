@@ -118,9 +118,15 @@ class Scanner:
 
 
 
+    def FoundDevice(self, address, props):
+        """
+        """
+        print('Found device %s'%(props))
+
+
     def print_normal(self, address, properties):
 
-        print("[ " + address + " ]")
+        #print("[ " + address + " ]")
 
         for key in properties.keys():
             value = properties[key]
@@ -131,14 +137,12 @@ class Scanner:
             else:
                 print("    %s = %s" % (key, value))
 
-        print()
-
         name    = str(properties['Name'])
         rssi    = str(properties['RSSI'])
         self.uiDevices[str(address)] = {'Name':name, 'RSSI':rssi}
         uuids   = [str(uuid) for uuid in properties['UUIDs']]
         if '6e400001-b5a3-f393-8877-665544332211' in uuids:
-            print(self.uiDevices)
+            self.FoundDevice(address, properties)
 
         properties["Logged"] = True
 
@@ -164,9 +168,10 @@ class Scanner:
             address = "<unknown>"
 
         uuids   = [str(uuid) for uuid in self.devices[path]['UUIDs']]
+        print(uuids)
         if '6e400001-b5a3-f393-8877-665544332211' in uuids:
-            print('<added %s>'%path)
-            self.print_normal(address, self.devices[path])
+            self.FoundDevice(address, self.devices[path])
+            #self.print_normal(address, self.devices[path])
         #print('add:')
         #self.print_normal(address, self.devices[path])
 
@@ -188,9 +193,11 @@ class Scanner:
             address = "<unknown>"
 
         uuids   = [str(uuid) for uuid in self.devices[path]['UUIDs']]
+        print(uuids)
         if '6e400001-b5a3-f393-8877-665544332211' in uuids:
             print('<changed>')
-            self.print_normal(address, self.devices[path])
+            self.FoundDevice(address, self.devices[path])
+            #self.print_normal(address, self.devices[path])
         #print('change:')
         #self.print_normal(address, self.devices[path])
 
