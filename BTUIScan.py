@@ -85,7 +85,8 @@ class Scanner:
         #adapter.SetDiscoveryFilter({'UUIDs':["6e400001-b5a3-f393-e0a9-e50e24dcca9e"]})
         #adapter.SetDiscoveryFilter({'UUIDs':["0000feaa-0000-1000-8000-00805f9b34fb"]})
         #adapter.SetDiscoveryFilter({'UUIDs':["6e400001-b5a3-f393-8877-665544332211"]})
-        adapter.SetDiscoveryFilter({'UUIDs': ["0f0e0d0c-0b0a-0908-0706-050403020100"]})
+        adapter.SetDiscoveryFilter({'UUIDs': ["6e400001-b5a3-f393-8877-665544332211"]})
+        #adapter.SetDiscoveryFilter({'UUIDs': ["0f0e0d0c-0b0a-0908-0706-050403020100"]})
                                             #4db9-0ef2-f9d6-fdc9-717a-000000000000
 
         adapter.SetDiscoveryFilter({})
@@ -135,7 +136,9 @@ class Scanner:
         name    = str(properties['Name'])
         rssi    = str(properties['RSSI'])
         self.uiDevices[str(address)] = {'Name':name, 'RSSI':rssi}
-        print(self.uiDevices)
+        uuids   = [str(uuid) for uuid in properties['UUIDs']]
+        if '6e400001-b5a3-f393-8877-665544332211' in uuids:
+            print(self.uiDevices)
 
         properties["Logged"] = True
 
@@ -147,9 +150,6 @@ class Scanner:
             if not properties:
                 return
         else:
-            print('<not a bluez interface>')
-            print(path)
-            print(interfaces)
             return
 
         if path in self.devices:
@@ -163,11 +163,12 @@ class Scanner:
         else:
             address = "<unknown>"
 
-        #if '6e400001-b5a3-f393-e0a9-e50e24dcca9e' in self.devices[path]['UUIDs']:
-            #print('<added>')
-            #self.print_normal(address, self.devices[path])
-        print('add:')
-        self.print_normal(address, self.devices[path])
+        uuids   = [str(uuid) for uuid in self.devices[path]['UUIDs']]
+        if '6e400001-b5a3-f393-8877-665544332211' in uuids:
+            print('<added %s>'%path)
+            self.print_normal(address, self.devices[path])
+        #print('add:')
+        #self.print_normal(address, self.devices[path])
 
 
 
@@ -186,11 +187,12 @@ class Scanner:
         else:
             address = "<unknown>"
 
-        #if '6e400001-b5a3-f393-e0a9-e50e24dcca9e' in self.devices[path]['UUIDs']:
-            #print('<changed>')
-            #self.print_normal(address, self.devices[path])
-        print('change:')
-        self.print_normal(address, self.devices[path])
+        uuids   = [str(uuid) for uuid in self.devices[path]['UUIDs']]
+        if '6e400001-b5a3-f393-8877-665544332211' in uuids:
+            print('<changed>')
+            self.print_normal(address, self.devices[path])
+        #print('change:')
+        #self.print_normal(address, self.devices[path])
 
 
 
