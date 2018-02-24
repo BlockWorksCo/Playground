@@ -1,0 +1,9 @@
+#!/bin/sh
+
+
+cp -R /etc/letsencrypt letsencrypt
+docker build -t server .
+
+
+
+
