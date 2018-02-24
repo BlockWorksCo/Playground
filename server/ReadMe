@@ -3,7 +3,10 @@
 https://certbot.eff.org/#ubuntuxenial-nginx
 
 docker build -t server .
-docker run 
+docker run -it -p 80:80 -v ~/BlockWorks.co:/var/www/html  -t server bash
+docker run -it -p 80:80 -p 443:443 -v ~/BlockWorks.co:/var/www/html  -t server bash
+docker build -t server .
+
 
 
 oot@6ec0bc0b3484:/project# certbot --nginx
@@ -121,6 +124,17 @@ root@6ec0bc0b3484:/project#
 root@6ec0bc0b3484:/project# 
 root@6ec0bc0b3484:/project# 
 root@6ec0bc0b3484:/project# service nginx restart
+
+
+
+/etc/nginx/sites-available/default
+        listen 443 ssl default_server;
+        listen [::]:443 ssl default_server;
+
+        ssl_certificate /etc/letsencrypt/live/blockworks.co/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/blockworks.co/privkey.pem;
+        ssl_trusted_certificate /etc/letsencrypt/live/blockworks.co/fullchain.pem;
+
 
 
 
