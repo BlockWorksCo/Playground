@@ -20,3 +20,6 @@ RUN apt-get install -y python-certbot-nginx
 
 EXPOSE 443
 
+
+CMD service nginx start && tail -F /var/log/nginx/error.log
+

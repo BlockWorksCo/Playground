@@ -2,6 +2,7 @@
 
 
 
-docker run -it -p 443:443 -t server bash
+#docker run -it -p 443:443 -t server bash
+docker run -d -p 443:443 -t server
 
 
