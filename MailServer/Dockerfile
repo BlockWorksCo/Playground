@@ -20,6 +20,8 @@ RUN mkdir -p /var/run/mysqld
 RUN chown mysql /var/run/mysqld
 
 ADD Install Install
+ADD hosts hosts
+#RUN cp hosts /etc/hosts
 RUN ./Install
 
 
