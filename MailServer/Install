@@ -6,6 +6,7 @@ service mysql start
 wget https://bitbucket.org/zhb/iredmail/downloads/iRedMail-0.9.7.tar.bz2
 tar jxvf iRedMail*.tar.bz2
 
+export TERM='linux'
 cd iRedMail* && # AUTO_USE_EXISTING_CONFIG_FILE=y \
 AUTO_INSTALL_WITHOUT_CONFIRM=y \
 AUTO_CLEANUP_REMOVE_SENDMAIL=y \
