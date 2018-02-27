@@ -26,11 +26,19 @@ ADD Install Install
 ADD hosts hosts
 ADD hostname /bin/hostname
 RUN cp /project/hosts /etc/hosts && echo mail.blockworks.co > /etc/hostname && cat /etc/hosts && ./Install
-#RUN echo 127.0.0.1 mail.blockworks.co >> /etc/hosts
 
 
 
-EXPOSE 443
+EXPOSE 25
+EXPOSE 587
+EXPOSE 110
+EXPOSE 995
+EXPOSE 993
+EXPOSE 143
+EXPOSE 389
+EXPOSE 636
+EXPOSE 24242
+
 
 
 #CMD service nginx start && tail -F /var/log/nginx/error.log
