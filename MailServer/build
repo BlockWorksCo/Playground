@@ -1,6 +1,5 @@
 #!/bin/sh
 
 
-cp /etc/hosts .
 docker build -t mailserver .
 

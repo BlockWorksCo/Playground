@@ -2,7 +2,7 @@
 
 
 
-docker run -it -p 443:443 -t mailserver bash
-#docker run -d -p 443:443 -t mailserver
+docker run --hostname mail -it -p 443:443 -t mailserver bash
+#docker run -d --hostname mail -p 443:443 -t mailserver
 
 
