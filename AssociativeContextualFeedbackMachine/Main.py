@@ -26,7 +26,7 @@ contexts    = \
 ]
 
 
-numberOfSymbols     = 26
+numberOfSymbols     = 27
 symbolStrengths     = [[0]*numberOfSymbols for i in range(numberOfSymbols)] 
 symbolActivation    = [0]*numberOfSymbols
 
@@ -49,7 +49,11 @@ def PopulateContexts(cycleNumber):
 
     inputData   = "Hello World"
     position    = cycleNumber % len(inputData)
-    symbol      = ord(inputData[position].lower()) - ord('a')
+    c           = inputData[position].lower()
+    if c.isalpha() == True:
+        symbol      = ord(c) - ord('a') + 1
+    else:
+        symbol      = 0
 
     for context in contexts:
         context['Contents'].append(symbol)
@@ -61,10 +65,12 @@ def PopulateContexts(cycleNumber):
 
 def ShowStrengths(symbolStrengths):
 
+    symbolsRepr = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
     sys.stdout.write('\n')
     sys.stdout.write(' | ')
     for symbolB in range(numberOfSymbols):
-        sys.stdout.write('%c '%(chr(ord('A')+symbolB)))
+        sys.stdout.write('%c '%( symbolsRepr[symbolB] ))
 
     sys.stdout.write('\n')
     sys.stdout.write(' |')
@@ -74,9 +80,11 @@ def ShowStrengths(symbolStrengths):
     sys.stdout.write('\n')
     for symbolA in range(numberOfSymbols):
 
-        sys.stdout.write('%c| '%(chr(ord('A')+symbolA)))
+        sys.stdout.write('%c| '%(symbolsRepr[symbolA]))
         for symbolB in range(numberOfSymbols):
             strength    = symbolStrengths[symbolA][symbolB]
+            if strength > 26:
+                strength    = 26
             c           = '.'
             if strength > 0:
                 c   = chr(ord('a')+strength)
