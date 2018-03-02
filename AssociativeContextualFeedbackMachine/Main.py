@@ -60,10 +60,27 @@ def PopulateContexts(cycleNumber):
 
 
 def ShowStrengths(symbolStrengths):
+
+    sys.stdout.write('\n')
+    sys.stdout.write(' | ')
+    for symbolB in range(numberOfSymbols):
+        sys.stdout.write('%c '%(chr(ord('A')+symbolB)))
+
+    sys.stdout.write('\n')
+    sys.stdout.write(' |')
+    for symbolB in range(numberOfSymbols):
+        sys.stdout.write('--')
+
+    sys.stdout.write('\n')
     for symbolA in range(numberOfSymbols):
+
+        sys.stdout.write('%c| '%(chr(ord('A')+symbolA)))
         for symbolB in range(numberOfSymbols):
             strength    = symbolStrengths[symbolA][symbolB]
-            sys.stdout.write('%02d '%strength)
+            c           = '.'
+            if strength > 0:
+                c   = chr(ord('a')+strength)
+            sys.stdout.write('%c '%(c))
         print('')
 
 
