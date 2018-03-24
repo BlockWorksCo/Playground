@@ -27,3 +27,8 @@ create table workout (
     time        datetime
 );
 
+
+
+insert into user (id,name,emailAddress) values (0,'Steve Tickle','steve@zookoo.com');
+
+
