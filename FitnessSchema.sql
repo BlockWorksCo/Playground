@@ -24,6 +24,6 @@ create table user (
 create table workout (
     userID      int,
     hrProfile   longtext,
-    time        datetime,
+    time        datetime
 );
 
