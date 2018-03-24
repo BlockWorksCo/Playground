@@ -18,13 +18,20 @@ connection = pymysql.connect(host='localhost',
 
 
 
-def InsertHRDataIntoDatabase(hrData):
+def InsertHRDataIntoDatabase(name,date,time,hrData):
 
     try:
         with connection.cursor() as cursor:
             # Create a new record
-            sql = "INSERT INTO `workout` (`userID`, `time`, `hrProfile`) VALUES (%s, %s, %s)"
-            cursor.execute(sql, ('0', "20111218131717", hrData))
+            sql = "INSERT INTO `workout` (`userID`, `time`, `hrProfile`) VALUES ('%s', STR_TO_DATE('%s','%%d-%%m-%%Y %%h:%%i:%%s'), '%s' )"
+            #cursor.execute(sql, ('0', "20111218131717", hrData))
+            sql = sql%('0', date+' '+time, hrData)
+            print(sql)
+            cursor.execute(sql)
+
+            d="STR_TO_DATE('%s','%%d-%%m-%%Y %%h:%%m:s')"
+            # INSERT INTO `workout` (`userID`, `time`, `hrProfile`) VALUES ('0', STR_TO_DATE('24-03-2018 09:04:34','%d-%m-%Y %h:%m:%s'), 'blaa' );
+            # INSERT INTO `workout` (`userID`, `time`, `hrProfile`) VALUES ('0', STR_TO_DATE('24-03-2018 09:04:34','%d-%m-%Y %h:%m:%s'), 'blaa' );
 
 
         # connection is not autocommit by default. So you must commit to save
@@ -40,7 +47,21 @@ with open(sys.argv[1], 'rb') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
     rowCount    = 0
     hrData      = []
+    name        = ''
+    date        = ''
+    time        = ''
     for row in spamreader:
+
+        if rowCount == 1:
+            name    = row[0]
+            date    = row[2]
+            time    = row[3]
+            #24-03-2018
+            #09:04:34
+            print(name)
+            print(date)
+            print(time)
+
         if rowCount > 2:
             #print(row[1])
             #print(row[2])
@@ -55,7 +76,7 @@ with open(sys.argv[1], 'rb') as csvfile:
 
     if len(hrData) > 0:
         jsonHRData  = json.dumps(hrData)
-        InsertHRDataIntoDatabase(jsonHRData)
+        InsertHRDataIntoDatabase(name,date,time,jsonHRData)
         print(jsonHRData)
 
 
