@@ -18,6 +18,7 @@ RUN apt-get update -q --fix-missing && \
   apt-get -y upgrade && \
   apt-get -y install postfix && \
   apt-get -y install --no-install-recommends \
+    letsencrypt \
     amavisd-new \
     arj \
     binutils \

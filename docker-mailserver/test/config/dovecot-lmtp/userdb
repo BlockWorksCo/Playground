@@ -1,0 +1,3 @@
+user1@localhost.localdomain:{SHA512-CRYPT}$6$cXJjx8n7p6kSKCpi$67hh.doWZ61LPl411czFngFpflvQmAgJv3SW4PgsxB9B5.eDzb//8/jTeYg0BNEe.0AG.V/YjIFK2CPHA7ROv0:5000:5000::/var/mail/localhost.localdomain/user1::
+user2@otherdomain.tld:{SHA512-CRYPT}$6$CDGj7qyG2C91TRiR$B2oc9m4Y/Ben78fmgayPcrcGZL1srBz/bYD/5k0adL/A7VaaoykTuPhiS/MyAwT4b/wUQvqKDMUk/oKLAW6QG1:5000:5000::/var/mail/otherdomain.tld/user2::
+added@localhost.localdomain:{SHA512-CRYPT}$6$ZHgaqUTKVuHf53xB$4Bv2Ybdul8xjF5UEaYPHCNu2zz6yQKLHByO1qs/h3W2yW9Pn2UQiKQNNSpw/auIMeN8SxXCjvS4orov4a5uWR/:5000:5000::/var/mail/localhost.localdomain/added::
