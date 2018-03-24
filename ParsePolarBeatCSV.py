@@ -5,6 +5,35 @@ import csv
 import sys
 import re
 import json
+import pymysql.cursors
+
+
+# Connect to the database
+connection = pymysql.connect(host='localhost',
+                             user='fitness',
+                             password='fitness',
+                             db='fitness',
+                             charset='utf8mb4',
+                             cursorclass=pymysql.cursors.DictCursor)
+
+
+
+def InsertHRDataIntoDatabase(hrData):
+
+    try:
+        with connection.cursor() as cursor:
+            # Create a new record
+            sql = "INSERT INTO `workout` (`userID`, `time`, `hrProfile`) VALUES (%s, %s, %s)"
+            cursor.execute(sql, ('0', "20111218131717", hrData))
+
+
+        # connection is not autocommit by default. So you must commit to save
+        # your changes.
+        connection.commit()
+
+    finally:
+        connection.close()
+
 
 
 with open(sys.argv[1], 'rb') as csvfile:
@@ -24,7 +53,9 @@ with open(sys.argv[1], 'rb') as csvfile:
             #print(timestamp)
         rowCount    = rowCount+1
 
-    jsonHRData  = json.dumps(hrData)
-    print(jsonHRData)
+    if len(hrData) > 0:
+        jsonHRData  = json.dumps(hrData)
+        InsertHRDataIntoDatabase(jsonHRData)
+        print(jsonHRData)
 
 
