@@ -4,40 +4,37 @@
 
 
 
-import getpass, poplib
 import email
+import poplib
 
-
-allowed_mimetypes = ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]
-
-
-
-mimes = ["image/tif","image/tiff","images/x-tif","image/x-tiff",
-           "application/tif","application/tiff","application/x-tif",
-           "application/x-tiff"]
+mimes = ["text/csv", 'application/vnd.garmin.tcx+xml']
 
 def WriteAttachment(msg):
     for part in msg.walk():
-        if part.get_type() in mimes:
+        print(part.get_content_type())
+        #print(part)
+        if part.get_content_type() in mimes:
             name = part.get_filename()
             data = part.get_payload(decode=True)
+
+            print(name);
             f = file(name,'wb')
             f.write(data)
             f.close()
 
+ms = poplib.POP3_SSL('mail.blockworks.co')
+ms.user('hrdata@blockworks.co')
+ms.pass_('hrdata')
 
-user = 'hrdata@blockworks.co' 
-Mailbox = poplib.POP3_SSL('mail.blockworks.co', '995') 
-Mailbox.user(user) 
-Mailbox.pass_('hrdata') 
-numMessages = len(Mailbox.list()[1])
-for i in range(numMessages):
-    for msg in Mailbox.retr(i+1)[1]:
-        print msg
-        m = email.message_from_string('\r\n'.join(msg))
-        WriteAttachment(m)
+l = ms.list()
+print(l)
 
-Mailbox.quit()
+msgcount = len(l[1])
+for i in range(msgcount):
+    response, msg_as_list, size = ms.retr(i+1)
+    #print(msg_as_list)
+    msg = email.message_from_string('\r\n'.join(msg_as_list))
+    WriteAttachment(msg)
 
 
 
