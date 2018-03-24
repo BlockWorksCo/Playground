@@ -4,6 +4,7 @@
 import csv
 import sys
 import re
+import json
 
 
 with open(sys.argv[1], 'rb') as csvfile:
@@ -23,6 +24,7 @@ with open(sys.argv[1], 'rb') as csvfile:
             #print(timestamp)
         rowCount    = rowCount+1
 
-    print(hrData)
+    jsonHRData  = json.dumps(hrData)
+    print(jsonHRData)
 
 
