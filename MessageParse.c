@@ -279,7 +279,7 @@ void axdrGetLength(AXDRStream inStream, AXDRStream* outStream, uint32_t* length)
         }
         else if(numberOfBytes == 4)
         {
-            *length = (streamBytes[1]<<24) | (streamBytes[2]<<16) | (streamBytes[3]<<8) | (streamBytes[2]);
+            *length = (streamBytes[1]<<24) | (streamBytes[2]<<16) | (streamBytes[3]<<8) | (streamBytes[4]);
             *outStream  = (AXDRStream)(streamBytes+5);
         }
         else
@@ -328,6 +328,7 @@ void axdrGetOctetString(AXDRStream inStream, AXDRStream* outStream, uint8_t* dat
     assert(tag == octet_string);
 
     axdrGetLength( inStream, &inStream, numberOfBytes );
+    assert( *numberOfBytes < dataMaxSize );
 
     axdrGetUint8Array( inStream, &inStream, data,*numberOfBytes );
     
