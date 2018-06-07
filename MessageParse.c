@@ -172,18 +172,18 @@ void axdrGetUINT32(AXDRStream stream, uint32_t* value)
 
 
 
-void axdrSetUint8(AXDRStream inStream, AXDRStream* outStream, uint8_t value)
+void axdrSetUint8(AXDRStream* stream, uint8_t value)
 {
-    uint8_t*    streamBytes = (uint8_t*)inStream;
+    uint8_t*    streamBytes = (uint8_t*)*stream;
     streamBytes[0]  = value;
-    *outStream      = (AXDRStream)(streamBytes+1);
+    *stream      = (AXDRStream)(streamBytes+1);
 }
 
 void axdrSetUint8Array(AXDRStream inStream, AXDRStream* outStream, uint8_t* values, uint32_t numberOfElements)
 {
     for(uint32_t i=0; i<numberOfElements; i++)
     {
-        axdrSetUint8( inStream, &inStream, values[i] );
+        axdrSetUint8( &inStream, values[i] );
     }
     *outStream  = inStream;
 }
@@ -217,7 +217,7 @@ void axdrSetLength(AXDRStream inStream, AXDRStream* outStream, uint32_t length)
 
 void axdrSetOctetString(AXDRStream inStream, AXDRStream* outStream, uint8_t* data, uint32_t numberOfBytes)
 {
-    axdrSetUint8(inStream, &inStream, octet_string);
+    axdrSetUint8(&inStream, octet_string);
     axdrSetLength(inStream, &inStream, numberOfBytes);
     axdrSetUint8Array(inStream, &inStream, data,numberOfBytes);
     *outStream  = inStream;
@@ -226,7 +226,7 @@ void axdrSetOctetString(AXDRStream inStream, AXDRStream* outStream, uint8_t* dat
 
 void axdrSetUint32(AXDRStream inStream, AXDRStream* outStream, uint32_t value)
 {
-    axdrSetUint8(inStream, &inStream, unsigned32);
+    axdrSetUint8(&inStream, unsigned32);
     axdrSetUint8Array(inStream, &inStream, (void*)&value,sizeof(value) );
     *outStream  = inStream;
 }
@@ -234,7 +234,7 @@ void axdrSetUint32(AXDRStream inStream, AXDRStream* outStream, uint32_t value)
 
 void axdrSetStruct(AXDRStream inStream, AXDRStream* outStream, uint32_t numberOfFields)
 {
-    axdrSetUint8(inStream, &inStream, structure);
+    axdrSetUint8(&inStream, structure);
     axdrSetLength(inStream, &inStream, numberOfFields);
     *outStream  = inStream;
 }
@@ -242,7 +242,7 @@ void axdrSetStruct(AXDRStream inStream, AXDRStream* outStream, uint32_t numberOf
 
 void axdrSetArray(AXDRStream inStream, AXDRStream* outStream, uint32_t numberOfElements)
 {
-    axdrSetUint8(inStream, &inStream, array);
+    axdrSetUint8(&inStream, array);
     axdrSetLength(inStream, &inStream, numberOfElements);
     *outStream  = inStream;
 }
