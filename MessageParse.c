@@ -144,6 +144,35 @@ typedef enum
 } InterfaceClass;
 
 
+typedef enum
+{
+    Data            = 0,
+    AccessResult    = 1, 
+
+} ResultType;
+
+
+typedef enum
+{
+    success                   = 0,
+    hardware_fault            = 1,
+    temporary_failure         = 2,
+    read_write_denied         = 3,
+    object_undefined          = 4,
+    object_class_inconsistent = 9,
+    object_unavailable        = 11,
+    type_unmatched            = 12,
+    scope_of_access_violated  = 13,
+    data_block_unavailable    = 14,
+    long_get_aborted          = 15,
+    no_long_get_in_progress   = 16,
+    long_set_aborted          = 17,
+    no_long_set_in_progress   = 18,
+    other_reason              = 250
+
+} DataAccessResult;
+
+
 typedef uint8_t*    AXDRStream;
 typedef uint8_t     OBISCode[6];
 typedef uint16_t    AttributeId;
@@ -388,6 +417,50 @@ void dlmsParseGetRequest( AXDRStream* stream,  OBISCode* obisCode, InterfaceClas
 }
 
 
+//
+// C401 09 00 09 06 45 6C 73 74 65 72
+//
+//   <GetResponseNormal>
+//    <InvokeIdAndPriority Value="129" />
+//    <Result>
+//      <Data>
+//        <!--Elster-->
+//        <OctetString Value="456C73746572" />
+//      </Data>
+//    </Result>
+//  </GetResponseNormal>
+//
+void dlmsFormGetResponseNormal( AXDRStream* stream,  ResultType type )
+{
+    axdrSetUint8( stream, 0xc4 );   // type
+    axdrSetUint8( stream, 0x01 );   // subType
+
+    axdrSetUint8( stream, 0x81 );   // invokeId
+
+    axdrSetUint8( stream, type );   // result type, 0=data, 1=returnCode.
+}
+
+void dlmsParseGetResponseNormal( AXDRStream* stream,  ResultType* resultType )
+{
+    uint8_t     type    = 0;
+    uint8_t     subType = 0;
+    uint8_t     invokeId= 0;
+    uint8_t     result  = 0;
+
+    axdrGetUint8( stream, &type );
+    assert( type == 0xc4 );
+
+    axdrGetUint8( stream, &subType );
+    assert( subType == 0x01 );
+
+    axdrGetUint8( stream, &invokeId );
+    axdrGetUint8( stream, &result );
+
+    *resultType   = (DataAccessResult)result;
+}
+
+
+
 void printHex(uint8_t value)
 {
     printf("%02X",value);
@@ -406,12 +479,15 @@ int main()
     uint8_t     data[1024]  = {0};
 
     {
+        //
+        // AXDR test routines.
+        //
         AXDRStream  stream  = &data[0];
         uint32_t    valueOne       = 0xdeadbeef;
         uint8_t     stringOne[]    = {0x01,0x02,0x03,0x04,0x05};
         uint8_t     stringTwo[]    = {0x04,0x05,0x06};
 
-        memset( &data[0], 0, sizeof(data) );
+        memset( &data[0], 0xaa, sizeof(data) );
 
         axdrSetArray(&stream, 1);
         axdrSetStruct(&stream, 3);
@@ -424,6 +500,9 @@ int main()
     printf("\n");
 
     {
+        //
+        // AXDR test routines.
+        //
         AXDRStream  stream  = &data[0];
         uint32_t    numberOfElements = 0;
         uint32_t    numberOfFields  = 0;
@@ -451,6 +530,9 @@ int main()
 
 
     {
+        //
+        // GetRequestNormal
+        //
         AXDRStream  stream  = &data[0];
         OBISCode    timeOBIS    = {0,0,1,0,0,255};
 
@@ -460,9 +542,10 @@ int main()
         printHexData( &data[0], 40 );
         printf("\n");
     }
-
-
     {
+        //
+        // GetRequestNormal
+        //
         AXDRStream  stream  = &data[0];
         OBISCode        obisCode= {0};
         InterfaceClass  ic      = 0;
@@ -475,6 +558,82 @@ int main()
         printHexData( &obisCode[0], sizeof(obisCode) );
         printf("\n");
     }
+
+    {
+        //
+        // GetResponseNormal with a read-write-denied access result.
+        //
+        AXDRStream  stream  = &data[0];
+
+        memset( &data[0], 0xaa, sizeof(data) );
+        dlmsFormGetResponseNormal( &stream,  AccessResult );
+
+        DataAccessResult    result  = read_write_denied;
+        axdrSetUint8( &stream, (uint8_t)result );
+
+        printHexData( &data[0], 40 );
+        printf("\n");
+    }
+    {
+        //
+        // GetResponseNormal
+        //
+        AXDRStream  stream  = &data[0];
+        OBISCode        obisCode= {0};
+        InterfaceClass  ic      = 0;
+        AttributeId     attrId  = 0;
+        ResultType      resultType;
+        uint8_t         resultCode;
+        DataAccessResult    result;
+
+        dlmsParseGetResponseNormal( &stream,  &resultType );
+        assert( resultType == AccessResult );
+
+        axdrGetUint8( &stream, &resultCode );
+        result  = resultCode;
+        assert( result == read_write_denied );
+    }
+
+    {
+        //
+        // GetResponseNormal with a 12-byte octet string result.
+        //
+        AXDRStream  stream  = &data[0];
+
+        memset( &data[0], 0xaa, sizeof(data) );
+        dlmsFormGetResponseNormal( &stream,  Data );
+
+        uint8_t     timeResult[12]  = {1,2,3,4,5,6,7,8,9,10,11,12};
+        axdrSetOctetString( &stream, timeResult,sizeof(timeResult) );
+
+        printHexData( &data[0], 40 );
+        printf("\n");
+    }
+    {
+        //
+        // GetResponseNormal
+        //
+        AXDRStream  stream  = &data[0];
+        OBISCode        obisCode= {0};
+        InterfaceClass  ic      = 0;
+        AttributeId     attrId  = 0;
+        ResultType      resultType;
+        uint8_t         resultCode;
+
+        dlmsParseGetResponseNormal( &stream,  &resultType );
+        assert( resultType == Data );
+
+        uint8_t         timeResult[16]      = {0};
+        uint32_t        timeResultLength    = 0;
+        axdrGetOctetString( &stream, &timeResult[0],sizeof(timeResult), &timeResultLength );
+        assert(timeResultLength == 12);
+
+        printHexData( &timeResult[0], timeResultLength );
+        printf("\n");
+    }
+
+
+
 
     return 0;
 }
