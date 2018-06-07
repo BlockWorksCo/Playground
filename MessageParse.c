@@ -137,38 +137,7 @@ static const int32_t     primitiveTypeLength[]   =
 
 
 
-typedef uint8_t     AXDRType;
-typedef uint16_t    AXDRLength;
 typedef uint8_t*    AXDRStream;
-
-
-void axdrGetTypeAndLength(AXDRStream* stream, AXDRType* type, AXDRLength* length)
-{
-    uint8_t*    streamBytes = (uint8_t*)stream;
-    *type   = *streamBytes;
-    streamBytes++;
-    PrimitiveTypeTag    tag = (PrimitiveTypeTag)*type;
-    int32_t     typeLength  = primitiveTypeLength[tag];
-    if(typeLength == -1)
-    {
-        *length = *streamBytes;
-        streamBytes++;
-    }
-    else
-    {
-        *length = typeLength;
-    }
-
-    *stream = streamBytes;
-}
-
-void axdrGetTypeAndValue(AXDRStream* stream)
-{
-}
-
-void axdrGetUINT32(AXDRStream stream, uint32_t* value)
-{
-}
 
 
 
