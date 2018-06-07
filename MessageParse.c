@@ -137,7 +137,16 @@ static const int32_t     primitiveTypeLength[]   =
 
 
 
+typedef enum
+{
+    TimeClass   = 8,
+
+} InterfaceClass;
+
+
 typedef uint8_t*    AXDRStream;
+typedef uint8_t     OBISCode[6];
+typedef uint16_t    AttributeId;
 
 
 
@@ -194,6 +203,13 @@ void axdrSetOctetString(AXDRStream* stream, uint8_t* data, uint32_t numberOfByte
 void axdrSetUint32(AXDRStream* stream, uint32_t value)
 {
     axdrSetUint8(stream, unsigned32);
+    axdrSetUint8Array(stream, (void*)&value,sizeof(value) );
+}
+
+
+void axdrSetUint16(AXDRStream* stream, uint16_t value)
+{
+    axdrSetUint8(stream, unsigned16);
     axdrSetUint8Array(stream, (void*)&value,sizeof(value) );
 }
 
@@ -305,6 +321,41 @@ void axdrGetUint32(AXDRStream* stream, uint32_t* value)
 
 
 
+
+
+//
+// C001 81 0008 0000010000FF 0200
+//
+// <GetRequest>
+// <GetRequestNormal>
+// <InvokeIdAndPriority Value="81" />
+// <AttributeDescriptor>
+// <!--CLOCK-->
+// <ClassId Value="0008" />
+// <!--0.0.1.0.0.255-->
+// <InstanceId Value="0000010000FF" />
+// <AttributeId Value="02" />
+// </AttributeDescriptor>
+// </GetRequestNormal>
+// </GetRequest>
+//
+void dlmsFormGetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId )
+{
+    axdrSetUint8( stream, 0xc0 );
+    axdrSetUint8( stream, 0x01 );
+    axdrSetUint8( stream, 0x81 );
+    
+    uint16_t    ic  = ifClass;
+    axdrSetUint8Array( stream, (void*)&ic, sizeof(ic) );
+
+    axdrSetUint8Array( stream, obisCode,sizeof(OBISCode) );
+    
+    uint16_t    attrId  = attributeId;
+    axdrSetUint8Array( stream, (void*)&attrId, sizeof(attrId) );
+}
+
+
+
 void printHex(uint8_t value)
 {
     printf("%02X",value);
@@ -328,6 +379,8 @@ int main()
         uint8_t     stringOne[]    = {0x01,0x02,0x03,0x04,0x05};
         uint8_t     stringTwo[]    = {0x04,0x05,0x06};
 
+        memset( &data[0], 0, sizeof(data) );
+
         axdrSetArray(&stream, 1);
         axdrSetStruct(&stream, 3);
         axdrSetOctetString(&stream, stringOne,sizeof(stringOne));
@@ -340,7 +393,6 @@ int main()
 
     {
         AXDRStream  stream  = &data[0];
-        bool        completeFlag    = false;
         uint32_t    numberOfElements = 0;
         uint32_t    numberOfFields  = 0;
         uint32_t    valueOne        = 0;
@@ -362,6 +414,18 @@ int main()
         printHexData( &stringTwo[0], stringTwoLength );
         printf("\n");
         printHexData( (void*)&valueOne, sizeof(valueOne) );
+        printf("\n");
+    }
+
+
+    {
+        AXDRStream  stream  = &data[0];
+        OBISCode    timeOBIS    = {0,0,1,0,0,255};
+
+        memset( &data[0], 0xaa, sizeof(data) );
+        dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
+
+        printHexData( &data[0], 40 );
         printf("\n");
     }
 
