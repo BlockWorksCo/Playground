@@ -318,6 +318,16 @@ void axdrGetUint32(AXDRStream* stream, uint32_t* value)
 }
 
 
+void axdrGetUint16(AXDRStream* stream, uint16_t* value)
+{
+    uint8_t    tag   = 0;
+    axdrGetUint8( stream, &tag );
+    assert(tag == unsigned16);
+
+    axdrGetUint8Array( stream, (void*)value,sizeof(*value) );
+}
+
+
 
 
 
@@ -341,9 +351,9 @@ void axdrGetUint32(AXDRStream* stream, uint32_t* value)
 //
 void dlmsFormGetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId )
 {
-    axdrSetUint8( stream, 0xc0 );
-    axdrSetUint8( stream, 0x01 );
-    axdrSetUint8( stream, 0x81 );
+    axdrSetUint8( stream, 0xc0 );   // type
+    axdrSetUint8( stream, 0x01 );   // subType
+    axdrSetUint8( stream, 0x81 );   // invokeId
     
     uint16_t    ic  = ifClass;
     axdrSetUint8Array( stream, (void*)&ic, sizeof(ic) );
@@ -354,6 +364,28 @@ void dlmsFormGetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass 
     axdrSetUint8Array( stream, (void*)&attrId, sizeof(attrId) );
 }
 
+void dlmsParseGetRequest( AXDRStream* stream,  OBISCode* obisCode, InterfaceClass* ifClass, AttributeId* attributeId )
+{
+    uint8_t     type    = 0;
+    uint8_t     subType = 0;
+    uint8_t     invokeId= 0;
+    uint16_t    ic      = 0;
+    uint16_t    attr    = 0;
+
+    axdrGetUint8( stream, &type );
+    assert( type == 0xc0 );
+
+    axdrGetUint8( stream, &subType );
+    assert( subType == 0x01 );
+
+    axdrGetUint8( stream, &invokeId );
+    axdrGetUint8Array( stream, (void*)&ic,sizeof(ic) );
+    axdrGetUint8Array( stream, (void*)obisCode,sizeof(OBISCode) );
+    axdrGetUint8Array( stream, (void*)&attr,sizeof(attr) );
+
+    *attributeId    = (AttributeId)attr;
+    *ifClass        = (InterfaceClass)ic;
+}
 
 
 void printHex(uint8_t value)
@@ -426,6 +458,21 @@ int main()
         dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
 
         printHexData( &data[0], 40 );
+        printf("\n");
+    }
+
+
+    {
+        AXDRStream  stream  = &data[0];
+        OBISCode        obisCode= {0};
+        InterfaceClass  ic      = 0;
+        AttributeId     attrId  = 0;
+
+        dlmsParseGetRequest( &stream,  &obisCode, &ic, &attrId );
+        assert( ic == TimeClass );
+        assert( attrId == 2 );
+
+        printHexData( &obisCode[0], sizeof(obisCode) );
         printf("\n");
     }
 
