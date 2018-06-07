@@ -363,7 +363,7 @@ void axdrGetUint16(AXDRStream* stream, uint16_t* value)
 
 
 //
-// C001 81 0008 0000010000FF 0200
+// C001 81 0008 0000010000FF 02 00
 //
 // <GetRequest>
 // <GetRequestNormal>
@@ -389,8 +389,7 @@ void dlmsFormGetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass 
 
     axdrSetUint8Array( stream, obisCode,sizeof(OBISCode) );
     
-    uint16_t    attrId  = attributeId;
-    axdrSetUint8Array( stream, (void*)&attrId, sizeof(attrId) );
+    axdrSetUint8( stream, attributeId );
 }
 
 void dlmsParseGetRequest( AXDRStream* stream,  OBISCode* obisCode, InterfaceClass* ifClass, AttributeId* attributeId )
@@ -458,6 +457,44 @@ void dlmsParseGetResponseNormal( AXDRStream* stream,  ResultType* resultType )
 
     *resultType   = (DataAccessResult)result;
 }
+
+
+//
+// C101 C1 0004 0000600200FF 0400 090870726F6720696420
+//
+// <SetRequest>
+//   <SetRequestNormal>
+//     <InvokeIdAndPriority Value="C1" />
+//     <AttributeDescriptor>
+//       <!--EXTENDED_REGISTER-->
+//       <ClassId Value="0004" />
+//       <!--0.0.96.2.0.255-->
+//       <InstanceId Value="0000600200FF" />
+//       <AttributeId Value="04" />
+//     </AttributeDescriptor>
+//     <Value>
+//       <!--prog id -->
+//       <OctetString Value="70726F6720696420" />
+//     </Value>
+//   </SetRequestNormal>
+// </SetRequest>
+//
+void dlmsFormSetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId )
+{
+    axdrSetUint8( stream, 0xc1 );   // type
+    axdrSetUint8( stream, 0x01 );   // subType
+    axdrSetUint8( stream, 0xc1 );   // invokeId
+    
+    uint16_t    ic  = ifClass;
+    axdrSetUint8Array( stream, (void*)&ic, sizeof(ic) );
+
+    axdrSetUint8Array( stream, obisCode,sizeof(OBISCode) );
+    
+    uint8_t     attrId  = attributeId;
+    axdrSetUint8Array( stream, (void*)&attrId, sizeof(attrId) );
+}
+
+
 
 
 
@@ -538,6 +575,7 @@ int main()
 
         memset( &data[0], 0xaa, sizeof(data) );
         dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
+        axdrSetUint8( &stream, 0x00 );  // No selective access.
 
         printHexData( &data[0], 40 );
         printf("\n");
