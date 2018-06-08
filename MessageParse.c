@@ -506,6 +506,37 @@ void dlmsFormSelectiveAccessType( AXDRStream* stream, SelectiveAccessType type)
     axdrSetUint8( stream, type );
 }
 
+void dlmsParseSetRequest( AXDRStream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId, SelectiveAccessType* saType )
+{
+    uint8_t     type    = 0;
+    uint8_t     subType = 0;
+    uint8_t     invokeId= 0;
+    uint8_t     result  = 0;
+    uint16_t    ic      = 0;
+    uint8_t     sa      = 0;
+    uint8_t     attr    = 0;
+
+    axdrGetUint8( stream, &type );
+    assert( type == 0xc1 );
+
+    axdrGetUint8( stream, &subType );
+    assert( subType == 0x01 );
+
+    axdrGetUint8( stream, &invokeId );
+
+    axdrGetUint8Array( stream, (void*)&ic,sizeof(ic) );
+    *ifClass    = (InterfaceClass)ic;
+
+    axdrGetUint8Array( stream, (void*)obisCode,sizeof(OBISCode) );
+
+    axdrGetUint8( stream, &attr );
+    *attrId  = (AttributeId)attr;
+
+    axdrGetUint8( stream, &sa );
+    *saType   = (SelectiveAccessType)sa;
+}
+
+
 
 
 
@@ -699,6 +730,36 @@ int main()
         printHexData( &data[0], 40 );
         printf("\n");
     }
+    {
+        //
+        // SetRequestNormal
+        //
+        AXDRStream  stream  = &data[0];
+        OBISCode        obisCode= {0};
+        InterfaceClass  ic      = 0;
+        AttributeId     attrId  = 0;
+        SelectiveAccessType      saType;
+        uint8_t         resultCode;
+        OBISCode    timeOBIS    = {0,0,1,0,0,255};
+
+        dlmsParseSetRequest( &stream, &ic, &obisCode, &attrId, &saType );
+        assert( ic == TimeClass );
+        assert( memcmp(obisCode, timeOBIS , 6) == 0 );
+        assert( attrId == 2 );
+        assert( saType == NoSelectiveAccess );
+
+        uint8_t         timeResult[16]      = {0};
+        uint32_t        timeResultLength    = 0;
+        axdrGetOctetString( &stream, &timeResult[0],sizeof(timeResult), &timeResultLength );
+        assert(timeResultLength == 12);
+
+        printHexData( &timeResult[0], timeResultLength );
+        printf("\n");
+        printHexData( &obisCode[0], sizeof(OBISCode) );
+        printf("\n");
+    }
+
+
 
 
     return 0;
