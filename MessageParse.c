@@ -173,6 +173,12 @@ typedef enum
 } DataAccessResult;
 
 
+typedef enum
+{
+    NoSelectiveAccess,
+
+} SelectiveAccessType;
+
 typedef uint8_t*    AXDRStream;
 typedef uint8_t     OBISCode[6];
 typedef uint16_t    AttributeId;
@@ -417,7 +423,7 @@ void dlmsParseGetRequest( AXDRStream* stream,  OBISCode* obisCode, InterfaceClas
 
 
 //
-// C401 09 00 09 06 45 6C 73 74 65 72
+// C401 09 00 09 06 456C73746572
 //
 //   <GetResponseNormal>
 //    <InvokeIdAndPriority Value="129" />
@@ -460,7 +466,7 @@ void dlmsParseGetResponseNormal( AXDRStream* stream,  ResultType* resultType )
 
 
 //
-// C101 C1 0004 0000600200FF 0400 090870726F6720696420
+// C101 C1 0004 0000600200FF 04 00 090870726F6720696420
 //
 // <SetRequest>
 //   <SetRequestNormal>
@@ -491,9 +497,14 @@ void dlmsFormSetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass 
     axdrSetUint8Array( stream, obisCode,sizeof(OBISCode) );
     
     uint8_t     attrId  = attributeId;
-    axdrSetUint8Array( stream, (void*)&attrId, sizeof(attrId) );
+    axdrSetUint8( stream, attrId );
 }
 
+void dlmsFormSelectiveAccessType( AXDRStream* stream, SelectiveAccessType type)
+{
+    uint8_t     saType  = type;
+    axdrSetUint8( stream, type );
+}
 
 
 
@@ -575,7 +586,7 @@ int main()
 
         memset( &data[0], 0xaa, sizeof(data) );
         dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
-        axdrSetUint8( &stream, 0x00 );  // No selective access.
+        dlmsFormSelectiveAccessType( &stream, NoSelectiveAccess );
 
         printHexData( &data[0], 40 );
         printf("\n");
@@ -593,7 +604,7 @@ int main()
         assert( ic == TimeClass );
         assert( attrId == 2 );
 
-        printHexData( &obisCode[0], sizeof(obisCode) );
+        printHexData( &data[0], 40 );
         printf("\n");
     }
 
@@ -671,6 +682,23 @@ int main()
     }
 
 
+    {
+        //
+        // SetRequestNormal with a 12-byte octet string result.
+        //
+        AXDRStream  stream  = &data[0];
+        OBISCode    timeOBIS    = {0,0,1,0,0,255};
+
+        memset( &data[0], 0xaa, sizeof(data) );
+        dlmsFormSetRequest( &stream,  timeOBIS, TimeClass, 2 );
+        dlmsFormSelectiveAccessType( &stream, NoSelectiveAccess );
+
+        //uint8_t     timeResult[12]  = {1,2,3,4,5,6,7,8,9,10,11,12};
+        //axdrSetOctetString( &stream, timeResult,sizeof(timeResult) );
+
+        printHexData( &data[0], 40 );
+        printf("\n");
+    }
 
 
     return 0;
