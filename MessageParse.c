@@ -693,8 +693,8 @@ int main()
         dlmsFormSetRequest( &stream,  timeOBIS, TimeClass, 2 );
         dlmsFormSelectiveAccessType( &stream, NoSelectiveAccess );
 
-        //uint8_t     timeResult[12]  = {1,2,3,4,5,6,7,8,9,10,11,12};
-        //axdrSetOctetString( &stream, timeResult,sizeof(timeResult) );
+        uint8_t     timeResult[12]  = {1,2,3,4,5,6,7,8,9,10,11,12};
+        axdrSetOctetString( &stream, timeResult,sizeof(timeResult) );
 
         printHexData( &data[0], 40 );
         printf("\n");
