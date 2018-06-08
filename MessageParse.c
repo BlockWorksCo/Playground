@@ -184,6 +184,14 @@ typedef uint8_t     OBISCode[6];
 typedef uint16_t    AttributeId;
 
 
+void dlmsFormAttributeDescriptor( AXDRStream* stream, InterfaceClass ifClass, OBISCode obisCode, AttributeId attrId );
+void dlmsParseAttributeDescriptor( AXDRStream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId );
+
+
+
+
+
+
 
 void axdrSetUint8(AXDRStream* stream, uint8_t value)
 {
@@ -390,12 +398,7 @@ void dlmsFormGetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass 
     axdrSetUint8( stream, 0x01 );   // subType
     axdrSetUint8( stream, 0x81 );   // invokeId
     
-    uint16_t    ic  = ifClass;
-    axdrSetUint8Array( stream, (void*)&ic, sizeof(ic) );
-
-    axdrSetUint8Array( stream, obisCode,sizeof(OBISCode) );
-    
-    axdrSetUint8( stream, attributeId );
+    dlmsFormAttributeDescriptor( stream, ifClass, obisCode, attributeId );
 }
 
 void dlmsParseGetRequest( AXDRStream* stream,  OBISCode* obisCode, InterfaceClass* ifClass, AttributeId* attributeId )
@@ -413,12 +416,8 @@ void dlmsParseGetRequest( AXDRStream* stream,  OBISCode* obisCode, InterfaceClas
     assert( subType == 0x01 );
 
     axdrGetUint8( stream, &invokeId );
-    axdrGetUint8Array( stream, (void*)&ic,sizeof(ic) );
-    axdrGetUint8Array( stream, (void*)obisCode,sizeof(OBISCode) );
-    axdrGetUint8Array( stream, (void*)&attr,sizeof(attr) );
 
-    *attributeId    = (AttributeId)attr;
-    *ifClass        = (InterfaceClass)ic;
+    dlmsParseAttributeDescriptor( stream, ifClass, obisCode, attributeId );
 }
 
 
@@ -582,6 +581,33 @@ void dlmsParseAccessSelection( AXDRStream* stream, uint8_t* accessSelector )
 {
 }
 
+
+
+//
+//
+//
+void dlmsFormAttributeDescriptor( AXDRStream* stream, InterfaceClass ifClass, OBISCode obisCode, AttributeId attrId )
+{
+    uint16_t    ic  = ifClass;
+    axdrSetUint8Array( stream, (void*)&ic, sizeof(ic) );
+
+    axdrSetUint8Array( stream, obisCode,sizeof(OBISCode) );
+    
+    axdrSetUint8( stream, attrId );
+}
+
+void dlmsParseAttributeDescriptor( AXDRStream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId )
+{
+    uint16_t ic;
+    axdrGetUint8Array( stream, (void*)&ic,sizeof(ic) );
+    *ifClass    = (InterfaceClass)ic;
+
+    axdrGetUint8Array( stream, (void*)obisCode,sizeof(OBISCode) );
+
+    uint8_t attr;
+    axdrGetUint8( stream, &attr );
+    *attrId  = (AttributeId)attr;
+}
 
 
 void printHex(uint8_t value)
