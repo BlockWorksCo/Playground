@@ -490,13 +490,7 @@ void dlmsFormSetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass 
     axdrSetUint8( stream, 0x01 );   // subType
     axdrSetUint8( stream, 0xc1 );   // invokeId
     
-    uint16_t    ic  = ifClass;
-    axdrSetUint8Array( stream, (void*)&ic, sizeof(ic) );
-
-    axdrSetUint8Array( stream, obisCode,sizeof(OBISCode) );
-    
-    uint8_t     attrId  = attributeId;
-    axdrSetUint8( stream, attrId );
+    dlmsFormAttributeDescriptor( stream, ifClass, obisCode, attributeId );
 }
 
 void dlmsFormSelectiveAccessType( AXDRStream* stream, SelectiveAccessType type)
@@ -523,13 +517,7 @@ void dlmsParseSetRequest( AXDRStream* stream, InterfaceClass* ifClass, OBISCode*
 
     axdrGetUint8( stream, &invokeId );
 
-    axdrGetUint8Array( stream, (void*)&ic,sizeof(ic) );
-    *ifClass    = (InterfaceClass)ic;
-
-    axdrGetUint8Array( stream, (void*)obisCode,sizeof(OBISCode) );
-
-    axdrGetUint8( stream, &attr );
-    *attrId  = (AttributeId)attr;
+    dlmsParseAttributeDescriptor( stream, ifClass, obisCode, attrId );
 
     axdrGetUint8( stream, &sa );
     *saType   = (SelectiveAccessType)sa;
