@@ -37,6 +37,8 @@ void printPDU(uint8_t* startData, uint8_t* endData)
 
 uint8_t     data[256]  = {0};
 
+static OBISCode            timeOBIS    = {0,0,1,0,0,255};
+
 
 void AXDRTests()
 {
@@ -44,7 +46,7 @@ void AXDRTests()
     // Set
     //
     {
-        AXDRStream  stream  = &data[0];
+        AXDRStream  stream         = &data[0];
         uint32_t    valueOne       = 0xdeadbeef;
         uint8_t     stringOne[]    = {0x01,0x02,0x03,0x04,0x05};
         uint8_t     stringTwo[]    = {0x04,0x05,0x06};
@@ -91,7 +93,6 @@ void GetRequestTests()
     //
     {
         AXDRStream  stream  = &data[0];
-        OBISCode    timeOBIS    = {0,0,1,0,0,255};
 
         memset( &data[0], 0xaa, sizeof(data) );
         dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
@@ -196,14 +197,16 @@ void SetRequestTests()
         // Form SetRequestNormal with a 12-byte octet string result.
         //
         AXDRStream  stream  = &data[0];
-        OBISCode    timeOBIS    = {0,0,1,0,0,255};
 
         memset( &data[0], 0xaa, sizeof(data) );
         dlmsFormSetRequest( &stream,  timeOBIS, TimeClass, 2 );
         dlmsFormSelectiveAccessType( &stream, NoSelectiveAccess );
 
-        uint8_t     timeResult[12]  = {1,2,3,4,5,6,7,8,9,10,11,12};
+        uint8_t     timeResult[]  = {1,2,3,4,5,6,7,8,9,10,11,12};
         axdrSetOctetString( &stream, timeResult,sizeof(timeResult) );
+
+        uint8_t expected[]  = {0xC1,0x01,0xC1,0x08,0x00,0x00,0x00,0x01,0x00,0x00,0xFF,0x02,0x00,0x09,0x0C,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C};
+        assert( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
 
         printPDU( &data[0], (uint8_t*)stream );
     }
@@ -211,13 +214,12 @@ void SetRequestTests()
         //
         // Parse SetRequestNormal
         //
-        AXDRStream  stream  = &data[0];
-        OBISCode        obisCode= {0};
-        InterfaceClass  ic      = 0;
-        AttributeId     attrId  = 0;
-        SelectiveAccessType      saType;
-        uint8_t         resultCode;
-        OBISCode    timeOBIS    = {0,0,1,0,0,255};
+        AXDRStream          stream  = &data[0];
+        OBISCode            obisCode= {0};
+        InterfaceClass      ic      = 0;
+        AttributeId         attrId  = 0;
+        SelectiveAccessType saType;
+        uint8_t             resultCode;
 
         dlmsParseSetRequest( &stream, &ic, &obisCode, &attrId, &saType );
         assert( ic == TimeClass );
@@ -228,6 +230,8 @@ void SetRequestTests()
         uint8_t         timeResult[16]      = {0};
         uint32_t        timeResultLength    = 0;
         axdrGetOctetString( &stream, &timeResult[0],sizeof(timeResult), &timeResultLength );
+        assert(timeResult[0] == 1);
+        assert(timeResult[11] == 12);
         assert(timeResultLength == 12);
     }
 }
