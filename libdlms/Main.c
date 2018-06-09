@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <stddef.h>
 
 
 void printHex(uint8_t value)
@@ -22,6 +23,14 @@ void printHexData(uint8_t* data, uint32_t numberOfBytes)
     {
         printHex(data[i]);   
     }
+}
+
+void printPDU(uint8_t* startData, uint8_t* endData)
+{
+    ptrdiff_t    numberOfBytes   = (ptrdiff_t)endData - (ptrdiff_t)startData;
+
+    printHexData( startData, numberOfBytes );
+    printf("\r\n");
 }
 
 
@@ -47,6 +56,8 @@ void AXDRTests()
         axdrSetOctetString(&stream, stringOne,sizeof(stringOne));
         axdrSetOctetString(&stream, stringTwo,sizeof(stringTwo));
         axdrSetUint32(&stream, valueOne);
+
+        printPDU( &data[0], (uint8_t*)stream );
     }
 
     //
@@ -69,13 +80,6 @@ void AXDRTests()
         axdrGetOctetString(&stream, &stringOne[0],sizeof(stringOne), &stringOneLength);
         axdrGetOctetString(&stream, &stringTwo[0],sizeof(stringTwo), &stringTwoLength);
         axdrGetUint32(&stream, &valueOne );
-
-        printHexData( &stringOne[0], stringOneLength );
-        printf("\n");
-        printHexData( &stringTwo[0], stringTwoLength );
-        printf("\n");
-        printHexData( (void*)&valueOne, sizeof(valueOne) );
-        printf("\n");
     }
 }
 
@@ -93,8 +97,7 @@ void GetRequestTests()
         dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
         dlmsFormSelectiveAccessType( &stream, NoSelectiveAccess );
 
-        printHexData( &data[0], 40 );
-        printf("\n");
+        printPDU( &data[0], (uint8_t*)stream );
     }
 
     //
@@ -109,9 +112,6 @@ void GetRequestTests()
         dlmsParseGetRequest( &stream,  &obisCode, &ic, &attrId );
         assert( ic == TimeClass );
         assert( attrId == 2 );
-
-        printHexData( &data[0], 40 );
-        printf("\n");
     }
 }
 
@@ -130,8 +130,7 @@ void GetResponseTests()
         DataAccessResult    result  = read_write_denied;
         axdrSetUint8( &stream, (uint8_t)result );
 
-        printHexData( &data[0], 40 );
-        printf("\n");
+        printPDU( &data[0], (uint8_t*)stream );
     }
     {
         //
@@ -165,8 +164,7 @@ void GetResponseTests()
         uint8_t     timeResult[12]  = {1,2,3,4,5,6,7,8,9,10,11,12};
         axdrSetOctetString( &stream, timeResult,sizeof(timeResult) );
 
-        printHexData( &data[0], 40 );
-        printf("\n");
+        printPDU( &data[0], (uint8_t*)stream );
     }
     {
         //
@@ -186,9 +184,6 @@ void GetResponseTests()
         uint32_t        timeResultLength    = 0;
         axdrGetOctetString( &stream, &timeResult[0],sizeof(timeResult), &timeResultLength );
         assert(timeResultLength == 12);
-
-        printHexData( &timeResult[0], timeResultLength );
-        printf("\n");
     }
 }
 
@@ -210,8 +205,7 @@ void SetRequestTests()
         uint8_t     timeResult[12]  = {1,2,3,4,5,6,7,8,9,10,11,12};
         axdrSetOctetString( &stream, timeResult,sizeof(timeResult) );
 
-        printHexData( &data[0], 40 );
-        printf("\n");
+        printPDU( &data[0], (uint8_t*)stream );
     }
     {
         //
@@ -235,11 +229,6 @@ void SetRequestTests()
         uint32_t        timeResultLength    = 0;
         axdrGetOctetString( &stream, &timeResult[0],sizeof(timeResult), &timeResultLength );
         assert(timeResultLength == 12);
-
-        printHexData( &timeResult[0], timeResultLength );
-        printf("\n");
-        printHexData( &obisCode[0], sizeof(OBISCode) );
-        printf("\n");
     }
 }
 
