@@ -46,12 +46,6 @@ typedef enum
 } DataAccessResult;
 
 
-typedef enum
-{
-    NoSelectiveAccess,
-
-} SelectiveAccessType;
-
 typedef uint8_t     OBISCode[6];
 typedef uint16_t    AttributeId;
 
@@ -117,13 +111,12 @@ typedef enum
 
 
 
-void dlmsFormGetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId );
-void dlmsParseGetRequest( AXDRStream* stream,  OBISCode* obisCode, InterfaceClass* ifClass, AttributeId* attributeId );
+void dlmsFormGetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId, uint8_t accessSelector );
+void dlmsParseGetRequest( AXDRStream* stream,  OBISCode* obisCode, InterfaceClass* ifClass, AttributeId* attributeId, uint8_t* accessSelector );
 void dlmsFormGetResponseNormal( AXDRStream* stream,  ResultType type );
 void dlmsParseGetResponseNormal( AXDRStream* stream,  ResultType* resultType );
-void dlmsFormSetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId );
-void dlmsFormSelectiveAccessType( AXDRStream* stream, SelectiveAccessType type);
-void dlmsParseSetRequest( AXDRStream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId, SelectiveAccessType* saType );
+void dlmsFormSetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId, uint8_t accessSelector );
+void dlmsParseSetRequest( AXDRStream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId, uint8_t* accessSelector );
 void dlmsParseAccessSelection( AXDRStream* stream, uint8_t* accessSelector );
 void dlmsFormAttributeDescriptor( AXDRStream* stream, InterfaceClass ifClass, OBISCode obisCode, AttributeId attrId );
 void dlmsParseAttributeDescriptor( AXDRStream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId );

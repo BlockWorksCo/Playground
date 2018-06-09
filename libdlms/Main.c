@@ -95,8 +95,7 @@ void GetRequestTests()
         AXDRStream  stream  = &data[0];
 
         memset( &data[0], 0xaa, sizeof(data) );
-        dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
-        dlmsFormSelectiveAccessType( &stream, NoSelectiveAccess );
+        dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2, 0 );
 
         printPDU( &data[0], (uint8_t*)stream );
     }
@@ -109,10 +108,12 @@ void GetRequestTests()
         OBISCode        obisCode= {0};
         InterfaceClass  ic      = 0;
         AttributeId     attrId  = 0;
+        uint8_t         accessSelector  = 0;
 
-        dlmsParseGetRequest( &stream,  &obisCode, &ic, &attrId );
+        dlmsParseGetRequest( &stream,  &obisCode, &ic, &attrId, &accessSelector );
         assert( ic == TimeClass );
         assert( attrId == 2 );
+        assert( accessSelector == 0 );
     }
 }
 
@@ -199,8 +200,7 @@ void SetRequestTests()
         AXDRStream  stream  = &data[0];
 
         memset( &data[0], 0xaa, sizeof(data) );
-        dlmsFormSetRequest( &stream,  timeOBIS, TimeClass, 2 );
-        dlmsFormSelectiveAccessType( &stream, NoSelectiveAccess );
+        dlmsFormSetRequest( &stream,  timeOBIS, TimeClass, 2, 0 );
 
         uint8_t     timeResult[]  = {1,2,3,4,5,6,7,8,9,10,11,12};
         axdrSetOctetString( &stream, timeResult,sizeof(timeResult) );
@@ -218,14 +218,14 @@ void SetRequestTests()
         OBISCode            obisCode= {0};
         InterfaceClass      ic      = 0;
         AttributeId         attrId  = 0;
-        SelectiveAccessType saType;
+        uint8_t             accessSelector  = 0;
         uint8_t             resultCode;
 
-        dlmsParseSetRequest( &stream, &ic, &obisCode, &attrId, &saType );
+        dlmsParseSetRequest( &stream, &ic, &obisCode, &attrId, &accessSelector );
         assert( ic == TimeClass );
         assert( memcmp(obisCode, timeOBIS , 6) == 0 );
         assert( attrId == 2 );
-        assert( saType == NoSelectiveAccess );
+        assert( accessSelector == 0 );
 
         uint8_t         timeResult[16]      = {0};
         uint32_t        timeResultLength    = 0;
