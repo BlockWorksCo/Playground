@@ -23,7 +23,7 @@
 //
 void dlmsFormGetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId )
 {
-    axdrSetUint8( stream, 0xc0 );   // type
+    axdrSetUint8( stream, get_request );   // type
     axdrSetUint8( stream, 0x01 );   // subType
     axdrSetUint8( stream, 0x81 );   // invokeId
     
@@ -39,7 +39,7 @@ void dlmsParseGetRequest( AXDRStream* stream,  OBISCode* obisCode, InterfaceClas
     uint16_t    attr    = 0;
 
     axdrGetUint8( stream, &type );
-    assert( type == 0xc0 );
+    assert( type == get_request );
 
     axdrGetUint8( stream, &subType );
     assert( subType == 0x01 );
@@ -65,7 +65,7 @@ void dlmsParseGetRequest( AXDRStream* stream,  OBISCode* obisCode, InterfaceClas
 //
 void dlmsFormGetResponseNormal( AXDRStream* stream,  ResultType type )
 {
-    axdrSetUint8( stream, 0xc4 );   // type
+    axdrSetUint8( stream, get_response );   // type
     axdrSetUint8( stream, 0x01 );   // subType
 
     axdrSetUint8( stream, 0x81 );   // invokeId
@@ -81,7 +81,7 @@ void dlmsParseGetResponseNormal( AXDRStream* stream,  ResultType* resultType )
     uint8_t     result  = 0;
 
     axdrGetUint8( stream, &type );
-    assert( type == 0xc4 );
+    assert( type == get_response );
 
     axdrGetUint8( stream, &subType );
     assert( subType == 0x01 );
@@ -115,7 +115,7 @@ void dlmsParseGetResponseNormal( AXDRStream* stream,  ResultType* resultType )
 //
 void dlmsFormSetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId )
 {
-    axdrSetUint8( stream, 0xc1 );   // type
+    axdrSetUint8( stream, set_request );   // type
     axdrSetUint8( stream, 0x01 );   // subType
     axdrSetUint8( stream, 0xc1 );   // invokeId
     
@@ -139,7 +139,7 @@ void dlmsParseSetRequest( AXDRStream* stream, InterfaceClass* ifClass, OBISCode*
     uint8_t     attr    = 0;
 
     axdrGetUint8( stream, &type );
-    assert( type == 0xc1 );
+    assert( type == set_request );
 
     axdrGetUint8( stream, &subType );
     assert( subType == 0x01 );
