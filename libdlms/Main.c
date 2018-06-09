@@ -24,14 +24,17 @@ void printHexData(uint8_t* data, uint32_t numberOfBytes)
     }
 }
 
-int main()
-{
-    uint8_t     data[1024]  = {0};
 
+
+uint8_t     data[256]  = {0};
+
+
+void AXDRTests()
+{
+    //
+    // Set
+    //
     {
-        //
-        // AXDR test routines.
-        //
         AXDRStream  stream  = &data[0];
         uint32_t    valueOne       = 0xdeadbeef;
         uint8_t     stringOne[]    = {0x01,0x02,0x03,0x04,0x05};
@@ -46,13 +49,10 @@ int main()
         axdrSetUint32(&stream, valueOne);
     }
 
-    printHexData( &data[0], 40 );
-    printf("\n");
-
+    //
+    // Get
+    //
     {
-        //
-        // AXDR test routines.
-        //
         AXDRStream  stream  = &data[0];
         uint32_t    numberOfElements = 0;
         uint32_t    numberOfFields  = 0;
@@ -77,12 +77,15 @@ int main()
         printHexData( (void*)&valueOne, sizeof(valueOne) );
         printf("\n");
     }
+}
 
 
+void GetRequestTests()
+{
+    //
+    // Form
+    //
     {
-        //
-        // GetRequestNormal
-        //
         AXDRStream  stream  = &data[0];
         OBISCode    timeOBIS    = {0,0,1,0,0,255};
 
@@ -93,10 +96,11 @@ int main()
         printHexData( &data[0], 40 );
         printf("\n");
     }
+
+    //
+    // Parse
+    //
     {
-        //
-        // GetRequestNormal
-        //
         AXDRStream  stream  = &data[0];
         OBISCode        obisCode= {0};
         InterfaceClass  ic      = 0;
@@ -109,7 +113,11 @@ int main()
         printHexData( &data[0], 40 );
         printf("\n");
     }
+}
 
+
+void GetResponseTests()
+{
     {
         //
         // GetResponseNormal with a read-write-denied access result.
@@ -182,11 +190,15 @@ int main()
         printHexData( &timeResult[0], timeResultLength );
         printf("\n");
     }
+}
 
 
+
+void SetRequestTests()
+{
     {
         //
-        // SetRequestNormal with a 12-byte octet string result.
+        // Form SetRequestNormal with a 12-byte octet string result.
         //
         AXDRStream  stream  = &data[0];
         OBISCode    timeOBIS    = {0,0,1,0,0,255};
@@ -203,7 +215,7 @@ int main()
     }
     {
         //
-        // SetRequestNormal
+        // Parse SetRequestNormal
         //
         AXDRStream  stream  = &data[0];
         OBISCode        obisCode= {0};
@@ -229,9 +241,16 @@ int main()
         printHexData( &obisCode[0], sizeof(OBISCode) );
         printf("\n");
     }
+}
 
 
+int main()
+{
 
+    AXDRTests();
+    GetRequestTests();
+    GetResponseTests();
+    SetRequestTests();
 
     return 0;
 }
