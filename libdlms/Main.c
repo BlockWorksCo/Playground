@@ -95,7 +95,8 @@ void GetRequestTests()
         AXDRStream  stream  = &data[0];
 
         memset( &data[0], 0xaa, sizeof(data) );
-        dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2, 0 );
+        dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
+        dlmsFormNoAccessSelection( &stream );
 
         printPDU( &data[0], (uint8_t*)stream );
     }
@@ -108,12 +109,16 @@ void GetRequestTests()
         OBISCode        obisCode= {0};
         InterfaceClass  ic      = 0;
         AttributeId     attrId  = 0;
+        bool            accessSelection = 0;
         uint8_t         accessSelector  = 0;
 
-        dlmsParseGetRequest( &stream,  &obisCode, &ic, &attrId, &accessSelector );
+        dlmsParseGetRequest( &stream,  &obisCode, &ic, &attrId );
         assert( ic == TimeClass );
         assert( attrId == 2 );
         assert( accessSelector == 0 );
+
+        dlmsParseAccessSelection( &stream, &accessSelection, &accessSelector );
+        assert( accessSelection == false );
     }
 }
 
@@ -200,7 +205,8 @@ void SetRequestTests()
         AXDRStream  stream  = &data[0];
 
         memset( &data[0], 0xaa, sizeof(data) );
-        dlmsFormSetRequest( &stream,  timeOBIS, TimeClass, 2, 0 );
+        dlmsFormSetRequest( &stream,  timeOBIS, TimeClass, 2 );
+        dlmsFormNoAccessSelection( &stream );
 
         uint8_t     timeResult[]  = {1,2,3,4,5,6,7,8,9,10,11,12};
         axdrSetOctetString( &stream, timeResult,sizeof(timeResult) );
@@ -218,14 +224,17 @@ void SetRequestTests()
         OBISCode            obisCode= {0};
         InterfaceClass      ic      = 0;
         AttributeId         attrId  = 0;
+        bool                accessSelection = false;
         uint8_t             accessSelector  = 0;
         uint8_t             resultCode;
 
-        dlmsParseSetRequest( &stream, &ic, &obisCode, &attrId, &accessSelector );
+        dlmsParseSetRequest( &stream, &ic, &obisCode, &attrId );
         assert( ic == TimeClass );
         assert( memcmp(obisCode, timeOBIS , 6) == 0 );
         assert( attrId == 2 );
-        assert( accessSelector == 0 );
+
+        dlmsParseAccessSelection( &stream, &accessSelection, &accessSelector );
+        assert( accessSelection == false );
 
         uint8_t         timeResult[16]      = {0};
         uint32_t        timeResultLength    = 0;

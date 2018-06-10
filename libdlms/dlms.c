@@ -21,18 +21,16 @@
 // </GetRequestNormal>
 // </GetRequest>
 //
-void dlmsFormGetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId, uint8_t accessSelectionFlag )
+void dlmsFormGetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId )
 {
     axdrSetUint8( stream, get_request );   // type
     axdrSetUint8( stream, 0x01 );   // subType
     axdrSetUint8( stream, 0x81 );   // invokeId
     
     dlmsFormAttributeDescriptor( stream, ifClass, obisCode, attributeId );
-
-    axdrSetUint8( stream, accessSelectionFlag );   // access selection flag. 1=accessSelector follows, 0=no accessSelector.
 }
 
-void dlmsParseGetRequest( AXDRStream* stream,  OBISCode* obisCode, InterfaceClass* ifClass, AttributeId* attributeId, uint8_t* accessSelectionFlag )
+void dlmsParseGetRequest( AXDRStream* stream,  OBISCode* obisCode, InterfaceClass* ifClass, AttributeId* attributeId )
 {
     uint8_t     type    = 0;
     uint8_t     subType = 0;
@@ -49,8 +47,6 @@ void dlmsParseGetRequest( AXDRStream* stream,  OBISCode* obisCode, InterfaceClas
     axdrGetUint8( stream, &invokeId );
 
     dlmsParseAttributeDescriptor( stream, ifClass, obisCode, attributeId );
-
-    axdrGetUint8( stream, accessSelectionFlag );    // flag: 1=accessSelecctor follows, 0=no accessSelector.
 }
 
 
@@ -117,18 +113,16 @@ void dlmsParseGetResponseNormal( AXDRStream* stream,  ResultType* resultType )
 //   </SetRequestNormal>
 // </SetRequest>
 //
-void dlmsFormSetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId, uint8_t accessSelectionFlag )
+void dlmsFormSetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId )
 {
     axdrSetUint8( stream, set_request );   // type
     axdrSetUint8( stream, 0x01 );   // subType
     axdrSetUint8( stream, 0xc1 );   // invokeId
     
     dlmsFormAttributeDescriptor( stream, ifClass, obisCode, attributeId );
-
-    axdrSetUint8( stream, accessSelectionFlag );   //  0=no access selector follows, 1=access selector follows. 
 }
 
-void dlmsParseSetRequest( AXDRStream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId, uint8_t* accessSelectionFlag )
+void dlmsParseSetRequest( AXDRStream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId )
 {
     uint8_t     type    = 0;
     uint8_t     subType = 0;
@@ -147,8 +141,6 @@ void dlmsParseSetRequest( AXDRStream* stream, InterfaceClass* ifClass, OBISCode*
     axdrGetUint8( stream, &invokeId );
 
     dlmsParseAttributeDescriptor( stream, ifClass, obisCode, attrId );
-
-    axdrGetUint8( stream, accessSelectionFlag );    // 0=no access selector follows, 1=access selector follows.
 }
 
 
@@ -193,17 +185,42 @@ void dlmsParseSetRequest( AXDRStream* stream, InterfaceClass* ifClass, OBISCode*
 //      </AccessParameters>
 //    </AccessSelection>
 //
-void dlmsFormProfileByRangeAccessSelection( AXDRStream* stream )
+void dlmsFormNoAccessSelection( AXDRStream* stream )
+{
+    axdrSetUint8( stream, 0 );  // access selection flag.
+}
+
+void dlmsFormProfileByRangeAccessSelection( AXDRStream* stream, uint32_t from, uint32_t to )
 {
     axdrSetUint8( stream, 1 );  // access selection flag.
-    axdrSetUint8( stream, 0 );  // access selector.
+    axdrSetUint8( stream, 2 );  // by-range access selector.
+
+    // TODO:
 }
 
-void dlmsParseAccessSelection( AXDRStream* stream, uint8_t* accessSelector )
+void dlmsFormProfileByEntryAccessSelection( AXDRStream* stream, uint32_t from, uint32_t to )
 {
-    axdrGetUint8( stream, accessSelector );
+    axdrSetUint8( stream, 1 );  // access selection flag.
+    axdrSetUint8( stream, 1 );  // by-entry access selector.
+
+    // TODO:
 }
 
+
+void dlmsParseAccessSelection( AXDRStream* stream, bool* accessSelection, uint8_t* accessSelector )
+{
+    uint8_t selectionFlag   = 0;
+    axdrGetUint8( stream, &selectionFlag );
+    if(selectionFlag == 0)
+    {
+        *accessSelection    = false;
+    }
+    else
+    {
+        *accessSelection    = true;
+        axdrGetUint8( stream, accessSelector );
+    }
+}
 
 
 //
