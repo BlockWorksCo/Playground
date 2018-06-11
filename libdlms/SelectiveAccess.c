@@ -94,11 +94,8 @@ void dlmsFormByTimeRangeAccessSelection( AXDRStream* stream, uint32_t from, uint
     axdrSetUint8( stream, 1 );  // access selection flag.
     axdrSetUint8( stream, 1 );  // by-range access selector.
 
-    axdrSetUint8( stream, 2 );  // TODO: struct of 4 elements
-    axdrSetUint8( stream, 4 );
-
-    axdrSetUint8( stream, 2 );  // TODO: struct of 4 elements
-    axdrSetUint8( stream, 4 );
+    axdrSetStruct( stream, 4 ); // structure of 4 fields as the first field of 4 within a structure.
+    axdrSetStruct( stream, 4 );
 
     OBISCode    timeOBIS    = {0,0,1,0,0,255};
 
@@ -106,13 +103,12 @@ void dlmsFormByTimeRangeAccessSelection( AXDRStream* stream, uint32_t from, uint
     axdrSetOctetString( stream, (void*)&timeOBIS,sizeof(OBISCode) );          
     axdrSetUint8__( stream, 2 );   // Fix naming for this.
 
-    axdrSetUint16( stream, 0 ); // what is this field?
+    axdrSetUint16( stream, 0 ); // data index (0=whole attribute).
 
     dlmsFormTimeFromUTC( stream, from );
     dlmsFormTimeFromUTC( stream, to );
 
-    axdrSetUint8( stream, 1 );  // TODO: array of zero elements (column selection) not present.
-    axdrSetUint8( stream, 0 );
+    axdrSetArray( stream, 4 );  // Unused 4th field is empty array of columns.
 }
 
 void dlmsFormByEntryAccessSelection( AXDRStream* stream, uint32_t from, uint32_t to )
