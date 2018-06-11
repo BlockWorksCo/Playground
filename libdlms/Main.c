@@ -108,7 +108,7 @@ void GetRequestTests()
         AXDRStream  stream  = &data[0];
         OBISCode        obisCode= {0};
         InterfaceClass  ic      = 0;
-        AttributeId     attrId  = 0;
+        AttributeId     attrId  = 1;
         bool            accessSelection = 0;
         uint8_t         accessSelector  = 0;
 
