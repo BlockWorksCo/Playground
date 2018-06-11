@@ -246,6 +246,36 @@ void SetRequestTests()
 }
 
 
+void SetResponseTests()
+{
+    {
+        //
+        // Form SetRequestNormal with a 12-byte octet string result.
+        //
+        AXDRStream  stream  = &data[0];
+
+        memset( &data[0], 0xaa, sizeof(data) );
+        dlmsFormSetResponse( &stream,  object_unavailable );
+
+        printPDU( &data[0], (uint8_t*)stream );
+
+        uint8_t expected[]  = {0xC5, 0x01, 0xc1, 0x0b };
+        assert( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
+
+    }
+    {
+        //
+        // Parse SetRequestNormal
+        //
+        AXDRStream          stream  = &data[0];
+        DataAccessResult    result;
+
+        dlmsParseSetResponse( &stream, &result );
+        assert( result == object_unavailable );
+    }
+}
+
+
 int main()
 {
 
@@ -253,6 +283,7 @@ int main()
     GetRequestTests();
     GetResponseTests();
     SetRequestTests();
+    SetResponseTests();
 
     return 0;
 }

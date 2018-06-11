@@ -117,6 +117,8 @@ void dlmsFormGetResponseNormal( AXDRStream* stream,  ResultType type );
 void dlmsParseGetResponseNormal( AXDRStream* stream,  ResultType* resultType );
 void dlmsFormSetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId );
 void dlmsParseSetRequest( AXDRStream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId );
+void dlmsFormSetResponse( AXDRStream* stream,  DataAccessResult result );
+void dlmsParseSetResponse( AXDRStream* stream, DataAccessResult* result );
 void dlmsFormAttributeDescriptor( AXDRStream* stream, InterfaceClass ifClass, OBISCode obisCode, AttributeId attrId );
 void dlmsParseAttributeDescriptor( AXDRStream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId );
 
