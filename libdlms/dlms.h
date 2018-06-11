@@ -124,6 +124,12 @@ void dlmsParseAttributeDescriptor( AXDRStream* stream, InterfaceClass* ifClass, 
 
 void dlmsFormNoAccessSelection( AXDRStream* stream );
 void dlmsParseAccessSelection( AXDRStream* stream, bool* accessSelection, uint8_t* accessSelector );
+void dlmsFormByTimeRangeAccessSelection( AXDRStream* stream, uint32_t from, uint32_t to );
+void dlmsFormByEntryAccessSelection( AXDRStream* stream, uint32_t from, uint32_t to );
+
+void dlmsFormTimeFromUTC( AXDRStream* stream, uint32_t utc );
+void dlmsParseTime( AXDRStream* stream, uint32_t* utc );
+
 
 
 #endif

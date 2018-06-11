@@ -120,6 +120,20 @@ void GetRequestTests()
         dlmsParseAccessSelection( &stream, &accessSelection, &accessSelector );
         assert( accessSelection == false );
     }
+
+    //
+    // Form
+    //
+    {
+        AXDRStream  stream  = &data[0];
+
+        memset( &data[0], 0xaa, sizeof(data) );
+        dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
+        dlmsFormByTimeRangeAccessSelection( &stream, 1234, 5678 );
+
+        printPDU( &data[0], (uint8_t*)stream );
+    }
+
 }
 
 

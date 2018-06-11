@@ -46,20 +46,76 @@
 //      </AccessParameters>
 //    </AccessSelection>
 //
+//
+// c001 81 0007 0100630100ff 02 01 01 0204 0204 120008 09060000010000ff 0f02 120000 090c07e2060704110e11ffffc480 090c07e2060704111c11ffffc480 0100 
+// C001 81 0800 0000010000FF 02 01 01 0204 0204 120800 090c0000010000FF ff02 120000 090C000102030405060708090A0B 090C000102030405060708090A0B 0100
+//
+// <GetRequest>
+//   <GetRequestNormal>
+//     <InvokeIdAndPriority Value="81" />
+//     <AttributeDescriptor>
+//       <!--PROFILE_GENERIC-->
+//       <ClassId Value="0007" />
+//       <!--1.0.99.1.0.255-->
+//       <InstanceId Value="0100630100FF" />
+//       <AttributeId Value="02" />
+//     </AttributeDescriptor>
+//     <AccessSelection>
+//       <AccessSelector Value="01" />
+//       <AccessParameters>
+//         <Structure Qty="04" >
+//           <Structure Qty="04" >
+//             <UInt16 Value="0008" />
+//             <!--0.0.1.0.0.255-->
+//             <OctetString Value="0000010000FF" />
+//             <Int8 Value="02" />
+//             <UInt16 Value="0000" />
+//           </Structure>
+//           <!--2018-06-07 17:14:17-->
+//           <OctetString Value="07E2060704110E11FFFFC480" />
+//           <!--2018-06-07 17:28:17-->
+//           <OctetString Value="07E2060704111C11FFFFC480" />
+//           <Array Qty="00" >
+//           </Array>
+//         </Structure>
+//       </AccessParameters>
+//     </AccessSelection>
+//   </GetRequestNormal>
+// </GetRequest>
+// 
+//
 void dlmsFormNoAccessSelection( AXDRStream* stream )
 {
     axdrSetUint8( stream, 0 );  // access selection flag.
 }
 
-void dlmsFormProfileByRangeAccessSelection( AXDRStream* stream, uint32_t from, uint32_t to )
+void dlmsFormByTimeRangeAccessSelection( AXDRStream* stream, uint32_t from, uint32_t to )
 {
     axdrSetUint8( stream, 1 );  // access selection flag.
-    axdrSetUint8( stream, 2 );  // by-range access selector.
+    axdrSetUint8( stream, 1 );  // by-range access selector.
 
-    // TODO:
+    axdrSetUint8( stream, 2 );  // TODO: struct of 4 elements
+    axdrSetUint8( stream, 4 );
+
+    axdrSetUint8( stream, 2 );  // TODO: struct of 4 elements
+    axdrSetUint8( stream, 4 );
+
+    OBISCode    timeOBIS    = {0,0,1,0,0,255};
+
+    axdrSetUint16( stream, TimeClass );             
+    axdrSetOctetString( stream, (void*)&timeOBIS,sizeof(OBISCode) );          
+    axdrSetUint8__( stream, 2 );   // Fix naming for this.
+
+    axdrSetUint16( stream, 0 ); // what is this field?
+
+    dlmsFormTimeFromUTC( stream, from );
+    dlmsFormTimeFromUTC( stream, to );
+
+    axdrSetUint8( stream, 1 );  // TODO: array of zero elements (column selection) not present.
+    axdrSetUint8( stream, 0 );
 }
 
-void dlmsFormProfileByEntryAccessSelection( AXDRStream* stream, uint32_t from, uint32_t to )
+void dlmsFormByEntryAccessSelection( AXDRStream* stream, uint32_t from, uint32_t to )
 {
     axdrSetUint8( stream, 1 );  // access selection flag.
     axdrSetUint8( stream, 1 );  // by-entry access selector.

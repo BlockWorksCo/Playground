@@ -1,4 +1,4 @@
 #!/bin/sh
 
-gcc -o Main Main.c axdr.c dlms.c GetRequest.c GetResponse.c SetRequest.c SetResponse.c SelectiveAccess.c AttributeDescriptor.c
+gcc -o Main Main.c axdr.c dlms.c GetRequest.c GetResponse.c SetRequest.c SetResponse.c SelectiveAccess.c AttributeDescriptor.c Time.c
 

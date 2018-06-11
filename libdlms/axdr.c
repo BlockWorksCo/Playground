@@ -69,6 +69,13 @@ void axdrSetUint16(AXDRStream* stream, uint16_t value)
 }
 
 
+void axdrSetUint8__(AXDRStream* stream, uint8_t value)
+{
+    axdrSetUint8(stream, unsigned8);
+    axdrSetUint8Array(stream, (void*)&value,sizeof(value) );
+}
+
+
 void axdrSetStruct(AXDRStream* stream, uint32_t numberOfFields)
 {
     axdrSetUint8(stream, structure);

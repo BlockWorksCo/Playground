@@ -123,6 +123,7 @@ void axdrSetLength(AXDRStream* stream, uint32_t length);
 void axdrSetOctetString(AXDRStream* stream, uint8_t* data, uint32_t numberOfBytes);
 void axdrSetUint32(AXDRStream* stream, uint32_t value);
 void axdrSetUint16(AXDRStream* stream, uint16_t value);
+void axdrSetUint8__(AXDRStream* stream, uint8_t value);  // TODO: Name clash!
 void axdrSetStruct(AXDRStream* stream, uint32_t numberOfFields);
 void axdrSetArray(AXDRStream* stream, uint32_t numberOfElements);
 void axdrGetUint8(AXDRStream* stream, uint8_t* value);
