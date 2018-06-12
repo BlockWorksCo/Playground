@@ -11,6 +11,10 @@
 #include <string.h>
 #include <stddef.h>
 
+#include <CUnit/CUnit.h>
+#include <CUnit/Automated.h>
+#include <CUnit/Basic.h>
+
 
 void printHex(uint8_t value)
 {
@@ -290,15 +294,45 @@ void SetResponseTests()
 }
 
 
+int suiteInit(void)
+{
+    return 0;
+}
+
+int suiteDeinit(void)
+{
+    return 0;
+}
+
+
 int main()
 {
+    CU_pSuite pSuite = NULL;
 
-    AXDRTests();
-    GetRequestTests();
-    GetResponseTests();
-    SetRequestTests();
-    SetResponseTests();
+    /* initialize the CUnit test registry */
+    if (CUE_SUCCESS != CU_initialize_registry())
+    {
+        return CU_get_error();
+    }
 
-    return 0;
+    /* add a suite to the registry */
+    pSuite = CU_add_suite("Suite_1", suiteInit, suiteDeinit);
+    if (NULL == pSuite) 
+    {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    CU_add_test(pSuite, "AXDR tests", AXDRTests);
+    CU_add_test(pSuite, "GetRequest tests", GetRequestTests);
+    CU_add_test(pSuite, "GetResponse tests", GetResponseTests);
+    CU_add_test(pSuite, "SetRequest tests", SetRequestTests);
+    CU_add_test(pSuite, "SetResponse tests", SetResponseTests);
+
+    /* Run all tests using the CUnit Basic interface */
+    CU_basic_set_mode(CU_BRM_VERBOSE);
+    CU_basic_run_tests();
+    CU_cleanup_registry();
+    return CU_get_error();
 }
 
