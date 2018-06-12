@@ -16,7 +16,7 @@
 #include <CUnit/Basic.h>
 
 
-#if 0
+#if 1
 void printHex(uint8_t value)
 {
     printf("%02X",value);
@@ -66,6 +66,9 @@ void AXDRTests()
         axdrSetUint32(&stream, valueOne);
 
         //printPDU( &data[0], (uint8_t*)stream );
+
+        uint8_t expected[]  = {0x01, 0x01, 0x02, 0x03, 0x09, 0x05, 0x01, 0x02, 0x03, 0x04, 0x05, 0x09, 0x03, 0x04, 0x05, 0x06, 0x06, 0xEF, 0xBE, 0xAD, 0xDE};
+        CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
     }
 
     //
@@ -83,11 +86,24 @@ void AXDRTests()
 
         axdrGetArray(&stream, &numberOfElements);
         CU_ASSERT( numberOfElements == 1 );
+
         axdrGetStruct(&stream, &numberOfFields);
         CU_ASSERT( numberOfFields == 3 );
+
         axdrGetOctetString(&stream, &stringOne[0],sizeof(stringOne), &stringOneLength);
+        {
+            uint8_t expected[]  = {0x01,0x02,0x03,0x04,0x05};
+            CU_ASSERT( memcmp(&stringOne[0], &expected[0], sizeof(expected) ) == 0 );
+        }
+
         axdrGetOctetString(&stream, &stringTwo[0],sizeof(stringTwo), &stringTwoLength);
+        {
+            uint8_t expected[]  = {0x04,0x05,0x06};
+            CU_ASSERT( memcmp(&stringTwo[0], &expected[0], sizeof(expected) ) == 0 );
+        }
+
         axdrGetUint32(&stream, &valueOne );
+        CU_ASSERT( valueOne == 0xdeadbeef );
     }
 }
 
@@ -105,6 +121,9 @@ void GetRequestTests()
         dlmsFormNoAccessSelection( &stream );
 
         //printPDU( &data[0], (uint8_t*)stream );
+
+        uint8_t expected[]  = {0xC0, 0x01, 0x81, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x02, 0x00};
+        CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
     }
 
     //
@@ -121,10 +140,10 @@ void GetRequestTests()
         dlmsParseGetRequest( &stream,  &obisCode, &ic, &attrId );
         CU_ASSERT( ic == TimeClass );
         CU_ASSERT( attrId == 2 );
-        CU_ASSERT( accessSelector == 0 );
 
         dlmsParseAccessSelection( &stream, &accessSelection, &accessSelector );
         CU_ASSERT( accessSelection == false );
+        CU_ASSERT( accessSelector == 0 );
     }
 
     //
@@ -138,6 +157,9 @@ void GetRequestTests()
         dlmsFormByTimeRangeAccessSelection( &stream, 1234, 5678 );
 
         //printPDU( &data[0], (uint8_t*)stream );
+
+        uint8_t expected[]  = {0xC0, 0x01, 0x81, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x02, 0x01, 0x01, 0x02, 0x04, 0x02, 0x04, 0x12, 0x08, 0x00, 0x09, 0x06, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x11, 0x02, 0x12, 0x00, 0x00, 0x09, 0x0C, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x09, 0x0C, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x01, 0x00};
+        CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
     }
 
 }
@@ -158,6 +180,9 @@ void GetResponseTests()
         axdrSetUint8( &stream, (uint8_t)result );
 
         //printPDU( &data[0], (uint8_t*)stream );
+
+        uint8_t expected[]  = {0xC4, 0x01, 0x81, 0x01, 0x11, 0x03};
+        CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
     }
     {
         //
@@ -192,6 +217,9 @@ void GetResponseTests()
         axdrSetOctetString( &stream, timeResult,sizeof(timeResult) );
 
         //printPDU( &data[0], (uint8_t*)stream );
+
+        uint8_t expected[]  = {0xC4, 0x01, 0x81, 0x00, 0x09, 0x0C, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C};
+        CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
     }
     {
         //
@@ -256,7 +284,7 @@ void SetRequestTests()
         dlmsParseAccessSelection( &stream, &accessSelection, &accessSelector );
         CU_ASSERT( accessSelection == false );
 
-        uint8_t         timeResult[16]      = {0};
+        uint8_t         timeResult[16]      = {};
         uint32_t        timeResultLength    = 0;
         axdrGetOctetString( &stream, &timeResult[0],sizeof(timeResult), &timeResultLength );
         CU_ASSERT(timeResult[0] == 1);
@@ -270,7 +298,7 @@ void SetResponseTests()
 {
     {
         //
-        // Form SetRequestNormal with a 12-byte octet string result.
+        // Form .
         //
         Stream  stream  = &data[0];
 
@@ -285,7 +313,7 @@ void SetResponseTests()
     }
     {
         //
-        // Parse SetRequestNormal
+        // Parse .
         //
         Stream          stream  = &data[0];
         DataAccessResult    result;
