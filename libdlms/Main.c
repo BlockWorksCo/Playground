@@ -16,6 +16,7 @@
 #include <CUnit/Basic.h>
 
 
+#if 0
 void printHex(uint8_t value)
 {
     printf("%02X",value);
@@ -36,6 +37,7 @@ void printPDU(uint8_t* startData, uint8_t* endData)
     printHexData( startData, numberOfBytes );
     printf("\r\n");
 }
+#endif
 
 
 
@@ -63,7 +65,7 @@ void AXDRTests()
         axdrSetOctetString(&stream, stringTwo,sizeof(stringTwo));
         axdrSetUint32(&stream, valueOne);
 
-        printPDU( &data[0], (uint8_t*)stream );
+        //printPDU( &data[0], (uint8_t*)stream );
     }
 
     //
@@ -80,9 +82,9 @@ void AXDRTests()
         uint32_t    stringTwoLength = 0;
 
         axdrGetArray(&stream, &numberOfElements);
-        assert( numberOfElements == 1 );
+        CU_ASSERT( numberOfElements == 1 );
         axdrGetStruct(&stream, &numberOfFields);
-        assert( numberOfFields == 3 );
+        CU_ASSERT( numberOfFields == 3 );
         axdrGetOctetString(&stream, &stringOne[0],sizeof(stringOne), &stringOneLength);
         axdrGetOctetString(&stream, &stringTwo[0],sizeof(stringTwo), &stringTwoLength);
         axdrGetUint32(&stream, &valueOne );
@@ -102,7 +104,7 @@ void GetRequestTests()
         dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
         dlmsFormNoAccessSelection( &stream );
 
-        printPDU( &data[0], (uint8_t*)stream );
+        //printPDU( &data[0], (uint8_t*)stream );
     }
 
     //
@@ -117,12 +119,12 @@ void GetRequestTests()
         uint8_t         accessSelector  = 0;
 
         dlmsParseGetRequest( &stream,  &obisCode, &ic, &attrId );
-        assert( ic == TimeClass );
-        assert( attrId == 2 );
-        assert( accessSelector == 0 );
+        CU_ASSERT( ic == TimeClass );
+        CU_ASSERT( attrId == 2 );
+        CU_ASSERT( accessSelector == 0 );
 
         dlmsParseAccessSelection( &stream, &accessSelection, &accessSelector );
-        assert( accessSelection == false );
+        CU_ASSERT( accessSelection == false );
     }
 
     //
@@ -135,7 +137,7 @@ void GetRequestTests()
         dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
         dlmsFormByTimeRangeAccessSelection( &stream, 1234, 5678 );
 
-        printPDU( &data[0], (uint8_t*)stream );
+        //printPDU( &data[0], (uint8_t*)stream );
     }
 
 }
@@ -155,7 +157,7 @@ void GetResponseTests()
         DataAccessResult    result  = read_write_denied;
         axdrSetUint8( &stream, (uint8_t)result );
 
-        printPDU( &data[0], (uint8_t*)stream );
+        //printPDU( &data[0], (uint8_t*)stream );
     }
     {
         //
@@ -170,11 +172,11 @@ void GetResponseTests()
         DataAccessResult    result;
 
         dlmsParseGetResponseNormal( &stream,  &resultType );
-        assert( resultType == AccessResult );
+        CU_ASSERT( resultType == AccessResult );
 
         axdrGetUint8( &stream, &resultCode );
         result  = resultCode;
-        assert( result == read_write_denied );
+        CU_ASSERT( result == read_write_denied );
     }
 
     {
@@ -189,7 +191,7 @@ void GetResponseTests()
         uint8_t     timeResult[12]  = {1,2,3,4,5,6,7,8,9,10,11,12};
         axdrSetOctetString( &stream, timeResult,sizeof(timeResult) );
 
-        printPDU( &data[0], (uint8_t*)stream );
+        //printPDU( &data[0], (uint8_t*)stream );
     }
     {
         //
@@ -203,12 +205,12 @@ void GetResponseTests()
         uint8_t         resultCode;
 
         dlmsParseGetResponseNormal( &stream,  &resultType );
-        assert( resultType == Data );
+        CU_ASSERT( resultType == Data );
 
         uint8_t         timeResult[16]      = {0};
         uint32_t        timeResultLength    = 0;
         axdrGetOctetString( &stream, &timeResult[0],sizeof(timeResult), &timeResultLength );
-        assert(timeResultLength == 12);
+        CU_ASSERT(timeResultLength == 12);
     }
 }
 
@@ -230,9 +232,9 @@ void SetRequestTests()
         axdrSetOctetString( &stream, timeResult,sizeof(timeResult) );
 
         uint8_t expected[]  = {0xC1,0x01,0xC1,0x08,0x00,0x00,0x00,0x01,0x00,0x00,0xFF,0x02,0x00,0x09,0x0C,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C};
-        assert( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
+        CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
 
-        printPDU( &data[0], (uint8_t*)stream );
+        //printPDU( &data[0], (uint8_t*)stream );
     }
     {
         //
@@ -247,19 +249,19 @@ void SetRequestTests()
         uint8_t             resultCode;
 
         dlmsParseSetRequest( &stream, &ic, &obisCode, &attrId );
-        assert( ic == TimeClass );
-        assert( memcmp(obisCode, timeOBIS , 6) == 0 );
-        assert( attrId == 2 );
+        CU_ASSERT( ic == TimeClass );
+        CU_ASSERT( memcmp(obisCode, timeOBIS , 6) == 0 );
+        CU_ASSERT( attrId == 2 );
 
         dlmsParseAccessSelection( &stream, &accessSelection, &accessSelector );
-        assert( accessSelection == false );
+        CU_ASSERT( accessSelection == false );
 
         uint8_t         timeResult[16]      = {0};
         uint32_t        timeResultLength    = 0;
         axdrGetOctetString( &stream, &timeResult[0],sizeof(timeResult), &timeResultLength );
-        assert(timeResult[0] == 1);
-        assert(timeResult[11] == 12);
-        assert(timeResultLength == 12);
+        CU_ASSERT(timeResult[0] == 1);
+        CU_ASSERT(timeResult[11] == 12);
+        CU_ASSERT(timeResultLength == 12);
     }
 }
 
@@ -275,10 +277,10 @@ void SetResponseTests()
         memset( &data[0], 0xaa, sizeof(data) );
         dlmsFormSetResponse( &stream,  object_unavailable );
 
-        printPDU( &data[0], (uint8_t*)stream );
+        //printPDU( &data[0], (uint8_t*)stream );
 
         uint8_t expected[]  = {0xC5, 0x01, 0xc1, 0x0b };
-        assert( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
+        CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
 
     }
     {
@@ -289,7 +291,7 @@ void SetResponseTests()
         DataAccessResult    result;
 
         dlmsParseSetResponse( &stream, &result );
-        assert( result == object_unavailable );
+        CU_ASSERT( result == object_unavailable );
     }
 }
 
