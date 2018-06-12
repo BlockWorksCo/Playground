@@ -112,24 +112,24 @@ typedef enum
 
 
 
-void dlmsFormGetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId );
-void dlmsParseGetRequest( AXDRStream* stream,  OBISCode* obisCode, InterfaceClass* ifClass, AttributeId* attributeId );
-void dlmsFormGetResponseNormal( AXDRStream* stream,  ResultType type );
-void dlmsParseGetResponseNormal( AXDRStream* stream,  ResultType* resultType );
-void dlmsFormSetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId );
-void dlmsParseSetRequest( AXDRStream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId );
-void dlmsFormSetResponse( AXDRStream* stream,  DataAccessResult result );
-void dlmsParseSetResponse( AXDRStream* stream, DataAccessResult* result );
-void dlmsFormAttributeDescriptor( AXDRStream* stream, InterfaceClass ifClass, OBISCode obisCode, AttributeId attrId );
-void dlmsParseAttributeDescriptor( AXDRStream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId );
+void dlmsFormGetRequest( Stream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId );
+void dlmsParseGetRequest( Stream* stream,  OBISCode* obisCode, InterfaceClass* ifClass, AttributeId* attributeId );
+void dlmsFormGetResponseNormal( Stream* stream,  ResultType type );
+void dlmsParseGetResponseNormal( Stream* stream,  ResultType* resultType );
+void dlmsFormSetRequest( Stream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId );
+void dlmsParseSetRequest( Stream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId );
+void dlmsFormSetResponse( Stream* stream,  DataAccessResult result );
+void dlmsParseSetResponse( Stream* stream, DataAccessResult* result );
+void dlmsFormAttributeDescriptor( Stream* stream, InterfaceClass ifClass, OBISCode obisCode, AttributeId attrId );
+void dlmsParseAttributeDescriptor( Stream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId );
 
-void dlmsFormNoAccessSelection( AXDRStream* stream );
-void dlmsParseAccessSelection( AXDRStream* stream, bool* accessSelection, uint8_t* accessSelector );
-void dlmsFormByTimeRangeAccessSelection( AXDRStream* stream, uint32_t from, uint32_t to );
-void dlmsFormByEntryAccessSelection( AXDRStream* stream, uint32_t from, uint32_t to );
+void dlmsFormNoAccessSelection( Stream* stream );
+void dlmsParseAccessSelection( Stream* stream, bool* accessSelection, uint8_t* accessSelector );
+void dlmsFormByTimeRangeAccessSelection( Stream* stream, uint32_t from, uint32_t to );
+void dlmsFormByEntryAccessSelection( Stream* stream, uint32_t from, uint32_t to );
 
-void dlmsFormTimeFromUTC( AXDRStream* stream, uint32_t utc );
-void dlmsParseTime( AXDRStream* stream, uint32_t* utc );
+void dlmsFormTimeFromUTC( Stream* stream, uint32_t utc );
+void dlmsParseTime( Stream* stream, uint32_t* utc );
 
 
 

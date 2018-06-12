@@ -50,7 +50,7 @@ void AXDRTests()
     // Set
     //
     {
-        AXDRStream  stream         = &data[0];
+        Stream  stream         = &data[0];
         uint32_t    valueOne       = 0xdeadbeef;
         uint8_t     stringOne[]    = {0x01,0x02,0x03,0x04,0x05};
         uint8_t     stringTwo[]    = {0x04,0x05,0x06};
@@ -70,7 +70,7 @@ void AXDRTests()
     // Get
     //
     {
-        AXDRStream  stream  = &data[0];
+        Stream  stream  = &data[0];
         uint32_t    numberOfElements = 0;
         uint32_t    numberOfFields  = 0;
         uint32_t    valueOne        = 0;
@@ -96,7 +96,7 @@ void GetRequestTests()
     // Form
     //
     {
-        AXDRStream  stream  = &data[0];
+        Stream  stream  = &data[0];
 
         memset( &data[0], 0xaa, sizeof(data) );
         dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
@@ -109,7 +109,7 @@ void GetRequestTests()
     // Parse
     //
     {
-        AXDRStream  stream  = &data[0];
+        Stream  stream  = &data[0];
         OBISCode        obisCode= {0};
         InterfaceClass  ic      = 0;
         AttributeId     attrId  = 1;
@@ -129,7 +129,7 @@ void GetRequestTests()
     // Form
     //
     {
-        AXDRStream  stream  = &data[0];
+        Stream  stream  = &data[0];
 
         memset( &data[0], 0xaa, sizeof(data) );
         dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
@@ -147,7 +147,7 @@ void GetResponseTests()
         //
         // GetResponseNormal with a read-write-denied access result.
         //
-        AXDRStream  stream  = &data[0];
+        Stream  stream  = &data[0];
 
         memset( &data[0], 0xaa, sizeof(data) );
         dlmsFormGetResponseNormal( &stream,  AccessResult );
@@ -161,7 +161,7 @@ void GetResponseTests()
         //
         // GetResponseNormal
         //
-        AXDRStream  stream  = &data[0];
+        Stream  stream  = &data[0];
         OBISCode        obisCode= {0};
         InterfaceClass  ic      = 0;
         AttributeId     attrId  = 0;
@@ -181,7 +181,7 @@ void GetResponseTests()
         //
         // GetResponseNormal with a 12-byte octet string result.
         //
-        AXDRStream  stream  = &data[0];
+        Stream  stream  = &data[0];
 
         memset( &data[0], 0xaa, sizeof(data) );
         dlmsFormGetResponseNormal( &stream,  Data );
@@ -195,7 +195,7 @@ void GetResponseTests()
         //
         // GetResponseNormal
         //
-        AXDRStream  stream  = &data[0];
+        Stream  stream  = &data[0];
         OBISCode        obisCode= {0};
         InterfaceClass  ic      = 0;
         AttributeId     attrId  = 0;
@@ -220,7 +220,7 @@ void SetRequestTests()
         //
         // Form SetRequestNormal with a 12-byte octet string result.
         //
-        AXDRStream  stream  = &data[0];
+        Stream  stream  = &data[0];
 
         memset( &data[0], 0xaa, sizeof(data) );
         dlmsFormSetRequest( &stream,  timeOBIS, TimeClass, 2 );
@@ -238,7 +238,7 @@ void SetRequestTests()
         //
         // Parse SetRequestNormal
         //
-        AXDRStream          stream  = &data[0];
+        Stream          stream  = &data[0];
         OBISCode            obisCode= {0};
         InterfaceClass      ic      = 0;
         AttributeId         attrId  = 0;
@@ -270,7 +270,7 @@ void SetResponseTests()
         //
         // Form SetRequestNormal with a 12-byte octet string result.
         //
-        AXDRStream  stream  = &data[0];
+        Stream  stream  = &data[0];
 
         memset( &data[0], 0xaa, sizeof(data) );
         dlmsFormSetResponse( &stream,  object_unavailable );
@@ -285,7 +285,7 @@ void SetResponseTests()
         //
         // Parse SetRequestNormal
         //
-        AXDRStream          stream  = &data[0];
+        Stream          stream  = &data[0];
         DataAccessResult    result;
 
         dlmsParseSetResponse( &stream, &result );

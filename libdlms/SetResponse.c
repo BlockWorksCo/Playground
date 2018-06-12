@@ -14,7 +14,7 @@
 //   </SetResponseNormal>
 // </SetResponse>
 //
-void dlmsFormSetResponse( AXDRStream* stream, DataAccessResult result )
+void dlmsFormSetResponse( Stream* stream, DataAccessResult result )
 {
     streamSetUint8( stream, set_response );   // type
     streamSetUint8( stream, 0x01 );   // subType
@@ -23,7 +23,7 @@ void dlmsFormSetResponse( AXDRStream* stream, DataAccessResult result )
     streamSetUint8( stream, result );   // invokeId
 }
 
-void dlmsParseSetResponse( AXDRStream* stream, DataAccessResult* resultType )
+void dlmsParseSetResponse( Stream* stream, DataAccessResult* resultType )
 {
     uint8_t     type    = 0;
     uint8_t     subType = 0;

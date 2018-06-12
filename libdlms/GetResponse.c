@@ -18,7 +18,7 @@
 //    </Result>
 //  </GetResponseNormal>
 //
-void dlmsFormGetResponseNormal( AXDRStream* stream,  ResultType type )
+void dlmsFormGetResponseNormal( Stream* stream,  ResultType type )
 {
     streamSetUint8( stream, get_response );   // type
     streamSetUint8( stream, 0x01 );   // subType
@@ -28,7 +28,7 @@ void dlmsFormGetResponseNormal( AXDRStream* stream,  ResultType type )
     streamSetUint8( stream, type );   // result type, 0=data, 1=returnCode.
 }
 
-void dlmsParseGetResponseNormal( AXDRStream* stream,  ResultType* resultType )
+void dlmsParseGetResponseNormal( Stream* stream,  ResultType* resultType )
 {
     uint8_t     type    = 0;
     uint8_t     subType = 0;

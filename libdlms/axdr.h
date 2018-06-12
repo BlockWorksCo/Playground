@@ -112,24 +112,24 @@ static const int32_t     primitiveTypeLength[]   =
 
 
 
-void axdrSetUint8(AXDRStream* stream, uint8_t value);
-void axdrSetUint8Array(AXDRStream* stream, uint8_t* values, uint32_t numberOfElements);
-void axdrSetLength(AXDRStream* stream, uint32_t length);
-void axdrSetOctetString(AXDRStream* stream, uint8_t* data, uint32_t numberOfBytes);
-void axdrSetUint32(AXDRStream* stream, uint32_t value);
-void axdrSetUint16(AXDRStream* stream, uint16_t value);
-void axdrSetUint8(AXDRStream* stream, uint8_t value);  // TODO: Name clash!
-void axdrSetStruct(AXDRStream* stream, uint32_t numberOfFields);
-void axdrSetArray(AXDRStream* stream, uint32_t numberOfElements);
-void axdrGetUint8(AXDRStream* stream, uint8_t* value);
-void axdrGetLength(AXDRStream* stream, uint32_t* length);
-void axdrGetArray(AXDRStream* stream, uint32_t* numberOfElements);
-void axdrGetStruct(AXDRStream* stream, uint32_t* numberOfFields);
-void axdrGetUint8Array(AXDRStream* stream, uint8_t* values, uint32_t numberOfElements);
-void axdrGetOctetString(AXDRStream* stream, uint8_t* data, uint32_t dataMaxSize, uint32_t* numberOfBytes);
-void axdrGetUint32(AXDRStream* stream, uint32_t* value);
-void axdrGetUint16(AXDRStream* stream, uint16_t* value);
-void axdrGetUint8(AXDRStream* stream, uint8_t* value);   // TODO: Name.
+void axdrSetUint8(Stream* stream, uint8_t value);
+void axdrSetUint8Array(Stream* stream, uint8_t* values, uint32_t numberOfElements);
+void axdrSetLength(Stream* stream, uint32_t length);
+void axdrSetOctetString(Stream* stream, uint8_t* data, uint32_t numberOfBytes);
+void axdrSetUint32(Stream* stream, uint32_t value);
+void axdrSetUint16(Stream* stream, uint16_t value);
+void axdrSetUint8(Stream* stream, uint8_t value);  // TODO: Name clash!
+void axdrSetStruct(Stream* stream, uint32_t numberOfFields);
+void axdrSetArray(Stream* stream, uint32_t numberOfElements);
+void axdrGetUint8(Stream* stream, uint8_t* value);
+void axdrGetLength(Stream* stream, uint32_t* length);
+void axdrGetArray(Stream* stream, uint32_t* numberOfElements);
+void axdrGetStruct(Stream* stream, uint32_t* numberOfFields);
+void axdrGetUint8Array(Stream* stream, uint8_t* values, uint32_t numberOfElements);
+void axdrGetOctetString(Stream* stream, uint8_t* data, uint32_t dataMaxSize, uint32_t* numberOfBytes);
+void axdrGetUint32(Stream* stream, uint32_t* value);
+void axdrGetUint16(Stream* stream, uint16_t* value);
+void axdrGetUint8(Stream* stream, uint8_t* value);   // TODO: Name.
 
 #endif
 

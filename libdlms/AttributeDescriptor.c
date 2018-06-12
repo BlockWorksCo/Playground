@@ -9,7 +9,7 @@
 //
 //
 //
-void dlmsFormAttributeDescriptor( AXDRStream* stream, InterfaceClass ifClass, OBISCode obisCode, AttributeId attrId )
+void dlmsFormAttributeDescriptor( Stream* stream, InterfaceClass ifClass, OBISCode obisCode, AttributeId attrId )
 {
     uint16_t    ic  = ifClass;
     streamSetUint8Array( stream, (void*)&ic, sizeof(ic) );
@@ -19,7 +19,7 @@ void dlmsFormAttributeDescriptor( AXDRStream* stream, InterfaceClass ifClass, OB
     streamSetUint8( stream, attrId );
 }
 
-void dlmsParseAttributeDescriptor( AXDRStream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId )
+void dlmsParseAttributeDescriptor( Stream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId )
 {
     uint16_t ic;
     streamGetUint8Array( stream, (void*)&ic,sizeof(ic) );

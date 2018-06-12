@@ -6,21 +6,21 @@
 
 
 
-void axdrSetLength(AXDRStream* stream, uint32_t length)
+void axdrSetLength(Stream* stream, uint32_t length)
 {
     uint8_t*    streamBytes = (uint8_t*)*stream;
     
     if(length < 0x80)
     {
         streamBytes[0]  = (uint8_t)length;
-        *stream      = (AXDRStream)(streamBytes+1);
+        *stream      = (Stream)(streamBytes+1);
     }
     else if(length < 0xffff)
     {
         streamBytes[0]  = 0x82;
         streamBytes[1]  = (length>>8)&0x00ff;
         streamBytes[2]  = length&0x00ff;
-        *stream      = (AXDRStream)(streamBytes+3);
+        *stream      = (Stream)(streamBytes+3);
     }
     else
     {
@@ -29,11 +29,11 @@ void axdrSetLength(AXDRStream* stream, uint32_t length)
         streamBytes[2]  = (length>>16)&0x000000ff;
         streamBytes[3]  = (length>>8)&0x000000ff;
         streamBytes[4]  = length&0x000000ff;
-        *stream      = (AXDRStream)(streamBytes+5);
+        *stream      = (Stream)(streamBytes+5);
     }
 }
 
-void axdrSetOctetString(AXDRStream* stream, uint8_t* data, uint32_t numberOfBytes)
+void axdrSetOctetString(Stream* stream, uint8_t* data, uint32_t numberOfBytes)
 {
     streamSetUint8(stream, octet_string);
     axdrSetLength(stream, numberOfBytes);
@@ -41,35 +41,35 @@ void axdrSetOctetString(AXDRStream* stream, uint8_t* data, uint32_t numberOfByte
 }
 
 
-void axdrSetUint32(AXDRStream* stream, uint32_t value)
+void axdrSetUint32(Stream* stream, uint32_t value)
 {
     streamSetUint8(stream, unsigned32);
     streamSetUint8Array(stream, (void*)&value,sizeof(value) );
 }
 
 
-void axdrSetUint16(AXDRStream* stream, uint16_t value)
+void axdrSetUint16(Stream* stream, uint16_t value)
 {
     streamSetUint8(stream, unsigned16);
     streamSetUint8Array(stream, (void*)&value,sizeof(value) );
 }
 
 
-void axdrSetUint8(AXDRStream* stream, uint8_t value)
+void axdrSetUint8(Stream* stream, uint8_t value)
 {
     streamSetUint8(stream, unsigned8);
     streamSetUint8Array(stream, (void*)&value,sizeof(value) );
 }
 
 
-void axdrSetStruct(AXDRStream* stream, uint32_t numberOfFields)
+void axdrSetStruct(Stream* stream, uint32_t numberOfFields)
 {
     streamSetUint8(stream, structure);
     axdrSetLength(stream, numberOfFields);
 }
 
 
-void axdrSetArray(AXDRStream* stream, uint32_t numberOfElements)
+void axdrSetArray(Stream* stream, uint32_t numberOfElements)
 {
     streamSetUint8(stream, array);
     axdrSetLength(stream, numberOfElements);
@@ -79,7 +79,7 @@ void axdrSetArray(AXDRStream* stream, uint32_t numberOfElements)
 
 
 
-void axdrGetLength(AXDRStream* stream, uint32_t* length)
+void axdrGetLength(Stream* stream, uint32_t* length)
 {
     uint8_t*    streamBytes = (uint8_t*)*stream;
     
@@ -87,7 +87,7 @@ void axdrGetLength(AXDRStream* stream, uint32_t* length)
     if( (value&0x80) == 0)
     {
         *length = value;
-        *stream  = (AXDRStream)(streamBytes+1);
+        *stream  = (Stream)(streamBytes+1);
     }
     else
     {
@@ -95,21 +95,21 @@ void axdrGetLength(AXDRStream* stream, uint32_t* length)
         if(numberOfBytes == 2)
         {
             *length = (streamBytes[1]<<8) | (streamBytes[2]);
-            *stream  = (AXDRStream)(streamBytes+3);
+            *stream  = (Stream)(streamBytes+3);
         }
         else if(numberOfBytes == 4)
         {
             *length = (streamBytes[1]<<24) | (streamBytes[2]<<16) | (streamBytes[3]<<8) | (streamBytes[4]);
-            *stream  = (AXDRStream)(streamBytes+5);
+            *stream  = (Stream)(streamBytes+5);
         }
         else
         {
-            *stream  = (AXDRStream)(streamBytes+1);
+            *stream  = (Stream)(streamBytes+1);
         }
     }
 }
 
-void axdrGetArray(AXDRStream* stream, uint32_t* numberOfElements)
+void axdrGetArray(Stream* stream, uint32_t* numberOfElements)
 {
     uint8_t    tag   = 0;
     streamGetUint8( stream, &tag );
@@ -118,7 +118,7 @@ void axdrGetArray(AXDRStream* stream, uint32_t* numberOfElements)
     axdrGetLength( stream, numberOfElements );
 }
 
-void axdrGetStruct(AXDRStream* stream, uint32_t* numberOfFields)
+void axdrGetStruct(Stream* stream, uint32_t* numberOfFields)
 {
     uint8_t    tag   = 0;
     streamGetUint8( stream, &tag );
@@ -128,7 +128,7 @@ void axdrGetStruct(AXDRStream* stream, uint32_t* numberOfFields)
 }
 
 
-void axdrGetOctetString(AXDRStream* stream, uint8_t* data, uint32_t dataMaxSize, uint32_t* numberOfBytes)
+void axdrGetOctetString(Stream* stream, uint8_t* data, uint32_t dataMaxSize, uint32_t* numberOfBytes)
 {
     uint8_t    tag   = 0;
     streamGetUint8( stream, &tag );
@@ -140,7 +140,7 @@ void axdrGetOctetString(AXDRStream* stream, uint8_t* data, uint32_t dataMaxSize,
     streamGetUint8Array( stream, data,*numberOfBytes );
 }
 
-void axdrGetUint32(AXDRStream* stream, uint32_t* value)
+void axdrGetUint32(Stream* stream, uint32_t* value)
 {
     uint8_t    tag   = 0;
     streamGetUint8( stream, &tag );
@@ -150,7 +150,7 @@ void axdrGetUint32(AXDRStream* stream, uint32_t* value)
 }
 
 
-void axdrGetUint16(AXDRStream* stream, uint16_t* value)
+void axdrGetUint16(Stream* stream, uint16_t* value)
 {
     uint8_t    tag   = 0;
     streamGetUint8( stream, &tag );
@@ -160,7 +160,7 @@ void axdrGetUint16(AXDRStream* stream, uint16_t* value)
 }
 
 
-void axdrGetUint8(AXDRStream* stream, uint8_t* value)
+void axdrGetUint8(Stream* stream, uint8_t* value)
 {
     uint8_t    tag   = 0;
     streamGetUint8( stream, &tag );

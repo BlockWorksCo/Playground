@@ -21,7 +21,7 @@
 // </GetRequestNormal>
 // </GetRequest>
 //
-void dlmsFormGetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId )
+void dlmsFormGetRequest( Stream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId )
 {
     streamSetUint8( stream, get_request );   // type
     streamSetUint8( stream, 0x01 );   // subType
@@ -30,7 +30,7 @@ void dlmsFormGetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass 
     dlmsFormAttributeDescriptor( stream, ifClass, obisCode, attributeId );
 }
 
-void dlmsParseGetRequest( AXDRStream* stream,  OBISCode* obisCode, InterfaceClass* ifClass, AttributeId* attributeId )
+void dlmsParseGetRequest( Stream* stream,  OBISCode* obisCode, InterfaceClass* ifClass, AttributeId* attributeId )
 {
     uint8_t     type    = 0;
     uint8_t     subType = 0;

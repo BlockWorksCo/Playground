@@ -84,12 +84,12 @@
 // </GetRequest>
 // 
 //
-void dlmsFormNoAccessSelection( AXDRStream* stream )
+void dlmsFormNoAccessSelection( Stream* stream )
 {
     streamSetUint8( stream, 0 );  // access selection flag.
 }
 
-void dlmsFormByTimeRangeAccessSelection( AXDRStream* stream, uint32_t from, uint32_t to )
+void dlmsFormByTimeRangeAccessSelection( Stream* stream, uint32_t from, uint32_t to )
 {
     streamSetUint8( stream, 1 );  // access selection flag.
     streamSetUint8( stream, 1 );  // by-range access selector.
@@ -111,7 +111,7 @@ void dlmsFormByTimeRangeAccessSelection( AXDRStream* stream, uint32_t from, uint
     axdrSetArray( stream, 0 );  // Unused 4th field is empty array of columns.
 }
 
-void dlmsFormByEntryAccessSelection( AXDRStream* stream, uint32_t from, uint32_t to )
+void dlmsFormByEntryAccessSelection( Stream* stream, uint32_t from, uint32_t to )
 {
     streamSetUint8( stream, 1 );  // access selection flag.
     streamSetUint8( stream, 1 );  // by-entry access selector.
@@ -120,7 +120,7 @@ void dlmsFormByEntryAccessSelection( AXDRStream* stream, uint32_t from, uint32_t
 }
 
 
-void dlmsParseAccessSelection( AXDRStream* stream, bool* accessSelection, uint8_t* accessSelector )
+void dlmsParseAccessSelection( Stream* stream, bool* accessSelection, uint8_t* accessSelector )
 {
     uint8_t selectionFlag   = 0;
     streamGetUint8( stream, &selectionFlag );
@@ -136,7 +136,7 @@ void dlmsParseAccessSelection( AXDRStream* stream, bool* accessSelection, uint8_
 }
 
 
-void dlmsParseByTimeRangeAccessSelection( AXDRStream* stream, uint32_t* from, uint32_t* to )
+void dlmsParseByTimeRangeAccessSelection( Stream* stream, uint32_t* from, uint32_t* to )
 {
     uint32_t     numberOfFields;
 
