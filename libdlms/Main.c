@@ -156,7 +156,7 @@ void GetRequestTests()
         dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
         dlmsFormByTimeRangeAccessSelection( &stream, 1234, 5678 );
 
-        printPDU( &data[0], (uint8_t*)stream );
+        //printPDU( &data[0], (uint8_t*)stream );
 
         uint8_t expected[]  = {0xC0, 0x01, 0x81, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x02, 0x01, 0x01, 0x02, 0x04, 0x02, 0x04, 0x12, 0x08, 0x00, 0x09, 0x06, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x11, 0x02, 0x12, 0x00, 0x00, 0x09, 0x0C, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x09, 0x0C, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x01, 0x00};
         CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
@@ -184,6 +184,48 @@ void GetRequestTests()
         uint32_t    from    = 0;
         uint32_t    to      = 0;
         dlmsParseByTimeRangeAccessSelection( &stream, &from, &to );
+        //CU_ASSERT( from == 1234 );
+        //CU_ASSERT( to == 5678 );
+    }
+
+    //
+    // Form
+    //
+    {
+        Stream  stream  = &data[0];
+
+        memset( &data[0], 0xaa, sizeof(data) );
+        dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
+        dlmsFormByEntryAccessSelection( &stream, 1234, 5678 );
+
+        printPDU( &data[0], (uint8_t*)stream );
+
+        uint8_t expected[]  = {0xC0, 0x01, 0x81, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x02, 0x01, 0x01, 0x02, 0x04, 0x02, 0x04, 0x12, 0x08, 0x00, 0x09, 0x06, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x11, 0x02, 0x12, 0x00, 0x00, 0x09, 0x0C, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x09, 0x0C, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x01, 0x00};
+        CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
+    }
+
+    //
+    // Parse
+    //
+    {
+        Stream  stream  = &data[0];
+        OBISCode        obisCode= {0};
+        InterfaceClass  ic      = 0;
+        AttributeId     attrId  = 1;
+        bool            accessSelection = 0;
+        uint8_t         accessSelector  = 0;
+
+        dlmsParseGetRequest( &stream,  &obisCode, &ic, &attrId );
+        CU_ASSERT( ic == TimeClass );
+        CU_ASSERT( attrId == 2 );
+
+        dlmsParseAccessSelection( &stream, &accessSelection, &accessSelector );
+        CU_ASSERT( accessSelection == true );
+        CU_ASSERT( accessSelector == 1 );
+
+        uint32_t    from    = 0;
+        uint32_t    to      = 0;
+        dlmsParseByEntryAccessSelection( &stream, &from, &to );
         //CU_ASSERT( from == 1234 );
         //CU_ASSERT( to == 5678 );
     }

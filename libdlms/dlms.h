@@ -130,6 +130,7 @@ void dlmsFormByTimeRangeAccessSelection( Stream* stream, uint32_t from, uint32_t
 void dlmsParseByTimeRangeAccessSelection( Stream* stream, uint32_t* from, uint32_t* to );
 
 void dlmsFormByEntryAccessSelection( Stream* stream, uint32_t from, uint32_t to );
+void dlmsParseByEntryAccessSelection( Stream* stream, uint32_t* from, uint32_t* to );
 
 
 void dlmsFormTimeFromUTC( Stream* stream, uint32_t utc );
