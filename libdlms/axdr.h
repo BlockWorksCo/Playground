@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include "Stream.h"
 
 
 
@@ -105,12 +106,6 @@ static const int32_t     primitiveTypeLength[]   =
   4,    // time                = 27,
   -1,   // dont_care           = 255
 };
-
-
-
-typedef uint8_t*    AXDRStream;
-
-
 
 
 
