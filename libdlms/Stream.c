@@ -7,25 +7,25 @@
 #include "Stream.h"
 
 
-void axdrSetUint8(AXDRStream* stream, uint8_t value)                                               
+void streamSetUint8(AXDRStream* stream, uint8_t value)                                               
 {                                                                                                  
     uint8_t*    streamBytes = (uint8_t*)*stream;                                                   
     streamBytes[0]  = value;                                                                       
     *stream      = (AXDRStream)(streamBytes+1);                                                    
 }                                                                                                  
                                                                                                    
-void axdrSetUint8Array(AXDRStream* stream, uint8_t* values, uint32_t numberOfElements)             
+void streamSetUint8Array(AXDRStream* stream, uint8_t* values, uint32_t numberOfElements)             
 {                                                                                                  
     for(uint32_t i=0; i<numberOfElements; i++)                                                     
     {                                                                                              
-        axdrSetUint8( stream, values[i] );                                                         
+        streamSetUint8( stream, values[i] );                                                         
     }                                                                                              
 }                                                                                                  
 
 
 
 
-void axdrGetUint8(AXDRStream* stream, uint8_t* value)                    
+void streamGetUint8(AXDRStream* stream, uint8_t* value)                    
 {                                                                        
     uint8_t*    streamBytes = (uint8_t*)*stream;                         
                                                                          
@@ -34,11 +34,11 @@ void axdrGetUint8(AXDRStream* stream, uint8_t* value)
 }                                                                        
                                                                          
 
-void axdrGetUint8Array(AXDRStream* stream, uint8_t* values, uint32_t numberOfElements)              
+void streamGetUint8Array(AXDRStream* stream, uint8_t* values, uint32_t numberOfElements)              
 {                                                                                                   
     for(uint32_t i=0; i<numberOfElements; i++)                                                      
     {                                                                                               
-        axdrGetUint8( stream, &values[i] );                                                         
+        streamGetUint8( stream, &values[i] );                                                         
     }                                                                                               
 }                                                                                                   
 

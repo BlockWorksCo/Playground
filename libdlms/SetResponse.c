@@ -16,11 +16,11 @@
 //
 void dlmsFormSetResponse( AXDRStream* stream, DataAccessResult result )
 {
-    axdrSetUint8( stream, set_response );   // type
-    axdrSetUint8( stream, 0x01 );   // subType
-    axdrSetUint8( stream, 0xc1 );   // invokeId
+    streamSetUint8( stream, set_response );   // type
+    streamSetUint8( stream, 0x01 );   // subType
+    streamSetUint8( stream, 0xc1 );   // invokeId
     
-    axdrSetUint8( stream, result );   // invokeId
+    streamSetUint8( stream, result );   // invokeId
 }
 
 void dlmsParseSetResponse( AXDRStream* stream, DataAccessResult* resultType )
@@ -30,15 +30,15 @@ void dlmsParseSetResponse( AXDRStream* stream, DataAccessResult* resultType )
     uint8_t     invokeId= 0;
     uint8_t     result  = 0;
 
-    axdrGetUint8( stream, &type );
+    streamGetUint8( stream, &type );
     assert( type == set_response );
 
-    axdrGetUint8( stream, &subType );
+    streamGetUint8( stream, &subType );
     assert( subType == 0x01 );
 
-    axdrGetUint8( stream, &invokeId );
+    streamGetUint8( stream, &invokeId );
 
-    axdrGetUint8( stream, &result );
+    streamGetUint8( stream, &result );
     *resultType = (DataAccessResult)result;
 }
 

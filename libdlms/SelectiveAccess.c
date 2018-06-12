@@ -86,13 +86,13 @@
 //
 void dlmsFormNoAccessSelection( AXDRStream* stream )
 {
-    axdrSetUint8( stream, 0 );  // access selection flag.
+    streamSetUint8( stream, 0 );  // access selection flag.
 }
 
 void dlmsFormByTimeRangeAccessSelection( AXDRStream* stream, uint32_t from, uint32_t to )
 {
-    axdrSetUint8( stream, 1 );  // access selection flag.
-    axdrSetUint8( stream, 1 );  // by-range access selector.
+    streamSetUint8( stream, 1 );  // access selection flag.
+    streamSetUint8( stream, 1 );  // by-range access selector.
 
     axdrSetStruct( stream, 4 ); // structure of 4 fields as the first field of 4 within a structure.
     axdrSetStruct( stream, 4 );
@@ -101,7 +101,7 @@ void dlmsFormByTimeRangeAccessSelection( AXDRStream* stream, uint32_t from, uint
 
     axdrSetUint16( stream, TimeClass );             
     axdrSetOctetString( stream, (void*)&timeOBIS,sizeof(OBISCode) );          
-    axdrSetUint8__( stream, 2 );   // Fix naming for this.
+    axdrSetUint8( stream, 2 );   // Fix naming for this.
 
     axdrSetUint16( stream, 0 ); // data index (0=whole attribute).
 
@@ -113,8 +113,8 @@ void dlmsFormByTimeRangeAccessSelection( AXDRStream* stream, uint32_t from, uint
 
 void dlmsFormByEntryAccessSelection( AXDRStream* stream, uint32_t from, uint32_t to )
 {
-    axdrSetUint8( stream, 1 );  // access selection flag.
-    axdrSetUint8( stream, 1 );  // by-entry access selector.
+    streamSetUint8( stream, 1 );  // access selection flag.
+    streamSetUint8( stream, 1 );  // by-entry access selector.
 
     // TODO:
 }
@@ -123,7 +123,7 @@ void dlmsFormByEntryAccessSelection( AXDRStream* stream, uint32_t from, uint32_t
 void dlmsParseAccessSelection( AXDRStream* stream, bool* accessSelection, uint8_t* accessSelector )
 {
     uint8_t selectionFlag   = 0;
-    axdrGetUint8( stream, &selectionFlag );
+    streamGetUint8( stream, &selectionFlag );
     if(selectionFlag == 0)
     {
         *accessSelection    = false;
@@ -131,7 +131,7 @@ void dlmsParseAccessSelection( AXDRStream* stream, bool* accessSelection, uint8_
     else
     {
         *accessSelection    = true;
-        axdrGetUint8( stream, accessSelector );
+        streamGetUint8( stream, accessSelector );
     }
 }
 
@@ -157,7 +157,7 @@ void dlmsParseByTimeRangeAccessSelection( AXDRStream* stream, uint32_t* from, ui
     assert( stringLength == sizeof(timeOBIS) );
 
     uint8_t     attrId;
-    axdrGetUint8__( stream, &attrId );   // Fix naming for this.
+    axdrGetUint8( stream, &attrId );   // Fix naming for this.
     assert( attrId == 2 );
 
     uint16_t    dataIndex;

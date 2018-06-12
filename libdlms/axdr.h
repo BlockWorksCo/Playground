@@ -118,7 +118,7 @@ void axdrSetLength(AXDRStream* stream, uint32_t length);
 void axdrSetOctetString(AXDRStream* stream, uint8_t* data, uint32_t numberOfBytes);
 void axdrSetUint32(AXDRStream* stream, uint32_t value);
 void axdrSetUint16(AXDRStream* stream, uint16_t value);
-void axdrSetUint8__(AXDRStream* stream, uint8_t value);  // TODO: Name clash!
+void axdrSetUint8(AXDRStream* stream, uint8_t value);  // TODO: Name clash!
 void axdrSetStruct(AXDRStream* stream, uint32_t numberOfFields);
 void axdrSetArray(AXDRStream* stream, uint32_t numberOfElements);
 void axdrGetUint8(AXDRStream* stream, uint8_t* value);
@@ -129,7 +129,7 @@ void axdrGetUint8Array(AXDRStream* stream, uint8_t* values, uint32_t numberOfEle
 void axdrGetOctetString(AXDRStream* stream, uint8_t* data, uint32_t dataMaxSize, uint32_t* numberOfBytes);
 void axdrGetUint32(AXDRStream* stream, uint32_t* value);
 void axdrGetUint16(AXDRStream* stream, uint16_t* value);
-void axdrGetUint8__(AXDRStream* stream, uint8_t* value);   // TODO: Name.
+void axdrGetUint8(AXDRStream* stream, uint8_t* value);   // TODO: Name.
 
 #endif
 

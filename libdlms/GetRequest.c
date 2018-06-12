@@ -23,9 +23,9 @@
 //
 void dlmsFormGetRequest( AXDRStream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId )
 {
-    axdrSetUint8( stream, get_request );   // type
-    axdrSetUint8( stream, 0x01 );   // subType
-    axdrSetUint8( stream, 0x81 );   // invokeId
+    streamSetUint8( stream, get_request );   // type
+    streamSetUint8( stream, 0x01 );   // subType
+    streamSetUint8( stream, 0x81 );   // invokeId
     
     dlmsFormAttributeDescriptor( stream, ifClass, obisCode, attributeId );
 }
@@ -38,13 +38,13 @@ void dlmsParseGetRequest( AXDRStream* stream,  OBISCode* obisCode, InterfaceClas
     uint16_t    ic      = 0;
     uint16_t    attr    = 0;
 
-    axdrGetUint8( stream, &type );
+    streamGetUint8( stream, &type );
     assert( type == get_request );
 
-    axdrGetUint8( stream, &subType );
+    streamGetUint8( stream, &subType );
     assert( subType == 0x01 );
 
-    axdrGetUint8( stream, &invokeId );
+    streamGetUint8( stream, &invokeId );
 
     dlmsParseAttributeDescriptor( stream, ifClass, obisCode, attributeId );
 }
