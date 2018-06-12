@@ -123,10 +123,14 @@ void dlmsParseSetResponse( Stream* stream, DataAccessResult* result );
 void dlmsFormAttributeDescriptor( Stream* stream, InterfaceClass ifClass, OBISCode obisCode, AttributeId attrId );
 void dlmsParseAttributeDescriptor( Stream* stream, InterfaceClass* ifClass, OBISCode* obisCode, AttributeId* attrId );
 
-void dlmsFormNoAccessSelection( Stream* stream );
 void dlmsParseAccessSelection( Stream* stream, bool* accessSelection, uint8_t* accessSelector );
+void dlmsFormNoAccessSelection( Stream* stream );
+
 void dlmsFormByTimeRangeAccessSelection( Stream* stream, uint32_t from, uint32_t to );
+void dlmsParseByTimeRangeAccessSelection( Stream* stream, uint32_t* from, uint32_t* to );
+
 void dlmsFormByEntryAccessSelection( Stream* stream, uint32_t from, uint32_t to );
+
 
 void dlmsFormTimeFromUTC( Stream* stream, uint32_t utc );
 void dlmsParseTime( Stream* stream, uint32_t* utc );

@@ -135,7 +135,7 @@ void axdrGetOctetString(Stream* stream, uint8_t* data, uint32_t dataMaxSize, uin
     assert(tag == octet_string);
 
     axdrGetLength( stream, numberOfBytes );
-    assert( *numberOfBytes < dataMaxSize );
+    assert( *numberOfBytes <= dataMaxSize );
 
     streamGetUint8Array( stream, data,*numberOfBytes );
 }
