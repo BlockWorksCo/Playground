@@ -134,6 +134,7 @@ void axdrGetUint8Array(AXDRStream* stream, uint8_t* values, uint32_t numberOfEle
 void axdrGetOctetString(AXDRStream* stream, uint8_t* data, uint32_t dataMaxSize, uint32_t* numberOfBytes);
 void axdrGetUint32(AXDRStream* stream, uint32_t* value);
 void axdrGetUint16(AXDRStream* stream, uint16_t* value);
+void axdrGetUint8__(AXDRStream* stream, uint8_t* value);   // TODO: Name.
 
 #endif
 

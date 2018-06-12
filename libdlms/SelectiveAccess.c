@@ -108,7 +108,7 @@ void dlmsFormByTimeRangeAccessSelection( AXDRStream* stream, uint32_t from, uint
     dlmsFormTimeFromUTC( stream, from );
     dlmsFormTimeFromUTC( stream, to );
 
-    axdrSetArray( stream, 4 );  // Unused 4th field is empty array of columns.
+    axdrSetArray( stream, 0 );  // Unused 4th field is empty array of columns.
 }
 
 void dlmsFormByEntryAccessSelection( AXDRStream* stream, uint32_t from, uint32_t to )
@@ -134,6 +134,43 @@ void dlmsParseAccessSelection( AXDRStream* stream, bool* accessSelection, uint8_
         axdrGetUint8( stream, accessSelector );
     }
 }
+
+
+void dlmsParseByTimeRangeAccessSelection( AXDRStream* stream, uint32_t* from, uint32_t* to )
+{
+    uint32_t     numberOfFields;
+
+    axdrGetStruct( stream, &numberOfFields ); // structure of 4 fields as the first field of 4 within a structure.
+    assert( numberOfFields == 4);
+
+    axdrGetStruct( stream, &numberOfFields ); // structure of 4 fields as the first field of 4 within a structure.
+    assert( numberOfFields == 4);
+
+    OBISCode    timeOBIS    = {0,0,1,0,0,255};
+
+    uint16_t    ic;
+    axdrGetUint16( stream, &ic );             
+    assert( ic == TimeClass );
+
+    uint32_t    stringLength    = 0;
+    axdrGetOctetString( stream, (void*)&timeOBIS,sizeof(OBISCode),&stringLength );          
+    assert( stringLength == sizeof(timeOBIS) );
+
+    uint8_t     attrId;
+    axdrGetUint8__( stream, &attrId );   // Fix naming for this.
+    assert( attrId == 2 );
+
+    uint16_t    dataIndex;
+    axdrGetUint16( stream, &dataIndex ); // data index (0=whole attribute).
+    assert( dataIndex == 0 );
+
+    dlmsParseTime( stream, from );
+    dlmsParseTime( stream, to );
+
+    axdrGetArray( stream, &numberOfFields );  // Unused 4th field is empty array of columns.
+    assert( numberOfFields == 0 );
+}
+
 
 
 

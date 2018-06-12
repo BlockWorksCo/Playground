@@ -190,3 +190,13 @@ void axdrGetUint16(AXDRStream* stream, uint16_t* value)
 }
 
 
+void axdrGetUint8__(AXDRStream* stream, uint8_t* value)
+{
+    uint8_t    tag   = 0;
+    axdrGetUint8( stream, &tag );
+    assert(tag == unsigned8);
+
+    axdrGetUint8Array( stream, (void*)value,sizeof(*value) );
+}
+
+
