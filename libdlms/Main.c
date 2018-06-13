@@ -423,7 +423,7 @@ void GenerateHLSAARQ()
 
     dlmsFormAARQForHLS( &stream );
 
-    printPDU( &data[0], (uint8_t*)stream );
+    //printPDU( &data[0], (uint8_t*)stream );
 }
 
 
