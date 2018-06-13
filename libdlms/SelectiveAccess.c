@@ -124,7 +124,7 @@ void dlmsFormByEntryAccessSelection( Stream* stream, uint32_t from, uint32_t to 
     axdrSetUint32( stream, to );
 
     axdrSetUint16( stream, 0 ); // from-selected-value (0=all columns).
-    axdrSetArray( stream, 0 );  // to-selected-value (0=all columns).
+    axdrSetUint16( stream, 0 ); // to-selected-value (0=all columns).
 }
 
 
@@ -187,32 +187,16 @@ void dlmsParseByEntryAccessSelection( Stream* stream, uint32_t* from, uint32_t* 
     axdrGetStruct( stream, &numberOfFields ); // structure of 4 fields as the first field of 4 within a structure.
     assert( numberOfFields == 4);
 
-    axdrGetStruct( stream, &numberOfFields ); // structure of 4 fields as the first field of 4 within a structure.
-    assert( numberOfFields == 4);
+    axdrGetUint32( stream, from );             
+    axdrGetUint32( stream, to );
 
-    OBISCode    timeOBIS    = {0,0,1,0,0,255};
+    uint16_t    fromSelectedValue;
+    axdrGetUint16( stream, &fromSelectedValue );
+    assert( fromSelectedValue == 0 );
 
-    uint16_t    ic;
-    axdrGetUint16( stream, &ic );             
-    assert( ic == TimeClass );
-
-    uint32_t    stringLength    = 0;
-    axdrGetOctetString( stream, (void*)&timeOBIS,sizeof(OBISCode),&stringLength );          
-    assert( stringLength == sizeof(timeOBIS) );
-
-    uint8_t     attrId;
-    axdrGetUint8( stream, &attrId );   // Fix naming for this.
-    assert( attrId == 2 );
-
-    uint16_t    dataIndex;
-    axdrGetUint16( stream, &dataIndex ); // data index (0=whole attribute).
-    assert( dataIndex == 0 );
-
-    dlmsParseTime( stream, from );
-    dlmsParseTime( stream, to );
-
-    axdrGetArray( stream, &numberOfFields );  // Unused 4th field is empty array of columns.
-    assert( numberOfFields == 0 );
+    uint16_t    toSelectedValue;
+    axdrGetUint16( stream, &toSelectedValue );
+    assert( toSelectedValue == 0 );
 }
 
 
