@@ -411,6 +411,18 @@ void GenerateLLSAARQ()
 
     dlmsFormAARQForLLS( &stream );
 
+    //printPDU( &data[0], (uint8_t*)stream );
+}
+
+
+
+void GenerateHLSAARQ()
+{
+    uint8_t data[128]   = {0};
+    Stream  stream  = &data[0];
+
+    dlmsFormAARQForHLS( &stream );
+
     printPDU( &data[0], (uint8_t*)stream );
 }
 
@@ -464,6 +476,7 @@ int main()
     CU_add_test(pSuite, "SetResponse1 tests", SetResponseTest1);
     CU_add_test(pSuite, "SetResponse2 tests", SetResponseTest2);
     CU_add_test(pSuite, "Generate LLS AARQ", GenerateLLSAARQ);
+    CU_add_test(pSuite, "Generate HLS AARQ", GenerateHLSAARQ);
 
     /* Run all tests using the CUnit Basic interface */
     CU_basic_set_mode(CU_BRM_VERBOSE);
