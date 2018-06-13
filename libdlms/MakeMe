@@ -1,4 +1,4 @@
 #!/bin/sh
 
-gcc -g -o Main Main.c axdr.c dlms.c GetRequest.c GetResponse.c SetRequest.c SetResponse.c SelectiveAccess.c AttributeDescriptor.c Time.c Stream.c -lcunit
+gcc -g -o Main Main.c axdr.c dlms.c GetRequest.c GetResponse.c SetRequest.c SetResponse.c SelectiveAccess.c AttributeDescriptor.c Time.c Stream.c Association.c  -lcunit
 

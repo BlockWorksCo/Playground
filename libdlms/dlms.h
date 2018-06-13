@@ -78,6 +78,8 @@ typedef enum
 //  aare AARE-apdu
 //  rlrq RLRQ-apdu -- -- OPTIONAL
 //  rlre RLRE-apdu -- -- OPTIONAL
+  aarq                      = 96,
+  aare                      = 97,
 
 // APDUs used for data communication services using LN referencing
   get_request                =192,
@@ -132,9 +134,12 @@ void dlmsParseByTimeRangeAccessSelection( Stream* stream, uint32_t* from, uint32
 void dlmsFormByEntryAccessSelection( Stream* stream, uint32_t from, uint32_t to );
 void dlmsParseByEntryAccessSelection( Stream* stream, uint32_t* from, uint32_t* to );
 
-
 void dlmsFormTimeFromUTC( Stream* stream, uint32_t utc );
 void dlmsParseTime( Stream* stream, uint32_t* utc );
+
+void dlmsFormAARQ( Stream* stream );
+void dlmsFormAARQForLLS( Stream* stream );
+void dlmsFormAARQForHLS( Stream* stream );
 
 
 
