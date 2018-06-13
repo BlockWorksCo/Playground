@@ -41,8 +41,6 @@ void printPDU(uint8_t* startData, uint8_t* endData)
 
 
 
-uint8_t     data[256]  = {0};
-
 static OBISCode            timeOBIS    = {0,0,1,0,0,255};
 
 
@@ -52,6 +50,7 @@ void AXDRTests()
     // Set
     //
     {
+        uint8_t data[128]   = {0};
         Stream  stream         = &data[0];
         uint32_t    valueOne       = 0xdeadbeef;
         uint8_t     stringOne[]    = {0x01,0x02,0x03,0x04,0x05};
@@ -75,7 +74,8 @@ void AXDRTests()
     // Get
     //
     {
-        Stream  stream  = &data[0];
+        uint8_t input[]  = {0x01, 0x01, 0x02, 0x03, 0x09, 0x05, 0x01, 0x02, 0x03, 0x04, 0x05, 0x09, 0x03, 0x04, 0x05, 0x06, 0x06, 0xEF, 0xBE, 0xAD, 0xDE};
+        Stream  stream  = &input[0];
         uint32_t    numberOfElements = 0;
         uint32_t    numberOfFields  = 0;
         uint32_t    valueOne        = 0;
@@ -108,286 +108,300 @@ void AXDRTests()
 }
 
 
-void GetRequestTests()
+void GetRequestTest1()
 {
-    //
-    // Form
-    //
-    {
-        Stream  stream  = &data[0];
+    uint8_t data[128]   = {0};
+    Stream  stream  = &data[0];
 
-        memset( &data[0], 0xaa, sizeof(data) );
-        dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
-        dlmsFormNoAccessSelection( &stream );
+    memset( &data[0], 0xaa, sizeof(data) );
+    dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
+    dlmsFormNoAccessSelection( &stream );
 
-        //printPDU( &data[0], (uint8_t*)stream );
+    //printPDU( &data[0], (uint8_t*)stream );
 
-        uint8_t expected[]  = {0xC0, 0x01, 0x81, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x02, 0x00};
-        CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
-    }
+    uint8_t expected[]  = {0xC0, 0x01, 0x81, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x02, 0x00};
+    CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
+}
 
-    //
-    // Parse
-    //
-    {
-        Stream  stream  = &data[0];
-        OBISCode        obisCode= {0};
-        InterfaceClass  ic      = 0;
-        AttributeId     attrId  = 1;
-        bool            accessSelection = 0;
-        uint8_t         accessSelector  = 0;
+void GetRequestTest2()
+{
+    uint8_t input[]  = {0xC0, 0x01, 0x81, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x02, 0x00};
+    Stream  stream  = &input[0];
+    OBISCode        obisCode= {0};
+    InterfaceClass  ic      = 0;
+    AttributeId     attrId  = 1;
+    bool            accessSelection = 0;
+    uint8_t         accessSelector  = 0;
 
-        dlmsParseGetRequest( &stream,  &obisCode, &ic, &attrId );
-        CU_ASSERT( ic == TimeClass );
-        CU_ASSERT( attrId == 2 );
+    dlmsParseGetRequest( &stream,  &obisCode, &ic, &attrId );
+    CU_ASSERT( ic == TimeClass );
+    CU_ASSERT( attrId == 2 );
 
-        dlmsParseAccessSelection( &stream, &accessSelection, &accessSelector );
-        CU_ASSERT( accessSelection == false );
-        CU_ASSERT( accessSelector == 0 );
-    }
+    dlmsParseAccessSelection( &stream, &accessSelection, &accessSelector );
+    CU_ASSERT( accessSelection == false );
+    CU_ASSERT( accessSelector == 0 );
+}
 
-    //
-    // Form
-    //
-    {
-        Stream  stream  = &data[0];
+//
+// Form
+//
+void GetRequestTest3()
+{
+    uint8_t data[128]   = {0};
+    Stream  stream  = &data[0];
 
-        memset( &data[0], 0xaa, sizeof(data) );
-        dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
-        dlmsFormByTimeRangeAccessSelection( &stream, 1234, 5678 );
+    memset( &data[0], 0xaa, sizeof(data) );
+    dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
+    dlmsFormByTimeRangeAccessSelection( &stream, 1234, 5678 );
 
-        //printPDU( &data[0], (uint8_t*)stream );
+    //printPDU( &data[0], (uint8_t*)stream );
 
-        uint8_t expected[]  = {0xC0, 0x01, 0x81, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x02, 0x01, 0x01, 0x02, 0x04, 0x02, 0x04, 0x12, 0x08, 0x00, 0x09, 0x06, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x11, 0x02, 0x12, 0x00, 0x00, 0x09, 0x0C, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x09, 0x0C, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x01, 0x00};
-        CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
-    }
+    uint8_t expected[]  = {0xC0, 0x01, 0x81, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x02, 0x01, 0x01, 0x02, 0x04, 0x02, 0x04, 0x12, 0x08, 0x00, 0x09, 0x06, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x11, 0x02, 0x12, 0x00, 0x00, 0x09, 0x0C, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x09, 0x0C, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x01, 0x00};
+    CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
+}
 
-    //
-    // Parse
-    //
-    {
-        Stream  stream  = &data[0];
-        OBISCode        obisCode= {0};
-        InterfaceClass  ic      = 0;
-        AttributeId     attrId  = 1;
-        bool            accessSelection = 0;
-        uint8_t         accessSelector  = 0;
+//
+// Parse
+//
+void GetRequestTest4()
+{
+    uint8_t input[]  = {0xC0, 0x01, 0x81, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x02, 0x01, 0x01, 0x02, 0x04, 0x02, 0x04, 0x12, 0x08, 0x00, 0x09, 0x06, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x11, 0x02, 0x12, 0x00, 0x00, 0x09, 0x0C, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x09, 0x0C, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x01, 0x00};
+    Stream  stream  = &input[0];
+    OBISCode        obisCode= {0};
+    InterfaceClass  ic      = 0;
+    AttributeId     attrId  = 1;
+    bool            accessSelection = 0;
+    uint8_t         accessSelector  = 0;
 
-        dlmsParseGetRequest( &stream,  &obisCode, &ic, &attrId );
-        CU_ASSERT( ic == TimeClass );
-        CU_ASSERT( attrId == 2 );
+    dlmsParseGetRequest( &stream,  &obisCode, &ic, &attrId );
+    CU_ASSERT( ic == TimeClass );
+    CU_ASSERT( attrId == 2 );
 
-        dlmsParseAccessSelection( &stream, &accessSelection, &accessSelector );
-        CU_ASSERT( accessSelection == true );
-        CU_ASSERT( accessSelector == 1 );
+    dlmsParseAccessSelection( &stream, &accessSelection, &accessSelector );
+    CU_ASSERT( accessSelection == true );
+    CU_ASSERT( accessSelector == 1 );
 
-        uint32_t    from    = 0;
-        uint32_t    to      = 0;
-        dlmsParseByTimeRangeAccessSelection( &stream, &from, &to );
-        //CU_ASSERT( from == 1234 );
-        //CU_ASSERT( to == 5678 );
-    }
+    uint32_t    from    = 0;
+    uint32_t    to      = 0;
+    dlmsParseByTimeRangeAccessSelection( &stream, &from, &to );
+    //CU_ASSERT( from == 1234 );
+    //CU_ASSERT( to == 5678 );
+}
 
-    //
-    // Form
-    //
-    {
-        Stream  stream  = &data[0];
+//
+// Form
+//
+void GetRequestTest5()
+{
+    uint8_t data[128]   = {0};
+    Stream  stream  = &data[0];
 
-        memset( &data[0], 0xaa, sizeof(data) );
-        dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
-        dlmsFormByEntryAccessSelection( &stream, 1234, 5678 );
+    memset( &data[0], 0xaa, sizeof(data) );
+    dlmsFormGetRequest( &stream, timeOBIS, TimeClass, 2 );
+    dlmsFormByEntryAccessSelection( &stream, 1234, 5678 );
 
-        //printPDU( &data[0], (uint8_t*)stream );
+    //printPDU( &data[0], (uint8_t*)stream );
 
-        uint8_t expected[]  = {0xC0, 0x01, 0x81, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x02, 0x01, 0x02, 0x02, 0x04, 0x06, 0xD2, 0x04, 0x00, 0x00, 0x06, 0x2E, 0x16, 0x00, 0x00, 0x12, 0x00, 0x00, 0x12, 0x00, 0x00};
-        CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
-    }
+    uint8_t expected[]  = {0xC0, 0x01, 0x81, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x02, 0x01, 0x02, 0x02, 0x04, 0x06, 0xD2, 0x04, 0x00, 0x00, 0x06, 0x2E, 0x16, 0x00, 0x00, 0x12, 0x00, 0x00, 0x12, 0x00, 0x00};
+    CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
+}
 
-    //
-    // Parse
-    //
-    {
-        Stream  stream  = &data[0];
-        OBISCode        obisCode= {0};
-        InterfaceClass  ic      = 0;
-        AttributeId     attrId  = 1;
-        bool            accessSelection = 0;
-        uint8_t         accessSelector  = 0;
+//
+// Parse
+//
+void GetRequestTest6()
+{
+    uint8_t input[]  = {0xC0, 0x01, 0x81, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0xFF, 0x02, 0x01, 0x02, 0x02, 0x04, 0x06, 0xD2, 0x04, 0x00, 0x00, 0x06, 0x2E, 0x16, 0x00, 0x00, 0x12, 0x00, 0x00, 0x12, 0x00, 0x00};
+    Stream  stream  = &input[0];
+    OBISCode        obisCode= {0};
+    InterfaceClass  ic      = 0;
+    AttributeId     attrId  = 1;
+    bool            accessSelection = 0;
+    uint8_t         accessSelector  = 0;
 
-        dlmsParseGetRequest( &stream,  &obisCode, &ic, &attrId );
-        CU_ASSERT( ic == TimeClass );
-        CU_ASSERT( attrId == 2 );
+    dlmsParseGetRequest( &stream,  &obisCode, &ic, &attrId );
+    CU_ASSERT( ic == TimeClass );
+    CU_ASSERT( attrId == 2 );
 
-        dlmsParseAccessSelection( &stream, &accessSelection, &accessSelector );
-        CU_ASSERT( accessSelection == true );
-        CU_ASSERT( accessSelector == 2 );
+    dlmsParseAccessSelection( &stream, &accessSelection, &accessSelector );
+    CU_ASSERT( accessSelection == true );
+    CU_ASSERT( accessSelector == 2 );
 
-        uint32_t    from    = 0;
-        uint32_t    to      = 0;
-        dlmsParseByEntryAccessSelection( &stream, &from, &to );
-        //CU_ASSERT( from == 1234 );
-        //CU_ASSERT( to == 5678 );
-    }
+    uint32_t    from    = 0;
+    uint32_t    to      = 0;
+    dlmsParseByEntryAccessSelection( &stream, &from, &to );
+    //CU_ASSERT( from == 1234 );
+    //CU_ASSERT( to == 5678 );
 }
 
 
-void GetResponseTests()
+void GetResponseTest1()
 {
-    {
-        //
-        // GetResponseNormal with a read-write-denied access result.
-        //
-        Stream  stream  = &data[0];
+    //
+    // GetResponseNormal with a read-write-denied access result.
+    //
+    uint8_t data[128]   = {0};
+    Stream  stream  = &data[0];
 
-        memset( &data[0], 0xaa, sizeof(data) );
-        dlmsFormGetResponseNormal( &stream,  AccessResult );
+    memset( &data[0], 0xaa, sizeof(data) );
+    dlmsFormGetResponseNormal( &stream,  AccessResult );
 
-        DataAccessResult    result  = read_write_denied;
-        axdrSetUint8( &stream, (uint8_t)result );
+    DataAccessResult    result  = read_write_denied;
+    axdrSetUint8( &stream, (uint8_t)result );
 
-        //printPDU( &data[0], (uint8_t*)stream );
+    //printPDU( &data[0], (uint8_t*)stream );
 
-        uint8_t expected[]  = {0xC4, 0x01, 0x81, 0x01, 0x11, 0x03};
-        CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
-    }
-    {
-        //
-        // GetResponseNormal
-        //
-        Stream  stream  = &data[0];
-        OBISCode        obisCode= {0};
-        InterfaceClass  ic      = 0;
-        AttributeId     attrId  = 0;
-        ResultType      resultType;
-        uint8_t         resultCode;
-        DataAccessResult    result;
+    uint8_t expected[]  = {0xC4, 0x01, 0x81, 0x01, 0x11, 0x03};
+    CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
+}
 
-        dlmsParseGetResponseNormal( &stream,  &resultType );
-        CU_ASSERT( resultType == AccessResult );
+void GetResponseTest2()
+{
+    //
+    // GetResponseNormal
+    //
+    uint8_t input[]  = {0xC4, 0x01, 0x81, 0x01, 0x11, 0x03};
+    Stream  stream  = &input[0];
+    OBISCode        obisCode= {0};
+    InterfaceClass  ic      = 0;
+    AttributeId     attrId  = 0;
+    ResultType      resultType;
+    uint8_t         resultCode;
+    DataAccessResult    result;
 
-        axdrGetUint8( &stream, &resultCode );
-        result  = resultCode;
-        CU_ASSERT( result == read_write_denied );
-    }
+    dlmsParseGetResponseNormal( &stream,  &resultType );
+    CU_ASSERT( resultType == AccessResult );
 
-    {
-        //
-        // GetResponseNormal with a 12-byte octet string result.
-        //
-        Stream  stream  = &data[0];
+    axdrGetUint8( &stream, &resultCode );
+    result  = resultCode;
+    CU_ASSERT( result == read_write_denied );
+}
 
-        memset( &data[0], 0xaa, sizeof(data) );
-        dlmsFormGetResponseNormal( &stream,  Data );
+void GetResponseTest3()
+{
+    //
+    // GetResponseNormal with a 12-byte octet string result.
+    //
+    uint8_t data[128]   = {0};
+    Stream  stream  = &data[0];
 
-        uint8_t     timeResult[12]  = {1,2,3,4,5,6,7,8,9,10,11,12};
-        axdrSetOctetString( &stream, timeResult,sizeof(timeResult) );
+    memset( &data[0], 0xaa, sizeof(data) );
+    dlmsFormGetResponseNormal( &stream,  Data );
 
-        //printPDU( &data[0], (uint8_t*)stream );
+    uint8_t     timeResult[12]  = {1,2,3,4,5,6,7,8,9,10,11,12};
+    axdrSetOctetString( &stream, timeResult,sizeof(timeResult) );
 
-        uint8_t expected[]  = {0xC4, 0x01, 0x81, 0x00, 0x09, 0x0C, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C};
-        CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
-    }
-    {
-        //
-        // GetResponseNormal
-        //
-        Stream  stream  = &data[0];
-        OBISCode        obisCode= {0};
-        InterfaceClass  ic      = 0;
-        AttributeId     attrId  = 0;
-        ResultType      resultType;
-        uint8_t         resultCode;
+    //printPDU( &data[0], (uint8_t*)stream );
 
-        dlmsParseGetResponseNormal( &stream,  &resultType );
-        CU_ASSERT( resultType == Data );
+    uint8_t expected[]  = {0xC4, 0x01, 0x81, 0x00, 0x09, 0x0C, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C};
+    CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
+}
 
-        uint8_t         timeResult[16]      = {0};
-        uint32_t        timeResultLength    = 0;
-        axdrGetOctetString( &stream, &timeResult[0],sizeof(timeResult), &timeResultLength );
-        CU_ASSERT(timeResultLength == 12);
-    }
+void GetResponseTest4()
+{
+    //
+    // GetResponseNormal
+    //
+    uint8_t input[]  = {0xC4, 0x01, 0x81, 0x00, 0x09, 0x0C, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C};
+    Stream  stream  = &input[0];
+    OBISCode        obisCode= {0};
+    InterfaceClass  ic      = 0;
+    AttributeId     attrId  = 0;
+    ResultType      resultType;
+    uint8_t         resultCode;
+
+    dlmsParseGetResponseNormal( &stream,  &resultType );
+    CU_ASSERT( resultType == Data );
+
+    uint8_t         timeResult[16]      = {0};
+    uint32_t        timeResultLength    = 0;
+    axdrGetOctetString( &stream, &timeResult[0],sizeof(timeResult), &timeResultLength );
+    CU_ASSERT(timeResultLength == 12);
 }
 
 
 
-void SetRequestTests()
+void SetRequestTest1()
 {
-    {
-        //
-        // Form SetRequestNormal with a 12-byte octet string result.
-        //
-        Stream  stream  = &data[0];
+    //
+    // Form SetRequestNormal with a 12-byte octet string result.
+    //
+    uint8_t data[128]   = {0};
+    Stream  stream  = &data[0];
 
-        memset( &data[0], 0xaa, sizeof(data) );
-        dlmsFormSetRequest( &stream,  timeOBIS, TimeClass, 2 );
-        dlmsFormNoAccessSelection( &stream );
+    memset( &data[0], 0xaa, sizeof(data) );
+    dlmsFormSetRequest( &stream,  timeOBIS, TimeClass, 2 );
+    dlmsFormNoAccessSelection( &stream );
 
-        uint8_t     timeResult[]  = {1,2,3,4,5,6,7,8,9,10,11,12};
-        axdrSetOctetString( &stream, timeResult,sizeof(timeResult) );
+    uint8_t     timeResult[]  = {1,2,3,4,5,6,7,8,9,10,11,12};
+    axdrSetOctetString( &stream, timeResult,sizeof(timeResult) );
 
-        uint8_t expected[]  = {0xC1,0x01,0xC1,0x08,0x00,0x00,0x00,0x01,0x00,0x00,0xFF,0x02,0x00,0x09,0x0C,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C};
-        CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
+    uint8_t expected[]  = {0xC1,0x01,0xC1,0x08,0x00,0x00,0x00,0x01,0x00,0x00,0xFF,0x02,0x00,0x09,0x0C,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C};
+    CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
 
-        //printPDU( &data[0], (uint8_t*)stream );
-    }
-    {
-        //
-        // Parse SetRequestNormal
-        //
-        Stream          stream  = &data[0];
-        OBISCode            obisCode= {0};
-        InterfaceClass      ic      = 0;
-        AttributeId         attrId  = 0;
-        bool                accessSelection = false;
-        uint8_t             accessSelector  = 0;
-        uint8_t             resultCode;
+    //printPDU( &data[0], (uint8_t*)stream );
+}
 
-        dlmsParseSetRequest( &stream, &ic, &obisCode, &attrId );
-        CU_ASSERT( ic == TimeClass );
-        CU_ASSERT( memcmp(obisCode, timeOBIS , 6) == 0 );
-        CU_ASSERT( attrId == 2 );
+void SetRequestTest2()
+{
+    //
+    // Parse SetRequestNormal
+    //
+    uint8_t         input[]  = {0xC1,0x01,0xC1,0x08,0x00,0x00,0x00,0x01,0x00,0x00,0xFF,0x02,0x00,0x09,0x0C,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C};
+    Stream          stream  = &input[0];
+    OBISCode            obisCode= {0};
+    InterfaceClass      ic      = 0;
+    AttributeId         attrId  = 0;
+    bool                accessSelection = false;
+    uint8_t             accessSelector  = 0;
+    uint8_t             resultCode;
 
-        dlmsParseAccessSelection( &stream, &accessSelection, &accessSelector );
-        CU_ASSERT( accessSelection == false );
+    dlmsParseSetRequest( &stream, &ic, &obisCode, &attrId );
+    CU_ASSERT( ic == TimeClass );
+    CU_ASSERT( memcmp(obisCode, timeOBIS , 6) == 0 );
+    CU_ASSERT( attrId == 2 );
 
-        uint8_t         timeResult[16]      = {};
-        uint32_t        timeResultLength    = 0;
-        axdrGetOctetString( &stream, &timeResult[0],sizeof(timeResult), &timeResultLength );
-        CU_ASSERT(timeResult[0] == 1);
-        CU_ASSERT(timeResult[11] == 12);
-        CU_ASSERT(timeResultLength == 12);
-    }
+    dlmsParseAccessSelection( &stream, &accessSelection, &accessSelector );
+    CU_ASSERT( accessSelection == false );
+
+    uint8_t         timeResult[16]      = {};
+    uint32_t        timeResultLength    = 0;
+    axdrGetOctetString( &stream, &timeResult[0],sizeof(timeResult), &timeResultLength );
+    CU_ASSERT(timeResult[0] == 1);
+    CU_ASSERT(timeResult[11] == 12);
+    CU_ASSERT(timeResultLength == 12);
 }
 
 
-void SetResponseTests()
+void SetResponseTest1()
 {
-    {
-        //
-        // Form .
-        //
-        Stream  stream  = &data[0];
+    //
+    // Form .
+    //
+    uint8_t data[128]   = {0};
+    Stream  stream  = &data[0];
 
-        memset( &data[0], 0xaa, sizeof(data) );
-        dlmsFormSetResponse( &stream,  object_unavailable );
+    memset( &data[0], 0xaa, sizeof(data) );
+    dlmsFormSetResponse( &stream,  object_unavailable );
 
-        //printPDU( &data[0], (uint8_t*)stream );
+    //printPDU( &data[0], (uint8_t*)stream );
 
-        uint8_t expected[]  = {0xC5, 0x01, 0xc1, 0x0b };
-        CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
+    uint8_t expected[]  = {0xC5, 0x01, 0xc1, 0x0b };
+    CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
 
-    }
-    {
-        //
-        // Parse .
-        //
-        Stream          stream  = &data[0];
-        DataAccessResult    result;
+}
 
-        dlmsParseSetResponse( &stream, &result );
-        CU_ASSERT( result == object_unavailable );
-    }
+void SetResponseTest2()
+{
+    //
+    // Parse .
+    //
+    uint8_t input[]  = {0xC5, 0x01, 0xc1, 0x0b };
+    Stream          stream  = &input[0];
+    DataAccessResult    result;
+
+    dlmsParseSetResponse( &stream, &result );
+    CU_ASSERT( result == object_unavailable );
 }
 
 
@@ -421,10 +435,20 @@ int main()
     }
 
     CU_add_test(pSuite, "AXDR tests", AXDRTests);
-    CU_add_test(pSuite, "GetRequest tests", GetRequestTests);
-    CU_add_test(pSuite, "GetResponse tests", GetResponseTests);
-    CU_add_test(pSuite, "SetRequest tests", SetRequestTests);
-    CU_add_test(pSuite, "SetResponse tests", SetResponseTests);
+    CU_add_test(pSuite, "GetRequest test1", GetRequestTest1);
+    CU_add_test(pSuite, "GetRequest test2", GetRequestTest2);
+    CU_add_test(pSuite, "GetRequest test3", GetRequestTest3);
+    CU_add_test(pSuite, "GetRequest test4", GetRequestTest4);
+    CU_add_test(pSuite, "GetRequest test5", GetRequestTest5);
+    CU_add_test(pSuite, "GetRequest test6", GetRequestTest6);
+    CU_add_test(pSuite, "GetResponse tests", GetResponseTest1);
+    CU_add_test(pSuite, "GetResponse tests", GetResponseTest2);
+    CU_add_test(pSuite, "GetResponse tests", GetResponseTest3);
+    CU_add_test(pSuite, "GetResponse tests", GetResponseTest4);
+    CU_add_test(pSuite, "SetRequest1 tests", SetRequestTest1);
+    CU_add_test(pSuite, "SetRequest2 tests", SetRequestTest2);
+    CU_add_test(pSuite, "SetResponse1 tests", SetResponseTest1);
+    CU_add_test(pSuite, "SetResponse2 tests", SetResponseTest2);
 
     /* Run all tests using the CUnit Basic interface */
     CU_basic_set_mode(CU_BRM_VERBOSE);
