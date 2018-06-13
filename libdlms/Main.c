@@ -44,67 +44,66 @@ void printPDU(uint8_t* startData, uint8_t* endData)
 static OBISCode            timeOBIS    = {0,0,1,0,0,255};
 
 
-void AXDRTests()
+//
+// Set
+//
+void AXDRTest1()
 {
-    //
-    // Set
-    //
+    uint8_t data[128]   = {0};
+    Stream  stream         = &data[0];
+    uint32_t    valueOne       = 0xdeadbeef;
+    uint8_t     stringOne[]    = {0x01,0x02,0x03,0x04,0x05};
+    uint8_t     stringTwo[]    = {0x04,0x05,0x06};
+
+    memset( &data[0], 0xaa, sizeof(data) );
+
+    axdrSetArray(&stream, 1);
+    axdrSetStruct(&stream, 3);
+    axdrSetOctetString(&stream, stringOne,sizeof(stringOne));
+    axdrSetOctetString(&stream, stringTwo,sizeof(stringTwo));
+    axdrSetUint32(&stream, valueOne);
+
+    //printPDU( &data[0], (uint8_t*)stream );
+
+    uint8_t expected[]  = {0x01, 0x01, 0x02, 0x03, 0x09, 0x05, 0x01, 0x02, 0x03, 0x04, 0x05, 0x09, 0x03, 0x04, 0x05, 0x06, 0x06, 0xEF, 0xBE, 0xAD, 0xDE};
+    CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
+}
+
+//
+// Get
+//
+void AXDRTest2()
+{
+    uint8_t input[]  = {0x01, 0x01, 0x02, 0x03, 0x09, 0x05, 0x01, 0x02, 0x03, 0x04, 0x05, 0x09, 0x03, 0x04, 0x05, 0x06, 0x06, 0xEF, 0xBE, 0xAD, 0xDE};
+    Stream  stream  = &input[0];
+    uint32_t    numberOfElements = 0;
+    uint32_t    numberOfFields  = 0;
+    uint32_t    valueOne        = 0;
+    uint8_t     stringOne[32];
+    uint32_t    stringOneLength = 0;
+    uint8_t     stringTwo[32];
+    uint32_t    stringTwoLength = 0;
+
+    axdrGetArray(&stream, &numberOfElements);
+    CU_ASSERT( numberOfElements == 1 );
+
+    axdrGetStruct(&stream, &numberOfFields);
+    CU_ASSERT( numberOfFields == 3 );
+
+    axdrGetOctetString(&stream, &stringOne[0],sizeof(stringOne), &stringOneLength);
     {
-        uint8_t data[128]   = {0};
-        Stream  stream         = &data[0];
-        uint32_t    valueOne       = 0xdeadbeef;
-        uint8_t     stringOne[]    = {0x01,0x02,0x03,0x04,0x05};
-        uint8_t     stringTwo[]    = {0x04,0x05,0x06};
-
-        memset( &data[0], 0xaa, sizeof(data) );
-
-        axdrSetArray(&stream, 1);
-        axdrSetStruct(&stream, 3);
-        axdrSetOctetString(&stream, stringOne,sizeof(stringOne));
-        axdrSetOctetString(&stream, stringTwo,sizeof(stringTwo));
-        axdrSetUint32(&stream, valueOne);
-
-        //printPDU( &data[0], (uint8_t*)stream );
-
-        uint8_t expected[]  = {0x01, 0x01, 0x02, 0x03, 0x09, 0x05, 0x01, 0x02, 0x03, 0x04, 0x05, 0x09, 0x03, 0x04, 0x05, 0x06, 0x06, 0xEF, 0xBE, 0xAD, 0xDE};
-        CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
+        uint8_t expected[]  = {0x01,0x02,0x03,0x04,0x05};
+        CU_ASSERT( memcmp(&stringOne[0], &expected[0], sizeof(expected) ) == 0 );
     }
 
-    //
-    // Get
-    //
+    axdrGetOctetString(&stream, &stringTwo[0],sizeof(stringTwo), &stringTwoLength);
     {
-        uint8_t input[]  = {0x01, 0x01, 0x02, 0x03, 0x09, 0x05, 0x01, 0x02, 0x03, 0x04, 0x05, 0x09, 0x03, 0x04, 0x05, 0x06, 0x06, 0xEF, 0xBE, 0xAD, 0xDE};
-        Stream  stream  = &input[0];
-        uint32_t    numberOfElements = 0;
-        uint32_t    numberOfFields  = 0;
-        uint32_t    valueOne        = 0;
-        uint8_t     stringOne[32];
-        uint32_t    stringOneLength = 0;
-        uint8_t     stringTwo[32];
-        uint32_t    stringTwoLength = 0;
-
-        axdrGetArray(&stream, &numberOfElements);
-        CU_ASSERT( numberOfElements == 1 );
-
-        axdrGetStruct(&stream, &numberOfFields);
-        CU_ASSERT( numberOfFields == 3 );
-
-        axdrGetOctetString(&stream, &stringOne[0],sizeof(stringOne), &stringOneLength);
-        {
-            uint8_t expected[]  = {0x01,0x02,0x03,0x04,0x05};
-            CU_ASSERT( memcmp(&stringOne[0], &expected[0], sizeof(expected) ) == 0 );
-        }
-
-        axdrGetOctetString(&stream, &stringTwo[0],sizeof(stringTwo), &stringTwoLength);
-        {
-            uint8_t expected[]  = {0x04,0x05,0x06};
-            CU_ASSERT( memcmp(&stringTwo[0], &expected[0], sizeof(expected) ) == 0 );
-        }
-
-        axdrGetUint32(&stream, &valueOne );
-        CU_ASSERT( valueOne == 0xdeadbeef );
+        uint8_t expected[]  = {0x04,0x05,0x06};
+        CU_ASSERT( memcmp(&stringTwo[0], &expected[0], sizeof(expected) ) == 0 );
     }
+
+    axdrGetUint32(&stream, &valueOne );
+    CU_ASSERT( valueOne == 0xdeadbeef );
 }
 
 
@@ -434,7 +433,8 @@ int main()
         return CU_get_error();
     }
 
-    CU_add_test(pSuite, "AXDR tests", AXDRTests);
+    CU_add_test(pSuite, "AXDR test1", AXDRTest1);
+    CU_add_test(pSuite, "AXDR test2", AXDRTest2);
     CU_add_test(pSuite, "GetRequest test1", GetRequestTest1);
     CU_add_test(pSuite, "GetRequest test2", GetRequestTest2);
     CU_add_test(pSuite, "GetRequest test3", GetRequestTest3);
