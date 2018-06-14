@@ -113,6 +113,36 @@ typedef enum
 } PDUType;
 
 
+// Used in the InitiateRequest APDU (AARQ).
+typedef enum
+{
+    reserved0                     =0,
+    reserved1                     =1,
+    reserved2                     =2,
+    read                          =3,
+    write                         =4,
+    unconfirmed_write             =5,
+    reserved6                     =6,
+    reserved7                     =7,
+    attribute0_supported_with_SET =8,
+    priority_mgmt_supported       =9,
+    attribute0_supported_with_GET =10,
+    block_transfer_with_get       =11,
+    block_transfer_with_set       =12,
+    block_transfer_with_action    =13,
+    multiple_references           =14,
+    information_report            =15,
+    reserved16                    =16,
+    reserved17                    =17,
+    parameterized_access          =18,
+    get                           =19,
+    set                           =20,
+    selective_access              =21,
+    event_notification            =22,
+    action                        =23,
+
+} ConformanceBits;
+
 
 void dlmsFormGetRequest( Stream* stream,  OBISCode obisCode, InterfaceClass ifClass, AttributeId attributeId );
 void dlmsParseGetRequest( Stream* stream,  OBISCode* obisCode, InterfaceClass* ifClass, AttributeId* attributeId );
