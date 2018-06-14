@@ -19,7 +19,81 @@ const uint8_t   lnInitiateRequestAPDU[]     = {0x01, 0x00, 0x00, 0x00, 0x06, 0x5
 const uint8_t   snInitiateRequestAPDU[]     = {0x01, 0x00, 0x00, 0x00, 0x06, 0x5F, 0x1F, 0x04, 0x00, 0x1c, 0x03, 0x20, 0x04, 0xB0};
 
 
-void dlmsFormAARQ( Stream* stream )                      
+
+
+
+
+void dlmsFormInitiateRequestAPDU( Stream* stream,  uint8_t dedicatedKey[],uint32_t dedicatedKeyLength, bool responseAllowed, int8_t proposedQualityOfService, uint8_t proposedDlmsVersion, uint32_t proposedConformanceFlags, uint16_t clientMaxReceivePDUSize )
+{
+    // InitiateRequest APDU tag
+    streamSetUint8( stream, 0x01 );
+
+    // dedicated-key
+    if( dedicatedKeyLength > 0 )
+    {
+        streamSetUint8( stream, 0x01 ); // usage flag
+        streamSetUint8( stream, dedicatedKeyLength ); // length
+        streamSetUint8Array( stream, &dedicatedKey[0], dedicatedKeyLength ); // value.
+    }
+    else
+    {
+        streamSetUint8( stream, 0x00 ); // usage flag
+    }
+
+    // response-allowed
+    if( responseAllowed > 0 )
+    {
+        streamSetUint8( stream, 0x01 ); // usage flag
+    }
+    else
+    {
+        streamSetUint8( stream, 0x00 ); // usage flag
+    }
+
+    // proposed-quality-of-service
+    if( false )
+    {
+        streamSetUint8( stream, 0x01 ); // usage flag
+        streamSetUint8( stream, proposedQualityOfService ); // value
+    }
+    else
+    {
+        streamSetUint8( stream, 0x00 ); // usage flag
+    }
+
+    // proposed-dlms-version-number
+    if( true )
+    {
+        streamSetUint8( stream, proposedDlmsVersion ); // value
+    }
+    else
+    {
+        streamSetUint8( stream, 0x00 ); // usage flag
+    }
+
+    // proposed-conformance
+    if( true )
+    {
+        streamSetUint8( stream, 0x5f ); // tag
+        streamSetUint8( stream, 0x1f ); // tag
+        streamSetUint8( stream, 0x04 ); // length
+        streamSetUint8( stream, 0x00 ); // number of unused bits in last byte.
+        streamSetUint8( stream, proposedConformanceFlags >> 16 ); // value
+        streamSetUint8( stream, proposedConformanceFlags >> 8 ); // value
+        streamSetUint8( stream, proposedConformanceFlags ); // value
+    }
+    else
+    {
+        streamSetUint8( stream, 0x00 ); // usage flag
+    }
+
+    // client-max-receive-pdu-size
+    streamSetUint8( stream, clientMaxReceivePDUSize >> 8 ); // value
+    streamSetUint8( stream, clientMaxReceivePDUSize ); // value
+}
+
+
+void dlmsFormAARQ( Stream* stream ) 
 {                                                                                                          
     OBISCode    object;
 

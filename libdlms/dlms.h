@@ -140,6 +140,7 @@ void dlmsParseTime( Stream* stream, uint32_t* utc );
 void dlmsFormAARQ( Stream* stream );
 void dlmsFormAARQForLLS( Stream* stream );
 void dlmsFormAARQForHLS( Stream* stream );
+void dlmsFormInitiateRequestAPDU( Stream* stream,  uint8_t dedicatedKey[],uint32_t dedicatedKeyLength, bool responseAllowed, int8_t proposedQualityOfService, uint8_t proposedDlmsVersion, uint32_t proposedConformanceFlags, uint16_t clientMaxReceivePDUSize );
 
 
 

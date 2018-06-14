@@ -432,6 +432,21 @@ void GenerateHLSAARQ()
     CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
 }
 
+void GenerateInitiateRequestAPDU()
+{
+    uint8_t data[128]   = {0};
+    Stream  stream  = &data[0];
+
+    uint8_t dedicatedKey[]  = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF};
+    dlmsFormInitiateRequestAPDU( &stream, dedicatedKey,sizeof(dedicatedKey), false, false, 0x06, 0x007e1f, 1200 );
+
+    //printPDU( &data[0], (uint8_t*)stream );
+
+    uint8_t expected[]  = {0x01, 0x01, 0x10, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x00, 0x00, 0x06, 0x5F, 0x1F, 0x04, 0x00, 0x00, 0x7E, 0x1F, 0x04, 0xB0};
+    CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
+
+}
+
 
 
 
@@ -483,6 +498,8 @@ int main()
     CU_add_test(pSuite, "SetResponse2 tests", SetResponseTest2);
     CU_add_test(pSuite, "Generate LLS AARQ", GenerateLLSAARQ);
     CU_add_test(pSuite, "Generate HLS AARQ", GenerateHLSAARQ);
+    CU_add_test(pSuite, "Generate InitiateRequest APDU", GenerateInitiateRequestAPDU);
+
 
     /* Run all tests using the CUnit Basic interface */
     CU_basic_set_mode(CU_BRM_VERBOSE);
