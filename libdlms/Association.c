@@ -276,8 +276,52 @@ void dlmsParseAARQ( Stream* stream, char* mechanismName, uint32_t mechanismNameM
 }
 
 
-void dlmsFormAARE( Stream* stream ) 
+void dlmsFormAARE( Stream* stream, uint8_t appContextName[],uint32_t appContextNameLength, uint8_t respondingAPTitle[],uint32_t respondingAPTitleLength, uint8_t initiateRequestAPDU[], uint32_t initiateRequestAPDULength ) 
 {
+    // PDU
+    streamSetUint8( stream, aare ); // tag
+    streamSetUint8( stream, 0x48 ); // length
+
+    // Application context name
+    streamSetUint8( stream, 0xa1 ); // tag
+    streamSetUint8( stream, 0x09 ); // length.
+    streamSetUint8( stream, 0x06 ); // tag
+    streamSetUint8( stream, appContextNameLength ); // length.
+    streamSetUint8Array( stream, (uint8_t*)&appContextName[0], appContextNameLength ); // value.
+
+    // association-result
+    streamSetUint8( stream, 0xa2 ); // tag
+    streamSetUint8( stream, 0x03 ); // length
+    streamSetUint8( stream, 0x02 ); // choice-type (INT)
+    streamSetUint8( stream, 0x01 ); // choice-length
+    streamSetUint8( stream, 0x00 ); // choice-value
+                                                                                                           
+    // result-source-diagnostic
+    streamSetUint8( stream, 0xa3 ); // tag
+    streamSetUint8( stream, 0x05 ); // length.
+
+    // acse-service-user
+    streamSetUint8( stream, 0xa1 ); // tag
+    streamSetUint8( stream, 0x03 ); // length
+
+    // choice for associate-source-diagnostics (INT)
+    streamSetUint8( stream, 0x02 ); // type
+    streamSetUint8( stream, 0x01 ); // length
+    streamSetUint8( stream, 0x00 ); // value (no diagnostics provided)
+
+    // responding AP-title field.
+    streamSetUint8( stream, 0xa4 ); // tag
+    streamSetUint8( stream, respondingAPTitleLength+2 ); // length
+    streamSetUint8( stream, 0x04 ); // type octet-string
+    streamSetUint8( stream, respondingAPTitleLength ); // length
+    streamSetUint8Array( stream, (uint8_t*)&respondingAPTitle[0], respondingAPTitleLength ); // value.
+
+    // user-information (InitiateRequedt APDU)
+    streamSetUint8( stream, 0xbe ); // tag
+    streamSetUint8( stream, 0x23 ); // length
+    streamSetUint8( stream, 0x04 ); // type (octet string)
+    streamSetUint8( stream, initiateRequestAPDULength ); // length
+    streamSetUint8Array( stream, (uint8_t*)&initiateRequestAPDU[0], initiateRequestAPDULength ); // value.
 }
 
 

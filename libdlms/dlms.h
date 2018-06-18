@@ -172,7 +172,7 @@ void dlmsFormAARQForLLS( Stream* stream );
 void dlmsFormAARQForHLS( Stream* stream );
 void dlmsFormInitiateRequestAPDU( Stream* stream,  uint8_t dedicatedKey[],uint32_t dedicatedKeyLength, bool responseAllowed, int8_t proposedQualityOfService, uint8_t proposedDlmsVersion, uint32_t proposedConformanceFlags, uint16_t clientMaxReceivePDUSize );
 void dlmsParseAARQ( Stream* stream, char* mechanismName, uint32_t mechanismNameMaxSize );
-void dlmsFormAARE( Stream* stream ) ;
+void dlmsFormAARE( Stream* stream, uint8_t appContextName[],uint32_t appContextNameLength, uint8_t respondingAPTitle[],uint32_t respondingAPTitleLength, uint8_t initiateRequestAPDU[], uint32_t initiateRequestAPDULength );
 
 
 
