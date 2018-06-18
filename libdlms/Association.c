@@ -276,5 +276,11 @@ void dlmsParseAARQ( Stream* stream, char* mechanismName, uint32_t mechanismNameM
 }
 
 
+void dlmsFormAARE( Stream* stream ) 
+{
+}
+
+
+
 
 

@@ -460,6 +460,19 @@ void ParseAARQ()
 }
 
 
+void GenerateAARE()
+{
+    uint8_t data[128]   = {0};
+    Stream  stream  = &data[0];
+
+    dlmsFormAARE( &stream );
+
+    //printPDU( &data[0], (uint8_t*)stream );
+
+    uint8_t expected[]  = {1};
+    CU_ASSERT( memcmp(&data[0], &expected[0], sizeof(expected) ) == 0 );
+}
+
 
 
 int suiteInit(void)
@@ -511,6 +524,7 @@ int main()
     CU_add_test(pSuite, "Generate HLS AARQ", GenerateHLSAARQ);
     CU_add_test(pSuite, "Generate InitiateRequest APDU", GenerateInitiateRequestAPDU);
     CU_add_test(pSuite, "ParseAARQ", ParseAARQ);
+    CU_add_test(pSuite, "Generate AARE", GenerateAARE);
 
 
     /* Run all tests using the CUnit Basic interface */
