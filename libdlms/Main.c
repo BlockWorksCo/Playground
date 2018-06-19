@@ -477,6 +477,27 @@ void GenerateAARE()
 }
 
 
+void ParseAARE()
+{
+    uint8_t input[]  = {0x60, 0x36, 0xA1, 0x09, 0x06, 0x07, 0x60, 0x85, 0x74, 0x05, 0x08, 0x01, 0x01, 0x8A, 0x02, 0x07, 0x80, 0x8B, 0x07, 0x60, 0x85, 0x74, 0x05, 0x08, 0x02, 0x05, 0xAC, 0x0A, 0x80, 0x09, 0x4B, 0x35, 0x36, 0x69, 0x56, 0x61, 0x67, 0x59, 0x00, 0xBE, 0x10, 0x04, 0x0E, 0x01, 0x00, 0x00, 0x00, 0x06, 0x5F, 0x1F, 0x04, 0x00, 0x00, 0x7E, 0x1F, 0x04, 0xB0};
+    Stream  stream  = &input[0];
+
+    uint32_t    appContextNameLength        = 0;
+    uint8_t     appContextName[]            = {0};
+    uint32_t    respondingAPTitleLength     = 0;
+    uint8_t     respondingAPTitle[]         = {0};
+    uint32_t    initiateRequestAPDULength   = 0;
+    uint8_t     initiateRequestAPDU[]       = {0};
+    dlmsParseAARE( &stream, &appContextName[0],&appContextNameLength, &respondingAPTitle[0],&respondingAPTitleLength, &initiateRequestAPDU[0],&initiateRequestAPDULength  );
+
+    const uint8_t   expected[]  = {0x60, 0x85, 0x74, 0x05, 0x08, 0x02, 0x05};
+    CU_ASSERT( memcmp(&appContextName[0], &expected[0], sizeof(expected) ) == 0 );
+}
+
+
+
+
+
 
 int suiteInit(void)
 {
@@ -528,6 +549,7 @@ int main()
     CU_add_test(pSuite, "Generate InitiateRequest APDU", GenerateInitiateRequestAPDU);
     CU_add_test(pSuite, "ParseAARQ", ParseAARQ);
     CU_add_test(pSuite, "Generate AARE", GenerateAARE);
+    CU_add_test(pSuite, "Parse AARE", ParseAARE);
 
 
     /* Run all tests using the CUnit Basic interface */

@@ -327,4 +327,7 @@ void dlmsFormAARE( Stream* stream, uint8_t appContextName[],uint32_t appContextN
 
 
 
+void dlmsParseAARE( Stream* stream, uint8_t* appContextName, uint32_t* appContextNameLength, uint8_t* respondingAPTitle, uint32_t* respondingAPTitleLength, uint8_t* initiateRequestAPDU,uint32_t* initiateRequestAPDULength  )
+{
+}
 
