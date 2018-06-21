@@ -329,5 +329,20 @@ void dlmsFormAARE( Stream* stream, uint8_t appContextName[],uint32_t appContextN
 
 void dlmsParseAARE( Stream* stream, uint8_t* appContextName, uint32_t* appContextNameLength, uint8_t* respondingAPTitle, uint32_t* respondingAPTitleLength, uint8_t* initiateRequestAPDU,uint32_t* initiateRequestAPDULength  )
 {
+    // PDU
+    uint8_t     tag;
+    streamGetUint8( stream, &tag ); // tag
+    assert( tag == aare );
+
+    uint8_t     length;
+    streamGetUint8( stream, &length ); // length
+    //assert( length == 0x48 );
+
+    // Application context name
+    streamGetUint8( stream, &tag ); // tag
+    assert( tag == 0xa1 );
+    streamGetUint8( stream, &length ); // length.
+    //assert( length == 9 );
+
 }
 

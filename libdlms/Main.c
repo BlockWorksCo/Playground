@@ -490,8 +490,10 @@ void ParseAARE()
     uint8_t     initiateRequestAPDU[]       = {0};
     dlmsParseAARE( &stream, &appContextName[0],&appContextNameLength, &respondingAPTitle[0],&respondingAPTitleLength, &initiateRequestAPDU[0],&initiateRequestAPDULength  );
 
-    const uint8_t   expected[]  = {0x60, 0x85, 0x74, 0x05, 0x08, 0x02, 0x05};
-    CU_ASSERT( memcmp(&appContextName[0], &expected[0], sizeof(expected) ) == 0 );
+    {
+        const uint8_t   expected[]  = {0x60, 0x85, 0x74, 0x05, 0x08, 0x02, 0x05};
+        CU_ASSERT( memcmp(&appContextName[0], &expected[0], sizeof(expected) ) == 0 );
+    }
 }
 
 
