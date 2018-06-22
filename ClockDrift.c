@@ -6,9 +6,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <math.h>
 
-#define DRIFT_RATE      (0.01)
 
+#define TOKEN_PERIOD            (1800)
 
 typedef struct
 {
@@ -17,14 +18,15 @@ typedef struct
     uint32_t    token;
     uint32_t    value;
     uint32_t    correctedDeviceTime;
+    float       driftRate;
 
 } Sample;
 
 
 
-uint32_t DriftTime( uint32_t serverTime, uint32_t timeSinceSync )
+uint32_t DriftTime( float driftRate, uint32_t serverTime, uint32_t timeSinceSync )
 {
-    uint32_t    driftedTime = serverTime + (uint32_t)(DRIFT_RATE * (float)timeSinceSync );
+    uint32_t    driftedTime = serverTime + (uint32_t)(driftRate * (float)timeSinceSync );
 }
 
 
@@ -34,11 +36,12 @@ void GenerateClockDriftData( Sample* samples, uint32_t numberOfSamples )
 
     for(uint32_t i=0; i<numberOfSamples; i++)
     {
+        samples[i].driftRate     = sin( ((float)i)/7200.0 ) / 1000.0;
         samples[i].token         = lastTokenReceived;
         samples[i].serverTime    = i;
-        samples[i].deviceTime    = DriftTime( samples[i].serverTime, i );
+        samples[i].deviceTime    = DriftTime( samples[i].driftRate, samples[i].serverTime, i );
 
-        if( samples[i].serverTime % 3600 == 0 )
+        if( samples[i].serverTime % TOKEN_PERIOD == 0 )
         {
             lastTokenReceived   = rand();
         }
@@ -60,8 +63,8 @@ void RecoverSamples( Sample* samples, uint32_t numberOfSamples )
     {
         if( samples[i].token != lastToken )
         {
-            float       deviceDelta = samples[i].deviceTime - samples[lastTokenIndex].deviceTime; 
-            float       serverDelta = samples[i].serverTime - samples[lastTokenIndex].serverTime; 
+            float       deviceDelta = samples[i].deviceTime - samples[lastTokenIndex].deviceTime;
+            float       serverDelta = samples[i].serverTime - samples[lastTokenIndex].serverTime;
             driftRate   = (deviceDelta / serverDelta);
             printf("- %08d %08d %08x %f\n", samples[i].serverTime, samples[i].deviceTime, samples[i].token, driftRate );
 
@@ -89,7 +92,7 @@ int main()
     for(uint32_t i=0; i<numberOfSamples; i++)
     {
         uint32_t    diff    = samples[i].correctedDeviceTime - samples[i].serverTime;
-        printf("%08d %08d (%08d) %d\n", samples[i].serverTime, samples[i].deviceTime, samples[i].correctedDeviceTime, diff );
+        printf("%08d %08d (%08d) %1.5f %d\n", samples[i].serverTime, samples[i].deviceTime, samples[i].correctedDeviceTime, samples[i].driftRate, diff );
     }
 
     return 0;
