@@ -9,7 +9,14 @@
 #include <math.h>
 
 
-#define TOKEN_PERIOD            (1800)
+//
+// Algorithm assumes linear drift between token periods. Tokens are psuedo-random numbers
+// sent to the device on the return from the previous set of sample data being transferred
+// to the server.
+// Both the server and device can authenticate the other by checking the token against the
+// expected value.
+//
+#define TOKEN_PERIOD            (900)
 
 typedef struct
 {
@@ -18,7 +25,8 @@ typedef struct
     uint32_t    token;
     uint32_t    value;
     uint32_t    correctedDeviceTime;
-    float       driftRate;
+    float       driftRate;          // real drift rate used in generating data.
+    float       derivedDriftRate;   // calculated during correction.
 
 } Sample;
 
@@ -36,7 +44,7 @@ void GenerateClockDriftData( Sample* samples, uint32_t numberOfSamples )
 
     for(uint32_t i=0; i<numberOfSamples; i++)
     {
-        samples[i].driftRate     = sin( ((float)i)/7200.0 ) / 1000.0;
+        samples[i].driftRate     = sin( ((float)i)/7200.0 ) / 10000.0;
         samples[i].token         = lastTokenReceived;
         samples[i].serverTime    = i;
         samples[i].deviceTime    = DriftTime( samples[i].driftRate, samples[i].serverTime, i );
@@ -77,23 +85,38 @@ void RecoverSamples( Sample* samples, uint32_t numberOfSamples )
         uint32_t    deviceTimeSinceLastTokenChange    = samples[i].deviceTime - deviceTimeAtTokenChange;
         uint32_t    correctedDeviceTime = serverTimeAtTokenChange + (uint32_t)((float)deviceTimeSinceLastTokenChange / driftRate) + 1;
         samples[i].correctedDeviceTime  = correctedDeviceTime;
+        samples[i].derivedDriftRate     = driftRate;
     }
 }
 
 
 int main()
 {
-    Sample  samples[24*3600];
+    static Sample  samples[7*24*3600];
     const uint32_t  numberOfSamples = sizeof(samples)/sizeof(samples[0]);
+    uint32_t        totalError  = 0;
+    int32_t         maxError    = -1;
+    int32_t         minError    = 1;
 
     GenerateClockDriftData( &samples[0], numberOfSamples );
     RecoverSamples( &samples[0], numberOfSamples );
 
     for(uint32_t i=0; i<numberOfSamples; i++)
     {
-        uint32_t    diff    = samples[i].correctedDeviceTime - samples[i].serverTime;
-        printf("%08d %08d (%08d) %1.5f %d\n", samples[i].serverTime, samples[i].deviceTime, samples[i].correctedDeviceTime, samples[i].driftRate, diff );
+        int32_t    diff    = samples[i].correctedDeviceTime - samples[i].serverTime;
+        totalError  += diff;
+        if( diff >= maxError )
+        {
+            maxError    = diff;
+        }
+        if( diff <= minError )
+        {
+            minError    = diff;
+        }
+        printf("%08d %08d %08d %1.8f %d %f\n", samples[i].serverTime, samples[i].deviceTime, samples[i].correctedDeviceTime, samples[i].driftRate, diff, samples[i].derivedDriftRate-1.0 );
     }
+    printf("Average error: %f\n", (float)totalError / (float)numberOfSamples);
+    printf("error range: %d -> %d\n", minError, maxError );
 
     return 0;
 }
