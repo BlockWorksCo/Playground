@@ -6,6 +6,7 @@
       :clipped="clipped"
       v-model="drawer"
       enable-resize-watcher
+      hide-overlay="true"
       fixed
       app
     >
@@ -19,7 +20,7 @@
             <v-icon v-html="item.icon"></v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title v-text="item.title"></v-list-tile-title>
+            <router-link to=item.target>{{ item.title }}</router-link>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
@@ -28,21 +29,15 @@
       app
       :clipped-left="clipped"
     >
-      <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-btn icon @click.stop="miniVariant = !miniVariant">
-        <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
+
+      <v-btn v-on:click="miniVariant=!miniVariant" :flat="true" :small="true" :round="true">
+        <v-icon v-if="miniVariant==false">chevron_left</v-icon>
+        <v-icon v-if="miniVariant==true">chevron_right</v-icon>
       </v-btn>
-      <v-btn icon @click.stop="clipped = !clipped">
-        <v-icon>web</v-icon>
-      </v-btn>
-      <v-btn icon @click.stop="fixed = !fixed">
-        <v-icon>remove</v-icon>
-      </v-btn>
+
+      <v-spacer></v-spacer>
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon @click.stop="rightDrawer = !rightDrawer">
-        <v-icon>menu</v-icon>
-      </v-btn>
     </v-toolbar>
     <v-content>
       <HelloWorld/>
@@ -79,17 +74,42 @@ export default {
   },
   data () {
     return {
-      clipped: false,
+      chevronType:'chevron_left',
+      clipped: true,
       drawer: true,
       fixed: false,
-      items: [{
-        icon: 'bubble_chart',
-        title: 'Inspire'
-      }],
+      items: 
+      [
+        {
+            icon: 'cell_wifi',
+            title: 'Radio',
+            target: "one",
+        },
+        {
+            icon: 'speaker_phone',
+            title: 'IPA 1/3',
+            target: "two",
+        },
+        {
+            icon: 'router',
+            title: 'GW200',
+            target: "three",
+        },
+        {
+            icon: 'business',
+            title: 'Production',
+            target: "four",
+        },
+        {
+            icon: 'computer',
+            title: 'Host Agent',
+            target: "five",
+        },
+      ],
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'Vuetify.js'
+      title: 'OmniBox'
     }
   }
 }
