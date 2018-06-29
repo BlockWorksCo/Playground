@@ -93,7 +93,7 @@ export default {
         {
             icon: 'router',
             title: 'GW200',
-            target: "three",
+            target: "Gateway",
         },
         {
             icon: 'business',
