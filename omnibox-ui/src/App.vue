@@ -88,22 +88,22 @@ export default {
         {
             icon: 'speaker_phone',
             title: 'IPA 1/3',
-            target: "two",
+            target: "node",
         },
         {
             icon: 'router',
             title: 'GW200',
-            target: "Gateway",
+            target: "gateway",
         },
         {
             icon: 'business',
             title: 'Production',
-            target: "four",
+            target: "production",
         },
         {
             icon: 'computer',
             title: 'Host Agent',
-            target: "five",
+            target: "hostagent",
         },
       ],
       miniVariant: false,
