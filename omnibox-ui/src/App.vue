@@ -40,7 +40,7 @@
       <v-spacer></v-spacer>
     </v-toolbar>
     <v-content>
-      <HelloWorld/>
+      <router-view />
     </v-content>
     <v-navigation-drawer
       temporary
@@ -83,7 +83,7 @@ export default {
         {
             icon: 'cell_wifi',
             title: 'Radio',
-            target: "one",
+            target: "radio",
         },
         {
             icon: 'speaker_phone',
