@@ -15,15 +15,15 @@
         <v-list-tile
           class="white--text" active-class="white--text"
           value="true"
-          v-for="(item, i) in items"
-          :key="i"
+          v-for="item in items"
+          :key=item.title
           :to=item.target
         >
           <v-list-tile-action>
             <v-icon v-html="item.icon"></v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <router-link :to=item.target>{{ item.title }}</router-link>
+            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
