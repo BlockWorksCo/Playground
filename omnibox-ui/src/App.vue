@@ -9,12 +9,15 @@
       hide-overlay="true"
       fixed
       app
+      class="secondary"
     >
-      <v-list>
+      <v-list class="secondary" >
         <v-list-tile
+          class="white--text" active-class="white--text"
           value="true"
           v-for="(item, i) in items"
           :key="i"
+          :to=item.target
         >
           <v-list-tile-action>
             <v-icon v-html="item.icon"></v-icon>
@@ -29,6 +32,7 @@
     <v-toolbar
       app
       :clipped-left="clipped"
+      color="primary"
     >
 
       <v-btn v-on:click="miniVariant=!miniVariant" :flat="true" :small="true" :round="true">

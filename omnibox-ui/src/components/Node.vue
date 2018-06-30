@@ -21,11 +21,18 @@
 
             <v-stepper-items>
               <v-stepper-content step="1">
-                <v-card
-                  class="mb-5"
-                  color="grey lighten-1"
-                  height="200px"
-                ></v-card>
+                <v-card class="mb-5" color="grey lighten-1" height="200px" >
+                    <v-card-title primary-title>
+                      <div>
+                        <h3 class="headline mb-0">Kangaroo Valley Safari</h3>
+                        <div>Located two hours south of Sydney in the <br>Southern Highlands of New South Wales, ...</div>
+                      </div>
+                    </v-card-title>
+                    <v-card-actions>
+                      <v-btn color=success>Share</v-btn>
+                      <v-btn flat color="orange">Explore</v-btn>
+                    </v-card-actions>
+                </v-card>
 
                 <v-btn
                   color="primary"
