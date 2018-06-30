@@ -43,12 +43,8 @@
 
 <script>
 
-import VCard from 'vuetify/es5/components/VCard'
-import VCardMedia from 'vuetify/es5/components/VCard/VCardMedia';
-import VCardTitle from 'vuetify/es5/components/VCard/VCardTitle';
-
 export default {
-  components: { VCard, VCardMedia, VCardTitle },
+  components: {},
   name: 'Radio',
   props: {
     msg: String
