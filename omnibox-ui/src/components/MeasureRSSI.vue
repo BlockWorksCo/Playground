@@ -119,6 +119,11 @@
   </v-container>
 </template>
 
+
+
+import VueCharts from 'vue-chartjs'
+import { Bar, Line } from 'vue-chartjs'
+
 <script>
 export default {
   name: 'MeasureRSSI',
