@@ -8,15 +8,17 @@
         <v-flex xs12>
           <v-stepper v-model="e1">
             <v-stepper-header>
-              <v-stepper-step :complete="e1 > 1" step="1">Name of step 1</v-stepper-step>
 
+              <v-stepper-step :complete="e1 > 1" step="1">Connect Node to programmer</v-stepper-step>
               <v-divider></v-divider>
-
-              <v-stepper-step :complete="e1 > 2" step="2">Name of step 2</v-stepper-step>
-
+              <v-stepper-step :complete="e1 > 2" step="2">Choose bootloader</v-stepper-step>
               <v-divider></v-divider>
+              <v-stepper-step :complete="e1 > 3" step="3">Choose firmware</v-stepper-step>
+              <v-divider></v-divider>
+              <v-stepper-step :complete="e1 > 4" step="4">Program the images</v-stepper-step>
+              <v-divider></v-divider>
+              <v-stepper-step :complete="e1 > 5" step="5">Reboot and check</v-stepper-step>
 
-              <v-stepper-step step="3">Name of step 3</v-stepper-step>
             </v-stepper-header>
 
             <v-stepper-items>
@@ -24,59 +26,91 @@
                 <v-card class="mb-5" color="grey lighten-1" height="200px" >
                     <v-card-title primary-title>
                       <div>
-                        <h3 class="headline mb-0">Kangaroo Valley Safari</h3>
-                        <div>Located two hours south of Sydney in the <br>Southern Highlands of New South Wales, ...</div>
+                        <h3 class="headline mb-0">Step 1: Physical connections</h3>
+                        <div>Make sure this is plugged into that, and that into this.</div>
                       </div>
                     </v-card-title>
-                    <v-card-actions>
-                      <v-btn color=success>Share</v-btn>
-                      <v-btn flat color="orange">Explore</v-btn>
-                    </v-card-actions>
                 </v-card>
 
-                <v-btn
-                  color="primary"
-                  @click="e1 = 2"
-                >
-                  Continue
+                <v-btn color="primary" @click="e1 = 2" >
+                  Next
                 </v-btn>
 
                 <v-btn flat>Cancel</v-btn>
               </v-stepper-content>
 
               <v-stepper-content step="2">
-                <v-card
-                  class="mb-5"
-                  color="grey lighten-1"
-                  height="200px"
-                ></v-card>
 
-                <v-btn
-                  color="primary"
-                  @click="e1 = 3"
-                >
-                  Continue
+                <v-card class="mb-5" color="grey lighten-1" height="200px" >
+                    <v-card-title primary-title>
+                      <div>
+                        <h3 class="headline mb-0">Step 2: Choose a bootloader image</h3>
+                        <div>This should be called bootloader.elf or something similar.</div>
+                      </div>
+                    </v-card-title>
+                </v-card>
+
+                <v-btn color="primary" @click="e1 = 3" >
+                  Choose Bootloader
                 </v-btn>
 
-                <v-btn flat>Cancel</v-btn>
+                <v-btn flat @click="e1=1">Back</v-btn>
               </v-stepper-content>
 
               <v-stepper-content step="3">
-                <v-card
-                  class="mb-5"
-                  color="grey lighten-1"
-                  height="200px"
-                ></v-card>
 
-                <v-btn
-                  color="primary"
-                  @click="e1 = 1"
-                >
+                <v-card class="mb-5" color="grey lighten-1" height="200px" >
+                    <v-card-title primary-title>
+                      <div>
+                        <h3 class="headline mb-0">Step 3: Choose a firmware image</h3>
+                        <div>This should be called agent.elf or something similar.</div>
+                      </div>
+                    </v-card-title>
+                </v-card>
+
+                <v-btn color="primary" @click="e1 = 4" >
+                  Choose firmware...
+                </v-btn>
+
+                <v-btn flat @click="e1=2">Back</v-btn>
+              </v-stepper-content>
+
+              <v-stepper-content step="4">
+
+                <v-card class="mb-5" color="grey lighten-1" height="200px" >
+                    <v-card-title primary-title>
+                      <div>
+                        <h3 class="headline mb-0">Step 4: Program the board</h3>
+                        <div>Bootloader and firmware will now be programmed onto the node</div>
+                      </div>
+                    </v-card-title>
+                </v-card>
+
+                <v-btn color="primary" @click="e1 = 5" >
                   Continue
                 </v-btn>
 
-                <v-btn flat>Cancel</v-btn>
+                <v-btn flat @click="e1=3">Back</v-btn>
               </v-stepper-content>
+
+              <v-stepper-content step="5">
+
+                <v-card class="mb-5" color="grey lighten-1" height="200px" >
+                    <v-card-title primary-title>
+                      <div>
+                        <h3 class="headline mb-0">Step 5: Check</h3>
+                        <div>Check its all working.</div>
+                      </div>
+                    </v-card-title>
+                </v-card>
+
+                <v-btn color="primary" @click="e1 = 1" >
+                  Done
+                </v-btn>
+
+              </v-stepper-content>
+
+
             </v-stepper-items>
           </v-stepper>
         </v-flex>

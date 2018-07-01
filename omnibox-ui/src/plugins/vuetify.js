@@ -20,9 +20,9 @@ import 'vuetify/src/stylus/app.styl'
 Vue.use(Vuetify, {
 
   theme: {
-      primary: "#9C27B0",
-      secondary: "#BA68C8",
-      accent: "#9c27b0",
+      primary: "#FF9800",
+      secondary: "#FFB74D",
+      accent: "#FF9800",
       error: "#f44336",
       warning: "#ffeb3b",
       info: "#2196f3",
