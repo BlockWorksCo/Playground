@@ -121,7 +121,7 @@
 
 <script>
 export default {
-  name: 'Node',
+  name: 'ConfigureCredentials',
   props: {
     msg: String
   },

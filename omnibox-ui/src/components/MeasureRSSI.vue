@@ -121,7 +121,7 @@
 
 <script>
 export default {
-  name: 'Node',
+  name: 'MeasureRSSI',
   props: {
     msg: String
   },

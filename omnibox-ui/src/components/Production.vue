@@ -1,37 +1,67 @@
+
 <template>
   <v-container fluid>
     <v-slide-y-transition mode="out-in">
-      <v-layout column align-center>
-        <img src="@/assets/logo.png" alt="Vuetify.js" class="mb-5">
-        <h1>Production</h1>
+      <v-layout>
+
+        <v-flex xs6>
+           <v-card class="ma-5">
+            <v-card-media src="https://raw.githubusercontent.com/ijklim/simon-game/gh-pages/assets/img/bg--game-pad.jpg" height="200px" ></v-card-media>
+            <v-card-title primary-title>
+              <div>
+                <h3 class="headline mb-0">Take node out of production mode</h3>
+                <div>Take node out of production mode</div>
+              </div>
+            </v-card-title>
+            <v-card-actions>
+              <v-btn color=success>Do it...</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-flex>
+
+        <v-flex xs6>
+           <v-card class="ma-5">
+            <v-card-media src="https://raw.githubusercontent.com/ijklim/simon-game/gh-pages/assets/img/bg--game-pad.jpg" height="200px" ></v-card-media>
+            <v-card-title primary-title>
+              <div>
+                <h3 class="headline mb-0">Configure credentials</h3>
+                <div>Program the certificates and keys required for normal operation on an OmniMesh network</div>
+              </div>
+            </v-card-title>
+            <v-card-actions>
+              <v-btn to="ConfigureCredentials" color=success>Do it...</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-flex>
+
+        <v-flex xs6>
+           <v-card class="ma-5">
+            <v-card-media src="https://raw.githubusercontent.com/ijklim/simon-game/gh-pages/assets/img/bg--game-pad.jpg" height="200px" ></v-card-media>
+            <v-card-title primary-title>
+              <div>
+                <h3 class="headline mb-0">Nuke</h3>
+                <div>Remove all software, certificates and keys required for normal operation on an OmniMesh network</div>
+              </div>
+            </v-card-title>
+            <v-card-actions>
+              <v-btn color=success>Do it...</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-flex>
+
       </v-layout>
     </v-slide-y-transition>
   </v-container>
 </template>
 
 <script>
+
 export default {
-  name: 'Production',
+  components: {},
+  name: 'Gateway',
   props: {
     msg: String
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>

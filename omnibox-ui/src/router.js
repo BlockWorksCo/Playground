@@ -7,6 +7,8 @@ import Gateway from './components/Gateway.vue'
 import Node from './components/Node.vue'
 import Production from './components/Production.vue'
 import HostAgent from './components/HostAgent.vue'
+import ConfigureCredentials from './components/ConfigureCredentials.vue'
+import MeasureRSSI from './components/MeasureRSSI.vue'
 
 Vue.use(Router)
 
@@ -46,6 +48,16 @@ export default new Router({
       path: '/hostagent',
       name: 'HostAgent',
       component: HostAgent
+    },
+    {
+      path: '/configurecredentials',
+      name: 'ConfigureCredentials',
+      component: ConfigureCredentials
+    },
+    {
+      path: '/measurerssi',
+      name: 'MeasureRSSI',
+      component: MeasureRSSI
     },
   ]
 })
