@@ -2,7 +2,7 @@
 <template>
   <v-container fluid>
     <v-slide-y-transition mode="out-in">
-      <v-layout>
+      <v-layout wrap=true>
 
         <v-flex xs6>
            <v-card class="ma-5">

@@ -4,7 +4,7 @@
 <template>
   <v-container fluid>
     <v-slide-y-transition mode="out-in">
-      <v-layout>
+      <v-layout wrap=true>
         <v-flex xs12>
           <v-stepper v-model="e1">
             <v-stepper-header>
@@ -23,7 +23,7 @@
 
             <v-stepper-items>
               <v-stepper-content step="1">
-                <v-card class="mb-5" color="grey lighten-1" height="200px" >
+                <v-card class="mb-5" color="grey lighten-1" height="600px" >
                     <v-card-title primary-title>
                       <div>
                         <h3 class="headline mb-0">Step 1: Physical connections</h3>
@@ -41,14 +41,23 @@
 
               <v-stepper-content step="2">
 
-                <v-card class="mb-5" color="grey lighten-1" height="200px" >
-                    <v-card-title primary-title>
+                <v-card class="mb-5" height="600px" >
+                    <v-container wrap=true fluid>
+                        <v-layout wrap=true>
+                           <v-flex xs12 align-end flexbox>
+                             <v-card-title primary-title>
+                               <h3 class="headline mb-0">Step 2: Monitor RSSI values</h3>
+                             </v-card-title>
+                           </v-flex>
+                           <v-flex xs12 align-end flexbox>
+                                <div><line-chart :chart-data="datacollection" :options="options" /></div>
+                           </v-flex>
+                        </v-layout>
+                    </v-container>
+
                       <div>
-                        <h3 class="headline mb-0">Step 2: Choose a bootloader image</h3>
                         <div>This should be called bootloader.elf or something similar.</div>
-                        <div><line-chart :chart-data="datacollection" :options="options" /></div>
                       </div>
-                    </v-card-title>
                 </v-card>
 
                 <v-btn color="primary" @click="e1 = 3" >
