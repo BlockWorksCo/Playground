@@ -49,8 +49,8 @@
                                <h3 class="headline mb-0">Step 2: Monitor RSSI values</h3>
                              </v-card-title>
                            </v-flex>
-                           <v-flex xs12 align-end flexbox>
-                                <div><line-chart :chart-data="datacollection" :options="options" /></div>
+                           <v-flex xs12 align-end flexbox height=500px>
+                                <div><line-chart :chart-data="datacollection" :options="options" :height="500" :width="1000"/></div>
                            </v-flex>
                         </v-layout>
                     </v-container>
@@ -170,35 +170,21 @@ export default {
                }],
                xAxes: [{
                   gridLines: {
-                     display: false
+                     display: true
                   }
                }]
             },
             legend: {
-               display: true
+               display: false
             },
-            responsive: true,
+            responsive: false,
             maintainAspectRatio: false
-         }
+         },
+
+        myStyles: "max-width:100px max-height:300px width:333px height:444px",
       }
+
     },
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
