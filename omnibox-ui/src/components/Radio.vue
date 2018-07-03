@@ -6,7 +6,7 @@
 
         <v-flex xs6>
            <v-card class="ma-5">
-            <v-card-media v-bind:src="require('@/assets/SignalBars.svg')" contain height=200px />
+            <v-card-media v-bind:src="require('@/assets/SignalStrength.png')" contain height=200px />
             <v-card-title primary-title>
               <div>
                 <h3 class="headline mb-0">Measure RSSI</h3>
@@ -21,7 +21,7 @@
 
         <v-flex xs6 sm6>
            <v-card class="ma-5">
-            <v-card-media v-bind:src="require('@/assets/SpectrumAnalyser.jpg')" height=200px />
+            <v-card-media v-bind:src="require('@/assets/Transmitter.png')" contain height=200px />
             <v-card-title primary-title>
               <div>
                 <h3 class="headline mb-0">Continuous Transmit</h3>
