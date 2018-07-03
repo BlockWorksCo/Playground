@@ -6,7 +6,7 @@
 
         <v-flex xs6>
            <v-card class="ma-5">
-            <v-card-media src="https://raw.githubusercontent.com/ijklim/simon-game/gh-pages/assets/img/bg--game-pad.jpg" height="200px" ></v-card-media>
+            <v-card-media src="@/assets/SignalBars.png" height="200px" ></v-card-media>
             <v-card-title primary-title>
               <div>
                 <h3 class="headline mb-0">Measure RSSI</h3>

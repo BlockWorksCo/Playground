@@ -94,7 +94,7 @@ export default {
             target: "hostagent",
         },
       ],
-      miniVariant: false,
+      miniVariant: true,
       right: true,
       rightDrawer: false,
       title: 'OmniBox'
