@@ -50,7 +50,7 @@
                              </v-card-title>
                            </v-flex>
                            <v-flex xs12 align-end flexbox height=500px>
-                                <div><line-chart :chart-data="datacollection" :options="options" :height="500" :width="1000"/></div>
+                                <div><line-chart :data="datacollection" :options="options" :height="500" :width="1000"/></div>
                            </v-flex>
                         </v-layout>
                     </v-container>
