@@ -1,7 +1,7 @@
 
 
 <template>
- <textarea v-model="text">
+ <textarea v-model="text" cols=80 rows=25 maxlength=2000 readonly>
     blaa blaa blaa
  </textarea>
 </template>

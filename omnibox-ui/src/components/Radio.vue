@@ -52,6 +52,17 @@
 
       </v-layout>
     </v-slide-y-transition>
+
+<b-form-textarea id="textarea1"
+                     v-model="text"
+                     placeholder="Log text"
+                     :rows="80"
+                     :max-rows="25"
+                     plaintext
+                     readonly
+                     value="1234" />
+
+
   </v-container>
 </template>
 

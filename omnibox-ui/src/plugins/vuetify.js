@@ -17,6 +17,9 @@ import {
 } from 'vuetify'
 import 'vuetify/src/stylus/app.styl'
 import '../components/TextOutput.vue'
+//import { FormTextarea } from 'bootstrap-vue/es/components';
+
+//Vue.use(FormTextarea);
 
 Vue.use(Vuetify, {
 
