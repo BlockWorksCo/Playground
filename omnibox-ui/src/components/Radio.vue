@@ -36,6 +36,7 @@
 
         <v-flex xs6 sm6>
            <v-card class="ma-5">
+                <text-output text="blaa" width=100px height=100px />
             <v-card-media src="https://raw.githubusercontent.com/ijklim/simon-game/gh-pages/assets/img/bg--game-pad.jpg" height="200px" ></v-card-media>
             <v-card-title primary-title>
               <div>
