@@ -36,7 +36,8 @@
 
         <v-flex xs6 sm6>
            <v-card class="ma-5">
-                <text-output text="blaa" width=100px height=100px />
+                <text-output text="blaa" width="100px" height="100px" />
+
             <v-card-media src="https://raw.githubusercontent.com/ijklim/simon-game/gh-pages/assets/img/bg--game-pad.jpg" height="200px" ></v-card-media>
             <v-card-title primary-title>
               <div>
@@ -53,15 +54,9 @@
       </v-layout>
     </v-slide-y-transition>
 
-<b-form-textarea id="textarea1"
-                     v-model="text"
-                     placeholder="Log text"
-                     :rows="80"
-                     :max-rows="25"
-                     plaintext
-                     readonly
-                     value="1234" />
-
+    <div width="500px" height="100px">
+    <b-form-textarea id="textarea3" plaintext :value="text"></b-form-textarea>
+    </div>
 
   </v-container>
 </template>
@@ -73,7 +68,13 @@ export default {
   name: 'Radio',
   props: {
     msg: String
-  }
+  },
+  data () {
+    return {
+      text: 'This is some text.\nIt is read only and doesn\'t look like an input.'
+    }
+}
+
 }
 </script>
 
