@@ -10,7 +10,12 @@
 int main(int argc, char **argv)
 {
     {
-        AMessage    message;
+        AMessage    message = AMessage_init_zero;
+
+        message.a   = 33;
+        message.b   = 44;
+        message.has_b    = true;
+
         uint8_t buffer[AMessage_size];
         pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
         
