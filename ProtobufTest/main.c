@@ -26,6 +26,9 @@ int main(int argc, char **argv)
             pb_istream_t stream = pb_istream_from_buffer(buffer, sizeof(buffer));
             AMessage    message2    = AMessage_init_zero;
             pb_decode( &stream, AMessage_fields, &message2 );
+
+            printf("a=%d\n",message2.a);
+            printf("b=%d\n",message2.b);
             return 0; /* Success */
         }
         else
