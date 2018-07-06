@@ -6,17 +6,11 @@
 #include <string.h>
 #include <pb_encode.h>
 #include "alltypes.pb.h"
-#include "test_helpers.h"
 
 int main(int argc, char **argv)
 {
-    int mode = (argc > 1) ? atoi(argv[1]) : 0;
-    
-    /* Initialize the structure with constants */
     AllTypes alltypes = AllTypes_init_zero;
     
-    if (mode == 0 || mode == 1)
-    {
         alltypes.req_int32         = -1001;
         alltypes.req_int64         = -1002;
         alltypes.req_uint32        = 1003;
@@ -83,58 +77,6 @@ int main(int argc, char **argv)
         alltypes.req_limits.uint64_max = UINT64_MAX;
         alltypes.req_limits.enum_min   = HugeEnum_Negative;
         alltypes.req_limits.enum_max   = HugeEnum_Positive;
-    }
-    
-    if (mode == 1)
-    {
-        /* Fill in values for optional fields */
-        alltypes.has_opt_int32 = true;
-        alltypes.opt_int32         = 3041;
-        alltypes.has_opt_int64 = true;
-        alltypes.opt_int64         = 3042;
-        alltypes.has_opt_uint32 = true;
-        alltypes.opt_uint32        = 3043;
-        alltypes.has_opt_uint64 = true;
-        alltypes.opt_uint64        = 3044;
-        alltypes.has_opt_sint32 = true;
-        alltypes.opt_sint32        = 3045;
-        alltypes.has_opt_sint64 = true;
-        alltypes.opt_sint64        = 3046;
-        alltypes.has_opt_bool = true;
-        alltypes.opt_bool          = true;
-        
-        alltypes.has_opt_fixed32 = true;
-        alltypes.opt_fixed32       = 3048;
-        alltypes.has_opt_sfixed32 = true;
-        alltypes.opt_sfixed32      = 3049;
-        alltypes.has_opt_float = true;
-        alltypes.opt_float         = 3050.0f;
-        
-        alltypes.has_opt_fixed64 = true;
-        alltypes.opt_fixed64       = 3051;
-        alltypes.has_opt_sfixed64 = true;
-        alltypes.opt_sfixed64      = 3052;
-        alltypes.has_opt_double = true;
-        alltypes.opt_double        = 3053.0;
-        
-        alltypes.has_opt_string = true;
-        strcpy(alltypes.opt_string, "3054");
-        alltypes.has_opt_bytes = true;
-        alltypes.opt_bytes.size = 4;
-        memcpy(alltypes.opt_bytes.bytes, "3055", 4);
-        alltypes.has_opt_submsg = true;
-        strcpy(alltypes.opt_submsg.substuff1, "3056");
-        alltypes.opt_submsg.substuff2 = 3056;
-        alltypes.has_opt_enum = true;
-        alltypes.opt_enum = MyEnum_Truth;
-        alltypes.has_opt_emptymsg = true;
-        alltypes.has_opt_fbytes = true;
-        memcpy(alltypes.opt_fbytes, "3059", 4);
-
-        alltypes.which_oneof = AllTypes_oneof_msg1_tag;
-        strcpy(alltypes.oneof.oneof_msg1.substuff1, "4059");
-        alltypes.oneof.oneof_msg1.substuff2 = 4059;
-    }
     
     alltypes.end = 1099;
     

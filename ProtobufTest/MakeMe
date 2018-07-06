@@ -1,0 +1,4 @@
+
+
+protoc --plugin=protoc-gen-nanopb=/home/steve/Projects/nanopb/generator/protoc-gen-nanopb --nanopb_out=. message.proto
+
