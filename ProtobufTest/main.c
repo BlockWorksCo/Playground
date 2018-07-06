@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <pb_encode.h>
+#include <pb_decode.h>
 #include "message.pb.h"
 
 int main(int argc, char **argv)
@@ -22,7 +23,9 @@ int main(int argc, char **argv)
         /* Now encode it and check if we succeeded. */
         if (pb_encode(&stream, AMessage_fields, &message))
         {
-            fwrite(buffer, 1, stream.bytes_written, stdout);
+            pb_istream_t stream = pb_istream_from_buffer(buffer, sizeof(buffer));
+            AMessage    message2    = AMessage_init_zero;
+            pb_decode( &stream, AMessage_fields, &message2 );
             return 0; /* Success */
         }
         else
