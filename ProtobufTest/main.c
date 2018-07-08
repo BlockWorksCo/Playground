@@ -12,9 +12,49 @@
 
 
 
+void printHex(uint8_t value)                                                                    
+{                                                                                               
+    printf("%02X",value);                                                                       
+}                                                                                               
+                                                                                                
+void printHexData(uint8_t* data, uint32_t numberOfBytes)                                        
+{                                                                                               
+    for(uint32_t i=0; i<numberOfBytes; i++)                                                     
+    {                                                                                           
+        printHex(data[i]);                                                                      
+    }                                                                                           
+}                                                                                               
+                                                                                                
+
+
+bool decodeList(pb_istream_t *stream, const pb_field_t *field, void **arg)
+{
+    uint64_t value;
+    if (!pb_decode_varint(stream, &value))
+    {
+        printf("[done]\n");
+        return false;
+    }
+    else
+    {
+        printf("[%ld]\n", value);
+        return false;
+    }
+}
+
 
 bool encodeList(pb_ostream_t *stream, const pb_field_t *field, void * const *arg)
 {
+    for(uint32_t i=0; i<5; i++)
+    {
+        if (!pb_encode_tag_for_field(stream, field))
+        {
+            return false;
+        }
+        pb_encode_varint(stream, 9+i);
+        printf("encoding %d\n",9+i);
+    }
+    
     return true;
 }
 
@@ -23,8 +63,8 @@ int main(int argc, char **argv)
     {
         AMessage    message = AMessage_init_zero;
 
-        message.a   = 33;
-        message.b   = 44;
+        message.a   = 0xfa;
+        message.b   = 0xaf;
         message.has_b    = true;
         message.list.funcs.encode   = &encodeList;
 
@@ -33,12 +73,18 @@ int main(int argc, char **argv)
         printf("encoded size = %zu\n", bufferSize);
         uint8_t*    buffer  = malloc(bufferSize);
         pb_ostream_t stream = pb_ostream_from_buffer(buffer, bufferSize );
-        
+
         /* Now encode it and check if we succeeded. */
         if (pb_encode(&stream, AMessage_fields, &message))
         {
+            printf("\n");
+            printHexData( buffer, bufferSize );
+            printf("\n");
+        
+            printf("---decoding---\n");
             pb_istream_t stream = pb_istream_from_buffer(buffer, sizeof(buffer));
             AMessage    message2    = AMessage_init_zero;
+            message2.list.funcs.decode  = &decodeList;
             pb_decode( &stream, AMessage_fields, &message2 );
 
             printf("a=%d\n",message2.a);
