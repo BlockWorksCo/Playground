@@ -29,7 +29,7 @@
               </div>
             </v-card-title>
             <v-card-actions>
-              <v-btn color=success>Do it...</v-btn>
+              <v-btn color=success to="debugoutput">Do it...</v-btn>
             </v-card-actions>
           </v-card>
         </v-flex>

@@ -58,6 +58,7 @@ bool encodeList(pb_ostream_t *stream, const pb_field_t *field, void * const *arg
     return true;
 }
 
+// 08 FA 01 10 AF 01 18 09 18 0A 18 0B 18 0C 18 0D
 int main(int argc, char **argv)
 {
     {

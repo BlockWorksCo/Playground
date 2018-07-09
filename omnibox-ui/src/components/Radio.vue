@@ -54,11 +54,15 @@
       </v-layout>
     </v-slide-y-transition>
 
-    <div width="500px" height="100px">
-    <b-form-textarea id="textarea3" plaintext :value="text"></b-form-textarea>
-    </div>
+        <v-flex xs6 sm6>
+           <v-card class="ma-5">
+              <b-form-textarea id="textarea3" plaintext :value="text" readonly >This is the text area</b-form-textarea>
+          </v-card>
+        </v-flex>
 
   </v-container>
+
+
 </template>
 
 <script>

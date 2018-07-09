@@ -9,6 +9,7 @@ import Production from './components/Production.vue'
 import HostAgent from './components/HostAgent.vue'
 import ConfigureCredentials from './components/ConfigureCredentials.vue'
 import MeasureRSSI from './components/MeasureRSSI.vue'
+import DebugOutput from './components/DebugOutput.vue'
 
 Vue.use(Router)
 
@@ -58,6 +59,11 @@ export default new Router({
       path: '/measurerssi',
       name: 'MeasureRSSI',
       component: MeasureRSSI
+    },
+    {
+      path: '/debugoutput',
+      name: 'DebugOutput',
+      component: DebugOutput
     },
   ]
 })
