@@ -43,6 +43,28 @@ export default {
      return {
         text : 'This is the text in the textarea box\n\nblaa\none\ntwo\nthree\nfour\nfive\nsix\nseven'
      }
+  },
+  created() {
+    this.$options.interval = setInterval(this.periodicUpdate, 100);
+  },
+  methods: {
+    periodicUpdate() {
+
+       this.text = this.text + '['+Math.random()+']\n'; 
+
+       var lineCount    = 0; 
+       var i = 0;
+       for(i=this.text.length; i>0; i--) {
+         if(this.text[i] == '\n') {
+            lineCount++;
+            if(lineCount == 20) {
+                this.text = this.text.slice( i,this.text.length );
+                break;
+            }
+         }
+       }
+
+    }
   }
 }
 </script>
