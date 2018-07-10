@@ -46,23 +46,44 @@ export default {
   },
   created() {
     this.$options.interval = setInterval(this.periodicUpdate, 100);
+
+    var socket = new WebSocket('ws://steve-latitude-e7240:8081/');
+
+    socket.onopen = () => {
+
+        this.text   = 'opened\n';
+        socket.onmessage = (response) => {
+
+           //
+           // append the text from websocketd to the text box.
+           //
+           this.text   = this.text + '\n' + response.data;
+
+           //
+           // limit the text in the text box to 20 lines to cause scrolling.
+           //
+           var lineCount    = 0; 
+           var i = 0;
+           for(i=this.text.length; i>0; i--) {
+             if(this.text[i] == '\n') {
+                lineCount++;
+                if(lineCount == 20) {
+                    this.text = this.text.slice( i,this.text.length );
+                    break;
+                }
+             }
+           }
+
+        };
+
+    }
+
   },
   methods: {
     periodicUpdate() {
 
-       this.text = this.text + '['+Math.random()+']\n'; 
+       //this.text = this.text + '['+Math.random()+']\n'; 
 
-       var lineCount    = 0; 
-       var i = 0;
-       for(i=this.text.length; i>0; i--) {
-         if(this.text[i] == '\n') {
-            lineCount++;
-            if(lineCount == 20) {
-                this.text = this.text.slice( i,this.text.length );
-                break;
-            }
-         }
-       }
 
     }
   }
