@@ -41,17 +41,17 @@ export default {
   },
   data() {
      return {
-        text : 'This is the text in the textarea box\n\nblaa\none\ntwo\nthree\nfour\nfive\nsix\nseven'
+        text : '\n'
      }
   },
   created() {
-    this.$options.interval = setInterval(this.periodicUpdate, 100);
 
     var socket = new WebSocket('ws://steve-latitude-e7240:8081/');
+    var numberOfLines   = 30;
 
     socket.onopen = () => {
 
-        this.text   = 'opened\n';
+        this.text   = '\n'.repeat(numberOfLines) + 'opened\n';
         socket.onmessage = (response) => {
 
            //
@@ -67,7 +67,7 @@ export default {
            for(i=this.text.length; i>0; i--) {
              if(this.text[i] == '\n') {
                 lineCount++;
-                if(lineCount == 20) {
+                if(lineCount == numberOfLines) {
                     this.text = this.text.slice( i,this.text.length );
                     break;
                 }
@@ -80,12 +80,6 @@ export default {
 
   },
   methods: {
-    periodicUpdate() {
-
-       //this.text = this.text + '['+Math.random()+']\n'; 
-
-
-    }
   }
 }
 </script>
