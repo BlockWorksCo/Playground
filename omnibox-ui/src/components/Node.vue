@@ -50,8 +50,8 @@
                     </v-card-title>
                 </v-card>
 
-                <div><upload-btn color="primary" @click="e1 = 3" title="upload...">Upload</upload-btn></div>
 
+                <upload-btn :color="primary" title="Choose Bootloader..." @click="e1=3" />
                 <v-btn color="primary" @click="e1 = 3" >
                   Choose Bootloader
                 </v-btn>
@@ -122,8 +122,14 @@
 </template>
 
 <script>
+
+import UploadButton from 'vuetify-upload-button';
+
 export default {
   name: 'Node',
+  components: {
+      'upload-btn': UploadButton
+  },
   props: {
     msg: String
   },
