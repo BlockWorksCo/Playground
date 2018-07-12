@@ -50,6 +50,8 @@
                     </v-card-title>
                 </v-card>
 
+                <div><upload-btn color="primary" @click="e1 = 3" title="upload...">Upload</upload-btn></div>
+
                 <v-btn color="primary" @click="e1 = 3" >
                   Choose Bootloader
                 </v-btn>

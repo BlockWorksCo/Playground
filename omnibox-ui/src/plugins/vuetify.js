@@ -17,6 +17,7 @@ import {
 } from 'vuetify'
 import 'vuetify/src/stylus/app.styl'
 import '../components/TextOutput.vue'
+import UploadButton from 'vuetify-upload-button';
 //import { FormTextarea } from 'bootstrap-vue/es/components';
 
 //Vue.use(FormTextarea);
@@ -45,6 +46,7 @@ Vue.use(Vuetify, {
     transitions,
     VStepper,
     VCard,
+    UploadButton,
   },
 
 })
