@@ -51,7 +51,7 @@
                 </v-card>
 
 
-                <upload-btn :color="primary" title="Choose Bootloader..." @click="e1=3" />
+                <upload-btn :color="primary" title="Choose Bootloader..." @fileChangedCallback=onFileChosen />
                 <v-btn color="primary" @click="e1 = 3" >
                   Choose Bootloader
                 </v-btn>
@@ -137,7 +137,12 @@ export default {
       return {
         e1: 0
       }
+    },
+  methods: {
+    onFileChosen: () => {
+        alert('blaa')
     }
+  }
 }
 </script>
 
