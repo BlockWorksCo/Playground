@@ -51,10 +51,7 @@
                 </v-card>
 
 
-                <upload-btn :color="primary" title="Choose Bootloader..." @fileChangedCallback=onFileChosen />
-                <v-btn color="primary" @click="e1 = 3" >
-                  Choose Bootloader
-                </v-btn>
+                <input type="file" @change="onFileSelected" />
 
                 <v-btn flat @click="e1=1">Back</v-btn>
               </v-stepper-content>
@@ -123,12 +120,9 @@
 
 <script>
 
-import UploadButton from 'vuetify-upload-button';
-
 export default {
   name: 'Node',
   components: {
-      'upload-btn': UploadButton
   },
   props: {
     msg: String
@@ -139,8 +133,8 @@ export default {
       }
     },
   methods: {
-    onFileChosen: () => {
-        alert('blaa')
+    onFileSelected: (event) => {
+        alert( event.target.files[0] )
     }
   }
 }
