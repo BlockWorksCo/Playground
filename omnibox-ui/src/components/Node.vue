@@ -50,9 +50,7 @@
                     </v-card-title>
                 </v-card>
 
-
-                <input type="file" @change="onFileSelected" />
-                <v-btn flat @click="uploadFile">Upload</v-btn>
+                <upload-button title="Browse" :fileChangedCallback=onFileSelected> </upload-button>
 
                 <v-btn flat @click="e1=1">Back</v-btn>
               </v-stepper-content>
@@ -122,10 +120,12 @@
 <script>
 
 import axios from 'axios';
+import UploadButton from 'vuetify-upload-button';
 
 export default {
   name: 'Node',
   components: {
+    UploadButton,
   },
   props: {
     msg: String
@@ -139,15 +139,14 @@ export default {
   methods: {
     onFileSelected() {
         this.selectedFile = event.target.files[0];
-    },
-    uploadFile() {
+
         const fd = new FormData();
         fd.append('imageFile', this.selectedFile, this.selectedFile.name );
         axios.post('http://localhost:5001/', fd).then( res => {alert('Done:' + res)} );
-        alert('uploading' + this.selectedFile.name );
+        //alert('uploading' + this.selectedFile.name );
 
         this.e1 = 3;
-    }
+    },
   }
 }
 </script>
