@@ -52,7 +52,7 @@
 
                 <v-layout>
                     <v-flex xs2>
-                        <upload-button title="Choose Bootloader..." :fileChangedCallback="onBootloaderFileSelected" /> 
+                        <upload-button title="Choose Bootloader..." :fileChangedCallback="onFileSelected" /> 
                     </v-flex>
                     <v-flex xs1>
                         <v-btn flat @click="e1=1">Back</v-btn>
@@ -74,7 +74,7 @@
 
                 <v-layout>
                     <v-flex xs2>
-                        <upload-button title="Choose Firmware..." :fileChangedCallback="onFirmwareFileSelected" /> 
+                        <upload-button title="Choose Firmware..." :fileChangedCallback="onFileSelected" /> 
                     </v-flex>
                     <v-flex xs1>
                         <v-btn flat @click="e1=2">Back</v-btn>
@@ -147,25 +147,16 @@ export default {
       }
     },
   methods: {
-    onBootloaderFileSelected(file) {
+    onFileSelected(file) {
 
         this.selectedFile = file;
 
         const fd = new FormData();
-        fd.append('bootloader', this.selectedFile, this.selectedFile.name );
+        const names = ['bootloader','firmware'];
+        fd.append( names[this.e1-2], this.selectedFile, this.selectedFile.name );
         axios.post('http://localhost:5001/', fd).then( res => {alert('Done:' + res)} );
 
-        this.e1 = 3;
-    },
-    onFirmwareFileSelected(file) {
-
-        this.selectedFile = file;
-
-        const fd = new FormData();
-        fd.append('firmware', this.selectedFile, this.selectedFile.name );
-        axios.post('http://localhost:5001/', fd).then( res => {alert('Done:' + res)} );
-
-        this.e1 = 4;
+        this.e1 = this.e1+1;
     },
   },
 }
