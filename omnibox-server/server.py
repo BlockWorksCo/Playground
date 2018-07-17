@@ -11,7 +11,12 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 @app.route("/", methods=['POST'])
 def index():
     if request.method == 'POST':
-        file = request.files['imageFile']
+        print(request.files)
+        try:
+            file = request.files['bootloader']
+        except KeyError:
+            file = request.files['firmware']
+
         if file:
             filename = secure_filename(file.filename)
             print('fileName : %s'%filename)

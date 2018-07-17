@@ -50,9 +50,15 @@
                     </v-card-title>
                 </v-card>
 
-                <upload-button title="Browse" :fileChangedCallback=onFileSelected> </upload-button>
+                <v-layout>
+                    <v-flex xs2>
+                        <upload-button title="Choose Bootloader..." :fileChangedCallback="onBootloaderFileSelected" /> 
+                    </v-flex>
+                    <v-flex xs1>
+                        <v-btn flat @click="e1=1">Back</v-btn>
+                    </v-flex>
+                </v-layout>
 
-                <v-btn flat @click="e1=1">Back</v-btn>
               </v-stepper-content>
 
               <v-stepper-content step="3">
@@ -66,11 +72,15 @@
                     </v-card-title>
                 </v-card>
 
-                <v-btn color="primary" @click="e1 = 4" >
-                  Choose firmware...
-                </v-btn>
+                <v-layout>
+                    <v-flex xs2>
+                        <upload-button title="Choose Firmware..." :fileChangedCallback="onFirmwareFileSelected" /> 
+                    </v-flex>
+                    <v-flex xs1>
+                        <v-btn flat @click="e1=2">Back</v-btn>
+                    </v-flex>
+                </v-layout>
 
-                <v-btn flat @click="e1=2">Back</v-btn>
               </v-stepper-content>
 
               <v-stepper-content step="4">
@@ -125,7 +135,7 @@ import UploadButton from 'vuetify-upload-button';
 export default {
   name: 'Node',
   components: {
-    UploadButton,
+    'upload-button': UploadButton,
   },
   props: {
     msg: String
@@ -137,34 +147,27 @@ export default {
       }
     },
   methods: {
-    onFileSelected() {
-        this.selectedFile = event.target.files[0];
+    onBootloaderFileSelected(file) {
+
+        this.selectedFile = file;
 
         const fd = new FormData();
-        fd.append('imageFile', this.selectedFile, this.selectedFile.name );
+        fd.append('bootloader', this.selectedFile, this.selectedFile.name );
         axios.post('http://localhost:5001/', fd).then( res => {alert('Done:' + res)} );
-        //alert('uploading' + this.selectedFile.name );
 
         this.e1 = 3;
     },
-  }
+    onFirmwareFileSelected(file) {
+
+        this.selectedFile = file;
+
+        const fd = new FormData();
+        fd.append('firmware', this.selectedFile, this.selectedFile.name );
+        axios.post('http://localhost:5001/', fd).then( res => {alert('Done:' + res)} );
+
+        this.e1 = 4;
+    },
+  },
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
