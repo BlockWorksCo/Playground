@@ -27,6 +27,17 @@ void printHexData(uint8_t* data, uint32_t numberOfBytes)
                                                                                                 
 
 
+bool decodeSub(pb_istream_t *stream, const pb_field_t *field, void **arg)
+{
+    ASubMessage msg;
+
+    printf("decodeSub\n");
+    pb_decode(stream, ASubMessage_fields, &msg);
+    printf("   one=%d two=%d\n",msg.one,msg.two);
+
+    return true;
+}
+
 bool decodeList(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
     uint64_t value;
@@ -72,6 +83,12 @@ bool encodeSub(pb_ostream_t *stream, const pb_field_t *field, void * const *arg)
         pb_encode_submessage(stream, ASubMessage_fields, &msg);
     }
 
+    {
+        ASubMessage msg = {.one=555,.two=666};
+        pb_encode_tag_for_field(stream, field);
+        pb_encode_submessage(stream, ASubMessage_fields, &msg);
+    }
+
     return true;
 }
 
@@ -101,9 +118,10 @@ int main(int argc, char **argv)
             printf("\n");
         
             printf("---decoding---\n");
-            pb_istream_t stream = pb_istream_from_buffer(buffer, sizeof(buffer));
+            pb_istream_t stream = pb_istream_from_buffer(buffer, bufferSize);
             AMessage    message2    = AMessage_init_zero;
-            //message2.list.funcs.decode  = &decodeList;
+            message2.list.funcs.decode  = &decodeList;
+            message2.sub.funcs.decode  = &decodeSub;
             pb_decode( &stream, AMessage_fields, &message2 );
 
             printf("a=%d\n",message2.a);
