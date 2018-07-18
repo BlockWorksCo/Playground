@@ -60,9 +60,17 @@ bool encodeList(pb_ostream_t *stream, const pb_field_t *field, void * const *arg
 
 bool encodeSub(pb_ostream_t *stream, const pb_field_t *field, void * const *arg)
 {
-    ASubMessage msg = {.one=111,.two=222};
-    pb_encode_tag_for_field(stream, field);
-    pb_encode_submessage(stream, ASubMessage_fields, &msg);
+    {
+        ASubMessage msg = {.one=111,.two=222};
+        pb_encode_tag_for_field(stream, field);
+        pb_encode_submessage(stream, ASubMessage_fields, &msg);
+    }
+
+    {
+        ASubMessage msg = {.one=333,.two=444};
+        pb_encode_tag_for_field(stream, field);
+        pb_encode_submessage(stream, ASubMessage_fields, &msg);
+    }
 
     return true;
 }
