@@ -40,30 +40,23 @@ bool decodeSub(pb_istream_t *stream, const pb_field_t *field, void **arg)
 
 bool decodeList(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
-    uint64_t value;
-    if (!pb_decode_varint(stream, &value))
-    {
-        printf("[done]\n");
-        return false;
-    }
-    else
-    {
-        printf("[%ld]\n", value);
-        return false;
-    }
+    uint64_t value  = 0;
+    pb_decode_varint(stream, &value);
+    printf("[%ld]\n", value);
+
+    return true;
 }
 
 
 bool encodeList(pb_ostream_t *stream, const pb_field_t *field, void * const *arg)
 {
-    for(uint32_t i=0; i<0; i++)
+    for(uint32_t i=0; i<5; i++)
     {
         if (!pb_encode_tag_for_field(stream, field))
         {
             return false;
         }
         pb_encode_varint(stream, 9+i);
-        printf("encoding %d\n",9+i);
     }
     
     return true;
