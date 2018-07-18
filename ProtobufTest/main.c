@@ -58,6 +58,15 @@ bool encodeList(pb_ostream_t *stream, const pb_field_t *field, void * const *arg
     return true;
 }
 
+bool encodeSub(pb_ostream_t *stream, const pb_field_t *field, void * const *arg)
+{
+    ASubMessage msg = {.one=111,.two=222};
+    pb_encode_tag_for_field(stream, field);
+    pb_encode_submessage(stream, ASubMessage_fields, &msg);
+
+    return true;
+}
+
 // 08 FA 01 10 AF 01 18 09 18 0A 18 0B 18 0C 18 0D
 int main(int argc, char **argv)
 {
@@ -67,7 +76,8 @@ int main(int argc, char **argv)
         message.a   = 0xfa;
         message.b   = 0xaf;
         message.has_b    = true;
-        message.list.funcs.encode   = &encodeList;
+        //message.list.funcs.encode   = &encodeList;
+        message.sub.funcs.encode     = &encodeSub;
 
         size_t  bufferSize  = 0;
         pb_get_encoded_size( &bufferSize, AMessage_fields, &message );
@@ -85,7 +95,7 @@ int main(int argc, char **argv)
             printf("---decoding---\n");
             pb_istream_t stream = pb_istream_from_buffer(buffer, sizeof(buffer));
             AMessage    message2    = AMessage_init_zero;
-            message2.list.funcs.decode  = &decodeList;
+            //message2.list.funcs.decode  = &decodeList;
             pb_decode( &stream, AMessage_fields, &message2 );
 
             printf("a=%d\n",message2.a);

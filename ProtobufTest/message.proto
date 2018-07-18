@@ -2,9 +2,15 @@
 syntax = "proto2";
 
 
+
+message ASubMessage {
+    required uint32 one = 1;
+    required uint32 two = 2;
+}
+
 message AMessage {
   required int32 a=1; 
   optional int32 b=2;
-  repeated int32 list=3;
+  repeated ASubMessage  sub = 4;
 }
 
