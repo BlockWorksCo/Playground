@@ -11,6 +11,7 @@ message ASubMessage {
 message AMessage {
   required int32 a=1; 
   optional int32 b=2;
+  repeated uint32 list = 3;
   repeated ASubMessage  sub = 4;
 }
 
