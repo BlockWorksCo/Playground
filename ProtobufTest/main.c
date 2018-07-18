@@ -45,7 +45,7 @@ bool decodeList(pb_istream_t *stream, const pb_field_t *field, void **arg)
 
 bool encodeList(pb_ostream_t *stream, const pb_field_t *field, void * const *arg)
 {
-    for(uint32_t i=0; i<5; i++)
+    for(uint32_t i=0; i<0; i++)
     {
         if (!pb_encode_tag_for_field(stream, field))
         {
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
         message.a   = 0xfa;
         message.b   = 0xaf;
         message.has_b    = true;
-        //message.list.funcs.encode   = &encodeList;
+        message.list.funcs.encode   = &encodeList;
         message.sub.funcs.encode     = &encodeSub;
 
         size_t  bufferSize  = 0;
