@@ -26,12 +26,24 @@ void printHexData(uint8_t* data, uint32_t numberOfBytes)
 }                                                                                               
                                                                                                 
 
+bool decodeSchedule(pb_istream_t *stream, const pb_field_t *field, void **arg)
+{
+    printf("decodeSchedule\n");
+    
+    Schedule    msg = Schedule_init_zero;
+    pb_decode(stream, Schedule_fields, &msg);
+    
+    printf("\tstart=%d script=%d\n",msg.start,msg.scriptId);
+    return true;
+}
 
 bool decodeSub(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
-    ASubMessage msg;
+    ASubMessage msg = ASubMessage_init_zero;
 
     printf("decodeSub\n");
+    msg.schedule.funcs.decode  = &decodeSchedule;
+    msg.schedule.arg  = NULL;
     pb_decode(stream, ASubMessage_fields, &msg);
     printf("   one=%d two=%d\n",msg.one,msg.two);
 
@@ -62,6 +74,30 @@ bool encodeList(pb_ostream_t *stream, const pb_field_t *field, void * const *arg
     return true;
 }
 
+
+bool encodeSchedules(pb_ostream_t *stream, const pb_field_t *field, void * const *arg)
+{
+    {
+        Schedule msg = {.start=999,.scriptId=876};
+        pb_encode_tag_for_field(stream, field);
+        pb_encode_submessage(stream, Schedule_fields, &msg);
+    }
+
+    {
+        Schedule msg = {.start=55,.scriptId=66};
+        pb_encode_tag_for_field(stream, field);
+        pb_encode_submessage(stream, Schedule_fields, &msg);
+    }
+
+    {
+        Schedule msg = {.start=77,.scriptId=88};
+        pb_encode_tag_for_field(stream, field);
+        pb_encode_submessage(stream, Schedule_fields, &msg);
+    }
+
+    return true;
+}
+
 bool encodeSub(pb_ostream_t *stream, const pb_field_t *field, void * const *arg)
 {
     {
@@ -72,6 +108,8 @@ bool encodeSub(pb_ostream_t *stream, const pb_field_t *field, void * const *arg)
 
     {
         ASubMessage msg = {.one=333,.two=444};
+        msg.schedule.funcs.encode   = &encodeSchedules;
+        msg.schedule.arg            = NULL;
         pb_encode_tag_for_field(stream, field);
         pb_encode_submessage(stream, ASubMessage_fields, &msg);
     }

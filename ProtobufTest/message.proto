@@ -2,10 +2,15 @@
 syntax = "proto2";
 
 
+message Schedule {
+    required uint32 start = 1;
+    required uint32 scriptId = 2;
+}
 
 message ASubMessage {
     required uint32 one = 1;
     required uint32 two = 2;
+    repeated Schedule  schedule = 3;
 }
 
 message AMessage {
