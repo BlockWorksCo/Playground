@@ -36,7 +36,8 @@ bool decodeSeasonProfile(pb_istream_t *stream, const pb_field_t *field, void **a
 
     pb_decode(stream, SeasonProfile_fields, &msg);                                                   
 
-    printf("seasonId=%d\n\n",msg.identifier);
+    printf("seasonId=%d month=%d dayOfMonth=%d weekId=%d\n\n",msg.identifier, msg.month, 
+                                                msg.dayOfMonth, msg.weekProfileId);
                                                                                                    
     return true;                                                                                   
 }                                                                                                  
@@ -104,6 +105,77 @@ bool decodeRateCalendar(pb_istream_t *stream, const pb_field_t *field, void **ar
 
                                                                                                 
 
+bool encodeWeekProfiles(pb_ostream_t *stream, const pb_field_t *field, void * const *arg)
+{
+    {
+        WeekProfile msg = 
+        {
+            .identifier     = 1,
+            .mondayId       = 1,
+            .tuesdayId      = 2,
+            .wednesdayId    = 3,
+            .thursdayId     = 4,
+            .fridayId       = 5,
+            .saturdayId     = 6,
+            .sundayId       = 7,
+        };
+
+        pb_encode_tag_for_field(stream, field);
+        pb_encode_submessage(stream, WeekProfile_fields, &msg);
+    }
+
+    {
+        WeekProfile msg = 
+        {
+            .identifier     = 1,
+            .mondayId       = 2,
+            .tuesdayId      = 2,
+            .wednesdayId    = 2,
+            .thursdayId     = 2,
+            .fridayId       = 2,
+            .saturdayId     = 2,
+            .sundayId       = 2,
+        };
+
+        pb_encode_tag_for_field(stream, field);
+        pb_encode_submessage(stream, WeekProfile_fields, &msg);
+    }
+
+    return true;
+}
+
+
+bool encodeSeasonProfiles(pb_ostream_t *stream, const pb_field_t *field, void * const *arg)
+{
+    {
+        SeasonProfile msg = 
+        {
+            .identifier     = 1,
+            .month          = 3,
+            .dayOfMonth     = 4,
+            .weekProfileId  = 5,
+        };
+
+        pb_encode_tag_for_field(stream, field);
+        pb_encode_submessage(stream, SeasonProfile_fields, &msg);
+    }
+
+    {
+        SeasonProfile msg = 
+        {
+            .identifier     = 1,
+            .month          = 5,
+            .dayOfMonth     = 6,
+            .weekProfileId  = 7,
+        };
+
+        pb_encode_tag_for_field(stream, field);
+        pb_encode_submessage(stream, SeasonProfile_fields, &msg);
+    }
+
+    return true;
+}
+
 
 bool encodeDaySchedule(pb_ostream_t *stream, const pb_field_t *field, void * const *arg)
 {
@@ -164,8 +236,15 @@ bool encodeRateCalendar(pb_ostream_t *stream, const pb_field_t *field, void * co
 {
     {
         RateCalendar msg = {0};
+
         msg.dayProfiles.funcs.encode    = &encodeDayProfiles;
         msg.dayProfiles.arg             = NULL;
+
+        msg.weekProfiles.funcs.encode   = &encodeWeekProfiles;
+        msg.weekProfiles.arg            = NULL;
+
+        msg.seasonProfiles.funcs.encode = &encodeSeasonProfiles;
+        msg.seasonProfiles.arg          = NULL;
 
         pb_encode_tag_for_field(stream, field);
         pb_encode_submessage(stream, RateCalendar_fields, &msg);
