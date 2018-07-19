@@ -30,6 +30,32 @@ void printHexData(uint8_t* data, uint32_t numberOfBytes)
 
 
 
+bool decodeSeasonProfile(pb_istream_t *stream, const pb_field_t *field, void **arg)                          
+{                                                                                                  
+    SeasonProfile msg = SeasonProfile_init_zero;                                                       
+
+    pb_decode(stream, SeasonProfile_fields, &msg);                                                   
+
+    printf("seasonId=%d\n\n",msg.identifier);
+                                                                                                   
+    return true;                                                                                   
+}                                                                                                  
+
+
+bool decodeWeekProfile(pb_istream_t *stream, const pb_field_t *field, void **arg)                          
+{                                                                                                  
+    WeekProfile msg = WeekProfile_init_zero;                                                       
+
+    pb_decode(stream, WeekProfile_fields, &msg);                                                   
+
+    printf("m=%d t=%d w=%d t=%d f=%d s=%d s=%d\n",msg.mondayId, msg.tuesdayId, msg.wednesdayId,
+                                        msg.thursdayId, msg.fridayId, msg.saturdayId, msg.sundayId);
+    printf("weekId=%d\n\n",msg.identifier);
+                                                                                                   
+    return true;                                                                                   
+}                                                                                                  
+
+
 
 
 bool decodeDaySchedule(pb_istream_t *stream, const pb_field_t *field, void **arg)                          
@@ -42,8 +68,6 @@ bool decodeDaySchedule(pb_istream_t *stream, const pb_field_t *field, void **arg
                                                                                                    
     return true;                                                                                   
 }                                                                                                  
-
-
 
 bool decodeDayProfile(pb_istream_t *stream, const pb_field_t *field, void **arg)                          
 {                                                                                                  
@@ -59,15 +83,14 @@ bool decodeDayProfile(pb_istream_t *stream, const pb_field_t *field, void **arg)
     return true;                                                                                   
 }                                                                                                  
 
-
 bool decodeRateCalendar(pb_istream_t *stream, const pb_field_t *field, void **arg)                          
 {                                                                                                  
     RateCalendar msg = RateCalendar_init_zero;                                                       
 
-    msg.seasonProfiles.funcs.decode  = NULL;
+    msg.seasonProfiles.funcs.decode  = &decodeSeasonProfile;
     msg.seasonProfiles.arg  = NULL;                                                                      
 
-    msg.weekProfiles.funcs.decode  = NULL;
+    msg.weekProfiles.funcs.decode  = &decodeWeekProfile;
     msg.weekProfiles.arg  = NULL;                                                                      
 
     msg.dayProfiles.funcs.decode  = &decodeDayProfile;
@@ -150,6 +173,9 @@ bool encodeRateCalendar(pb_ostream_t *stream, const pb_field_t *field, void * co
 
     return true;
 }
+
+
+
 
 int main(int argc, char **argv)
 {
