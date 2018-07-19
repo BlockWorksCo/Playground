@@ -1,0 +1,61 @@
+syntax = "proto2"; 
+
+
+// Definition of the time in a day to switch to a new tariff.
+message TariffDaySchedule {
+    required uint32 hours = 1;
+    required uint32 minutes = 2;
+    required uint32 seconds = 3;
+
+    required uint32 tariffId = 4;           // identifier of the tariff to be used on this day (1->16).
+                                            // Note: We have different terminology for the same thing.
+                                            // - Blue-Book talks about "scriptId"
+                                            // - IS15959 talks about "time zones" (not geographic time zones).
+                                            // - SMA API refers to "Time of use zones".
+                                            // A better, more concise name for all the above is "tarrifId".
+}
+
+// Profile entry that maps a user-specified 'dayId' to a specific tariffId (1->16).
+message DayProfile {
+    required uint32 identifier = 1;              // user-defined identifier for this day profile.
+    repeated TariffDaySchedule daySchedule = 2;  // Up to 16 switching points per day schedule (sorted in ascending time order).
+
+}
+
+// Profile entry that maps a user-specified 'weekname' to a set of 7 ordered day profile entries.
+message WeekProfile {
+    required uint32 identifier = 1;          // Name of this profile (gets converted to string on agent-side).
+
+    required uint32 mondayId = 2;            // dayId to be used on Mondays.
+    required uint32 tuesdayId = 3;           // dayId to be used on Tuesdays.
+    required uint32 wednesdayId = 4;         // dayId to be used on Wednesdays.
+    required uint32 thursdayId = 5;          // dayId to be used on Thursdays.
+    required uint32 fridayId = 6;            // dayId to be used on Fridays.
+    required uint32 saturdayId = 7;          // dayId to be used on Saturdays.
+    required uint32 sundayId = 8;            // dayId to be used on Sundays.
+}
+
+// Profile entry that maps a user-specified 'season name' to a named week-profile.
+message SeasonProfile {
+    required uint32 identifier = 1;         // Name of this profile (gets converted to a string agent-side).
+    required uint32 month = 2;              // as per Blue-book.
+    required uint32 dayOfMonth = 3;         // as per Blue-book.
+    required uint32 weekProfileId = 4;      // Week profile that this season uses.
+}
+
+// Container that holds the lists of day, week and season profile entries.
+message RateCalendar {
+    optional uint32 activationTime = 1; // Activation time for the configured parameter
+
+    // NOTE: These lists *MUST* be sorted according to their date-time fields by the server.
+    repeated SeasonProfile seasonProfiles = 2;  // Mapping of seasons->weeks.
+    repeated WeekProfile weekProfiles = 3;      // Mapping of weeks->days.
+    repeated DayProfile dayProfiles = 4;        // Mapping of days->tariffIDs (scriptId in DLMS).
+}
+
+// Container for all meter configuration messages.
+message MeterConfigMessage {
+    // What follows is a list of all known type of configuration messages.
+    // Only one of the following fields is available in one single entry.
+    repeated RateCalendar rateCalendar = 8;
+}
