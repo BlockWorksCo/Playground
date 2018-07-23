@@ -8,6 +8,7 @@
 #include "axdr.h"
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 
 
@@ -95,6 +96,14 @@ bool axdrSetBytes( AXDRStream* stream, uint8_t* bytes, uint32_t numberOfBytes )
     return true;
 }
 
+bool axdrGetBytes( AXDRStream* stream, uint8_t* bytes, uint32_t numberOfBytes )
+{
+    memcpy(bytes, stream->data, numberOfBytes);
+    stream->data    += numberOfBytes;
+
+    return true;
+}
+
 //----------------------------------------------------------------------
 // primitive types.
 
@@ -102,12 +111,16 @@ bool axdrSetUint8( AXDRStream* stream, uint8_t value )
 {
     axdrSetByte( stream, DLMS_unsigned8 );
     axdrSetByte( stream, (value&0xff)>>0 );
+
+    return true;
 }
 
 bool axdrGetUint8( AXDRStream* stream, uint8_t* value )
 {
     axdrGetByteAndCheck( stream, NULL, DLMS_unsigned8 );
     axdrGetByte( stream, value );
+
+    return true;
 }
 
 
@@ -116,6 +129,8 @@ bool axdrSetUint16( AXDRStream* stream, uint16_t value )
     axdrSetByte( stream, DLMS_unsigned16 );
     axdrSetByte( stream, (value&0xff00)>>8 );
     axdrSetByte( stream, (value&0xff)>>0 );
+
+    return true;
 }
 
 bool axdrGetUint16( AXDRStream* stream, uint16_t* value )
@@ -127,6 +142,8 @@ bool axdrGetUint16( AXDRStream* stream, uint16_t* value )
     *value   = (*value << 8) | (uint16_t)byte;
     axdrGetByte( stream, &byte );
     *value   = (*value << 8) | (uint16_t)byte;
+
+    return true;
 }
 
 
@@ -137,6 +154,8 @@ bool axdrSetUint32( AXDRStream* stream, uint32_t value )
     axdrSetByte( stream, (value&0xff0000)>>16 );
     axdrSetByte( stream, (value&0xff00)>>8 );
     axdrSetByte( stream, (value&0xff)>>0 );
+
+    return true;
 }
 
 bool axdrGetUint32( AXDRStream* stream, uint32_t* value )
@@ -152,6 +171,129 @@ bool axdrGetUint32( AXDRStream* stream, uint32_t* value )
     *value   = (*value << 8) | (uint32_t)byte;
     axdrGetByte( stream, &byte );
     *value   = (*value << 8) | (uint32_t)byte;
+
+    return true;
+}
+
+
+
+//----------------------------------------------------------------------
+
+
+bool axdrSetLength( AXDRStream* stream, uint32_t length )
+{
+    if(length < 0x80)
+    {
+        stream->data[0]  = (uint8_t)length;
+        stream->data    += 1;
+    }
+    else if(length < 0xffff)
+    {
+        stream->data[0]  = 0x82;
+        stream->data[1]  = (length>>8)&0x00ff;
+        stream->data[2]  = length&0x00ff;
+        stream->data    += 3;
+    }
+    else
+    {
+        stream->data[0]  = 0x84;
+        stream->data[1]  = (length>>24)&0x000000ff;
+        stream->data[2]  = (length>>16)&0x000000ff;
+        stream->data[3]  = (length>>8)&0x000000ff;
+        stream->data[4]  = length&0x000000ff;
+        stream->data    += 5;
+    }
+
+    return true;
+}
+
+
+bool axdrGetLength( AXDRStream* stream, uint32_t* length )
+{
+    uint8_t     value   = stream->data[0];
+    if( (value&0x80) == 0)
+    {
+        *length = value;
+        stream->data    += 1;
+    }
+    else
+    {
+        uint8_t numberOfBytes   = value & 0x7f;
+        if(numberOfBytes == 2)
+        {
+            *length = (stream->data[1]<<8) | (stream->data[2]);
+            stream->data    += 3;
+        }
+        else if(numberOfBytes == 4)
+        {
+            *length = (stream->data[1]<<24) | (stream->data[2]<<16) | (stream->data[3]<<8) | (stream->data[4]);
+            stream->data    += 5;
+        }
+        else
+        {
+            stream->data    += 1;
+        }
+    }
+
+    return true;
+}
+
+
+bool axdrSetOctetString( AXDRStream* stream, uint8_t* data, uint32_t numberOfBytes)
+{
+    axdrSetByte(stream, DLMS_octet_string);
+    axdrSetLength(stream, numberOfBytes);
+    axdrSetBytes(stream, data,numberOfBytes);
+
+    return true;
+}
+
+
+bool axdrSetStruct( AXDRStream* stream, uint32_t numberOfFields)
+{
+    axdrSetByte(stream, DLMS_structure);
+    axdrSetLength(stream, numberOfFields);
+
+    return true;
+}
+
+
+bool axdrSetArray( AXDRStream* stream, uint32_t numberOfElements)
+{
+    axdrSetByte(stream, DLMS_array);
+    axdrSetLength(stream, numberOfElements);
+
+    return true;
+}
+
+
+
+bool axdrGetArray( AXDRStream* stream, uint32_t* numberOfElements)
+{
+    axdrGetByteAndCheck( stream, NULL, DLMS_array );
+    axdrGetLength( stream, numberOfElements );
+
+    return true;
+}
+
+bool axdrGetStruct( AXDRStream* stream, uint32_t* numberOfFields)
+{
+    axdrGetByteAndCheck( stream, NULL, DLMS_structure );
+    axdrGetLength( stream, numberOfFields );
+
+    return true;
+}
+
+bool axdrGetOctetString( AXDRStream* stream, uint8_t* data, uint32_t dataMaxSize, uint32_t* numberOfBytes)
+{
+    axdrGetByteAndCheck( stream, NULL, DLMS_octet_string );
+
+    axdrGetLength( stream, numberOfBytes );
+    assert( *numberOfBytes <= dataMaxSize );
+
+    axdrGetBytes( stream, data,*numberOfBytes );
+
+    return true;
 }
 
 
