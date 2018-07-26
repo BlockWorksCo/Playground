@@ -345,25 +345,44 @@ bool axdrSetTime( AXDRStream* stream, DLMSTime* time )
 bool axdrGetDateTime( AXDRStream* stream, DLMSDateTime* datetime )
 {
     axdrGetByteAndCheck( stream, NULL, DLMS_octet_string );
+    axdrGetByteAndCheck( stream, NULL, 12 );
 
-    uint32_t    length  = 0;
-    axdrGetLength( stream, &length );
+    uint8_t     lo;
+    uint8_t     hi;
+    axdrGetByte( stream, &hi );
+    axdrGetByte( stream, &lo );
+    datetime->date.year  = (hi<<8) | lo;
+    
+    axdrGetByte( stream, &datetime->date.month );
+    axdrGetByte( stream, &datetime->date.dayOfMonth );
+    axdrGetByte( stream, &datetime->date.dayOfWeek );
 }
 
 bool axdrGetDate( AXDRStream* stream, DLMSDate* date )
 {
     axdrGetByteAndCheck( stream, NULL, DLMS_octet_string );
+    axdrGetByteAndCheck( stream, NULL, 5 );
 
-    uint32_t    length  = 0;
-    axdrGetLength( stream, &length );
+    uint8_t     lo;
+    uint8_t     hi;
+    axdrGetByte( stream, &hi );
+    axdrGetByte( stream, &lo );
+    date->year  = (hi<<8) | lo;
+    
+    axdrGetByte( stream, &date->month );
+    axdrGetByte( stream, &date->dayOfMonth );
+    axdrGetByte( stream, &date->dayOfWeek );
 }
 
 bool axdrGetTime( AXDRStream* stream, DLMSTime* time )
 {
     axdrGetByteAndCheck( stream, NULL, DLMS_octet_string );
+    axdrGetByteAndCheck( stream, NULL, 4 );
 
-    uint32_t    length  = 0;
-    axdrGetLength( stream, &length );
+    axdrGetByte( stream, &time->hour );
+    axdrGetByte( stream, &time->minute );
+    axdrGetByte( stream, &time->seconds );
+    axdrGetByte( stream, &time->hundredths );
 }
 
 
