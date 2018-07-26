@@ -19,6 +19,46 @@ typedef struct {
 } AXDRStream;
 
 
+
+//
+//
+//
+
+typedef enum {
+    Invalid,
+    Doubtful, 
+    Different,
+    DSTActive,
+
+} DLMSClockStatus;
+
+typedef struct
+{
+    uint16_t    year;
+    uint8_t     month;
+    uint8_t     dayOfMonth;
+    uint8_t     dayOfWeek;
+
+} DLMSDate;
+
+typedef struct
+{
+    uint8_t     hour;
+    uint8_t     minute;
+    uint8_t     seconds;
+    uint8_t     hundredths;
+
+} DLMSTime;
+
+typedef struct
+{
+    DLMSDate        date;
+    DLMSTime        time;
+    int16_t         deviation;
+    DLMSClockStatus status;
+
+} DLMSDateTime;
+
 bool axdrStreamFromBytes( AXDRStream* stream, uint8_t* data, uint8_t numberOfBytes );
 
 bool axdrGetByte( AXDRStream* stream, uint8_t* byte );
@@ -41,6 +81,15 @@ bool axdrSetArray( AXDRStream* stream, uint32_t numberOfElements);
 bool axdrGetArray( AXDRStream* stream, uint32_t* numberOfElements);
 bool axdrGetStruct( AXDRStream* stream, uint32_t* numberOfFields);
 bool axdrGetOctetString( AXDRStream* stream, uint8_t* data, uint32_t dataMaxSize, uint32_t* numberOfBytes);
+
+bool axdrSetDateTime( AXDRStream* stream, DLMSDateTime* datetime );
+bool axdrSetDate( AXDRStream* stream, DLMSDate* date );                               
+bool axdrSetTime( AXDRStream* stream, DLMSTime* time );                                           
+
+bool axdrGetDateTime( AXDRStream* stream, DLMSDateTime* datetime );
+bool axdrGetDate( AXDRStream* stream, DLMSDate* date );                               
+bool axdrGetTime( AXDRStream* stream, DLMSTime* time );                                           
+
 
 
 

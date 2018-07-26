@@ -298,6 +298,73 @@ bool axdrGetOctetString( AXDRStream* stream, uint8_t* data, uint32_t dataMaxSize
 
 
 
+bool axdrSetDateTime( AXDRStream* stream, DLMSDateTime* datetime )
+{
+    axdrSetByte(stream, DLMS_octet_string);
+    axdrSetByte(stream, 12);
+
+    axdrSetByte(stream, (datetime->date.year&0xff00)>>8);
+    axdrSetByte(stream, datetime->date.year&0xff);
+    axdrSetByte(stream, datetime->date.month);
+    axdrSetByte(stream, datetime->date.dayOfMonth);
+    axdrSetByte(stream, datetime->date.dayOfWeek);
+    axdrSetByte(stream, datetime->time.hour);
+    axdrSetByte(stream, datetime->time.minute);
+    axdrSetByte(stream, datetime->time.seconds);
+    axdrSetByte(stream, datetime->time.hundredths);
+
+    axdrSetByte(stream, (datetime->deviation&0xff00)>>8);
+    axdrSetByte(stream, datetime->deviation&0xff);
+    axdrSetByte(stream, datetime->status);
+}
+
+bool axdrSetDate( AXDRStream* stream, DLMSDate* date )
+{
+    axdrSetByte(stream, DLMS_octet_string);
+    axdrSetByte(stream, 5);
+
+    axdrSetByte(stream, (date->year&0xff00)>>8);
+    axdrSetByte(stream, date->year&0xff);
+    axdrSetByte(stream, date->month);
+    axdrSetByte(stream, date->dayOfMonth);
+    axdrSetByte(stream, date->dayOfWeek);
+}
+
+bool axdrSetTime( AXDRStream* stream, DLMSTime* time )
+{
+    axdrSetByte(stream, DLMS_octet_string);
+    axdrSetByte(stream, 4);
+
+    axdrSetByte(stream, time->hour);
+    axdrSetByte(stream, time->minute);
+    axdrSetByte(stream, time->seconds);
+    axdrSetByte(stream, time->hundredths);
+}
+
+
+bool axdrGetDateTime( AXDRStream* stream, DLMSDateTime* datetime )
+{
+    axdrGetByteAndCheck( stream, NULL, DLMS_octet_string );
+
+    uint32_t    length  = 0;
+    axdrGetLength( stream, &length );
+}
+
+bool axdrGetDate( AXDRStream* stream, DLMSDate* date )
+{
+    axdrGetByteAndCheck( stream, NULL, DLMS_octet_string );
+
+    uint32_t    length  = 0;
+    axdrGetLength( stream, &length );
+}
+
+bool axdrGetTime( AXDRStream* stream, DLMSTime* time )
+{
+    axdrGetByteAndCheck( stream, NULL, DLMS_octet_string );
+
+    uint32_t    length  = 0;
+    axdrGetLength( stream, &length );
+}
 
 
 
