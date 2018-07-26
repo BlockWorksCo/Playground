@@ -356,6 +356,19 @@ bool axdrGetDateTime( AXDRStream* stream, DLMSDateTime* datetime )
     axdrGetByte( stream, &datetime->date.month );
     axdrGetByte( stream, &datetime->date.dayOfMonth );
     axdrGetByte( stream, &datetime->date.dayOfWeek );
+
+    axdrGetByte( stream, &datetime->time.hour );
+    axdrGetByte( stream, &datetime->time.minute );
+    axdrGetByte( stream, &datetime->time.seconds );
+    axdrGetByte( stream, &datetime->time.hundredths );
+
+    axdrGetByte( stream, &hi );
+    axdrGetByte( stream, &lo );
+    datetime->deviation  = (hi<<8) | lo;
+
+    uint8_t     temp    = 0;
+    axdrGetByte( stream, &temp );
+    datetime->status   = temp;
 }
 
 bool axdrGetDate( AXDRStream* stream, DLMSDate* date )
