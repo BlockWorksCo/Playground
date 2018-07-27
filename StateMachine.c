@@ -21,16 +21,28 @@ typedef struct
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
+// definition of fsm data.
 typedef struct
 {
     uint32_t    count;
 } FSMAStateData;
 
+// instantiation of fsm data.
 FSMAStateData   fsmaStateData =
 {
     .count  = 0,
 };
 
+// enumeration of the different states for fsm.
+typedef enum
+{
+    TickState,
+    TockState,
+    EndState,
+
+} FSMAState;
+
+// state machine.
 bool fsmaProcessEvent( StateMachine* fsm )
 {
     FSMAStateData*  data    = (FSMAStateData*)fsm->data; 
@@ -38,21 +50,21 @@ bool fsmaProcessEvent( StateMachine* fsm )
 
     switch( fsm->state )
     {
-        case 0:
+        case TickState:
             printf("tick\n");
-            fsm->state  = 1;
+            fsm->state  = TockState;
             break;
 
-        case 1:
+        case TockState:
             printf("tock (%d) \n",data->count);
             data->count++;
             if(data->count >= 10)
             {
-                fsm->state  = 2;
+                fsm->state  = EndState;
             }
             else
             {
-                fsm->state  = 0;
+                fsm->state  = TickState;
             }
             break;
 
@@ -67,10 +79,10 @@ bool fsmaProcessEvent( StateMachine* fsm )
     return finishedFlag;
 }
 
-
+// instantiation of state machine.
 StateMachine    fsma   =
 {
-    .state          = 0,
+    .state          = TickState,
     .ProcessEvent   = fsmaProcessEvent,
     .data           = &fsmaStateData,
 };
@@ -80,23 +92,29 @@ StateMachine    fsma   =
 
 
 
-
-StateMachine* nextFSM()
+// return next FSM in queue.
+StateMachine* UnqueueFSM()
 {
     return &fsma;
 }
 
+void QueueFSM( StateMachine* fsm )
+{
+}
 
+
+// entry point.
 int main()
 {
+    // forever...
     while(true)
     {
-        // Choose the next FSM.
-        StateMachine*   fsm = nextFSM();
+        // Choose the next FSM...
+        StateMachine*   fsm = UnqueueFSM();
 
         if( fsm != NULL )
         {
-            // Run the next FSM until finished.
+            // ...and run it until finished.
             bool    finishedFlag    = false;
             do
             {
