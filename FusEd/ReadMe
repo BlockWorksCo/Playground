@@ -1,5 +1,5 @@
 
-pip3 install fuse
+pip3 install fusepy
 
 
 ./FrontEnd.py TestFiles/MediumTestFile
