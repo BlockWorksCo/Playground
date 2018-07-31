@@ -39,25 +39,28 @@ class CursorWindow:
         This function produces modifies left,top,cx,cy such that (left+cx,top+cy) == (x,y)
         """
 
+        self.logger.debug('1) set absolute %d %d height is %d top is %d'%(x,y,self.height,self.top))
         self.cx = x - self.left
         self.cy = y - self.top
 
-        if self.cx >= self.width:
-            self.left   = self.cx - self.width
+        if self.cx >= (self.width-1):
+            self.left   = x - (self.width-1)
             self.cx     = x - self.left
 
         if self.cx < 0:
             self.left   += self.cx
             self.cx     = 0
 
-        if self.cy >= self.height:
-            self.top    = self.cy - self.height
+        if self.cy >= self.height-1:
+            self.top    = y - (self.height-1)
             self.cy     = y - self.top
+            self.logger.debug('push top=%d'%(self.top))
 
         if self.cy < 0:
             self.top    += self.cy
             self.cy     = 0
 
+        self.logger.debug('2) set absolute %d %d height is %d top is %d'%(x,y,self.height,self.top))
 
     def GetAbsolutePosition(self):
 
@@ -66,6 +69,7 @@ class CursorWindow:
 
     def GetCursorPosition(self):
 
+        self.logger.debug('get cursorpos %d %d'%(self.cx,self.cy))
         return (self.cx, self.cy)
 
 

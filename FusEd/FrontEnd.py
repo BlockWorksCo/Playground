@@ -45,7 +45,7 @@ class FrontEnd:
 
         self.height, self.width = self.contentWin.getmaxyx()
         bY,bX                   = self.contentWin.getbegyx()
-        self.cursorWindow       = CursorWindow.CursorWindow(0,0,self.width-2,self.height-5)
+        self.cursorWindow       = CursorWindow.CursorWindow(0,0,self.width-1,self.height-1)
 
         self.stdscr.clear()
         self.stdscr.keypad(True)
@@ -142,10 +142,12 @@ class FrontEnd:
 
         elif c == curses.KEY_BACKSPACE:
             self.cursor.Backspace()
-            ax  -= 1
+            if ax > 0:
+                ax  -= 1
 
         elif c == curses.KEY_LEFT:
-            ax  -= 1
+            if ax > 0:
+                ax  -= 1
             if self.x >  bX:
                 self.x  -= 1
             else:
@@ -161,7 +163,8 @@ class FrontEnd:
                 self.x      = self.width+2
 
         elif c == curses.KEY_UP:
-            ay  -= 1
+            if ay > 0:
+                ay  -= 1
             if self.y >  bY:
                 self.y  -= 1
             else:
@@ -227,10 +230,8 @@ class FrontEnd:
 
         self.cursorWindow.MoveAbsolute(ax,ay)
         cx,cy   = self.cursorWindow.GetCursorPosition()
-        #self.logger.debug('%d %d %d   %d %d %d '%(self.y,self.top,self.height, self.x,self.left,self.width))
         self.logger.debug('%d %d   %d %d   %d %d '%(cx,cy,self.cursorWindow.left,self.cursorWindow.top,self.cursorWindow.width,self.cursorWindow.height))
         self.stdscr.move(cy+bY,cx+bX)
-        #self.stdscr.move(self.y, self.x)
 
         return True
 
