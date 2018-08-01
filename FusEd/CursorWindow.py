@@ -39,6 +39,12 @@ class CursorWindow:
         This function produces modifies left,top,cx,cy such that (left+cx,top+cy) == (x,y)
         """
 
+        if x < 0:
+            x   = 0
+
+        if y < 0:
+            y   = 0
+
         self.logger.debug('1) set absolute %d %d height is %d top is %d'%(x,y,self.height,self.top))
         self.cx = x - self.left
         self.cy = y - self.top

@@ -135,19 +135,16 @@ class FrontEnd:
 
         elif c == curses.KEY_BACKSPACE:
             self.cursor.Backspace()
-            if ax > 0:
-                ax  -= 1
+            ax  -= 1
 
         elif c == curses.KEY_LEFT:
-            if ax > 0:
-                ax  -= 1
+            ax  -= 1
 
         elif c == curses.KEY_RIGHT:
             ax  += 1
 
         elif c == curses.KEY_UP:
-            if ay > 0:
-                ay  -= 1
+            ay  -= 1
 
         elif c == curses.KEY_DOWN:
             ay  += 1
