@@ -223,7 +223,6 @@ class FrontEnd:
             self.left   = lineLength
             self.x      = bX
 
-
         if self.x-bX > self.width:
             self.left   = (self.x-bX) - (self.width-6)
             self.x  = self.width+bX-2
