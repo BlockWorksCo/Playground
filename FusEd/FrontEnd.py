@@ -93,7 +93,7 @@ class FrontEnd:
         self.statusWin.clear()
         self.y, self.x          = self.stdscr.getyx()
         lineLength  = LineIndex.LengthOfLine('tmp/MediumSizeFile', self.cursorWindow.top+self.cursorWindow.cy-bY)
-        status  = 'pos: %d %d lines: %d length: %d index: %d '%(self.cursorWindow.left+self.x-bX, self.cursorWindow.top+self.y-bY,LineIndex.NumberOfLines(self.fileName),lineLength, LineIndex.IndexOfLine(self.fileName, self.cursorWindow.top+self.y-bY) )
+        status  = 'pos: %d %d lines: %d length: %d index: %d '%(self.cursorWindow.left+self.cursorWindow.cx, self.cursorWindow.top+self.cursorWindow.cy,LineIndex.NumberOfLines(self.fileName),lineLength, LineIndex.IndexOfLine(self.fileName, self.cursorWindow.top+self.cursorWindow.cy) )
         self.statusWin.addstr(0,0, status)
 
         self.leftBorder.refresh()
