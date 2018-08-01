@@ -109,7 +109,6 @@ class FrontEnd:
 
         self.height, self.width = self.contentWin.getmaxyx()
         bY,bX                   = self.contentWin.getbegyx()
-        self.y, self.x          = self.stdscr.getyx()
 
         #
         #
@@ -120,15 +119,12 @@ class FrontEnd:
         #
         #
         #
-        self.y, self.x          = self.stdscr.getyx()
         ax,ay   = self.cursorWindow.GetAbsolutePosition()
 
         #
         #
         #
-        #self.logger.debug('waiting for keypress.')
         c = self.stdscr.getch()
-        #self.logger.debug('got keypress %d'%(c))
 
         if c == 0x1b: 
             self.logger.debug('escape pressed... exiting.')
@@ -145,50 +141,34 @@ class FrontEnd:
         elif c == curses.KEY_LEFT:
             if ax > 0:
                 ax  -= 1
-            #if self.x >  bX:
-                #self.x  -= 1
 
         elif c == curses.KEY_RIGHT:
             ax  += 1
-            #if self.x < self.width+2:
-                #self.x  += 1
-            #else:
-                #self.x      = self.width+2
 
         elif c == curses.KEY_UP:
             if ay > 0:
                 ay  -= 1
-            #if self.y >  bY:
-                #self.y  -= 1
 
         elif c == curses.KEY_DOWN:
             ay  += 1
-            #if self.y < self.height-2:
-                #self.y  += 1
 
         elif c == curses.KEY_NPAGE:
             ay  += self.height
-            #self.y      = 0
 
         elif c == curses.KEY_PPAGE:
             ay  -= self.height
-            #self.y      = 0
 
         elif c == curses.KEY_HOME:
             ax  = 0
-            #self.x      = bX
 
         elif c == curses.KEY_END:
             lineLength  = LineIndex.LengthOfLine(self.fileName, self.cursorWindow.top+self.y)
             ax      = lineLength
-            #self.x      = lineLength+bX
             self.logger.debug('<< %d >>'%(lineLength))
 
         else:
             ax  += 1
             self.cursor.Insert(c)
-            #self.x      += 1
-
 
         #
         #
