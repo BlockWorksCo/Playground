@@ -31,8 +31,6 @@ class FrontEnd:
 
         self.stdscr = curses.initscr()
         curses.def_shell_mode()
-        self.top    = 0
-        self.left   = 0
         self.fileName    = 'tmp/MediumSizeFile'
 
         curses.noecho()
@@ -74,28 +72,28 @@ class FrontEnd:
 
         bY,bX                   = self.contentWin.getbegyx()
 
-        for i in range(0, self.height-1):
+        for i in range(0, self.cursorWindow.height):
 
-            if self.top+i < 0:
+            if self.cursorWindow.top+i < 0:
                 break
 
-            if self.top+i >= numberOfLines:
+            if self.cursorWindow.top+i >= numberOfLines:
                 break
 
-            index   = LineIndex.IndexOfLine(self.fileName, self.top+i)
+            index   = LineIndex.IndexOfLine(self.fileName, self.cursorWindow.top+i)
             self.fh.seek(index, os.SEEK_SET)
             line    = self.fh.readline().decode('utf-8').replace('\n','')
 
-            self.leftBorder.addstr(i,0, '%3d'%(i+self.top) )                
+            self.leftBorder.addstr(i,0, '%3d'%(i+self.cursorWindow.top) )                
 
             displayLine = '%s'%(line)
-            self.contentWin.addstr(i, 0, displayLine[self.left:self.left+self.width])
+            self.contentWin.addstr(i, 0, displayLine[self.cursorWindow.left:self.cursorWindow.left+self.cursorWindow.width])
 
 
         self.statusWin.clear()
         self.y, self.x          = self.stdscr.getyx()
-        lineLength  = LineIndex.LengthOfLine('tmp/MediumSizeFile', self.top+self.y-bY)
-        status  = 'pos: %d %d lines: %d length: %d index: %d '%(self.left+self.x-bX, self.top+self.y-bY,LineIndex.NumberOfLines(self.fileName),lineLength, LineIndex.IndexOfLine(self.fileName, self.top+self.y-bY) )
+        lineLength  = LineIndex.LengthOfLine('tmp/MediumSizeFile', self.cursorWindow.top+self.cursorWindow.cy-bY)
+        status  = 'pos: %d %d lines: %d length: %d index: %d '%(self.cursorWindow.left+self.x-bX, self.cursorWindow.top+self.y-bY,LineIndex.NumberOfLines(self.fileName),lineLength, LineIndex.IndexOfLine(self.fileName, self.cursorWindow.top+self.y-bY) )
         self.statusWin.addstr(0,0, status)
 
         self.leftBorder.refresh()
@@ -117,8 +115,7 @@ class FrontEnd:
         #
         #
         self.RedrawBuffer()
-        self.cursor.SetXY(self.left+self.x-bX, self.top+self.y-bY)
-        #self.cursorWindow.MoveAbsolute(self.left+self.x-bX, self.top+self.y-bY)
+        self.cursor.SetXY(self.cursorWindow.left+self.x-bX, self.cursorWindow.top+self.y-bY)
 
         #
         #
@@ -150,16 +147,12 @@ class FrontEnd:
                 ax  -= 1
             if self.x >  bX:
                 self.x  -= 1
-            else:
-                if self.left > 0:
-                    self.left   -= 1
 
         elif c == curses.KEY_RIGHT:
             ax  += 1
             if self.x < self.width+2:
                 self.x  += 1
             else:
-                self.left   += 1
                 self.x      = self.width+2
 
         elif c == curses.KEY_UP:
@@ -167,44 +160,26 @@ class FrontEnd:
                 ay  -= 1
             if self.y >  bY:
                 self.y  -= 1
-            else:
-                if self.top > 0:
-                    self.top    -= 1
 
         elif c == curses.KEY_DOWN:
             ay  += 1
             if self.y < self.height-2:
                 self.y  += 1
-            else:
-                if self.top < LineIndex.NumberOfLines(self.fileName) - self.height:
-                    self.top   += 1
-                    self.y      = self.height-2
 
         elif c == curses.KEY_NPAGE:
             ay  += self.height
-            self.top   += self.height-1
-            if self.top+self.y+(self.height-1) > LineIndex.NumberOfLines(self.fileName):
-                self.top    = LineIndex.NumberOfLines(self.fileName) - (self.height-1)
-                if self.top < 0:
-                    self.top    = 0
-            self.y      = self.height-2
+            self.y      = 0
 
         elif c == curses.KEY_PPAGE:
             ay  -= self.height
-            self.top    -= self.height-1
-            if self.top < 0:
-                self.top    = 0
-            if self.top+self.y < 0:
-                self.top    = 0
             self.y      = 0
 
         elif c == curses.KEY_HOME:
             ax  = 0
             self.x      = bX
-            self.left   = 0
 
         elif c == curses.KEY_END:
-            lineLength  = LineIndex.LengthOfLine(self.fileName, self.top+self.y)
+            lineLength  = LineIndex.LengthOfLine(self.fileName, self.cursorWindow.top+self.y)
             ax      = lineLength
             self.x      = lineLength+bX
             self.logger.debug('<< %d >>'%(lineLength))
@@ -218,15 +193,6 @@ class FrontEnd:
         #
         #
         #
-        lineLength  = LineIndex.LengthOfLine(self.fileName, self.top+self.y)
-        if self.left+self.x-bX > lineLength:
-            self.left   = lineLength
-            self.x      = bX
-
-        if self.x-bX > self.width:
-            self.left   = (self.x-bX) - (self.width-6)
-            self.x  = self.width+bX-2
-
         self.cursorWindow.MoveAbsolute(ax,ay)
         cx,cy   = self.cursorWindow.GetCursorPosition()
         self.logger.debug('%d %d   %d %d   %d %d '%(cx,cy,self.cursorWindow.left,self.cursorWindow.top,self.cursorWindow.width,self.cursorWindow.height))
