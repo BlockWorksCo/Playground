@@ -43,7 +43,7 @@ class FrontEnd:
 
         self.height, self.width = self.contentWin.getmaxyx()
         bY,bX                   = self.contentWin.getbegyx()
-        self.cursorWindow       = CursorWindow.CursorWindow(0,0,self.width-1,self.height-1)
+        self.cursorWindow       = CursorWindow.CursorWindow(0,0,self.width-1,self.height-1, 0)
 
         self.stdscr.clear()
         self.stdscr.keypad(True)
@@ -69,6 +69,7 @@ class FrontEnd:
 
         self.contentWin.clear()
         numberOfLines   = LineIndex.NumberOfLines(self.fileName)
+        self.cursorWindow.SetNumberOfLines(numberOfLines-2)
 
         bY,bX                   = self.contentWin.getbegyx()
 
@@ -173,6 +174,9 @@ class FrontEnd:
         self.cursorWindow.MoveAbsolute(ax,ay)
         cx,cy   = self.cursorWindow.GetCursorPosition()
         self.logger.debug('%d %d   %d %d   %d %d '%(cx,cy,self.cursorWindow.left,self.cursorWindow.top,self.cursorWindow.width,self.cursorWindow.height))
+        ry  = cy + bY
+        rx  = cx + bX
+        self.logger.debug("%d %d"%(ry,rx))
         self.stdscr.move(cy+bY,cx+bX)
 
         return True

@@ -23,7 +23,7 @@ def IndexFileNameFromFileName(fileName):
 
 def NumberOfLines(fileName):
 
-    return os.path.getsize(IndexFileNameFromFileName(fileName))/9
+    return int(os.path.getsize(IndexFileNameFromFileName(fileName))/9)
 
 
 def IndexOfLine(fileName, lineNumber):

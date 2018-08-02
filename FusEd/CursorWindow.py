@@ -16,18 +16,22 @@ class CursorWindow:
     absolute position of cursor in file is (left+cx,top+cy).
     """
 
-    def __init__(self, left,top,width,height):
+    def __init__(self, left,top,width,height, numberOfLines):
         self.logger     = logging.getLogger('CursorWindow')
 
-        self.left   = left
-        self.top    = top
-        self.width  = width
-        self.height = height
+        self.left               = left
+        self.top                = top
+        self.width              = width
+        self.height             = height
+        self.numberOfLines      = numberOfLines
 
         self.cx     = 0
         self.cy     = 0
 
 
+    def SetNumberOfLines( self, numberOfLines ):
+        self.logger.debug('numberofLines=%d'%(numberOfLines))
+        self.numberOfLines  = numberOfLines
 
     def MoveRelative(self, dx,dy):
         pass
@@ -44,6 +48,9 @@ class CursorWindow:
 
         if y < 0:
             y   = 0
+
+        if y > self.numberOfLines:
+            y   = self.numberOfLines
 
         #
         # NOTE: We don't know about the numberOfLines in the file here, we should.
