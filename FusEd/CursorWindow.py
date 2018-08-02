@@ -45,6 +45,10 @@ class CursorWindow:
         if y < 0:
             y   = 0
 
+        #
+        # NOTE: We don't know about the numberOfLines in the file here, we should.
+        #
+
         self.logger.debug('1) set absolute %d %d height is %d top is %d'%(x,y,self.height,self.top))
         self.cx = x - self.left
         self.cy = y - self.top
