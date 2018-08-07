@@ -29,6 +29,7 @@ def NumberOfLines(fileName):
 def IndexOfLine(fileName, lineNumber):
 
     #logger.debug(open(IndexFileNameFromFileName(fileName)).read() )
+    logger.debug('request for IndexOfLine(%d)'%(lineNumber))
 
     with open(IndexFileNameFromFileName(fileName),'rb') as inF:
         inF.seek(lineNumber*9, os.SEEK_SET)

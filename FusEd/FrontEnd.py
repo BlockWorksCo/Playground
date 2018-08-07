@@ -168,6 +168,16 @@ class FrontEnd:
             ax  += 1
             self.cursor.Insert(c)
 
+
+        #
+        #
+        #
+        self.cursorWindow.MoveAbsolute(ax,ay)
+        ax,ay   = self.cursorWindow.GetAbsolutePosition()
+        lineLength  = LineIndex.LengthOfLine(self.fileName, ay)
+        if ax >= lineLength:
+            ax  = lineLength
+        
         #
         #
         #
