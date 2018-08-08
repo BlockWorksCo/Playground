@@ -23,10 +23,14 @@ def IndexFileNameFromFileName(fileName):
 
 def NumberOfLines(fileName):
 
+    GenerateLineIndex( fileName )
+
     return int(os.path.getsize(IndexFileNameFromFileName(fileName))/9)
 
 
 def IndexOfLine(fileName, lineNumber):
+
+    #GenerateLineIndex( fileName )
 
     #logger.debug(open(IndexFileNameFromFileName(fileName)).read() )
     logger.debug('request for IndexOfLine(%d)'%(lineNumber))
@@ -34,10 +38,14 @@ def IndexOfLine(fileName, lineNumber):
     with open(IndexFileNameFromFileName(fileName),'rb') as inF:
         inF.seek(lineNumber*9, os.SEEK_SET)
         line    = inF.readline()
+        logger.debug('hex index of line %d = %s'%(lineNumber,line))
         return int(line, 16)
 
 
 def LengthOfLine(fileName, lineNumber):
+
+    GenerateLineIndex( fileName )
+
     index   = IndexOfLine(fileName, lineNumber)
     if lineNumber < NumberOfLines(fileName):
         index2  = IndexOfLine(fileName, lineNumber+1)
@@ -70,9 +78,6 @@ def GenerateLineIndex( fileName ):
     #logger.debug(open(IndexFileNameFromFileName(fileName)).read() )
 
     logger.debug('name: %s'%(IndexFileNameFromFileName(fileName)))
-    logger.debug('0: %08x'%(IndexOfLine(fileName, 111)))
-    logger.debug('1: %08x'%(IndexOfLine(fileName, 112)))
-    logger.debug('2: %08x'%(IndexOfLine(fileName, 113)))
     
 
 

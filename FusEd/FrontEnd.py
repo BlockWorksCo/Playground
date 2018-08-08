@@ -125,6 +125,8 @@ class FrontEnd:
         #
         c = self.stdscr.getch()
 
+        self.logger.debug('%02x pressed'%(c))
+
         if c == 0x1b: 
             self.logger.debug('escape pressed... exiting.')
             return False
@@ -135,6 +137,8 @@ class FrontEnd:
         elif c == curses.KEY_BACKSPACE:
             self.cursor.Backspace()
             ax  -= 1
+            if ax < 0:
+                ay  -= 1
 
         elif c == curses.KEY_LEFT:
             ax  -= 1
@@ -156,6 +160,11 @@ class FrontEnd:
 
         elif c == curses.KEY_HOME:
             ax  = 0
+
+        elif c == 0xa:
+            ay  += 1
+            ax  = 0
+            self.cursor.Insert(c)
 
         elif c == curses.KEY_END:
             lineLength  = LineIndex.LengthOfLine(self.fileName, self.cursorWindow.top+self.y)
