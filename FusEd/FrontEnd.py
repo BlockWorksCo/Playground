@@ -135,10 +135,17 @@ class FrontEnd:
             self.cursor.Delete()
 
         elif c == curses.KEY_BACKSPACE:
+
+            # Work out thecurrent length of the line abpve in case we delete the
+            # newline character and join this line to the one above.
+            if ay > 0:
+                lineLength  = LineIndex.LengthOfLine(self.fileName, ay-1)
+
             self.cursor.Backspace()
             ax  -= 1
-            if ax < 0:
+            if ax < 0 and ay > 0:
                 ay  -= 1
+                ax      = lineLength
 
         elif c == curses.KEY_LEFT:
             ax  -= 1
@@ -167,7 +174,7 @@ class FrontEnd:
             self.cursor.Insert(c)
 
         elif c == curses.KEY_END:
-            lineLength  = LineIndex.LengthOfLine(self.fileName, self.cursorWindow.top+self.y)
+            lineLength  = LineIndex.LengthOfLine(self.fileName, ay)
             ax      = lineLength
             self.logger.debug('<< %d >>'%(lineLength))
 
