@@ -66,11 +66,13 @@ class Cursor:
         handles = EDFS.GetHandles()
         fh,spans= handles['/MediumSizeFile']
         origin  = spans[0][0]
-        offset  = origin + LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.y ) + self.x
+
+        offset  = origin + LineIndex.IndexOfLine( './tmp/MediumSizeFile', self.y ) + self.x
         spans   = EDFS.InsertSpan(spans, (offset,offset+len(text), ds) )
+
         handles['/MediumSizeFile']    = (fh,spans)
         EDFS.SetHandles(handles)
-        EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
+        EDFS.RegenerateLineIndex('./tmp/MediumSizeFile')
 
         self.x  = self.x + len(text)
 
@@ -85,8 +87,10 @@ class Cursor:
         handles = EDFS.GetHandles()
         fh,spans= handles['/MediumSizeFile']
         origin  = spans[0][0]
-        offset  = origin + LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.y ) + self.x
+
+        offset  = origin + LineIndex.IndexOfLine( './tmp/MediumSizeFile', self.y ) + self.x
         spans   = EDFS.RemoveData(spans, offset,offset+1 )
+
         handles['/MediumSizeFile']    = (fh,spans)
         EDFS.SetHandles(handles)
         EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
@@ -96,7 +100,7 @@ class Cursor:
         handles = EDFS.GetHandles()
         fh,spans= handles['/MediumSizeFile']
         origin  = spans[0][0]
-        offset  = origin + LineIndex.IndexOfLine( 'tmp/MediumSizeFile', self.y ) + self.x
+        offset  = origin + LineIndex.IndexOfLine( './tmp/MediumSizeFile', self.y ) + self.x
         spans   = EDFS.RemoveData(spans, offset,offset+1 )
         handles['/MediumSizeFile']    = (fh,spans)
         EDFS.SetHandles(handles)

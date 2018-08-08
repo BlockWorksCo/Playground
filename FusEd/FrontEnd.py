@@ -31,7 +31,7 @@ class FrontEnd:
 
         self.stdscr = curses.initscr()
         curses.def_shell_mode()
-        self.fileName    = 'tmp/MediumSizeFile'
+        self.fileName    = './tmp/MediumSizeFile'
 
         curses.noecho()
 
@@ -54,7 +54,7 @@ class FrontEnd:
             curses.start_color()
             curses.init_color(0, 255, 255, 255)
 
-        self.fh         = open('./tmp/MediumSizeFile', 'rb')
+        self.fh         = open(self.fileName, 'rb')
         self.RedrawBuffer()
 
         self.stdscr.move(0,4)
@@ -63,9 +63,7 @@ class FrontEnd:
     def RedrawBuffer(self):
     
         handles  = EDFS.GetHandles()
-        EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
-
-        #self.logger.debug(open('MediumSizeFile.LineIndex').read() )
+        EDFS.RegenerateLineIndex(self.fileName)
 
         self.contentWin.clear()
         numberOfLines   = LineIndex.NumberOfLines(self.fileName)
@@ -93,7 +91,7 @@ class FrontEnd:
 
         self.statusWin.clear()
         self.y, self.x          = self.stdscr.getyx()
-        lineLength  = LineIndex.LengthOfLine('tmp/MediumSizeFile', self.cursorWindow.top+self.cursorWindow.cy-bY)
+        lineLength  = LineIndex.LengthOfLine(self.fileName, self.cursorWindow.top+self.cursorWindow.cy-bY)
         status  = 'pos: %d %d lines: %d length: %d index: %d '%(self.cursorWindow.left+self.cursorWindow.cx, self.cursorWindow.top+self.cursorWindow.cy,LineIndex.NumberOfLines(self.fileName),lineLength, LineIndex.IndexOfLine(self.fileName, self.cursorWindow.top+self.cursorWindow.cy) )
         self.statusWin.addstr(0,0, status)
 
@@ -115,12 +113,12 @@ class FrontEnd:
         #
         #
         self.RedrawBuffer()
-        self.cursor.SetXY(self.cursorWindow.left+self.x-bX, self.cursorWindow.top+self.y-bY)
 
         #
         #
         #
         ax,ay   = self.cursorWindow.GetAbsolutePosition()
+        self.cursor.SetXY(ax, ay)
 
         #
         #
