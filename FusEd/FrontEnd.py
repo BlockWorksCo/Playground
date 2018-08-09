@@ -31,7 +31,7 @@ class FrontEnd:
 
         self.stdscr = curses.initscr()
         curses.def_shell_mode()
-        self.fileName    = './tmp/MediumSizeFile'
+        self.fileName    = './tmp/'+fileName
 
         curses.noecho()
 
