@@ -17,6 +17,10 @@ class Cursor:
         self.fileName       = fileName
         self.x              = 0
         self.y              = 0
+        self.handleName     = '/'+self.fileName
+        self.workName       = './tmp/'+self.fileName 
+
+        self.logger.debug( 'filename = %s, hn=%s, wn=%s'%(self.fileName,self.handleName,self.workName) )
 
     def SetXY(self, x, y):
         self.x  = x
@@ -64,15 +68,15 @@ class Cursor:
         ds      = StringDataSource(text, 0,len(text))
 
         handles = EDFS.GetHandles()
-        fh,spans= handles['/MediumSizeFile']
+        fh,spans= handles[self.handleName]
         origin  = spans[0][0]
 
-        offset  = origin + LineIndex.IndexOfLine( './tmp/MediumSizeFile', self.y ) + self.x
+        offset  = origin + LineIndex.IndexOfLine( self.workName, self.y ) + self.x
         spans   = EDFS.InsertSpan(spans, (offset,offset+len(text), ds) )
 
-        handles['/MediumSizeFile']    = (fh,spans)
+        handles[self.handleName]    = (fh,spans)
         EDFS.SetHandles(handles)
-        EDFS.RegenerateLineIndex('./tmp/MediumSizeFile')
+        EDFS.RegenerateLineIndex( self.workName )
 
         self.x  = self.x + len(text)
 
@@ -85,26 +89,26 @@ class Cursor:
         self.x          = self.x - 1
 
         handles = EDFS.GetHandles()
-        fh,spans= handles['/MediumSizeFile']
+        fh,spans= handles[self.handleName]
         origin  = spans[0][0]
 
-        offset  = origin + LineIndex.IndexOfLine( './tmp/MediumSizeFile', self.y ) + self.x
+        offset  = origin + LineIndex.IndexOfLine( self.workName, self.y ) + self.x
         spans   = EDFS.RemoveData(spans, offset,offset+1 )
 
-        handles['/MediumSizeFile']    = (fh,spans)
+        handles[self.handleName]    = (fh,spans)
         EDFS.SetHandles(handles)
-        EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
+        EDFS.RegenerateLineIndex( self.workName )
 
 
     def Delete(self):
         handles = EDFS.GetHandles()
-        fh,spans= handles['/MediumSizeFile']
+        fh,spans= handles[self.handleName]
         origin  = spans[0][0]
-        offset  = origin + LineIndex.IndexOfLine( './tmp/MediumSizeFile', self.y ) + self.x
+        offset  = origin + LineIndex.IndexOfLine( self.workName, self.y ) + self.x
         spans   = EDFS.RemoveData(spans, offset,offset+1 )
-        handles['/MediumSizeFile']    = (fh,spans)
+        handles[self.handleName]    = (fh,spans)
         EDFS.SetHandles(handles)
-        EDFS.RegenerateLineIndex('tmp/MediumSizeFile')
+        EDFS.RegenerateLineIndex( self.workName )
 
 
 
