@@ -217,7 +217,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         #
         # Generate the line index
         #
-        LineIndex.GenerateLineIndex(full_path)
+        #LineIndex.GenerateLineIndex(full_path)
 
         return 0
 
@@ -268,8 +268,6 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def SetHandles(self, handles):
         self.SynchronousPut( (1,handles) )
-
-    def RegenerateLineIndex(self, fileName):
         self.SynchronousPut( (3,fileName) )
 
     def GetHandles(self):
@@ -295,10 +293,6 @@ def FUSEThread(fs, mountPoint):
 
 def SetHandles(handles):
     fs.SynchronousPut( (1,handles) )
-
-def RegenerateLineIndex(fileName):
-    LineIndex.GenerateLineIndex(fileName)
-    #fs.SynchronousPut( (3,fileName) )
 
 def GetHandles():
     handles = fs.SynchronousPut( (2,None) )

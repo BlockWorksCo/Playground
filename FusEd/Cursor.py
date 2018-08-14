@@ -76,7 +76,6 @@ class Cursor:
 
         handles[self.handleName]    = (fh,spans)
         EDFS.SetHandles(handles)
-        EDFS.RegenerateLineIndex( self.workName )
 
         self.x  = self.x + len(text)
 
@@ -97,7 +96,6 @@ class Cursor:
 
         handles[self.handleName]    = (fh,spans)
         EDFS.SetHandles(handles)
-        EDFS.RegenerateLineIndex( self.workName )
 
 
     def Delete(self):
@@ -108,7 +106,6 @@ class Cursor:
         spans   = EDFS.RemoveData(spans, offset,offset+1 )
         handles[self.handleName]    = (fh,spans)
         EDFS.SetHandles(handles)
-        EDFS.RegenerateLineIndex( self.workName )
 
 
 

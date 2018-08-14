@@ -63,7 +63,7 @@ class FrontEnd:
     def RedrawBuffer(self):
     
         handles  = EDFS.GetHandles()
-        EDFS.RegenerateLineIndex(self.fileName)
+        #EDFS.RegenerateLineIndex(self.fileName)
 
         self.contentWin.clear()
         numberOfLines   = LineIndex.NumberOfLines(self.fileName)
