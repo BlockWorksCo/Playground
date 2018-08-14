@@ -25,6 +25,7 @@ int main( int argc, char* argv[] )
             uint8_t     buffer[1024]    = {0};
             uint32_t    offset          = 0;
             ssize_t     bytesRead       = 0;
+            uint32_t    lineCount       = 0;
             do
             {
                 bytesRead   = read( inFd, buffer, sizeof(buffer));
@@ -36,6 +37,7 @@ int main( int argc, char* argv[] )
                         {
                             uint32_t    temp    = offset+i;
                             write( outFd, &temp, sizeof(temp) );
+                            lineCount++;
                             //printf("%08x\n",offset+i);
                         }
                     }
@@ -43,7 +45,8 @@ int main( int argc, char* argv[] )
                 }
 
             } while(bytesRead > 0);
-            printf("done.\n");
+
+            printf("%d lines\n",lineCount);
         }
         else
         {
