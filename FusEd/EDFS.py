@@ -204,34 +204,37 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def open(self, path, flags):
 
-        full_path = self._full_path(path)
-        fh  = os.open(full_path, flags)
-    
-        length      = os.stat(full_path).st_size
-        dataSource  = FileDataSource(fh, 0,length)
-        if path in list(self.handles.keys()):
-
-            #
-            # Already been opened, lets close the old handle but
-            # keep the spans.
-            #
-            fhOld,spans        = self.handles[path]
-            #os.close(fhOld)
+        self.logger.debug('<%s>'%(path))
+        if path == '/LineIndex':
+            return 0
         else:
+            full_path = self._full_path(path)
+            fh  = os.open(full_path, flags)
+        
+            length      = os.stat(full_path).st_size
+            dataSource  = FileDataSource(fh, 0,length)
+            if path in list(self.handles.keys()):
+
+                #
+                # Already been opened, lets close the old handle but
+                # keep the spans.
+                #
+                fhOld,spans        = self.handles[path]
+            else:
+
+                #
+                # New file open, lets make spans for the whole file.
+                #
+                spans       = [(0,length, dataSource)]
+
+            self.handles[path]    = (fh, spans)
 
             #
-            # New file open, lets make spans for the whole file.
+            # Generate the line index
             #
-            spans       = [(0,length, dataSource)]
+            #LineIndex.GenerateLineIndex(full_path)
 
-        self.handles[path]    = (fh, spans)
-
-        #
-        # Generate the line index
-        #
-        #LineIndex.GenerateLineIndex(full_path)
-
-        return 0
+            return 0
 
 
     def create(self, path, mode, fi=None):
@@ -241,20 +244,22 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def read(self, path, length, offset, fh):
 
-        fn,spans    = self.handles[path]
+        if path == '/LineIndex':
+            if offset < 27:
+                bytesToRead = min(length, 27-offset)
+                return b'a'*bytesToRead
+            else:
+                return None
+        else:
+            fn,spans    = self.handles[path]
 
-        origin      = spans[0][0]
-        #print('origin = %d'%origin)
+            origin      = spans[0][0]
 
-        #print(offset)
-        #print(length)
-        #print(spans)
-        data    = GetData(spans, offset+origin, offset+length+origin)
-        #print(data)
-        if len(data) > length:
-            data    = data[:length]
+            data    = GetData(spans, offset+origin, offset+length+origin)
+            if len(data) > length:
+                data    = data[:length]
 
-        return data
+            return data
 
     def write(self, path, buf, offset, fh):
         os.lseek(fh, offset, os.SEEK_SET)
@@ -269,11 +274,13 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         return 0
 
     def release(self, path, fh):
-        fn,spans    = self.handles[path]
-        os.close(fn)
-        #self.handles.pop(path)
-        return 1
-        #pass
+
+        if path == '/LineIndex':
+            return 1
+        else:
+            fn,spans    = self.handles[path]
+            os.close(fn)
+            return 1
 
     def fsync(self, path, fdatasync, fh):
         return self.flush(path, fh)
