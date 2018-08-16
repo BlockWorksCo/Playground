@@ -116,6 +116,10 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
             self.ProcessQ()
             return {'st_mode':33204, 'st_ino':2, 'st_dev':62, 'st_nlink':1, 'st_uid':1000, 'st_gid':1000, 'st_size':27, 'st_atime':int(time.time()), 'st_mtime':int(time.time()), 'st_ctime':1511394708}
 
+        if path == '/LineIndex':
+            self.ProcessQ()
+            return {'st_mode':33204, 'st_ino':2, 'st_dev':62, 'st_nlink':1, 'st_uid':1000, 'st_gid':1000, 'st_size':27, 'st_atime':int(time.time()), 'st_mtime':int(time.time()), 'st_ctime':1511394708}
+
         else:
             
             full_path = self._full_path(path)
@@ -135,7 +139,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
         full_path = self._full_path(path)
 
-        dirents = ['.', '..','q']
+        dirents = ['.', '..','q','LineIndex']
         if os.path.isdir(full_path):
             dirents.extend(os.listdir(full_path))
 
