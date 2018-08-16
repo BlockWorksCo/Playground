@@ -97,6 +97,9 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
     # Filesystem methods
     # ==================
 
+    exposedFileList = ['LineIndex','Patch','Ops','Buffer']
+    exposedPathList = ['/LineIndex','/Patch','/Ops','/Buffer']
+
     def access(self, path, mode):
         full_path = self._full_path(path)
         if not os.access(full_path, mode):
@@ -116,16 +119,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
             self.ProcessQ()
             return {'st_mode':33204, 'st_ino':2, 'st_dev':62, 'st_nlink':1, 'st_uid':1000, 'st_gid':1000, 'st_size':27, 'st_atime':int(time.time()), 'st_mtime':int(time.time()), 'st_ctime':1511394708}
 
-        if path == '/LineIndex':
-            return {'st_mode':33204, 'st_ino':2, 'st_dev':62, 'st_nlink':1, 'st_uid':1000, 'st_gid':1000, 'st_size':27, 'st_atime':int(time.time()), 'st_mtime':int(time.time()), 'st_ctime':1511394708}
-
-        if path == '/Patch':
-            return {'st_mode':33204, 'st_ino':2, 'st_dev':62, 'st_nlink':1, 'st_uid':1000, 'st_gid':1000, 'st_size':27, 'st_atime':int(time.time()), 'st_mtime':int(time.time()), 'st_ctime':1511394708}
-
-        if path == '/Ops':
-            return {'st_mode':33204, 'st_ino':2, 'st_dev':62, 'st_nlink':1, 'st_uid':1000, 'st_gid':1000, 'st_size':27, 'st_atime':int(time.time()), 'st_mtime':int(time.time()), 'st_ctime':1511394708}
-
-        if path == '/Buffer':
+        elif path in self.exposedPathList:
             return {'st_mode':33204, 'st_ino':2, 'st_dev':62, 'st_nlink':1, 'st_uid':1000, 'st_gid':1000, 'st_size':27, 'st_atime':int(time.time()), 'st_mtime':int(time.time()), 'st_ctime':1511394708}
 
         else:
@@ -147,7 +141,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
         full_path = self._full_path(path)
 
-        dirents = ['.', '..','q','LineIndex','Patch','Ops','Buffer']
+        dirents = ['.', '..','q'] + self.exposedFileList
         if os.path.isdir(full_path):
             dirents.extend(os.listdir(full_path))
 
@@ -177,10 +171,9 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
         full_path = self._full_path(path)
         stv = os.statvfs(full_path)
         
-        s=dict((key, getattr(stv, key)) for key in ('f_bavail', 'f_bfree',
+        s = dict((key, getattr(stv, key)) for key in ('f_bavail', 'f_bfree',
             'f_blocks', 'f_bsize', 'f_favail', 'f_ffree', 'f_files', 'f_flag',
             'f_frsize', 'f_namemax'))
-
 
         return s
 
@@ -204,8 +197,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def open(self, path, flags):
 
-        self.logger.debug('<%s>'%(path))
-        if path == '/LineIndex':
+        if path in self.exposedPathList:
             return 0
         else:
             full_path = self._full_path(path)
@@ -244,13 +236,15 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def read(self, path, length, offset, fh):
 
-        if path == '/LineIndex':
+        if path in self.exposedPathList:
+
             if offset < 27:
                 bytesToRead = min(length, 27-offset)
                 return b'a'*bytesToRead
             else:
                 return None
         else:
+
             fn,spans    = self.handles[path]
 
             origin      = spans[0][0]
@@ -275,9 +269,12 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
     def release(self, path, fh):
 
-        if path == '/LineIndex':
+        if path in self.exposedPathList:
+
             return 1
+
         else:
+
             fn,spans    = self.handles[path]
             os.close(fn)
             return 1
