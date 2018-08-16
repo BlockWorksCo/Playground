@@ -25,6 +25,9 @@ import unittest
 
 
 class LineIndexFile:
+    """
+    Current index of all lines in file.
+    """
 
     def __init__(self):
         pass
@@ -42,6 +45,9 @@ class LineIndexFile:
 
 
 class BufferFile:
+    """
+    Current editor file state.
+    """
 
     def __init__(self):
         pass
@@ -59,6 +65,9 @@ class BufferFile:
 
 
 class PatchFile:
+    """
+    current span-set as a patch file.
+    """
 
     def __init__(self):
         pass
@@ -76,6 +85,9 @@ class PatchFile:
 
 
 class OperationsFile:
+    """
+    list of operations for undo buffer.
+    """
 
     def __init__(self):
         pass
