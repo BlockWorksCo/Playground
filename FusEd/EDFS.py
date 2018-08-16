@@ -29,10 +29,13 @@ class LineIndexFile:
     def __init__(self):
         pass
 
+    def length(self):
+        return 10
+
     def read(self, path, length, offset, fh):
 
-        if offset < 27:
-            bytesToRead = min(length, 27-offset)
+        if offset < self.length():
+            bytesToRead = min(length, self.length()-offset)
             return b'a'*bytesToRead
         else:
             return None
@@ -43,10 +46,13 @@ class BufferFile:
     def __init__(self):
         pass
 
+    def length(self):
+        return 20
+
     def read(self, path, length, offset, fh):
 
-        if offset < 27:
-            bytesToRead = min(length, 27-offset)
+        if offset < self.length():
+            bytesToRead = min(length, self.length()-offset)
             return b'b'*bytesToRead
         else:
             return None
@@ -57,11 +63,31 @@ class PatchFile:
     def __init__(self):
         pass
 
+    def length(self):
+        return 30
+
     def read(self, path, length, offset, fh):
 
-        if offset < 27:
-            bytesToRead = min(length, 27-offset)
+        if offset < self.length():
+            bytesToRead = min(length, self.length()-offset)
             return b'c'*bytesToRead
+        else:
+            return None
+
+
+class OperationsFile:
+
+    def __init__(self):
+        pass
+
+    def length(self):
+        return 40
+
+    def read(self, path, length, offset, fh):
+
+        if offset < self.length():
+            bytesToRead = min(length, self.length()-offset)
+            return b'd'*bytesToRead
         else:
             return None
 
@@ -143,13 +169,14 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
     lineIndexFile   = LineIndexFile()
     bufferFile      = BufferFile()
     patchFile       = PatchFile()
+    opsFile         = OperationsFile()
 
     exposedFileList = ['LineIndex','Patch','Ops','Buffer']
     exposedPathList = ['/LineIndex','/Patch','/Ops','/Buffer']
     exposedFile =   {
                         '/LineIndex':lineIndexFile,
                         '/Patch':patchFile,
-                        '/Ops':None,
+                        '/Ops':opsFile,
                         '/Buffer':bufferFile,
                     }
 
@@ -173,7 +200,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
             return {'st_mode':33204, 'st_ino':2, 'st_dev':62, 'st_nlink':1, 'st_uid':1000, 'st_gid':1000, 'st_size':27, 'st_atime':int(time.time()), 'st_mtime':int(time.time()), 'st_ctime':1511394708}
 
         elif path in self.exposedPathList:
-            return {'st_mode':33204, 'st_ino':2, 'st_dev':62, 'st_nlink':1, 'st_uid':1000, 'st_gid':1000, 'st_size':27, 'st_atime':int(time.time()), 'st_mtime':int(time.time()), 'st_ctime':1511394708}
+            return {'st_mode':33204, 'st_ino':2, 'st_dev':62, 'st_nlink':1, 'st_uid':1000, 'st_gid':1000, 'st_size':self.exposedFile[path].length(), 'st_atime':int(time.time()), 'st_mtime':int(time.time()), 'st_ctime':1511394708}
 
         else:
             
