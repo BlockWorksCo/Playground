@@ -30,16 +30,25 @@ class LineIndexFile:
     """
 
     def __init__(self):
-        pass
+        self.numberOfLines  = 100000
 
     def length(self):
-        return 10
+        return self.numberOfLines * 9
 
     def read(self, path, length, offset, fh):
 
+        startLineNumber = int(offset/9)
+        stopLineNumber = int(offset+length/9)+1
+        adjustedOffset  = startLineNumber*9
+        adjust          = offset - adjustedOffset
+
+        # form the buffer
+        readBuffer  = b''.join([b'%08x\n'%(num) for num in range(startLineNumber,stopLineNumber)])
+        
+        # take the right portion of the buffer.
         if offset < self.length():
             bytesToRead = min(length, self.length()-offset)
-            return b'a'*bytesToRead
+            return readBuffer[(adjust+adjustedOffset):(adjust+bytesToRead)]
         else:
             return None
 
