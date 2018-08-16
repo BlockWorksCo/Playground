@@ -23,6 +23,49 @@ import unittest
 
 
 
+
+class LineIndexFile:
+
+    def __init__(self):
+        pass
+
+    def read(self, path, length, offset, fh):
+
+        if offset < 27:
+            bytesToRead = min(length, 27-offset)
+            return b'a'*bytesToRead
+        else:
+            return None
+
+
+class BufferFile:
+
+    def __init__(self):
+        pass
+
+    def read(self, path, length, offset, fh):
+
+        if offset < 27:
+            bytesToRead = min(length, 27-offset)
+            return b'b'*bytesToRead
+        else:
+            return None
+
+
+class PatchFile:
+
+    def __init__(self):
+        pass
+
+    def read(self, path, length, offset, fh):
+
+        if offset < 27:
+            bytesToRead = min(length, 27-offset)
+            return b'c'*bytesToRead
+        else:
+            return None
+
+
 class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
 
@@ -97,8 +140,18 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
     # Filesystem methods
     # ==================
 
+    lineIndexFile   = LineIndexFile()
+    bufferFile      = BufferFile()
+    patchFile       = PatchFile()
+
     exposedFileList = ['LineIndex','Patch','Ops','Buffer']
     exposedPathList = ['/LineIndex','/Patch','/Ops','/Buffer']
+    exposedFile =   {
+                        '/LineIndex':lineIndexFile,
+                        '/Patch':patchFile,
+                        '/Ops':None,
+                        '/Buffer':bufferFile,
+                    }
 
     def access(self, path, mode):
         full_path = self._full_path(path)
@@ -238,11 +291,8 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
 
         if path in self.exposedPathList:
 
-            if offset < 27:
-                bytesToRead = min(length, 27-offset)
-                return b'a'*bytesToRead
-            else:
-                return None
+            return self.exposedFile[path].read(path,length,offset,fh)
+
         else:
 
             fn,spans    = self.handles[path]
