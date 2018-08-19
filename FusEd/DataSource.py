@@ -46,7 +46,14 @@ class FileDataSource:
         newSource   = FileDataSource(self.fh, self.fileName, self.rangeStart+rangeStart, self.rangeStart+rangeEnd)
         return newSource
 
+    def NumberOfLinesBetweenOffsetsInFile(self, fileName, rangeStart, rangeEnd):
+
+        t   = subprocess.run(["dd", 'ibs=1','skip=%d'%rangeStart, 'count=%d'%(rangeEnd-rangeStart), "if=%s"%fileName, 'of=/tmp/ed.tmp', fileName], stdout=subprocess.PIPE).stdout 
+        t   = subprocess.run(["wc", "-l", '/tmp/ed.tmp'], stdout=subprocess.PIPE).stdout 
+        return 0
+
     def NumberOfLines(self) :
+        self.NumberOfLines  = self.NumberOfLinesBetweenOffsetsInFile( self.fileName, self.rangeStart, self.rangeEnd )
         return self.numberOfLines
 
 
