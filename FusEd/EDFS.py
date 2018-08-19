@@ -305,7 +305,7 @@ class Passthrough(Operations, multiprocessing.managers.BaseProxy):
             fh  = os.open(full_path, flags)
         
             length      = os.stat(full_path).st_size
-            dataSource  = FileDataSource(fh, 0,length)
+            dataSource  = FileDataSource(fh,full_path, 0,length)
             if path in list(self.handles.keys()):
 
                 #

@@ -10,11 +10,13 @@ import logging
 
 class FileDataSource:
 
-    def __init__(self, fh, rangeStart,rangeEnd):
+    def __init__(self, fh,fileName, rangeStart,rangeEnd):
         #self.logger     = logging.getLogger('FileDataSource')
         self.fh         = fh
         self.rangeStart = rangeStart
         self.rangeEnd   = rangeEnd
+        self.fileName   = fileName
+        self.numberOfLines  = 0
 
 
     def Read(self, offset, numberOfBytes):
@@ -41,8 +43,11 @@ class FileDataSource:
 
     def SubDataSource(self, rangeStart,rangeEnd):
         
-        newSource   = FileDataSource(self.fh, self.rangeStart+rangeStart, self.rangeStart+rangeEnd)
+        newSource   = FileDataSource(self.fh, self.fileName, self.rangeStart+rangeStart, self.rangeStart+rangeEnd)
         return newSource
+
+    def NumberOfLines(self) :
+        return self.numberOfLines
 
 
 
@@ -53,6 +58,7 @@ class StringDataSource:
         self.text       = text
         self.rangeStart = rangeStart
         self.rangeEnd   = rangeEnd
+        self.numberOfLines  = self.text.count(b'\n') 
 
 
     def Read(self, offset, numberOfBytes):
@@ -72,6 +78,8 @@ class StringDataSource:
         self.rangeStart = 0
         self.rangeEnd   = len(self.text)
 
+        self.numberOfLines  = self.text.count(b'\n') 
+
         return self
 
     def CanCombineWith(self, other):
@@ -81,6 +89,8 @@ class StringDataSource:
         
         return StringDataSource( self.text[rangeStart:rangeEnd], 0, rangeEnd-rangeStart )
 
+    def NumberOfLines(self) :
+        return self.numberOfLines
 
 
 class Tests(unittest.TestCase):
