@@ -233,7 +233,7 @@ def GetData(spans, rangeStart,rangeEnd):
             numberOfBytesCopied += numberOfBytesToCopy
             position            += numberOfBytesToCopy
 
-            #lines               = spanData.NumberOfLines()
+            numberOfLines       = spanData.NumberOfLines()
 
         else:
             return data

@@ -6,17 +6,19 @@ import unittest
 import os
 import time
 import logging
+import subprocess
 
 
 class FileDataSource:
 
     def __init__(self, fh,fileName, rangeStart,rangeEnd):
-        #self.logger     = logging.getLogger('FileDataSource')
+        self.logger     = logging.getLogger('FileDataSource')
         self.fh         = fh
         self.rangeStart = rangeStart
         self.rangeEnd   = rangeEnd
         self.fileName   = fileName
         self.numberOfLines  = 0
+        self.modified   = True
 
 
     def Read(self, offset, numberOfBytes):
@@ -31,6 +33,7 @@ class FileDataSource:
 
     def CombineWith(self, other):
         self.rangeEnd    = other.rangeEnd
+        self.modified   = True
 
         return self
         
@@ -48,12 +51,16 @@ class FileDataSource:
 
     def NumberOfLinesBetweenOffsetsInFile(self, fileName, rangeStart, rangeEnd):
 
-        t   = subprocess.run(["dd", 'ibs=1','skip=%d'%rangeStart, 'count=%d'%(rangeEnd-rangeStart), "if=%s"%fileName, 'of=/tmp/ed.tmp', fileName], stdout=subprocess.PIPE).stdout 
-        t   = subprocess.run(["wc", "-l", '/tmp/ed.tmp'], stdout=subprocess.PIPE).stdout 
+        t   = subprocess.run(["dd", 'ibs=1','skip=%d'%rangeStart, 'count=%d'%(rangeEnd-rangeStart), "if=%s"%fileName, 'of=/tmp/ed.tmp'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout 
+        t   = subprocess.run(["wc", "-l", '/tmp/ed.tmp'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout 
+        self.logger.debug('[%s]'%(t))
         return 0
 
     def NumberOfLines(self) :
-        self.NumberOfLines  = self.NumberOfLinesBetweenOffsetsInFile( self.fileName, self.rangeStart, self.rangeEnd )
+        if self.modified == True:
+            self.numberOfLines  = self.NumberOfLinesBetweenOffsetsInFile( self.fileName, self.rangeStart, self.rangeEnd )
+            self.modified       = False
+            
         return self.numberOfLines
 
 
