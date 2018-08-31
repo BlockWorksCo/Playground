@@ -12,13 +12,14 @@ import subprocess
 class FileDataSource:
 
     def __init__(self, fh,fileName, rangeStart,rangeEnd):
-        self.logger     = logging.getLogger('FileDataSource')
+        self.logger     = logging.getLogger('FileDataSource.log')
         self.fh         = fh
         self.rangeStart = rangeStart
         self.rangeEnd   = rangeEnd
         self.fileName   = fileName
         self.numberOfLines  = 0
         self.modified   = True
+        self.logger.debug('Starting up')
 
 
     def Read(self, offset, numberOfBytes):
@@ -54,6 +55,7 @@ class FileDataSource:
         t   = subprocess.run(["dd", 'ibs=1','skip=%d'%rangeStart, 'count=%d'%(rangeEnd-rangeStart), "if=%s"%fileName, 'of=/tmp/ed.tmp'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout 
         t   = subprocess.run(["wc", "-l", '/tmp/ed.tmp'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout 
         self.logger.debug('[%s]'%(t))
+        print(t)
         return 0
 
     def NumberOfLines(self) :

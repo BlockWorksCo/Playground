@@ -1,3 +1,12 @@
+
+
+# building
+apt-get install python-setuptools cmake build-essential ninja-build python-dev libffi-dev libssl-dev srecord
+pip install yotta
+
+yotta build
+
+
 # microbit-samples
 
 A collection of example programs using the micro:bit runtime.
