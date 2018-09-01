@@ -30,12 +30,14 @@ DEALINGS IN THE SOFTWARE.
   */
 
 #include "ble/UUID.h"
-
+#include "MicroBit.h"
 #include "ExternalEvents.h"
 #include "UserInterfaceService.h"
 #include "MicroBitFiber.h"
 #include "ErrorNo.h"
 #include "NotifyEvents.h"
+
+extern MicroBitSerial serial;
 
 static uint8_t txBufferHead = 0;
 static uint8_t txBufferTail = 0;
@@ -138,8 +140,9 @@ void UserInterfaceService::onDataWritten(const GattWriteCallbackParams *params) 
             {
                 char c = params->data[byteIterator];
 
-                extern uint8_t data[3];
-                data[1] = c;
+                //extern uint8_t data[3];
+                //data[1] = c;
+                serial.send( (uint8_t*)&c, 1 );
 
                 int delimeterOffset = 0;
                 int delimLength = this->delimeters.length();

@@ -73,6 +73,7 @@ void testFiber()
         uBit.display.print("O");
         fiber_sleep(500);
 
+        data[1]++;
         uiService->send( data, sizeof(data) );
     }
 }
