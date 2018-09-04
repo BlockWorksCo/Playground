@@ -49,6 +49,14 @@ class Bluetoothctl:
 
         return self.child.before.split("\r\n")
 
+    def characteristics(self):
+        try:
+            out = self.get_output("characteristics")
+        except BluetoothctlError, e:
+            print(e)
+            return None
+
+
     def start_scan(self):
         """Start bluetooth scanning process."""
         try:
@@ -184,6 +192,17 @@ class Bluetoothctl:
             return success
 
 
+
+
+
+def HasUI(device):
+    
+    if device['name'] == 'BW1':
+        return True
+    else:
+        return False
+
+
 if __name__ == "__main__":
 
     print("Init bluetooth...")
@@ -195,7 +214,14 @@ if __name__ == "__main__":
         print(i)
         time.sleep(1)
 
-    print(bl.get_discoverable_devices())
+    #
+    devices = bl.get_discoverable_devices()
+    for device in devices:
+        if HasUI(device) == True:
+            print(device)
+            bl.connect( device['mac_address'] )
+            characteristics = bl.characteristics()
+            print(characteristics)
 
 
 
