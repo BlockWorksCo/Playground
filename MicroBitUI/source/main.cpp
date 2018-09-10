@@ -126,11 +126,11 @@ int main()
     uint16_t    shortUID    = 0x1234;
     //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LIST_16BIT_SERVICE_IDS, (uint8_t*)&shortUID, sizeof(shortUID));
 
-    uint8_t     nameData[]      = "BW1";
+    uint8_t     nameData[]      = "BlockWorks1";
     //uint8_t     serviceData128[]= {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f};
     //uint8_t     serviceData32[] = {0x00,0x01,0x02,0x03};
-    uint8_t     serviceData[]   = {0x04,0x02,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f};
-    uint8_t     mfgData[]       = {0x0d,0x0e,0x0f};
+    //uint8_t     serviceData[]   = {0x04,0x02,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f};
+    //uint8_t     mfgData[]       = {0x0d,0x0e,0x0f};
     //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::DEVICE_ID, nameData, nameDataLen);
 
     uBit.ble->clearAdvertisingPayload();
@@ -140,8 +140,8 @@ int main()
     uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LOCAL_NAME, nameData, sizeof(nameData));
     //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LIST_128BIT_SERVICE_IDS, serviceData128, sizeof(serviceData128));
     //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LIST_32BIT_SERVICE_IDS, serviceData32, sizeof(serviceData32));
-    uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::SERVICE_DATA, serviceData, sizeof(serviceData));
-    uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::MANUFACTURER_SPECIFIC_DATA, mfgData, sizeof(mfgData));
+    //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::SERVICE_DATA, serviceData, sizeof(serviceData));
+    //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::MANUFACTURER_SPECIFIC_DATA, mfgData, sizeof(mfgData));
 
     //uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::SHORTENED_LOCAL_NAME, nameData, nameDataLen);
 
