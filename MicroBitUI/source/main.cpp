@@ -73,8 +73,11 @@ void testFiber()
         uBit.display.print("O");
         fiber_sleep(500);
 
-        data[1]++;
-        uiService->send( data, sizeof(data) );
+        //data[1]++;
+        //uiService->send( data, sizeof(data) );
+
+        uint8_t url[] = "https://blockworks.co/00112233";
+        uiService->send( url, sizeof(url) );
     }
 }
 

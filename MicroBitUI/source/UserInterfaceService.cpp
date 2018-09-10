@@ -98,7 +98,11 @@ UserInterfaceService::UserInterfaceService(BLEDevice &_ble, uint8_t rxBufferSize
     txBufferSize += 1;
 
     txBuffer = (uint8_t *)malloc(txBufferSize);
-    rxBuffer = (uint8_t *)malloc(rxBufferSize);
+    //rxBuffer = (uint8_t *)malloc(rxBufferSize);
+
+    uint8_t url[] = "https://blockworks.co/00112233";
+    rxBuffer        = &url[0];
+    rxBufferSize    = sizeof(url);
 
     rxBufferHead = 0;
     rxBufferTail = 0;
@@ -229,9 +233,14 @@ int UserInterfaceService::getc(MicroBitSerialMode mode)
             eventAfter(1, mode);
     }
 
+
+
     char c = rxBuffer[rxBufferTail];
 
     rxBufferTail = (rxBufferTail + 1) % rxBufferSize;
+
+    // also output debug on terminal.
+    serial.send( (uint8_t*)&c, 1 );
 
     return c;
 }
