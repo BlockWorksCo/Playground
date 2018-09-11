@@ -90,6 +90,8 @@ void dprintf( const char* format, ... )
   */
 void on_confirmation(uint16_t handle)
 {
+    dprintf("on confirm\n");
+
     if(handle == txCharacteristic->getValueAttribute().getHandle())
     {
         txBufferTail = txBufferHead;
@@ -124,8 +126,11 @@ UserInterfaceService::UserInterfaceService(BLEDevice &_ble, uint8_t rxBufferSize
     //
     //
     //
-    GattCharacteristic  rxCharacteristic(UIServiceRXCharacteristicUUID, rxBuffer, 1, rxBufferSize, GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_READ );
-    GattCharacteristic  txCharacteristic(UIServiceTXCharacteristicUUID, txBuffer, 1, txBufferSize, GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_INDICATE | GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE | GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE_WITHOUT_RESPONSE );
+    char    url[]   = "http:/BlockWorks.co/12345";
+    GattCharacteristic  rxCharacteristic(UIServiceRXCharacteristicUUID, (uint8_t*)&url[0], sizeof(url), sizeof(url),  GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_READ );
+    GattCharacteristic  txCharacteristic(UIServiceTXCharacteristicUUID, txBuffer, 1, txBufferSize,  GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_INDICATE | 
+                                                                                                    GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE | 
+                                                                                                    GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE_WITHOUT_RESPONSE );
     GattCharacteristic *charTable[] = {&txCharacteristic, &rxCharacteristic};
 
     GattService uartService(UIServiceUUID, charTable, sizeof(charTable) / sizeof(GattCharacteristic *));
@@ -134,11 +139,24 @@ UserInterfaceService::UserInterfaceService(BLEDevice &_ble, uint8_t rxBufferSize
 
     this->txCharacteristicHandle = txCharacteristic.getValueAttribute().getHandle();
 
-    _ble.gattServer().onDataWritten(this, &UserInterfaceService::onDataWritten);
-    _ble.gattServer().onConfirmationReceived(on_confirmation);
+    _ble.gattServer().onDataRead( this, &UserInterfaceService::onDataRead );
+    _ble.gattServer().onDataWritten( this, &UserInterfaceService::onDataWritten );
+    _ble.gattServer().onConfirmationReceived( on_confirmation );
 
     dprintf("Started up service...\n");
 }
+
+
+
+//
+//
+//
+void UserInterfaceService::onDataRead(const GattReadCallbackParams* params) 
+{
+    dprintf("onDataRead\n");
+}
+
+
 
 /**
   * A callback function for whenever a Bluetooth device writes to our RX characteristic.
@@ -405,6 +423,8 @@ int UserInterfaceService::send(ManagedString s, MicroBitSerialMode mode)
   */
 int UserInterfaceService::read(uint8_t *buf, int len, MicroBitSerialMode mode)
 {
+    dprintf("::read \r\n");
+
     if(mode == SYNC_SPINWAIT)
         return MICROBIT_INVALID_PARAMETER;
 
@@ -456,6 +476,8 @@ int UserInterfaceService::read(uint8_t *buf, int len, MicroBitSerialMode mode)
   */
 ManagedString UserInterfaceService::read(int len, MicroBitSerialMode mode)
 {
+    dprintf("::read\r\n");
+
     uint8_t buf[len + 1];
 
     memclr(&buf, len + 1);
@@ -488,6 +510,8 @@ ManagedString UserInterfaceService::read(int len, MicroBitSerialMode mode)
   */
 ManagedString UserInterfaceService::readUntil(ManagedString delimeters, MicroBitSerialMode mode)
 {
+    dprintf("readUntil\r\n");
+
     if(mode == SYNC_SPINWAIT)
         return MICROBIT_INVALID_PARAMETER;
 
@@ -560,6 +584,8 @@ ManagedString UserInterfaceService::readUntil(ManagedString delimeters, MicroBit
   */
 int UserInterfaceService::eventOn(ManagedString delimeters, MicroBitSerialMode mode)
 {
+    dprintf("eventOn\r\n");
+
     if(mode == SYNC_SPINWAIT)
         return MICROBIT_INVALID_PARAMETER;
 
@@ -591,6 +617,8 @@ int UserInterfaceService::eventOn(ManagedString delimeters, MicroBitSerialMode m
   */
 int UserInterfaceService::eventAfter(int len, MicroBitSerialMode mode)
 {
+    dprintf("eventAfter\r\n");
+
     if(mode == SYNC_SPINWAIT)
         return MICROBIT_INVALID_PARAMETER;
 
@@ -614,6 +642,7 @@ int UserInterfaceService::eventAfter(int len, MicroBitSerialMode mode)
   */
 int UserInterfaceService::isReadable()
 {
+    dprintf("isReadable\r\n");
     return (rxBufferTail != rxBufferHead) ? 1 : 0;
 }
 
@@ -622,6 +651,8 @@ int UserInterfaceService::isReadable()
   */
 int UserInterfaceService::rxBufferedSize()
 {
+    dprintf("rxBufferedSize\r\n");
+
     if(rxBufferTail > rxBufferHead)
         return (rxBufferSize - rxBufferTail) + rxBufferHead;
 
@@ -633,6 +664,8 @@ int UserInterfaceService::rxBufferedSize()
   */
 int UserInterfaceService::txBufferedSize()
 {
+    dprintf("txBufferedSize\r\n");
+
     if(txBufferTail > txBufferHead)
         return (txBufferSize - txBufferTail) + txBufferHead;
 

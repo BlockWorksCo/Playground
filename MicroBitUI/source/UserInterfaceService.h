@@ -71,6 +71,11 @@ class UserInterfaceService
       */
     void onDataWritten(const GattWriteCallbackParams *params);
 
+    //
+    //
+    //
+    void onDataRead(const GattReadCallbackParams* params);
+ 
     /**
       * An internal method that copies values from a circular buffer to a linear buffer.
       *
