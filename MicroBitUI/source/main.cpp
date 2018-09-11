@@ -33,6 +33,7 @@ UserInterfaceService*   uiService;
 
 MicroBitSerial serial(USBTX,USBRX);
 
+extern void dprintf( const char* format, ... );
 
 
 
@@ -60,21 +61,11 @@ void testFiber()
 {
     while(true)
     {
-    
-        uint8_t text[]    = "Tick\r\n";
-        serial.send( &text[0], strlen((char*)text) );
-
-        uBit.display.print("X");
+        dprintf("Tick... ");
         fiber_sleep(500);
 
-        uint8_t text2[]    = "Tock\r\n";
-        serial.send( &text2[0], strlen((char*)text2) );
-
-        uBit.display.print("O");
+        dprintf("Tock...\r\n");
         fiber_sleep(500);
-
-        //data[1]++;
-        //uiService->send( data, sizeof(data) );
 
         uint8_t url[] = "https://blockworks.co/00112233";
         uiService->send( url, sizeof(url) );

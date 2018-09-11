@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include "MicroBitFiber.h"
 #include "ErrorNo.h"
 #include "NotifyEvents.h"
+#include <stdarg.h>
 
 extern MicroBitSerial serial;
 
@@ -57,10 +58,6 @@ const uint8_t  UIServiceUUID[UUID::LENGTH_OF_LONG_UUID] = {
     0x6E, 0x40, (uint8_t)(UIServiceShortUUID >> 8), (uint8_t)(UIServiceShortUUID & 0xFF), 0xB5, 0xA3, 0xF3, 0x93,
     0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11,
 };
-//const uint8_t  UIServiceUUID_reversed[UUID::LENGTH_OF_LONG_UUID] = {
-    //0x9E, 0xCA, 0xDC, 0x24, 0x0E, 0xE5, 0xA9, 0xE0,
-    //0x93, 0xF3, 0xA3, 0xB5, (uint8_t)(UIServiceShortUUID & 0xFF), (uint8_t)(UIServiceShortUUID >> 8), 0x40, 0x6E
-//};
 const uint8_t  UIServiceTXCharacteristicUUID[UUID::LENGTH_OF_LONG_UUID] = {
     0x6E, 0x40, (uint8_t)(UIServiceTXCharacteristicShortUUID >> 8), (uint8_t)(UIServiceTXCharacteristicShortUUID & 0xFF), 0xB5, 0xA3, 0xF3, 0x93,
     0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11,
@@ -70,6 +67,22 @@ const uint8_t  UIServiceRXCharacteristicUUID[UUID::LENGTH_OF_LONG_UUID] = {
     0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11,
 };
 
+
+//
+//
+//
+void dprintf( const char* format, ... )
+{
+    va_list         argList;
+    static char     t[128]   = {0};
+
+    va_start( argList, format );
+
+    vsprintf( t, format, argList );
+    serial.send( (uint8_t*)&t[0], strlen(t) );
+
+    va_end(argList);
+}
 
 
 /**
@@ -98,11 +111,7 @@ UserInterfaceService::UserInterfaceService(BLEDevice &_ble, uint8_t rxBufferSize
     txBufferSize += 1;
 
     txBuffer = (uint8_t *)malloc(txBufferSize);
-    //rxBuffer = (uint8_t *)malloc(rxBufferSize);
-
-    uint8_t url[] = "https://blockworks.co/00112233";
-    rxBuffer        = &url[0];
-    rxBufferSize    = sizeof(url);
+    rxBuffer = (uint8_t *)malloc(rxBufferSize);
 
     rxBufferHead = 0;
     rxBufferTail = 0;
@@ -112,27 +121,33 @@ UserInterfaceService::UserInterfaceService(BLEDevice &_ble, uint8_t rxBufferSize
     txBufferTail = 0;
     this->txBufferSize = txBufferSize;
 
-    GattCharacteristic rxCharacteristic(UIServiceRXCharacteristicUUID, rxBuffer, 1, rxBufferSize, GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE | GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE_WITHOUT_RESPONSE);
-
-    txCharacteristic = new GattCharacteristic(UIServiceTXCharacteristicUUID, txBuffer, 1, txBufferSize, GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_INDICATE);
-
-    GattCharacteristic *charTable[] = {txCharacteristic, &rxCharacteristic};
+    //
+    //
+    //
+    GattCharacteristic  rxCharacteristic(UIServiceRXCharacteristicUUID, rxBuffer, 1, rxBufferSize, GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_READ );
+    GattCharacteristic  txCharacteristic(UIServiceTXCharacteristicUUID, txBuffer, 1, txBufferSize, GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_INDICATE | GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE | GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE_WITHOUT_RESPONSE );
+    GattCharacteristic *charTable[] = {&txCharacteristic, &rxCharacteristic};
 
     GattService uartService(UIServiceUUID, charTable, sizeof(charTable) / sizeof(GattCharacteristic *));
 
     _ble.addService(uartService);
 
-    this->rxCharacteristicHandle = rxCharacteristic.getValueAttribute().getHandle();
+    this->txCharacteristicHandle = txCharacteristic.getValueAttribute().getHandle();
 
     _ble.gattServer().onDataWritten(this, &UserInterfaceService::onDataWritten);
     _ble.gattServer().onConfirmationReceived(on_confirmation);
+
+    dprintf("Started up service...\n");
 }
 
 /**
   * A callback function for whenever a Bluetooth device writes to our RX characteristic.
   */
-void UserInterfaceService::onDataWritten(const GattWriteCallbackParams *params) {
-    if (params->handle == this->rxCharacteristicHandle)
+void UserInterfaceService::onDataWritten(const GattWriteCallbackParams *params) 
+{
+    dprintf("onDataWritten\n");
+
+    if (params->handle == this->txCharacteristicHandle)
     {
         uint16_t bytesWritten = params->len;
 

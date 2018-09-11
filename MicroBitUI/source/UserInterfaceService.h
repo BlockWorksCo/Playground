@@ -55,7 +55,7 @@ class UserInterfaceService
 
     uint8_t txBufferSize;
 
-    uint32_t rxCharacteristicHandle;
+    uint32_t txCharacteristicHandle;
 
     // Bluetooth stack we're running on.
     BLEDevice           &ble;
