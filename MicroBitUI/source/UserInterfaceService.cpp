@@ -85,6 +85,7 @@ void dprintf( const char* format, ... )
 }
 
 
+
 /**
   * A callback function for whenever a Bluetooth device consumes our TX Buffer
   */
@@ -126,26 +127,45 @@ UserInterfaceService::UserInterfaceService(BLEDevice &_ble, uint8_t rxBufferSize
     //
     //
     //
-    char    url[]   = "http:/BlockWorks.co/12345";
-    GattCharacteristic  rxCharacteristic(UIServiceRXCharacteristicUUID, (uint8_t*)&url[0], sizeof(url), sizeof(url),  GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_READ );
+    GattCharacteristic  rxCharacteristic(UIServiceRXCharacteristicUUID, NULL, 0, 128,  GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_READ |
+                                                                                                    GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_NOTIFY);
     GattCharacteristic  txCharacteristic(UIServiceTXCharacteristicUUID, txBuffer, 1, txBufferSize,  GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_INDICATE | 
                                                                                                     GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE | 
                                                                                                     GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE_WITHOUT_RESPONSE );
-    GattCharacteristic *charTable[] = {&txCharacteristic, &rxCharacteristic};
+    static GattCharacteristic *charTable[] = {&txCharacteristic, &rxCharacteristic};
 
-    GattService uartService(UIServiceUUID, charTable, sizeof(charTable) / sizeof(GattCharacteristic *));
+    static GattService uartService(UIServiceUUID, charTable, sizeof(charTable) / sizeof(GattCharacteristic *));
 
     _ble.addService(uartService);
 
-    this->txCharacteristicHandle = txCharacteristic.getValueAttribute().getHandle();
+    txCharacteristicHandle = txCharacteristic.getValueAttribute().getHandle();
+    rxCharacteristicHandle = rxCharacteristic.getValueAttribute().getHandle();
 
-    _ble.gattServer().onDataRead( this, &UserInterfaceService::onDataRead );
     _ble.gattServer().onDataWritten( this, &UserInterfaceService::onDataWritten );
     _ble.gattServer().onConfirmationReceived( on_confirmation );
+    _ble.gattServer().onDataRead( this, &UserInterfaceService::onDataRead );
 
     dprintf("Started up service...\n");
+    bprintf("Started up service...\n");
+
 }
 
+
+//
+//
+//
+void UserInterfaceService::bprintf( const char* format, ... )
+{
+    va_list         argList;
+    static char     t[128]   = {0};
+
+    va_start( argList, format );
+
+    vsprintf( t, format, argList );
+    ble.gattServer().write( rxCharacteristicHandle, (uint8_t*)&t[0], strlen(t) );
+
+    va_end(argList);
+}
 
 
 //
@@ -251,6 +271,8 @@ void UserInterfaceService::circularCopy(uint8_t *circularBuff, uint8_t circularB
   */
 int UserInterfaceService::getc(MicroBitSerialMode mode)
 {
+    dprintf("getc\r\n");
+
     if(mode == SYNC_SPINWAIT)
         return MICROBIT_INVALID_PARAMETER;
 
@@ -267,6 +289,7 @@ int UserInterfaceService::getc(MicroBitSerialMode mode)
     }
 
 
+#if 0
 
     char c = rxBuffer[rxBufferTail];
 
@@ -276,6 +299,9 @@ int UserInterfaceService::getc(MicroBitSerialMode mode)
     serial.send( (uint8_t*)&c, 1 );
 
     return c;
+#else
+    return 'x';
+#endif
 }
 
 /**
@@ -325,6 +351,9 @@ int UserInterfaceService::putc(char c, MicroBitSerialMode mode)
   */
 int UserInterfaceService::send(const uint8_t *buf, int length, MicroBitSerialMode mode)
 {
+    static int c=0;
+    bprintf("<%d>",c++);
+
     if(length < 1 || mode == SYNC_SPINWAIT)
         return MICROBIT_INVALID_PARAMETER;
 
@@ -643,7 +672,8 @@ int UserInterfaceService::eventAfter(int len, MicroBitSerialMode mode)
 int UserInterfaceService::isReadable()
 {
     dprintf("isReadable\r\n");
-    return (rxBufferTail != rxBufferHead) ? 1 : 0;
+    //return (rxBufferTail != rxBufferHead) ? 1 : 0;
+    return 1;
 }
 
 /**

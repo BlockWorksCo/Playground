@@ -56,6 +56,7 @@ class UserInterfaceService
     uint8_t txBufferSize;
 
     uint32_t txCharacteristicHandle;
+    uint32_t rxCharacteristicHandle;
 
     // Bluetooth stack we're running on.
     BLEDevice           &ble;
@@ -65,6 +66,9 @@ class UserInterfaceService
 
     //a variable used when a user calls the eventAfter() method.
     int rxBuffHeadMatch;
+
+    //
+    void bprintf( const char* format, ... );
 
     /**
       * A callback function for whenever a Bluetooth device writes to our TX characteristic.
