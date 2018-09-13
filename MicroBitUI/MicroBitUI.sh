@@ -59,3 +59,18 @@ Indication   handle = 0x000e value: 3c eb 3e
 Indication   handle = 0x000e value: 3c ec 3e 
 Indication   handle = 0x000e value: 3c ed 3e 
 
+
+
+
+#
+# These work with the MicroBit.
+#
+
+# read property.
+gatttool -t random -b FD:8E:CC:FA:11:B8 --handle=0x0011 --char-read
+
+# write property
+gatttool -t random -b FD:8E:CC:FA:11:B8 --handle=0x000e --char-write-req --value==343536
+
+
+
