@@ -31,6 +31,7 @@ UserInterfaceService*   uiService;
 
 
 
+MicroBitMessageBus bus;
 MicroBitSerial serial(USBTX,USBRX);
 
 extern void dprintf( const char* format, ... );
@@ -76,6 +77,9 @@ int main()
 {
     // Initialise the micro:bit runtime.
     uBit.init();
+
+    // initialise the fiber scheduler.
+    scheduler_init(bus);
 
     // Configuration Tips
     //

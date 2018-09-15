@@ -96,7 +96,7 @@ void on_confirmation(uint16_t handle)
     if(handle == txCharacteristic->getValueAttribute().getHandle())
     {
         txBufferTail = txBufferHead;
-        MicroBitEvent(MICROBIT_ID_NOTIFY, MICROBIT_UART_S_EVT_TX_EMPTY);
+        //MicroBitEvent(MICROBIT_ID_NOTIFY, MICROBIT_UART_S_EVT_TX_EMPTY);
     }
 }
 
@@ -183,50 +183,29 @@ void UserInterfaceService::onDataRead(const GattReadCallbackParams* params)
   */
 void UserInterfaceService::onDataWritten(const GattWriteCallbackParams *params) 
 {
-    dprintf("onDataWritten\n");
+    //dprintf("onDataWritten\n");
 
     if (params->handle == this->txCharacteristicHandle)
     {
         uint16_t bytesWritten = params->len;
 
-        for(int byteIterator = 0; byteIterator <  bytesWritten; byteIterator++)
+        //dprintf("\r\n[");
+        //dprintf("[%d]\r\n",bytesWritten);
+#if 1
+        static char     t[64]   = {0};
+        for(uint16_t i = 0; i <  bytesWritten; i++)
         {
-            int newHead = (rxBufferHead + 1) % rxBufferSize;
-
-            if(newHead != rxBufferTail)
+            char c = params->data[i];
             {
-                char c = params->data[byteIterator];
 
-                //extern uint8_t data[3];
-                //data[1] = c;
-                serial.send( (uint8_t*)&c, 1 );
+                sprintf( &t[i*3], "%02x ", c );
 
-                int delimeterOffset = 0;
-                int delimLength = this->delimeters.length();
-
-                //iterate through our delimeters (if any) to see if there is a match
-                while(delimeterOffset < delimLength)
-                {
-                    //fire an event if there is to block any waiting fibers
-                    if(this->delimeters.charAt(delimeterOffset) == c)
-                        MicroBitEvent(MICROBIT_ID_BLE_UART, MICROBIT_UART_S_EVT_DELIM_MATCH);
-
-                    delimeterOffset++;
-                }
-
-                rxBuffer[rxBufferHead] = c;
-
-                rxBufferHead = newHead;
-
-                if(rxBufferHead == rxBuffHeadMatch)
-                {
-                    rxBuffHeadMatch = -1;
-                    MicroBitEvent(MICROBIT_ID_BLE_UART, MICROBIT_UART_S_EVT_HEAD_MATCH);
-                }
             }
-            else
-                MicroBitEvent(MICROBIT_ID_BLE_UART, MICROBIT_UART_S_EVT_RX_FULL);
         }
+        serial.send( (uint8_t*)&t[0], bytesWritten*3 );
+        //dprintf(".. ", ASYNC);
+#endif
+        //dprintf("]\r\n");
     }
 }
 
