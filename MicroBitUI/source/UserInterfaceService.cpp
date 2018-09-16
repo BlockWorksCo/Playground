@@ -96,7 +96,6 @@ void on_confirmation(uint16_t handle)
     if(handle == txCharacteristic->getValueAttribute().getHandle())
     {
         txBufferTail = txBufferHead;
-        //MicroBitEvent(MICROBIT_ID_NOTIFY, MICROBIT_UART_S_EVT_TX_EMPTY);
     }
 }
 
@@ -108,28 +107,26 @@ void on_confirmation(uint16_t handle)
  *
  * @note defaults to 20
  */
-UserInterfaceService::UserInterfaceService(BLEDevice &_ble, uint8_t rxBufferSize, uint8_t txBufferSize) : ble(_ble)
+UserInterfaceService::UserInterfaceService(BLEDevice &_ble) : ble(_ble)
 {
-    rxBufferSize += 1;
-    txBufferSize += 1;
+    rxBufferSize = 32;
+    txBufferSize = 32;
 
     txBuffer = (uint8_t *)malloc(txBufferSize);
     rxBuffer = (uint8_t *)malloc(rxBufferSize);
 
     rxBufferHead = 0;
     rxBufferTail = 0;
-    this->rxBufferSize = rxBufferSize;
 
     txBufferHead = 0;
     txBufferTail = 0;
-    this->txBufferSize = txBufferSize;
 
     //
     //
     //
-    GattCharacteristic  rxCharacteristic(UIServiceRXCharacteristicUUID, NULL, 0, 128,  GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_READ |
+    GattCharacteristic  rxCharacteristic(UIServiceRXCharacteristicUUID, rxBuffer, 0, rxBufferSize,  GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_READ |
                                                                                                     GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_NOTIFY);
-    GattCharacteristic  txCharacteristic(UIServiceTXCharacteristicUUID, txBuffer, 1, txBufferSize,  GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_INDICATE | 
+    GattCharacteristic  txCharacteristic(UIServiceTXCharacteristicUUID, txBuffer, 0, txBufferSize,  GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_INDICATE | 
                                                                                                     GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE | 
                                                                                                     GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE_WITHOUT_RESPONSE );
     static GattCharacteristic *charTable[] = {&txCharacteristic, &rxCharacteristic};
@@ -183,29 +180,21 @@ void UserInterfaceService::onDataRead(const GattReadCallbackParams* params)
   */
 void UserInterfaceService::onDataWritten(const GattWriteCallbackParams *params) 
 {
-    //dprintf("onDataWritten\n");
-
-    if (params->handle == this->txCharacteristicHandle)
+    if (params->handle == txCharacteristicHandle)
     {
         uint16_t bytesWritten = params->len;
 
-        //dprintf("\r\n[");
-        //dprintf("[%d]\r\n",bytesWritten);
-#if 1
         static char     t[64]   = {0};
+#if 1
+        sprintf( &t[0], "(%d)", bytesWritten );
+#else
         for(uint16_t i = 0; i <  bytesWritten; i++)
         {
             char c = params->data[i];
-            {
-
-                sprintf( &t[i*3], "%02x ", c );
-
-            }
+            sprintf( &t[i*3], "%02x ", c );
         }
-        serial.send( (uint8_t*)&t[0], bytesWritten*3 );
-        //dprintf(".. ", ASYNC);
 #endif
-        //dprintf("]\r\n");
+        serial.send( (uint8_t*)&t[0], bytesWritten*3 );
     }
 }
 
@@ -233,6 +222,7 @@ void UserInterfaceService::circularCopy(uint8_t *circularBuff, uint8_t circularB
     }
 }
 
+#if 0
 /**
   * Retreives a single character from our RxBuffer.
   *
@@ -307,6 +297,7 @@ int UserInterfaceService::putc(char c, MicroBitSerialMode mode)
 {
     return (send((uint8_t *)&c, 1, mode) == 1) ? 1 : EOF;
 }
+#endif
 
 /**
   * Copies characters into the buffer used for Transmitting to the central device.
@@ -386,6 +377,7 @@ int UserInterfaceService::send(const uint8_t *buf, int length, MicroBitSerialMod
     return bytesWritten;
 }
 
+#if 0
 /**
   * Copies characters into the buffer used for Transmitting to the central device.
   *
@@ -667,6 +659,7 @@ int UserInterfaceService::rxBufferedSize()
 
     return rxBufferHead - rxBufferTail;
 }
+#endif
 
 /**
   * @return The currently buffered number of bytes in our txBuff.
@@ -680,3 +673,5 @@ int UserInterfaceService::txBufferedSize()
 
     return txBufferHead - txBufferTail;
 }
+
+

@@ -104,7 +104,7 @@ class UserInterfaceService
      *
      * @note The default size is MICROBIT_UART_S_DEFAULT_BUF_SIZE (20 bytes).
      */
-    UserInterfaceService(BLEDevice &_ble, uint8_t rxBufferSize = MICROBIT_UART_S_DEFAULT_BUF_SIZE, uint8_t txBufferSize = MICROBIT_UART_S_DEFAULT_BUF_SIZE);
+    UserInterfaceService(BLEDevice &_ble);
 
     /**
       * Retreives a single character from our RxBuffer.
