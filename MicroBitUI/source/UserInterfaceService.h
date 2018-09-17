@@ -29,14 +29,7 @@ DEALINGS IN THE SOFTWARE.
 #include "mbed.h"
 #include "ble/UUID.h"
 #include "ble/BLE.h"
-#include "MicroBitConfig.h"
-#include "MicroBitSerial.h"
 
-#define MICROBIT_UART_S_DEFAULT_BUF_SIZE    20
-
-#define MICROBIT_UART_S_EVT_DELIM_MATCH     1
-#define MICROBIT_UART_S_EVT_HEAD_MATCH      2
-#define MICROBIT_UART_S_EVT_RX_FULL         3
 
 /**
   * Class definition for the custom MicroBit UART Service.
@@ -60,12 +53,6 @@ class UserInterfaceService
 
     // Bluetooth stack we're running on.
     BLEDevice           &ble;
-
-    //delimeters used for matching on receive.
-    ManagedString delimeters;
-
-    //a variable used when a user calls the eventAfter() method.
-    int rxBuffHeadMatch;
 
     //
     void bprintf( const char* format, ... );
@@ -105,45 +92,6 @@ class UserInterfaceService
      * @note The default size is MICROBIT_UART_S_DEFAULT_BUF_SIZE (20 bytes).
      */
     UserInterfaceService(BLEDevice &_ble);
-
-    /**
-      * Retreives a single character from our RxBuffer.
-      *
-      * @param mode the selected mode, one of: ASYNC, SYNC_SPINWAIT, SYNC_SLEEP. Each mode
-      *        gives a different behaviour:
-      *
-      *            ASYNC - Will attempt to read a single character, and return immediately
-      *
-      *            SYNC_SPINWAIT - will return MICROBIT_INVALID_PARAMETER
-      *
-      *            SYNC_SLEEP - Will configure the event and block the current fiber until the
-      *                         event is received.
-      *
-      * @return MICROBIT_INVALID_PARAMETER if the mode given is SYNC_SPINWAIT, a character or MICROBIT_NO_DATA
-      */
-    int getc(MicroBitSerialMode mode = SYNC_SLEEP);
-
-    /**
-      * Places a single character into our transmission buffer,
-      *
-      * @param c the character to transmit
-      *
-      * @param mode the selected mode, one of: ASYNC, SYNC_SPINWAIT, SYNC_SLEEP. Each mode
-      *        gives a different behaviour:
-      *
-      *            ASYNC - Will copy as many characters as it can into the buffer for transmission,
-      *                    and return control to the user.
-      *
-      *            SYNC_SPINWAIT - will return MICROBIT_INVALID_PARAMETER
-      *
-      *            SYNC_SLEEP - Will perform a cooperative blocking wait until all
-      *                         given characters have been received by the connected
-      *                         device.
-      *
-      * @return the number of characters written, or MICROBIT_NOT_SUPPORTED if there is
-      *         no connected device, or the connected device has not enabled indications.
-      */
-    int putc(char c, MicroBitSerialMode mode = SYNC_SLEEP);
 
     /**
       * Copies characters into the buffer used for Transmitting to the central device.
@@ -187,105 +135,6 @@ class UserInterfaceService
       *         no connected device, or the connected device has not enabled indications.
       */
     int send(ManagedString s, MicroBitSerialMode mode = SYNC_SLEEP);
-
-    /**
-      * Reads a number of characters from the rxBuffer and fills user given buffer.
-      *
-      * @param buf a pointer to a buffer of len bytes.
-      * @param len the size of the user allocated buffer
-      * @param mode the selected mode, one of: ASYNC, SYNC_SPINWAIT, SYNC_SLEEP. Each mode
-      *        gives a different behaviour:
-      *
-      *            ASYNC - Will attempt to read all available characters, and return immediately
-      *                    until the buffer limit is reached
-      *
-      *            SYNC_SPINWAIT - will return MICROBIT_INVALID_PARAMETER
-      *
-      *            SYNC_SLEEP - Will first of all determine whether the given number of characters
-      *                         are available in our buffer, if not, it will set an event and sleep
-      *                         until the number of characters are avaialable.
-      *
-      * @return the number of characters digested
-      */
-    int read(uint8_t *buf, int len, MicroBitSerialMode mode = SYNC_SLEEP);
-
-    /**
-      * Reads a number of characters from the rxBuffer and returns them as a ManagedString
-      *
-      * @param len the number of characters to read.
-      * @param mode the selected mode, one of: ASYNC, SYNC_SPINWAIT, SYNC_SLEEP. Each mode
-      *        gives a different behaviour:
-      *
-      *            ASYNC - Will attempt to read all available characters, and return immediately
-      *                    until the buffer limit is reached
-      *
-      *            SYNC_SPINWAIT - will return MICROBIT_INVALID_PARAMETER
-      *
-      *            SYNC_SLEEP - Will first of all determine whether the given number of characters
-      *                         are available in our buffer, if not, it will set an event and sleep
-      *                         until the number of characters are avaialable.
-      *
-      * @return an empty ManagedString on error, or a ManagedString containing characters
-      */
-    ManagedString read(int len, MicroBitSerialMode mode = SYNC_SLEEP);
-
-    /**
-      * Reads characters until a character matches one of the given delimeters
-      *
-      * @param delimeters the number of characters to match against
-      * @param mode the selected mode, one of: ASYNC, SYNC_SPINWAIT, SYNC_SLEEP. Each mode
-      *        gives a different behaviour:
-      *
-      *            ASYNC - Will attempt read the immediate buffer, and look for a match.
-      *                    If there isn't, an empty ManagedString will be returned.
-      *
-      *            SYNC_SPINWAIT - will return MICROBIT_INVALID_PARAMETER
-      *
-      *            SYNC_SLEEP - Will first of all consider the characters in the immediate buffer,
-      *                         if a match is not found, it will block on an event, fired when a
-      *                         character is matched.
-      *
-      * @return an empty ManagedString on error, or a ManagedString containing characters
-      */
-    ManagedString readUntil(ManagedString delimeters, MicroBitSerialMode mode = SYNC_SLEEP);
-
-    /**
-      * Configures an event to be fired on a match with one of the delimeters.
-      *
-      * @param delimeters the characters to match received characters against e.g. ManagedString("\r\n")
-      * @param mode the selected mode, one of: ASYNC, SYNC_SPINWAIT, SYNC_SLEEP. Each mode
-      *        gives a different behaviour:
-      *
-      *            ASYNC - Will configure the event and return immediately.
-      *
-      *            SYNC_SPINWAIT - will return MICROBIT_INVALID_PARAMETER
-      *
-      *            SYNC_SLEEP - Will configure the event and block the current fiber until the
-      *                         event is received.
-      *
-      * @return MICROBIT_INVALID_PARAMETER if the mode given is SYNC_SPINWAIT, otherwise MICROBIT_OK.
-      *
-      * @note delimeters are matched on a per byte basis.
-      */
-    int eventOn(ManagedString delimeters, MicroBitSerialMode mode = ASYNC);
-
-    /**
-      * Configures an event to be fired after "len" characters.
-      *
-      * @param len the number of characters to wait before triggering the event
-      * @param mode the selected mode, one of: ASYNC, SYNC_SPINWAIT, SYNC_SLEEP. Each mode
-      *        gives a different behaviour:
-      *
-      *            ASYNC - Will configure the event and return immediately.
-      *
-      *            SYNC_SPINWAIT - will return MICROBIT_INVALID_PARAMETER
-      *
-      *            SYNC_SLEEP - Will configure the event and block the current fiber until the
-      *                         event is received.
-      *
-      * @return MICROBIT_INVALID_PARAMETER if the mode given is SYNC_SPINWAIT, otherwise MICROBIT_OK.
-      */
-    int eventAfter(int len, MicroBitSerialMode mode = ASYNC);
 
     /**
       * Determines if we have space in our rxBuff.

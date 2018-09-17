@@ -139,8 +139,8 @@ UserInterfaceService::UserInterfaceService(BLEDevice &_ble) : ble(_ble)
     rxCharacteristicHandle = rxCharacteristic.getValueAttribute().getHandle();
 
     _ble.gattServer().onDataWritten( this, &UserInterfaceService::onDataWritten );
-    _ble.gattServer().onConfirmationReceived( on_confirmation );
-    _ble.gattServer().onDataRead( this, &UserInterfaceService::onDataRead );
+    //_ble.gattServer().onConfirmationReceived( on_confirmation );
+    //_ble.gattServer().onDataRead( this, &UserInterfaceService::onDataRead );
 
     dprintf("Started up service...\n");
     bprintf("Started up service...\n");
@@ -154,7 +154,7 @@ UserInterfaceService::UserInterfaceService(BLEDevice &_ble) : ble(_ble)
 void UserInterfaceService::bprintf( const char* format, ... )
 {
     va_list         argList;
-    static char     t[128]   = {0};
+    static char     t[64]   = {0};
 
     va_start( argList, format );
 
@@ -174,6 +174,7 @@ void UserInterfaceService::onDataRead(const GattReadCallbackParams* params)
 }
 
 
+char     t[64]   = {0};
 
 /**
   * A callback function for whenever a Bluetooth device writes to our RX characteristic.
@@ -184,7 +185,6 @@ void UserInterfaceService::onDataWritten(const GattWriteCallbackParams *params)
     {
         uint16_t bytesWritten = params->len;
 
-        static char     t[64]   = {0};
 #if 0
         sprintf( &t[0], "(%d)", bytesWritten );
 #else
@@ -194,7 +194,7 @@ void UserInterfaceService::onDataWritten(const GattWriteCallbackParams *params)
             sprintf( &t[i*3], "%02x ", c );
         }
 #endif
-        serial.send( (uint8_t*)&t[0], bytesWritten*3 );
+        //serial.send( (uint8_t*)&t[0], bytesWritten*3 );
     }
 }
 
@@ -210,6 +210,7 @@ void UserInterfaceService::onDataWritten(const GattWriteCallbackParams *params)
   * @note this method assumes that the linear buffer has the appropriate amount of
   *       memory to contain the copy operation
   */
+#if 0
 void UserInterfaceService::circularCopy(uint8_t *circularBuff, uint8_t circularBuffSize, uint8_t *linearBuff, uint16_t tailPosition, uint16_t headPosition)
 {
     int toBuffIndex = 0;
@@ -221,6 +222,7 @@ void UserInterfaceService::circularCopy(uint8_t *circularBuff, uint8_t circularB
         tailPosition = (tailPosition + 1) % circularBuffSize;
     }
 }
+#endif
 
 
 /**
@@ -245,9 +247,10 @@ void UserInterfaceService::circularCopy(uint8_t *circularBuff, uint8_t circularB
   */
 int UserInterfaceService::send(const uint8_t *buf, int length, MicroBitSerialMode mode)
 {
-    static int c=0;
-    bprintf("<%d>",c++);
+    //static int c=0;
+    //bprintf("<%d>",c++);
 
+#if 0
     if(length < 1 || mode == SYNC_SPINWAIT)
         return MICROBIT_INVALID_PARAMETER;
 
@@ -299,20 +302,24 @@ int UserInterfaceService::send(const uint8_t *buf, int length, MicroBitSerialMod
     }
 
     return bytesWritten;
+#else
+    return 0;
+#endif
 }
 
 
+#if 0
 /**
   * @return The currently buffered number of bytes in our txBuff.
   */
 int UserInterfaceService::txBufferedSize()
 {
-    dprintf("txBufferedSize\r\n");
+    //dprintf("txBufferedSize\r\n");
 
     if(txBufferTail > txBufferHead)
         return (txBufferSize - txBufferTail) + txBufferHead;
 
     return txBufferHead - txBufferTail;
 }
-
+#endif
 

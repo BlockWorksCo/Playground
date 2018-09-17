@@ -57,6 +57,7 @@ void onDisconnected(MicroBitEvent)
 }
 
 uint8_t     data[]  = {'<', 0x02, '>'};
+extern char  t[64];
 
 void testFiber()
 {
@@ -67,6 +68,8 @@ void testFiber()
 
         dprintf("Tock...\r\n");
         fiber_sleep(500);
+
+        dprintf("[%s]", t);
 
         uint8_t url[] = "https://blockworks.co/00112233";
         uiService->send( url, sizeof(url) );
