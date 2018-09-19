@@ -22,18 +22,23 @@ class TunnelServer(object):
         r = [self._tun]; w = []; x = []
         to_tun = ''
         while True:
+
             try:
                 r, w, x = select.select(r, w, x)
                 if self._tun in r:
                     to_sock = self._tun.read(mtu)
+                    print('r%d'%(len(to_sock)))
                 if self._tun in w:
+                    print('w%d'%(len(to_tun)))
                     self._tun.write(to_tun)
                     to_tun = ''
+
                 r = []; w = []
                 if to_tun:
                     w.append(self._tun)
                 else:
                     r.append(self._tun)
+
             except (select.error, socket.error, pytun.Error), e:
                 if e[0] == errno.EINTR:
                     continue
