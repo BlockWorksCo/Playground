@@ -57,7 +57,7 @@ void onDisconnected(MicroBitEvent)
 }
 
 uint8_t     data[]  = {'<', 0x02, '>'};
-extern char  t[64];
+extern char  t[128];
 
 void testFiber()
 {

@@ -154,7 +154,7 @@ UserInterfaceService::UserInterfaceService(BLEDevice &_ble) : ble(_ble)
 void UserInterfaceService::bprintf( const char* format, ... )
 {
     va_list         argList;
-    static char     t[64]   = {0};
+    static char     t[128]   = {0};
 
     va_start( argList, format );
 
