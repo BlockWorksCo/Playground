@@ -56,6 +56,47 @@ void onDisconnected(MicroBitEvent)
     uBit.display.print("D");
 }
 
+uint8_t     packetQ[128];
+uint32_t    numberOfBytesInQ   = 0;
+
+void packetReceived( uint8_t* packet, uint32_t numberOfBytes )
+{
+    memcpy( &packetQ[0], packet, numberOfBytes );
+    numberOfBytesInQ        = numberOfBytes;
+}
+
+void byteReceived( uint8_t c )
+{
+    static uint8_t  packet[128];
+    static uint8_t  currentPosition = 0;
+    static bool     inPacket        = false;
+
+    if( inPacket == false )
+    {
+        if( c == 0x7e )
+        {
+            inPacket        = true;
+            currentPosition = 0;
+        }
+        else
+        {
+        }        
+    }
+    else
+    {
+        if( c == 0x7e )
+        {
+            packetReceived( &packet[0], currentPosition );
+            inPacket    = false;
+        }
+        else
+        {
+            packet[currentPosition] = c;
+            currentPosition++;
+        }        
+    }
+}
+
 uint8_t     data[]  = {'<', 0x02, '>'};
 extern char  t[128];
 
@@ -63,13 +104,19 @@ void testFiber()
 {
     while(true)
     {
-        dprintf("Tick... ");
-        fiber_sleep(500);
+        static uint32_t j=0;
+        j++;
+        dprintf("Tick %d ...\r\n ",j);
+        fiber_sleep(100);
 
-        dprintf("Tock...\r\n");
-        fiber_sleep(500);
-
-        dprintf("[%s]", t);
+        if( numberOfBytesInQ > 0 )
+        {
+            for(uint32_t i=0; i<numberOfBytesInQ; i++ )
+            {
+                dprintf("%02x ",packetQ[i]);
+            }
+            numberOfBytesInQ    = 0;
+        }
 
         uint8_t url[] = "https://blockworks.co/00112233";
         uiService->send( url, sizeof(url) );

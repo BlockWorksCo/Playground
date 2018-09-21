@@ -175,6 +175,7 @@ void UserInterfaceService::onDataRead(const GattReadCallbackParams* params)
 
 
 char     t[64]   = {0};
+void byteReceived( uint8_t c );
 
 /**
   * A callback function for whenever a Bluetooth device writes to our RX characteristic.
@@ -185,16 +186,11 @@ void UserInterfaceService::onDataWritten(const GattWriteCallbackParams *params)
     {
         uint16_t bytesWritten = params->len;
 
-#if 0
-        sprintf( &t[0], "(%d)", bytesWritten );
-#else
         for(uint16_t i = 0; i <  bytesWritten; i++)
         {
             char c = params->data[i];
-            sprintf( &t[i*3], "%02x ", c );
+            byteReceived( c );
         }
-#endif
-        //serial.send( (uint8_t*)&t[0], bytesWritten*3 );
     }
 }
 
