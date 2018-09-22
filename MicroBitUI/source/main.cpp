@@ -56,21 +56,53 @@ void onDisconnected(MicroBitEvent)
     uBit.display.print("D");
 }
 
-uint8_t     packetQ[128];
-uint32_t    numberOfBytesInQ   = 0;
 
-void packetReceived( uint8_t* packet, uint32_t numberOfBytes )
+
+//
+//
+//
+void transmitPacket( uint8_t* packet, uint32_t numberOfBytes )
 {
-    memcpy( &packetQ[0], packet, numberOfBytes );
-    numberOfBytesInQ        = numberOfBytes;
+    uiService->send( packet, numberOfBytes );
 }
 
+uint8_t     packetQ[128];
+uint32_t    numberOfBytesInQ   = 0;
+uint32_t    tick                = 0;
+
+void packetReceived( uint8_t protocolVersion, uint8_t* packet, uint32_t numberOfBytes )
+{
+    if( protocolVersion == 0 )
+    {
+        memcpy( &packetQ[0], packet, numberOfBytes );
+        numberOfBytesInQ        = numberOfBytes;
+    }
+}
+
+//
+//    0         1        2  3  4  5  6  7
+// 7e <version> <length> 00 11 22 33 44 7e
+//
+// 7e000700112233447e
+//
 void byteReceived( uint8_t c )
 {
-    static uint8_t  packet[128];
-    static uint8_t  currentPosition = 0;
-    static bool     inPacket        = false;
+    static uint8_t  packet[128]             = {0};
+    static uint8_t  currentPosition         = 0;
+    static bool     inPacket                = false;
+    static uint32_t expectedPacketLength    = 0;
+    static uint8_t  protocolVersion         = 0;
+    static uint32_t lastByteReceivedTime    = 0;
 
+    // If we have not received a byte in 1 second then timeout
+    // the parser-state by resetting it.
+    uint32_t    timeSinceLastByte   = tick - lastByteReceivedTime;
+    if( timeSinceLastByte >= 10 )
+    {
+        inPacket        = false;
+    }
+
+    // Process the byte.
     if( inPacket == false )
     {
         if( c == 0x7e )
@@ -78,23 +110,35 @@ void byteReceived( uint8_t c )
             inPacket        = true;
             currentPosition = 0;
         }
-        else
-        {
-        }        
     }
     else
     {
-        if( c == 0x7e )
+        if( (c == 0x7e) && (currentPosition == expectedPacketLength) )
         {
-            packetReceived( &packet[0], currentPosition );
+            packetReceived( protocolVersion, &packet[0], currentPosition-2 );
             inPacket    = false;
         }
         else
         {
-            packet[currentPosition] = c;
+            if( currentPosition == 0 )
+            {
+                protocolVersion         = c;
+            }
+            else if( currentPosition == 1 )
+            {
+                expectedPacketLength    = c;
+            }
+            else if( currentPosition-2 < sizeof(packet) )
+            {
+                packet[currentPosition-2] = c;
+            }
+
             currentPosition++;
         }        
     }
+
+    // Keep track of the time of the last byte.
+    lastByteReceivedTime    = tick;
 }
 
 uint8_t     data[]  = {'<', 0x02, '>'};
@@ -104,13 +148,18 @@ void testFiber()
 {
     while(true)
     {
-        static uint32_t j=0;
-        j++;
-        dprintf("Tick %d ...\r\n ",j);
+        //static uint32_t j=0;
+        //j++;
+        //dprintf("Tick %d ...\r\n ",j);
         fiber_sleep(100);
 
+        // timeout ticker.
+        tick++;
+
+        // process packet.
         if( numberOfBytesInQ > 0 )
         {
+            dprintf("\r\n");
             for(uint32_t i=0; i<numberOfBytesInQ; i++ )
             {
                 dprintf("%02x ",packetQ[i]);

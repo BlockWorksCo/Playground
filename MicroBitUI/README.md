@@ -1,4 +1,9 @@
 
+# Generating interface code.
+
+protoc --js_out=import_style=browser,binary:out interface.proto 
+
+
 
 # building
 apt-get install python-setuptools cmake build-essential ninja-build python-dev libffi-dev libssl-dev srecord
