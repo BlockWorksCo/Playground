@@ -66,11 +66,16 @@ Indication   handle = 0x000e value: 3c ed 3e
 # These work with the MicroBit.
 #
 
+#discovery.
+./test-discovery.py --uuids 1234
+
 # read property.
 gatttool -t random -b FD:8E:CC:FA:11:B8 --handle=0x0011 --char-read
 
 # write property
 gatttool -t random -b FD:8E:CC:FA:11:B8 --handle=0x000e --char-write-req --value==343536
 
+# write packet
+gatttool -t random -b FD:8E:CC:FA:11:B8 --handle=0x000e --char-write-req --value=7e000700112233447e
 
 
