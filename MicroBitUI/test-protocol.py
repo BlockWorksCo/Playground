@@ -43,12 +43,21 @@ def MyMain():
 
     a = device['org.bluez.Device1']
 
-    #proxy = bus.get_object('org.bluez.Device1', '/org/bluez/hci0/dev_FD_8E_CC_FA_11_B8')
     proxy = bus.get_object('org.bluez', '/org/bluez/hci0/dev_FD_8E_CC_FA_11_B8')
     pp=dbus.Interface(proxy, 'org.bluez.Device1')
 
     pp.Connect()
-    time.sleep(1)
+
+    
+    characteristic=dbus.Interface(proxy, 'org.bluez.GattCharacteristic1')
+    proxy2 = bus.get_object('org.bluez', '/org/bluez/hci0/dev_FD_8E_CC_FA_11_B8/service000c/char0010')
+    pp2=dbus.Interface(proxy2, 'org.bluez.GattCharacteristic1')
+    d = pp2.ReadValue({})
+    print(d)
+    for c in d:
+        print('%c'%(int(c)))
+    
+
     pp.Disconnect()
 
 
