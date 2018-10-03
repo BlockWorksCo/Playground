@@ -4,6 +4,7 @@ import dbus
 import dbus.mainloop.glib
 import bluezutils
 import time
+import sys
 
 
 
@@ -26,6 +27,15 @@ import time
     RSSI = -82
     Trusted = 0
     Blocked = 0
+
+
+handle = 0x0002, char properties = 0x0a, char value handle = 0x0003, uuid = 00002a00-0000-1000-8000-00805f9b34fb
+handle = 0x0004, char properties = 0x02, char value handle = 0x0005, uuid = 00002a01-0000-1000-8000-00805f9b34fb
+handle = 0x0006, char properties = 0x02, char value handle = 0x0007, uuid = 00002a04-0000-1000-8000-00805f9b34fb
+handle = 0x0009, char properties = 0x20, char value handle = 0x000a, uuid = 00002a05-0000-1000-8000-00805f9b34fb
+handle = 0x000d, char properties = 0x2c, char value handle = 0x000e, uuid = 6e400002-b5a3-f393-8877-665544332211
+handle = 0x0010, char properties = 0x12, char value handle = 0x0011, uuid = 6e400003-b5a3-f393-8877-665544332211
+
 """
 
 
@@ -49,14 +59,22 @@ def MyMain():
     pp.Connect()
 
     
+    # Read from the characteristic.
     characteristic=dbus.Interface(proxy, 'org.bluez.GattCharacteristic1')
     proxy2 = bus.get_object('org.bluez', '/org/bluez/hci0/dev_FD_8E_CC_FA_11_B8/service000c/char0010')
     pp2=dbus.Interface(proxy2, 'org.bluez.GattCharacteristic1')
     d = pp2.ReadValue({})
     print(d)
     for c in d:
-        print('%c'%(int(c)))
+        sys.stdout.write('%c'%(int(c)))
     
+    # write to a characteristic
+    #characteristic=dbus.Interface(proxy, 'org.bluez.GattCharacteristic1')
+    #proxy2 = bus.get_object('org.bluez', '/org/bluez/hci0/dev_FD_8E_CC_FA_11_B8/service000c/char000d')
+    #pp2=dbus.Interface(proxy2, 'org.bluez.GattCharacteristic1')
+    #d = pp2.WriteValue(bytearray([0x7e, 0x00, 0x07, 0x00, 0x11, 0x22, 0x33, 0x44, 0x7e]), {})
+    #d = pp2.WriteValue(bytes([0x7e, 0x00, 0x07, 0x00, 0x11, 0x22, 0x33, 0x44, 0x7e]), {'offset':0})
+    #d = pp2.WriteValue(bytes([0x7e, 0x00, 0x07, 0x00, 0x11, 0x22, 0x33, 0x44, 0x7e]), {})
 
     pp.Disconnect()
 
