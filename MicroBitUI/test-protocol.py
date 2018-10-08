@@ -63,18 +63,19 @@ def MyMain():
     characteristic=dbus.Interface(proxy, 'org.bluez.GattCharacteristic1')
     proxy2 = bus.get_object('org.bluez', '/org/bluez/hci0/dev_FD_8E_CC_FA_11_B8/service000c/char0010')
     pp2=dbus.Interface(proxy2, 'org.bluez.GattCharacteristic1')
-    d = pp2.ReadValue({})
+    d = pp2.ReadValue( {} )
+    #d = pp2.ReadValue( dbus.Dictionary({'offset': 0}, signature='sv') )
     print(d)
     for c in d:
         sys.stdout.write('%c'%(int(c)))
     
     # write to a characteristic
-    #characteristic=dbus.Interface(proxy, 'org.bluez.GattCharacteristic1')
-    #proxy2 = bus.get_object('org.bluez', '/org/bluez/hci0/dev_FD_8E_CC_FA_11_B8/service000c/char000d')
-    #pp2=dbus.Interface(proxy2, 'org.bluez.GattCharacteristic1')
-    #d = pp2.WriteValue(bytearray([0x7e, 0x00, 0x07, 0x00, 0x11, 0x22, 0x33, 0x44, 0x7e]), {})
-    #d = pp2.WriteValue(bytes([0x7e, 0x00, 0x07, 0x00, 0x11, 0x22, 0x33, 0x44, 0x7e]), {'offset':0})
-    #d = pp2.WriteValue(bytes([0x7e, 0x00, 0x07, 0x00, 0x11, 0x22, 0x33, 0x44, 0x7e]), {})
+    characteristic=dbus.Interface(proxy, 'org.bluez.GattCharacteristic1')
+    proxy2 = bus.get_object('org.bluez', '/org/bluez/hci0/dev_FD_8E_CC_FA_11_B8/service000c/char0010')
+    pp2=dbus.Interface(proxy2, 'org.bluez.GattCharacteristic1')
+    ba = dbus.ByteArray( [0x7e, 0x00, 0x07, 0x00, 0x11, 0x22, 0x33, 0x44, 0x7e] )
+    o = dbus.Dictionary({'offset': 0}, signature='sv')
+    d = pp2.WriteValue( ba, o )
 
     pp.Disconnect()
 
