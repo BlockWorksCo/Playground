@@ -8,7 +8,7 @@
 #include <time.h>
 
 // The larger this value, the less data will be taken with timing info.
-#define TRACE_TIMESTAMP_RESOLUTION      (1)
+#define TRACE_TIMESTAMP_RESOLUTION      (10)
 
 // Masks for working out the 7-bit portions.
 #define MASK_B0                         (0x0000007f)
@@ -170,8 +170,12 @@ void traceOutput( uint32_t marker )
 //
 void traceInput( uint32_t* timeDelta, uint32_t* marker )
 {
+    // Parse the tokens from the stream.
     traceDecodeUInt32( timeDelta, &tracePacketPtr );
     traceDecodeUInt32( marker, &tracePacketPtr );
+
+    // Multiply the timeDelta back up
+    *timeDelta   *= TRACE_TIMESTAMP_RESOLUTION;
 }
 
 //
