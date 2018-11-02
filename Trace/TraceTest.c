@@ -149,6 +149,8 @@ void traceDecodeUInt32( uint32_t* value, uint8_t** ptr )
 //
 void traceOutput( uint32_t marker )
 {
+    // TODO: At start of packet, we need a full timestamp.
+
     // Work out the time delta since we were last called.
     uint32_t    timestamp       = traceGetTimestamp();
     uint32_t    deltaTimestamp  = (timestamp - lastTraceTimestamp) / TRACE_TIMESTAMP_RESOLUTION;
