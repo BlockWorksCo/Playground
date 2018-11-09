@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdarg.h>
 #include <string.h>
 #include <time.h>
 
@@ -15,10 +16,12 @@
 #define MASK_B1                         (0x00003f80)
 #define MASK_B2                         (0x001fc000)
 #define MASK_B3                         (0x0fe00000)
+#define MASK_B4                         (0xf0000000)
 #define SHIFT_B0                        (0)
 #define SHIFT_B1                        (7)
 #define SHIFT_B2                        (14)
 #define SHIFT_B3                        (21)
+#define SHIFT_B4                        (28)
 
 // Packet & stream data.
 uint8_t     tempData[1024];
@@ -109,9 +112,18 @@ void traceEncodeUInt32( uint32_t value, uint8_t** ptr )
         traceEncodeUInt8( (value & MASK_B1) >> SHIFT_B1, ptr, false );
         traceEncodeUInt8( (value & MASK_B0) >> SHIFT_B0, ptr, true );
     }
-    else
+    else if( value < 0xfffffff )
     {
         // 28-bit case.
+        traceEncodeUInt8( (value & MASK_B3) >> SHIFT_B3, ptr, false );
+        traceEncodeUInt8( (value & MASK_B2) >> SHIFT_B2, ptr, false );
+        traceEncodeUInt8( (value & MASK_B1) >> SHIFT_B1, ptr, false );
+        traceEncodeUInt8( (value & MASK_B0) >> SHIFT_B0, ptr, true );
+    }
+    else
+    {
+        // 32-bit case.
+        traceEncodeUInt8( (value & MASK_B4) >> SHIFT_B4, ptr, false );
         traceEncodeUInt8( (value & MASK_B3) >> SHIFT_B3, ptr, false );
         traceEncodeUInt8( (value & MASK_B2) >> SHIFT_B2, ptr, false );
         traceEncodeUInt8( (value & MASK_B1) >> SHIFT_B1, ptr, false );
@@ -180,6 +192,73 @@ void traceInput( uint32_t* timeDelta, uint32_t* marker )
     *timeDelta   *= TRACE_TIMESTAMP_RESOLUTION;
 }
 
+
+
+
+
+
+//
+//
+// %c char single character
+// %d (%i) int signed integer
+// %e (%E) float or double exponential format
+// %f float or double signed decimal
+// %g (%G) float or double use %f or %e as required
+// %o int unsigned octal value
+// %p pointer address stored in pointer
+// %s array of char sequence of characters
+// %u int unsigned decimal
+// %x (%X) int unsigned hex value
+// %z size_t.
+//
+void tracePrintf( uint8_t** ptr, const char* format, ... )
+{
+    va_list args;
+    va_start(args, format);
+
+    // first, output the format string identifier...
+    traceEncodeUInt32( (uint32_t)(format), ptr );
+
+    // ...then scan thru the string finding all the
+    // format specifiers, determine their size and output
+    // the binary data associated with them.
+    bool    percent = false;
+    for( uint32_t i=0; i<strlen(format); i++)
+    {
+        if( format[i] == '%' )
+        {
+            percent = true;
+        }
+        else if( percent == true )
+        {
+            char    type    = format[i];
+
+            //
+            switch(type)
+            {
+                case 'c': traceEncodeUInt32( (uint32_t)va_arg(args,int), ptr ); break;
+                case 'd': traceEncodeUInt32( (uint32_t)va_arg(args,int), ptr ); break;
+                case 'e': traceEncodeUInt32( (uint32_t)va_arg(args,int), ptr ); break;
+                case 'f': traceEncodeUInt32( (uint32_t)va_arg(args,double), ptr ); break;
+                case 'g': traceEncodeUInt32( (uint32_t)va_arg(args,double), ptr ); break;
+                case 'o': traceEncodeUInt32( (uint32_t)va_arg(args,int), ptr ); break;
+                case 'p': traceEncodeUInt32( (uint32_t)va_arg(args,void*), ptr ); break;
+                case 's': traceEncodeUInt32( (uint32_t)va_arg(args,int), ptr ); break;
+                case 'u': traceEncodeUInt32( (uint32_t)va_arg(args,int), ptr ); break;
+                case 'x': traceEncodeUInt32( (uint32_t)va_arg(args,int), ptr ); break;
+                case 'z': traceEncodeUInt32( (uint32_t)va_arg(args,size_t), ptr ); break;
+            }
+
+            // For now, we only parse simple format-specifiers, i.e "%d".
+            percent = false;
+        }
+    }
+
+    va_end(args);
+}
+
+
+
 //
 int main()
 {
@@ -189,6 +268,7 @@ int main()
     traceOutput( 0x1fff );
     traceOutput( 456 );
     traceOutput( 0xabcdef );
+    traceOutput( 0xffffffff );
 
 
     tracePacket = &tempData[0];
@@ -196,6 +276,9 @@ int main()
 
     uint32_t    timeDelta   = 0;
     uint32_t    marker      = 0;
+    traceInput( &timeDelta, &marker );
+    printf(" +%d) %x\n", timeDelta, marker);
+
     traceInput( &timeDelta, &marker );
     printf(" +%d) %x\n", timeDelta, marker);
 
