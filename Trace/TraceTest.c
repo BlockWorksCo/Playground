@@ -132,6 +132,52 @@ void traceEncodeUInt32( uint32_t value, uint8_t** ptr )
 }
 
 //
+void traceEncodeBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr )
+{
+    // For every block of 7-bits in the BLOB, encode the byte.
+    uint32_t    numberOfBitsEncoded = 0;
+    for(uint32_t bitPosition=0; bitPosition<numberOfBytes*8; bitPosition+=7)
+    {
+        // Any single block of 7-bits may straddle a byte boundary,
+        // therefore we need to work out where the uint16_t value
+        // lies that can contain it completely and the corresponding
+        // mask for the value itself.
+        uint32_t    bytePosition                = bitPosition / 8;
+        uint32_t    bytePositionInBits          = bytePosition * 8;
+        uint32_t    offsetOfFirstBitIntoByte    = bitPosition - bytePositionInBits;
+        uint16_t    mask                        = 0x007f << offsetOfFirstBitIntoByte;
+        uint16_t    value16                     = *((uint16_t*)(blob+bytePosition)) & mask;
+        uint8_t     value8                      = value16 >> offsetOfFirstBitIntoByte;
+
+        // Is this the last one?
+        bool    lastFlag    = false;
+
+        // Output the 7-bits as an encoded byte.
+        traceEncodeUInt8( (uint32_t)value8, ptr, lastFlag );
+    }
+}
+
+
+//
+void traceDecodeBLOB( uint8_t* blob, uint32_t maxNumberOfBytes, uint8_t** ptr )
+{
+    bool        lastFlag        = true;
+    uint32_t    numberOfBits    = 0;
+
+    do
+    {
+        uint8_t value       = 0;
+
+        traceDecodeUInt8( ptr, &value, &lastFlag );
+        uint32_t    byteNumber  = numberOfBits / 8;
+
+        // next one...
+        numberOfBits    += 7;
+
+    } while( lastFlag == false );
+}
+
+//
 void traceDecodeUInt32( uint32_t* value, uint8_t** ptr )
 {
     bool        lastFlag    = false;
@@ -219,6 +265,10 @@ void tracePrintf( uint8_t** ptr, const char* format, ... )
     // first, output the format string identifier...
     traceEncodeUInt32( (uint32_t)(format), ptr );
 
+    // Now, count the number of parameters ("%" characters).
+    uint32_t    numberOfParameters  = 0;
+    traceEncodeUInt32( numberOfParameters, ptr );
+
     // ...then scan thru the string finding all the
     // format specifiers, determine their size and output
     // the binary data associated with them.
@@ -269,7 +319,11 @@ int main()
     traceOutput( 456 );
     traceOutput( 0xabcdef );
     traceOutput( 0xffffffff );
+    
+    uint8_t blob[]  = {0x12,0x34,0x56,0x78,0x9a,0xbc};
+    traceEncodeBLOB( &blob[0], sizeof(blob), &tracePacketPtr );
 
+    printf("\n-----\n");
 
     tracePacket = &tempData[0];
     tracePacketPtr  = tracePacket;
