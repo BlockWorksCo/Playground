@@ -1,3 +1,33 @@
+//
+// uint32 encoded using a continuation-bit, 0 indicates another byte to come, 1 indicates no more
+// bytes.
+// 
+//
+// Timestamps:
+// up to uint32-max in total, Type in high part of timestamp.
+// First uint32 in packet is a time-base. All other timestamps are deltas from this. 
+// Resolution is 0.1s
+// time can use lower 2048 (204.8sec, 11 bits), leaving upper 4 bits for type and 1 for continuation-bit.
+// 0123456701234567
+// 0TTTTttttttttttt
+//
+// Type 0: marker
+// <Type&Timestamp:uint16> <marker:uint32>
+// typical size 2 + 2 = 4b
+//
+// Type 1: printf
+// <Type&Timestamp:uint16> <formatAddress:uint32> <:uint32> <:uint32> ... Number of params defined by format string.
+// typical size 2 + 3 + 2 + 2 = 9b
+//
+// Type 2: hex dump:
+// <Type&Timestamp:uint16> <numberOfBytesinBLOB> <BLOB>
+// typical size 2 + 1 + n = (3+n)b
+//
+//
+// In typical 256b packet:
+// 256/4 = 64 type 0.
+// 256/9 = 28 type 1.
+//
 
 
 
@@ -307,6 +337,10 @@ void tracePrintf( uint8_t** ptr, const char* format, ... )
     va_end(args);
 }
 
+//
+void traceOutputHex( uint8_t* data, uint32_t numberOfBytes )
+{
+}
 
 
 //
