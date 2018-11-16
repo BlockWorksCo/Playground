@@ -1,7 +1,10 @@
 //
 // uint32 encoded using a continuation-bit, 0 indicates another byte to come, 1 indicates no more
 // bytes.
-// 
+// This scheme means there is an advantage gained while storing values closer to zero as less bytes
+// need to be stored to represent the data.
+// If the numeric value is combined with a set of flags, the flags should be in the LSB, meaning they
+// do not create an artificially large-valued number.
 //
 // Timestamps:
 // up to uint32-max in total, Type in high part of timestamp.
@@ -12,21 +15,31 @@
 // 0TTTTttttttttttt
 //
 // Type 0: marker
-// <Type&Timestamp:uint16> <marker:uint32>
-// typical size 2 + 2 = 4b
+// <markerAndType:uint32>
+// 01234567
+// 1xxxxxtt   x = marker-value, t = type.
+// typical size 1b
 //
-// Type 1: printf
-// <Type&Timestamp:uint16> <formatAddress:uint32> <:uint32> <:uint32> ... Number of params defined by format string.
-// typical size 2 + 3 + 2 + 2 = 9b
+// Type 1: hex dump:
+// <numberOfBytesinBLOB&Type> <BLOB>
+// 01234567
+// 1nnnnntt     n = number-of-bytes, t = type
+// 1 byte can encode up to32 bytes of data.
+// typical size 1 + n 
 //
-// Type 2: hex dump:
-// <Type&Timestamp:uint16> <numberOfBytesinBLOB> <BLOB>
-// typical size 2 + 1 + n = (3+n)b
+// Type 2: printf
+// <formatAddressAndFlags:uint32> <:uint32> <:uint32> ...
+// 012345670123456701234567
+// 0aaaaaaa0aaaaaaa1aaaaatt     a=address t = type.
+// 3 bytes can encode any string address in a 512KB image (19-bits)
+// parameters will follow as specified by the format-string.
 //
+// Type 3: unknown
 //
 // In typical 256b packet:
-// 256/4 = 64 type 0.
-// 256/9 = 28 type 1.
+// 256/1 = 256 type 0.
+// 256/(1+31) = 8 type 1.
+// 256/3 = 85 type 1.
 //
 
 
