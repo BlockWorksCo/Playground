@@ -39,7 +39,8 @@
 // In typical 256b packet:
 // 256/1 = 256 type 0.
 // 256/(1+31) = 8 type 1.
-// 256/3 = 85 type 1.
+// 256/3 = 85 type 1 with no params.
+// 256/(3+2) = 51 type 1 with 2 small params.
 //
 
 
