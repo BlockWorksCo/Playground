@@ -286,70 +286,6 @@ void traceInput( uint32_t* timeDelta, uint32_t* marker )
 
 
 
-
-//
-// %c char single character
-// %d (%i) int signed integer
-// %e (%E) float or double exponential format
-// %f float or double signed decimal
-// %g (%G) float or double use %f or %e as required
-// %o int unsigned octal value
-// %p pointer address stored in pointer
-// %s array of char sequence of characters
-// %u int unsigned decimal
-// %x (%X) int unsigned hex value
-// %z size_t.
-//
-void tracePrintf( uint8_t** ptr, const char* format, ... )
-{
-    va_list args;
-    va_start(args, format);
-
-    // first, output the format string identifier...
-    traceEncodeUInt32( (uint32_t)(format), ptr );
-
-    // Now, count the number of parameters ("%" characters).
-    uint32_t    numberOfParameters  = 0;
-    traceEncodeUInt32( numberOfParameters, ptr );
-
-    // ...then scan thru the string finding all the
-    // format specifiers, determine their size and output
-    // the binary data associated with them.
-    bool    percent = false;
-    for( uint32_t i=0; i<strlen(format); i++)
-    {
-        if( format[i] == '%' )
-        {
-            percent = true;
-        }
-        else if( percent == true )
-        {
-            char    type    = format[i];
-
-            //
-            switch(type)
-            {
-                case 'c': traceEncodeUInt32( (uint32_t)va_arg(args,int), ptr ); break;
-                case 'd': traceEncodeUInt32( (uint32_t)va_arg(args,int), ptr ); break;
-                case 'e': traceEncodeUInt32( (uint32_t)va_arg(args,int), ptr ); break;
-                case 'f': traceEncodeUInt32( (uint32_t)va_arg(args,double), ptr ); break;
-                case 'g': traceEncodeUInt32( (uint32_t)va_arg(args,double), ptr ); break;
-                case 'o': traceEncodeUInt32( (uint32_t)va_arg(args,int), ptr ); break;
-                case 'p': traceEncodeUInt32( (uint32_t)va_arg(args,void*), ptr ); break;
-                case 's': traceEncodeUInt32( (uint32_t)va_arg(args,int), ptr ); break;
-                case 'u': traceEncodeUInt32( (uint32_t)va_arg(args,int), ptr ); break;
-                case 'x': traceEncodeUInt32( (uint32_t)va_arg(args,int), ptr ); break;
-                case 'z': traceEncodeUInt32( (uint32_t)va_arg(args,size_t), ptr ); break;
-            }
-
-            // For now, we only parse simple format-specifiers, i.e "%d".
-            percent = false;
-        }
-    }
-
-    va_end(args);
-}
-
 //
 void traceOutputHex( uint8_t* data, uint32_t numberOfBytes )
 {
@@ -370,6 +306,83 @@ void traceEncodeMarker( uint32_t marker, uint8_t** ptr )
     uint32_t    value   = (marker << 2) | type;
 
     traceEncodeUInt32( value, ptr );
+}
+
+#define BASE_ADDRESS            (0x550000000000)
+
+//
+// %c char single character
+// %d (%i) int signed integer
+// %e (%E) float or double exponential format
+// %f float or double signed decimal
+// %g (%G) float or double use %f or %e as required
+// %o int unsigned octal value
+// %p pointer address stored in pointer
+// %s array of char sequence of characters
+// %u int unsigned decimal
+// %x (%X) int unsigned hex value
+// %z size_t.
+//
+void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
+{
+    va_list args;
+    va_start(args, format);
+
+    // first, determine the address of the format string identifier...
+    // minus the base address.
+    uintptr_t  address = (uintptr_t)format;
+    printf("-- %p -- ",format);
+    address     -= BASE_ADDRESS;
+
+    // Encode the type with the address.
+    uint32_t    type    = 2;
+    uint32_t    value   = (address << 2) | type;
+    traceEncodeUInt32( address, ptr );
+
+    // ...then scan thru the string finding all the
+    // format specifiers, determine their size and output
+    // the binary data associated with them.
+    bool    percent = false;
+    for( uint32_t i=0; i<strlen(format); i++)
+    {
+        if( format[i] == '%' )
+        {
+            percent = true;
+        }
+        else if( percent == true )
+        {
+            char    type    = format[i];
+
+            //
+            switch(type)
+            {
+                case 'c':
+                case 'd':
+                case 'e':
+                case 'f':
+                case 'g':
+                case 'o':
+                case 'p':
+                case 's':
+                case 'u':
+                case 'x':
+                case 'z':
+                {
+                    traceEncodeUInt32( (uint32_t)va_arg(args,uint32_t), ptr );
+                    break;
+                }
+
+                default:
+                     traceEncodeUInt32( 0, ptr );
+                    break;
+            }
+
+            // For now, we only parse simple format-specifiers, i.e "%d".
+            percent = false;
+        }
+    }
+
+    va_end(args);
 }
 
 
@@ -406,8 +419,9 @@ void traceDecode( uint8_t** ptr )
 
         case 2:
         {
-            uint32_t    address = value + 0x800000;
-            printf("format string addx: %08x\n", address);
+            uintptr_t   address     = value + BASE_ADDRESS;
+            void*       pAddress    = (void*)address;
+            printf("format string addx: %p\n", pAddress);
             break;
         }
 
@@ -433,11 +447,13 @@ int main()
     traceEncodeMarker( 1, &tracePacketPtr );
     traceEncodeMarker( 2, &tracePacketPtr );
     traceEncodeMarker( 3, &tracePacketPtr );
+    traceEncodePrintf( &tracePacketPtr, "Hello World." );
 
     // Decode
     tracePacket = &tempData[0];
     tracePacketPtr  = tracePacket;
 
+    traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
