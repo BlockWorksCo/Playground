@@ -34,7 +34,7 @@
 // 3 bytes can encode any string address in a 512KB image (19-bits)
 // parameters will follow as specified by the format-string.
 //
-// Type 3: unknown
+// Type 3: Timestamp
 //
 // In typical 256b packet:
 // 256/1 = 256 type 0.
@@ -288,7 +288,6 @@ void traceInput( uint32_t* timeDelta, uint32_t* marker )
 
 
 //
-//
 // %c char single character
 // %d (%i) int signed integer
 // %e (%E) float or double exponential format
@@ -357,38 +356,91 @@ void traceOutputHex( uint8_t* data, uint32_t numberOfBytes )
 }
 
 
+
+
+
+
+
+
+
+//
+void traceEncodeMarker( uint32_t marker, uint8_t** ptr )
+{
+    uint32_t    type    = 0;
+    uint32_t    value   = (marker << 2) | type;
+
+    traceEncodeUInt32( value, ptr );
+}
+
+
+
+//
+void traceDecode( uint8_t** ptr )
+{
+    uint32_t    value   = 0;
+    traceDecodeUInt32( &value, ptr );
+
+    uint8_t     type    = value & 0x3;
+    value >>= 2;
+    
+    switch( type )
+    {
+        case 0:
+            printf("marker %d\n", value);
+            break;
+
+        case 1:
+        {
+            uint32_t    numberOfBytes   = value;
+            static uint8_t  data[128]   = {0};
+            memcpy( &data[0], *ptr, numberOfBytes );
+            *ptr    += numberOfBytes;
+            printf("%d bytes: ", numberOfBytes);
+            for( uint32_t i=0; i<numberOfBytes; i++) 
+            {
+                printf( "%02x ",data[i] );
+            }
+            printf("\n");
+            break;
+        }
+
+        case 2:
+        {
+            uint32_t    address = value + 0x800000;
+            printf("format string addx: %08x\n", address);
+            break;
+        }
+
+        case 3:
+            break;
+
+        default:
+            break;
+    }
+
+}
+
+
+
+
 //
 int main()
 {
+    // Encode
     tracePacket = &tempData[0];
     tracePacketPtr  = tracePacket;
 
-    traceOutput( 0x1fff );
-    traceOutput( 456 );
-    traceOutput( 0xabcdef );
-    traceOutput( 0xffffffff );
-    
-    uint8_t blob[]  = {0x12,0x34,0x56,0x78,0x9a,0xbc};
-    traceEncodeBLOB( &blob[0], sizeof(blob), &tracePacketPtr );
+    traceEncodeMarker( 1, &tracePacketPtr );
+    traceEncodeMarker( 2, &tracePacketPtr );
+    traceEncodeMarker( 3, &tracePacketPtr );
 
-    printf("\n-----\n");
-
+    // Decode
     tracePacket = &tempData[0];
     tracePacketPtr  = tracePacket;
 
-    uint32_t    timeDelta   = 0;
-    uint32_t    marker      = 0;
-    traceInput( &timeDelta, &marker );
-    printf(" +%d) %x\n", timeDelta, marker);
-
-    traceInput( &timeDelta, &marker );
-    printf(" +%d) %x\n", timeDelta, marker);
-
-    traceInput( &timeDelta, &marker );
-    printf(" +%d) %x\n", timeDelta, marker);
-
-    traceInput( &timeDelta, &marker );
-    printf(" +%d) %x\n", timeDelta, marker);
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
 }
 
 
