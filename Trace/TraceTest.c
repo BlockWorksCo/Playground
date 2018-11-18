@@ -388,6 +388,55 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
 }
 
 
+void traceDecodePrintf( uint8_t** ptr, const char* format )
+{
+    // ...then scan thru the string finding all the
+    // format specifiers, determine their size and output
+    // the binary data associated with them.
+    bool    percent = false;
+    for( uint32_t i=0; i<strlen(format); i++)
+    {
+        if( format[i] == '%' )
+        {
+            percent = true;
+        }
+        else if( percent == true )
+        {
+            char    type    = format[i];
+
+            //
+            switch(type)
+            {
+                case 'c':
+                case 'd':
+                case 'e':
+                case 'f':
+                case 'g':
+                case 'o':
+                case 'p':
+                case 's':
+                case 'u':
+                case 'x':
+                case 'z':
+                {
+                    uint32_t    value;
+                    traceDecodeUInt32( &value, ptr );
+                    printf("-- %d --\n",value);
+                    break;
+                }
+
+                default:
+                     traceEncodeUInt32( 0, ptr );
+                    break;
+            }
+
+            // For now, we only parse simple format-specifiers, i.e "%d".
+            percent = false;
+        }
+    }
+}
+
+
 
 //
 void traceDecode( uint8_t** ptr )
@@ -424,6 +473,7 @@ void traceDecode( uint8_t** ptr )
             uintptr_t   address     = ((uintptr_t)value) | BASE_ADDRESS;
             void*       pAddress    = (void*)address;
             printf("format string addx: %s\n", (char*)pAddress);
+            traceDecodePrintf( ptr, (char*)pAddress );
             break;
         }
 
@@ -456,11 +506,15 @@ int main()
     traceEncodeMarker( 2, &tracePacketPtr );
     traceEncodeMarker( 3, &tracePacketPtr );
     traceEncodePrintf( &tracePacketPtr, "Hello World." );
+    traceEncodePrintf( &tracePacketPtr, "Hello World. (%d)", 123 );
+    traceEncodePrintf( &tracePacketPtr, "Hello World. (%d, %d)", 456,789 );
 
     // Decode
     tracePacket = &tempData[0];
     tracePacketPtr  = tracePacket;
 
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
