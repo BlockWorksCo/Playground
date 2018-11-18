@@ -68,7 +68,7 @@
 #define SHIFT_B4                        (28)
 
 // Packet & stream data.
-uint8_t     tempData[1024];
+uint8_t     tempData[128];
 uint8_t*    tracePacket     = &tempData[0];
 uint8_t*    tracePacketPtr  = NULL;
 
@@ -308,7 +308,8 @@ void traceEncodeMarker( uint32_t marker, uint8_t** ptr )
     traceEncodeUInt32( value, ptr );
 }
 
-#define BASE_ADDRESS            (0x550000000000)
+static uintptr_t                baseAddress  = 0;
+#define BASE_ADDRESS            (baseAddress)
 
 //
 // %c char single character
@@ -333,11 +334,12 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
     uintptr_t  address = (uintptr_t)format;
     printf("-- %p -- ",format);
     address     -= BASE_ADDRESS;
+    printf("++ %lx ++ ",address);
 
     // Encode the type with the address.
     uint32_t    type    = 2;
     uint32_t    value   = (address << 2) | type;
-    traceEncodeUInt32( address, ptr );
+    traceEncodeUInt32( value, ptr );
 
     // ...then scan thru the string finding all the
     // format specifiers, determine their size and output
@@ -419,9 +421,9 @@ void traceDecode( uint8_t** ptr )
 
         case 2:
         {
-            uintptr_t   address     = value + BASE_ADDRESS;
+            uintptr_t   address     = ((uintptr_t)value) | BASE_ADDRESS;
             void*       pAddress    = (void*)address;
-            printf("format string addx: %p\n", pAddress);
+            printf("format string addx: %s\n", (char*)pAddress);
             break;
         }
 
@@ -440,6 +442,12 @@ void traceDecode( uint8_t** ptr )
 //
 int main()
 {
+    const uint8_t temp[]  = "Hello World";
+    baseAddress  = ((uintptr_t)&main) & 0xfffffffff0000000;
+    printf("%p\r\n", &main);
+    printf("%p\r\n", (void*)&temp[0]);
+    printf("%p\r\n", (void*)baseAddress);
+
     // Encode
     tracePacket = &tempData[0];
     tracePacketPtr  = tracePacket;
