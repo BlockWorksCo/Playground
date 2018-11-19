@@ -392,6 +392,7 @@ void traceDecodePrintf( uint8_t** ptr, const char* format )
 {
     uint32_t    params[10];
     uint32_t    numberOfParams  = 0;
+    char        string[128]     = {0};
 
     // ...then scan thru the string finding all the
     // format specifiers, determine their size and output
@@ -405,7 +406,14 @@ void traceDecodePrintf( uint8_t** ptr, const char* format )
         }
         else if( percent == true )
         {
-            char    type    = format[i];
+            char    type            = format[i];
+            char    fieldText[64]   = {0};
+            char    formatText[8]   = {0};
+
+            //
+            formatText[0]   = '%';
+            formatText[1]   = type;
+            formatText[2]   = 0;
 
             //
             switch(type)
@@ -426,6 +434,8 @@ void traceDecodePrintf( uint8_t** ptr, const char* format )
                     traceDecodeUInt32( &value, ptr );
                     params[numberOfParams]  = value;
                     numberOfParams++;
+
+                    snprintf( &fieldText[0], sizeof(fieldText), formatText, value );
                     break;
                 }
 
@@ -434,19 +444,22 @@ void traceDecodePrintf( uint8_t** ptr, const char* format )
                     break;
             }
 
+            //
+            strcat( &string[0], &fieldText[0] );
+
             // For now, we only parse simple format-specifiers, i.e "%d".
             percent = false;
+        }
+        else 
+        {
+            uint32_t    currentLength   = strlen(string);
+            string[ currentLength+0 ]    = format[i];
+            string[ currentLength+1 ]    = 0;
         }
     }
 
     //
-    //
-    //
-    printf("\n");
-    for(uint32_t i=0; i<numberOfParams; i++)
-    {
-        printf("-- %d --\n",params[i]);
-    }
+    printf("\n[%s]\n",string);
 }
 
 
