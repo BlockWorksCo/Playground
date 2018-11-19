@@ -358,11 +358,16 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
             //
             switch(type)
             {
-                case 'c':
-                case 'd':
                 case 'e':
                 case 'f':
                 case 'g':
+                {
+                    traceEncodeUInt32( (uint32_t)va_arg(args,uint32_t), ptr );
+                    break;
+                }
+
+                case 'c':
+                case 'd':
                 case 'o':
                 case 'p':
                 case 's':
@@ -390,8 +395,6 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
 
 void traceDecodePrintf( uint8_t** ptr, const char* format )
 {
-    uint32_t    params[10];
-    uint32_t    numberOfParams  = 0;
     char        string[128]     = {0};
 
     // ...then scan thru the string finding all the
@@ -418,11 +421,19 @@ void traceDecodePrintf( uint8_t** ptr, const char* format )
             //
             switch(type)
             {
-                case 'c':
-                case 'd':
                 case 'e':
                 case 'f':
                 case 'g':
+                {
+                    uint32_t    value;
+                    float*      pFloat  = (float*)&value;
+                    traceDecodeUInt32( &value, ptr );
+                    snprintf( &fieldText[0], sizeof(fieldText), formatText, *pFloat );
+                    break;
+                }
+
+                case 'c':
+                case 'd':
                 case 'o':
                 case 'p':
                 case 's':
@@ -432,9 +443,6 @@ void traceDecodePrintf( uint8_t** ptr, const char* format )
                 {
                     uint32_t    value;
                     traceDecodeUInt32( &value, ptr );
-                    params[numberOfParams]  = value;
-                    numberOfParams++;
-
                     snprintf( &fieldText[0], sizeof(fieldText), formatText, value );
                     break;
                 }
@@ -535,12 +543,14 @@ int main()
     traceEncodePrintf( &tracePacketPtr, "Hello World." );
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%d)", 123 );
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%d, %d)", 456,789 );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%d, %d, %d)", 456,789, 304 );
+    traceEncodePrintf( &tracePacketPtr, "Hello World. (%x, %x, %x)", 0xab,0xabcd, 0x0123abcd );
+    traceEncodePrintf( &tracePacketPtr, "Hello World. (%c, %f, %d)", 'A',3.14, 304 );
 
     // Decode
     tracePacket = &tempData[0];
     tracePacketPtr  = tracePacket;
 
+    traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
