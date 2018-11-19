@@ -362,7 +362,8 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
                 case 'f':
                 case 'g':
                 {
-                    traceEncodeUInt32( (uint32_t)va_arg(args,uint32_t), ptr );
+                    double  fValue  = va_arg(args,double);
+                    traceEncodeBLOB( (uint8_t*)&fValue, sizeof(fValue), ptr );
                     break;
                 }
 
@@ -425,10 +426,9 @@ void traceDecodePrintf( uint8_t** ptr, const char* format )
                 case 'f':
                 case 'g':
                 {
-                    uint32_t    value;
-                    float*      pFloat  = (float*)&value;
-                    traceDecodeUInt32( &value, ptr );
-                    snprintf( &fieldText[0], sizeof(fieldText), formatText, *pFloat );
+                    double  fValue      = 0;
+                    traceDecodeBLOB( (uint8_t*)&fValue, sizeof(fValue),  ptr );
+                    snprintf( &fieldText[0], sizeof(fieldText), formatText, fValue );
                     break;
                 }
 
