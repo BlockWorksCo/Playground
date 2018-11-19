@@ -390,6 +390,9 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
 
 void traceDecodePrintf( uint8_t** ptr, const char* format )
 {
+    uint32_t    params[10];
+    uint32_t    numberOfParams  = 0;
+
     // ...then scan thru the string finding all the
     // format specifiers, determine their size and output
     // the binary data associated with them.
@@ -421,7 +424,8 @@ void traceDecodePrintf( uint8_t** ptr, const char* format )
                 {
                     uint32_t    value;
                     traceDecodeUInt32( &value, ptr );
-                    printf("-- %d --\n",value);
+                    params[numberOfParams]  = value;
+                    numberOfParams++;
                     break;
                 }
 
@@ -433,6 +437,15 @@ void traceDecodePrintf( uint8_t** ptr, const char* format )
             // For now, we only parse simple format-specifiers, i.e "%d".
             percent = false;
         }
+    }
+
+    //
+    //
+    //
+    printf("\n");
+    for(uint32_t i=0; i<numberOfParams; i++)
+    {
+        printf("-- %d --\n",params[i]);
     }
 }
 
@@ -492,6 +505,7 @@ void traceDecode( uint8_t** ptr )
 //
 int main()
 {
+    //
     const uint8_t temp[]  = "Hello World";
     baseAddress  = ((uintptr_t)&main) & 0xfffffffff0000000;
     printf("%p\r\n", &main);
@@ -508,11 +522,13 @@ int main()
     traceEncodePrintf( &tracePacketPtr, "Hello World." );
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%d)", 123 );
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%d, %d)", 456,789 );
+    traceEncodePrintf( &tracePacketPtr, "Hello World. (%d, %d, %d)", 456,789, 304 );
 
     // Decode
     tracePacket = &tempData[0];
     tracePacketPtr  = tracePacket;
 
+    traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
