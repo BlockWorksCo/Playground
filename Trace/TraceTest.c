@@ -99,7 +99,7 @@ void traceDecodeUInt8( uint8_t** ptr, uint8_t* value, bool* lastFlag )
     *value      = **ptr;
     *lastFlag   = false;
 
-    printf("[%02x]",*value);
+    //printf("[%02x]",*value);
 
     // If the top bit is set, this is the last byte in the value.
     if( ((*value)&0x80) != 0 )
@@ -124,7 +124,7 @@ void traceEncodeUInt8( uint8_t value, uint8_t** ptr, bool lastFlag )
         value   |= 0x80;
     }
 
-    printf("<%02x>",value);
+    //printf("<%02x>",value);
 
     // Insert the value into the byte stream.
     **ptr   = value;
@@ -379,9 +379,9 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
     // first, determine the address of the format string identifier...
     // minus the base address.
     uintptr_t  address = (uintptr_t)format;
-    printf("-- %p -- ",format);
+    //printf("-- %p -- ",format);
     address     -= BASE_ADDRESS;
-    printf("++ %lx ++ ",address);
+    //printf("++ %lx ++ ",address);
 
     // Encode the type with the address.
     uint32_t    type    = 2;
@@ -586,12 +586,8 @@ void traceDecode( uint8_t** ptr )
 //
 int main()
 {
-    //
-    const uint8_t temp[]  = "Hello World";
+    // Note: 28xzero, not 32.
     baseAddress  = ((uintptr_t)&main) & 0xfffffffff0000000;
-    printf("%p\r\n", &main);
-    printf("%p\r\n", (void*)&temp[0]);
-    printf("%p\r\n", (void*)baseAddress);
 
     // Encode
     tracePacket = &tempData[0];
