@@ -176,6 +176,38 @@ void traceEncodeUInt32( uint32_t value, uint8_t** ptr )
 }
 
 //
+void traceEncodeZeroTerminatedBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr )
+{
+    for( uint32_t i=0; i<numberOfBytes; i++ )
+    {
+        uint8_t     c   = blob[i];
+        **ptr       = c;
+        *ptr        += 1;
+        **ptr       = 0;
+    }
+
+}
+
+//
+void traceDecodeZeroTerminatedBLOB( uint8_t* blob, uint32_t maxNumberOfBytes, uint8_t** ptr )
+{
+    for( uint32_t i=0; i<maxNumberOfBytes; i++ )
+    {
+        char    c   = **ptr;
+        if( c != 0 )
+        {
+            blob[i] = c;
+        }
+        else
+        {
+            break;
+        }
+
+        *ptr    += 1;
+    }
+}
+
+//
 void traceEncodeFixedSizeBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr )
 {
     memcpy( *ptr, blob, numberOfBytes );
@@ -377,16 +409,22 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
                 case 'f':
                 case 'g':
                 {
-                    double  fValue  = va_arg(args,double);
+                    double  fValue  = va_arg( args, double );
                     traceEncodeFixedSizeBLOB( (uint8_t*)&fValue, sizeof(fValue), ptr );
                     break;
                 }
+
+                case 's':
+                {
+                    uint8_t*    sValue  = va_arg( args, char* );
+                    traceEncodeZeroTerminatedBLOB( &sValue[0], strlen(sValue), ptr );
+                    break;
+                }  
 
                 case 'c':
                 case 'd':
                 case 'o':
                 case 'p':
-                case 's':
                 case 'u':
                 case 'x':
                 case 'z':
@@ -447,11 +485,18 @@ void traceDecodePrintf( uint8_t** ptr, const char* format )
                     break;
                 }
 
+                case 's':
+                {
+                    uint8_t sValue[64];
+                    traceDecodeZeroTerminatedBLOB( (uint8_t*)&sValue, sizeof(sValue),  ptr );
+                    snprintf( &fieldText[0], sizeof(fieldText), formatText, sValue );
+                    break;
+                }
+
                 case 'c':
                 case 'd':
                 case 'o':
                 case 'p':
-                case 's':
                 case 'u':
                 case 'x':
                 case 'z':
@@ -560,11 +605,13 @@ int main()
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%d, %d)", 456,789 );
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%x, %x, %x)", 0xab,0xabcd, 0x0123abcd );
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%c, %f, %g)", 'A',3.14, 304.0 );
+    traceEncodePrintf( &tracePacketPtr, "Hello World. (%s)", "Blaa!" );
 
     // Decode
     tracePacket = &tempData[0];
     tracePacketPtr  = tracePacket;
 
+    traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
