@@ -176,6 +176,21 @@ void traceEncodeUInt32( uint32_t value, uint8_t** ptr )
 }
 
 //
+void traceEncodeFixedSizeBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr )
+{
+    memcpy( *ptr, blob, numberOfBytes );
+    *ptr    += numberOfBytes;
+}
+
+//
+void traceDecodeFixedSizeBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr )
+{
+    memcpy( blob, *ptr, numberOfBytes );
+    *ptr    += numberOfBytes;
+}
+
+
+//
 void traceEncodeBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr )
 {
     // For every block of 7-bits in the BLOB, encode the byte.
@@ -363,7 +378,7 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
                 case 'g':
                 {
                     double  fValue  = va_arg(args,double);
-                    traceEncodeBLOB( (uint8_t*)&fValue, sizeof(fValue), ptr );
+                    traceEncodeFixedSizeBLOB( (uint8_t*)&fValue, sizeof(fValue), ptr );
                     break;
                 }
 
@@ -427,7 +442,7 @@ void traceDecodePrintf( uint8_t** ptr, const char* format )
                 case 'g':
                 {
                     double  fValue      = 0;
-                    traceDecodeBLOB( (uint8_t*)&fValue, sizeof(fValue),  ptr );
+                    traceDecodeFixedSizeBLOB( (uint8_t*)&fValue, sizeof(fValue),  ptr );
                     snprintf( &fieldText[0], sizeof(fieldText), formatText, fValue );
                     break;
                 }
@@ -544,7 +559,7 @@ int main()
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%d)", 123 );
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%d, %d)", 456,789 );
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%x, %x, %x)", 0xab,0xabcd, 0x0123abcd );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%c, %f, %d)", 'A',3.14, 304 );
+    traceEncodePrintf( &tracePacketPtr, "Hello World. (%c, %f, %g)", 'A',3.14, 304.0 );
 
     // Decode
     tracePacket = &tempData[0];
