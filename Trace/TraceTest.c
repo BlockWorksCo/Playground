@@ -68,8 +68,7 @@
 #define SHIFT_B4                        (28)
 
 // Packet & stream data.
-uint8_t     tempData[128];
-uint8_t*    tracePacket     = &tempData[0];
+uint8_t     tracePacket[256];
 uint8_t*    tracePacketPtr  = NULL;
 
 // memento of the timestamp for working out the timed deltas.
@@ -590,8 +589,7 @@ int main()
     baseAddress  = ((uintptr_t)&main) & 0xfffffffff0000000;
 
     // Encode
-    tracePacket = &tempData[0];
-    tracePacketPtr  = tracePacket;
+    tracePacketPtr  = &tracePacket[0];
 
     traceEncodeMarker( 1, &tracePacketPtr );
     traceEncodeMarker( 2, &tracePacketPtr );
@@ -602,11 +600,12 @@ int main()
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%x, %x, %x)", 0xab,0xabcd, 0x0123abcd );
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%c, %f, %g)", 'A',3.14, 304.0 );
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%s)", "Blaa!" );
+    traceEncodePrintf( &tracePacketPtr, "Hello World. (%o, %o, %o)", 0xab,0xabcd, 0x0123abcd );
 
     // Decode
-    tracePacket = &tempData[0];
-    tracePacketPtr  = tracePacket;
+    tracePacketPtr  = &tracePacket[0];
 
+    traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
