@@ -51,6 +51,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <time.h>
+#include <stddef.h>
 
 // The larger this value, the less data will be taken with timing info.
 #define TRACE_TIMESTAMP_RESOLUTION      (10)
@@ -70,6 +71,7 @@
 // Packet & stream data.
 uint8_t     tracePacket[256];
 uint8_t*    tracePacketPtr  = NULL;
+uint32_t    totalSize       = 0;
 
 // memento of the timestamp for working out the timed deltas.
 uint32_t    lastTraceTimestamp   = 0;
@@ -177,6 +179,7 @@ void traceEncodeUInt32( uint32_t value, uint8_t** ptr )
 //
 void traceEncodeZeroTerminatedBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr )
 {
+    // copy the string into the output.
     for( uint32_t i=0; i<numberOfBytes; i++ )
     {
         uint8_t     c   = blob[i];
@@ -185,6 +188,7 @@ void traceEncodeZeroTerminatedBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8
         **ptr       = 0;
     }
 
+    // Don't forget about the zero-terminator.
     *ptr        += 1;
 }
 
@@ -334,8 +338,15 @@ void traceInput( uint32_t* timeDelta, uint32_t* marker )
 
 
 //
-void traceOutputHex( uint8_t* data, uint32_t numberOfBytes )
+void traceEncodeHex( uint8_t* data, uint32_t numberOfBytes, uint8_t** ptr )
 {
+    // Encode the type with the numberOfBytes.
+    uint32_t    type    = 1;
+    uint32_t    value   = (numberOfBytes << 2) | type;
+    traceEncodeUInt32( value, ptr );
+
+    // Then simply copy the bytes into the stream.
+    traceEncodeFixedSizeBLOB( data, numberOfBytes, ptr );
 }
 
 
@@ -379,9 +390,7 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
     // first, determine the address of the format string identifier...
     // minus the base address.
     uintptr_t  address = (uintptr_t)format;
-    //printf("-- %p -- ",format);
     address     -= BASE_ADDRESS;
-    //printf("++ %lx ++ ",address);
 
     // Encode the type with the address.
     uint32_t    type    = 2;
@@ -447,10 +456,8 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
 }
 
 
-void traceDecodePrintf( uint8_t** ptr, const char* format )
+void traceDecodePrintf( uint8_t** ptr, char* output, uint32_t maxOutputSize, const char* format )
 {
-    char        string[128]     = {0};
-
     // ...then scan thru the string finding all the
     // format specifiers, determine their size and output
     // the binary data associated with them.
@@ -513,21 +520,18 @@ void traceDecodePrintf( uint8_t** ptr, const char* format )
             }
 
             //
-            strcat( &string[0], &fieldText[0] );
+            strcat( &output[0], &fieldText[0] );
 
             // For now, we only parse simple format-specifiers, i.e "%d".
             percent = false;
         }
         else 
         {
-            uint32_t    currentLength   = strlen(string);
-            string[ currentLength+0 ]    = format[i];
-            string[ currentLength+1 ]    = 0;
+            uint32_t    currentLength   = strlen(output);
+            output[ currentLength+0 ]    = format[i];
+            output[ currentLength+1 ]    = 0;
         }
     }
-
-    //
-    printf("\n[%s]\n",string);
 }
 
 
@@ -535,39 +539,44 @@ void traceDecodePrintf( uint8_t** ptr, const char* format )
 //
 void traceDecode( uint8_t** ptr )
 {
+    char        text[128] = {0};
     uint32_t    value   = 0;
     traceDecodeUInt32( &value, ptr );
 
     uint8_t     type    = value & 0x3;
     value >>= 2;
     
+    // deserialise the text.
     switch( type )
     {
         case 0:
-            printf("marker %d\n", value);
+            // Marker
+            snprintf( &text[0], sizeof(text), "marker %d", value);
             break;
 
         case 1:
         {
+            // Hex/binary data.
             uint32_t    numberOfBytes   = value;
             static uint8_t  data[128]   = {0};
             memcpy( &data[0], *ptr, numberOfBytes );
             *ptr    += numberOfBytes;
-            printf("%d bytes: ", numberOfBytes);
+            snprintf( &text[0], sizeof(text), "%d bytes: ", numberOfBytes);
+            char    value[8];
             for( uint32_t i=0; i<numberOfBytes; i++) 
             {
-                printf( "%02x ",data[i] );
+                snprintf( &value[0], sizeof(value), "%02x ",data[i] );
+                strcat( &text[0], &value[0] );
             }
-            printf("\n");
             break;
         }
 
         case 2:
         {
+            // Serialised printf.
             uintptr_t   address     = ((uintptr_t)value) | BASE_ADDRESS;
             void*       pAddress    = (void*)address;
-            printf("format string addx: %s\n", (char*)pAddress);
-            traceDecodePrintf( ptr, (char*)pAddress );
+            traceDecodePrintf( ptr, &text[0], sizeof(text), (char*)pAddress );
             break;
         }
 
@@ -578,6 +587,9 @@ void traceDecode( uint8_t** ptr )
             break;
     }
 
+    // output the text.
+    totalSize   += strlen(text);
+    puts( text );
 }
 
 
@@ -601,7 +613,11 @@ int main()
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%x, %x, %x)", 0xab,0xabcd, 0x0123abcd );
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%c, %f, %g)", 'A',3.14, 304.0 );
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%s)", "Blaa!" );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. ");
+    traceEncodePrintf( &tracePacketPtr, "This is a long message to see if it improves the compression ratio....");
+    uint8_t data[]  = {0x12,0x34,0x45,0x67,0x89,0xab,0xcd,0xef};
+    traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
+
+    ptrdiff_t   serialisedSize    = tracePacketPtr - &tracePacket[0];
 
     // Decode
     tracePacketPtr  = &tracePacket[0];
@@ -616,6 +632,11 @@ int main()
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+
+    printf("serialised size = %ld\n", serialisedSize);
+    printf("deserialised size = %d\n", totalSize);
+    printf("serialise size = %.1f%%\n",(100.0/totalSize)*(float)serialisedSize);
 }
 
 
