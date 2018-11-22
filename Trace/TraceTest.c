@@ -189,6 +189,7 @@ void traceEncodeZeroTerminatedBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8
     }
 
     // Don't forget about the zero-terminator.
+    **ptr       = 0;
     *ptr        += 1;
 }
 
@@ -204,6 +205,7 @@ void traceDecodeZeroTerminatedBLOB( uint8_t* blob, uint32_t maxNumberOfBytes, ui
         }
         else
         {
+            blob[i] = 0;
             break;
         }
 
@@ -608,16 +610,22 @@ int main()
     traceEncodeMarker( 2, &tracePacketPtr );
     traceEncodeMarker( 3, &tracePacketPtr );
     traceEncodePrintf( &tracePacketPtr, "Hello World." );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%d)", 123 );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%d, %d)", 456,789 );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%x, %x, %x)", 0xab,0xabcd, 0x0123abcd );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%c, %f, %g)", 'A',3.14, 304.0 );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%s)", "Blaa!" );
-    traceEncodePrintf( &tracePacketPtr, "This is a long message to see if it improves the compression ratio....");
-    uint8_t data[]  = {0x12,0x34,0x45,0x67,0x89,0xab,0xcd,0xef};
-    traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
+    //traceEncodePrintf( &tracePacketPtr, "Hello World. (%d)", 123 );
+    //traceEncodePrintf( &tracePacketPtr, "Hello World. (%d, %d)", 456,789 );
+    //traceEncodePrintf( &tracePacketPtr, "Hello World. (%x, %x, %x)", 0xab,0xabcd, 0x0123abcd );
+    //traceEncodePrintf( &tracePacketPtr, "Hello World. (%c, %f, %g)", 'A',3.14, 304.0 );
+    //traceEncodePrintf( &tracePacketPtr, "Hello World. (%s)", "Blaa!" );
+    //traceEncodePrintf( &tracePacketPtr, "This is a long message to see if it improves the compression ratio....");
+    //uint8_t data[]  = {0x12,0x34,0x45,0x67,0x89,0xab,0xcd,0xef};
+    //traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
 
     ptrdiff_t   serialisedSize    = tracePacketPtr - &tracePacket[0];
+    printf("\n[");
+    for(uint32_t i=0; i<serialisedSize; i++) 
+    {
+        printf("%02x ",tracePacket[i]);
+    }
+    printf("]\n");
 
     // Decode
     tracePacketPtr  = &tracePacket[0];
@@ -626,13 +634,13 @@ int main()
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
+    //traceDecode( &tracePacketPtr );
+    //traceDecode( &tracePacketPtr );
+    //traceDecode( &tracePacketPtr );
+    //traceDecode( &tracePacketPtr );
+    //traceDecode( &tracePacketPtr );
+    //traceDecode( &tracePacketPtr );
+    //traceDecode( &tracePacketPtr );
 
     printf("serialised size = %ld\n", serialisedSize);
     printf("deserialised size = %d\n", totalSize);
