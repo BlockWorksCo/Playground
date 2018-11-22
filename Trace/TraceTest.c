@@ -185,6 +185,7 @@ void traceEncodeZeroTerminatedBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8
         **ptr       = 0;
     }
 
+    *ptr        += 1;
 }
 
 //
@@ -600,7 +601,7 @@ int main()
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%x, %x, %x)", 0xab,0xabcd, 0x0123abcd );
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%c, %f, %g)", 'A',3.14, 304.0 );
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%s)", "Blaa!" );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%o, %o, %o)", 0xab,0xabcd, 0x0123abcd );
+    traceEncodePrintf( &tracePacketPtr, "Hello World. ");
 
     // Decode
     tracePacketPtr  = &tracePacket[0];
