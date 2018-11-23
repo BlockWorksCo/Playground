@@ -72,7 +72,6 @@
 uint8_t     tracePacket[256];
 uint8_t*    tracePacketPtr  = NULL;
 uint32_t    totalSize       = 0;
-uintptr_t   rodataBase;
 
 // memento of the timestamp for working out the timed deltas.
 uint32_t    lastTraceTimestamp   = 0;
@@ -369,7 +368,32 @@ void traceEncodeMarker( uint32_t marker, uint8_t** ptr )
     traceEncodeUInt32( value, ptr );
 }
 
-#define BASE_ADDRESS            (rodataBase)
+
+uint32_t encodeConstantStringPointer( const char* text )
+{
+    extern const void * const rodata_start;
+    uintptr_t   rodataBase  = (uintptr_t)&rodata_start;
+
+    // first, determine the address of the format string identifier...
+    // minus the base address.
+    uintptr_t  address = (uintptr_t)text;
+    address     -= rodataBase;
+    printf("\n[%ld]\n",address);
+    uint32_t    encodedValue    = (uint32_t)address;
+    return encodedValue;
+}
+
+const char* decodeConstantStringPointer( uint32_t encodedValue )
+{
+    extern const void * const rodata_start;
+    uintptr_t   rodataBase  = (uintptr_t)&rodata_start;
+
+    uintptr_t   address = (uintptr_t)encodedValue;
+    address += rodataBase;
+    const char* text    = (const char*)address;
+    return text;
+}
+
 
 //
 // %c char single character
@@ -391,8 +415,7 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
 
     // first, determine the address of the format string identifier...
     // minus the base address.
-    uintptr_t  address = (uintptr_t)format;
-    address     -= BASE_ADDRESS;
+    uint32_t    address = encodeConstantStringPointer( format );
 
     // Encode the type with the address.
     uint32_t    type    = 2;
@@ -576,9 +599,8 @@ void traceDecode( uint8_t** ptr )
         case 2:
         {
             // Serialised printf.
-            uintptr_t   address     = ((uintptr_t)value) + BASE_ADDRESS;
-            void*       pAddress    = (void*)address;
-            traceDecodePrintf( ptr, &text[0], sizeof(text), (char*)pAddress );
+            const char*   pAddress    = decodeConstantStringPointer( value );
+            traceDecodePrintf( ptr, &text[0], sizeof(text), pAddress );
             break;
         }
 
@@ -600,10 +622,6 @@ void traceDecode( uint8_t** ptr )
 //
 int main()
 {
-    extern const void * const rodata_start;
-    rodataBase  = (uintptr_t)&rodata_start;
-    printf("rodata_start = %lx\n", rodataBase);
-
     // Encode
     tracePacketPtr  = &tracePacket[0];
 
