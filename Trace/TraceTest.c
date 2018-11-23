@@ -72,6 +72,7 @@
 uint8_t     tracePacket[256];
 uint8_t*    tracePacketPtr  = NULL;
 uint32_t    totalSize       = 0;
+uintptr_t   rodataBase;
 
 // memento of the timestamp for working out the timed deltas.
 uint32_t    lastTraceTimestamp   = 0;
@@ -368,8 +369,7 @@ void traceEncodeMarker( uint32_t marker, uint8_t** ptr )
     traceEncodeUInt32( value, ptr );
 }
 
-static uintptr_t                baseAddress  = 0;
-#define BASE_ADDRESS            (baseAddress)
+#define BASE_ADDRESS            (rodataBase)
 
 //
 // %c char single character
@@ -576,7 +576,7 @@ void traceDecode( uint8_t** ptr )
         case 2:
         {
             // Serialised printf.
-            uintptr_t   address     = ((uintptr_t)value) | BASE_ADDRESS;
+            uintptr_t   address     = ((uintptr_t)value) + BASE_ADDRESS;
             void*       pAddress    = (void*)address;
             traceDecodePrintf( ptr, &text[0], sizeof(text), (char*)pAddress );
             break;
@@ -600,8 +600,9 @@ void traceDecode( uint8_t** ptr )
 //
 int main()
 {
-    // Note: 28xzero, not 32.
-    baseAddress  = ((uintptr_t)&main) & 0xfffffffff0000000;
+    extern const void * const rodata_start;
+    rodataBase  = (uintptr_t)&rodata_start;
+    printf("rodata_start = %lx\n", rodataBase);
 
     // Encode
     tracePacketPtr  = &tracePacket[0];
