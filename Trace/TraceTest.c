@@ -52,6 +52,7 @@
 #include <string.h>
 #include <time.h>
 #include <stddef.h>
+#include <inttypes.h>
 
 // The larger this value, the less data will be taken with timing info.
 #define TRACE_TIMESTAMP_RESOLUTION      (10)
@@ -378,7 +379,7 @@ uint32_t encodeConstantStringPointer( const char* text )
     // minus the base address.
     uintptr_t  address = (uintptr_t)text;
     address     -= rodataBase;
-    printf("\n[%ld]\n",address);
+    printf("\n[%"PRIxPTR"]\n",address);
     uint32_t    encodedValue    = (uint32_t)address;
     return encodedValue;
 }
@@ -661,7 +662,7 @@ int main()
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
 
-    printf("serialised size = %ld\n", serialisedSize);
+    printf("serialised size = %"PRIiPTR"\n", serialisedSize);
     printf("deserialised size = %d\n", totalSize);
     printf("serialise size = %.1f%%\n",(100.0/totalSize)*(float)serialisedSize);
 }
