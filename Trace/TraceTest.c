@@ -379,7 +379,7 @@ uint32_t encodeConstantStringPointer( const char* text )
     // minus the base address.
     uintptr_t  address = (uintptr_t)text;
     address     -= rodataBase;
-    printf("\n[%"PRIxPTR"]\n",address);
+    //printf("\n[%"PRIxPTR"]\n",address);
     uint32_t    encodedValue    = (uint32_t)address;
     return encodedValue;
 }
@@ -643,10 +643,11 @@ int main()
     printf("\n[");
     for(uint32_t i=0; i<serialisedSize; i++) 
     {
-        printf("%02x ",tracePacket[i]);
+        printf("%02x",tracePacket[i]);
     }
     printf("]\n");
 
+#if 0
     // Decode
     tracePacketPtr  = &tracePacket[0];
 
@@ -665,6 +666,7 @@ int main()
     printf("serialised size = %"PRIiPTR"\n", serialisedSize);
     printf("deserialised size = %d\n", totalSize);
     printf("serialise size = %.1f%%\n",(100.0/totalSize)*(float)serialisedSize);
+#endif
 }
 
 
