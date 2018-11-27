@@ -640,12 +640,12 @@ int main()
     traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
 
     ptrdiff_t   serialisedSize    = tracePacketPtr - &tracePacket[0];
-    printf("\n[");
+    //printf("\n[");
     for(uint32_t i=0; i<serialisedSize; i++) 
     {
         printf("%02x",tracePacket[i]);
     }
-    printf("]\n");
+    //printf("]\n");
 
 #if 0
     // Decode
