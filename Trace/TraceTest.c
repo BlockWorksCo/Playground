@@ -80,6 +80,7 @@ typedef enum
 
 } TraceEntryType;
 
+#define BITS_PER_TYPE               (2)
 
 
 // Packet & stream data.
@@ -87,25 +88,7 @@ uint8_t     tracePacket[256];
 uint8_t*    tracePacketPtr  = NULL;
 uint32_t    totalSize       = 0;
 
-// memento of the timestamp for working out the timed deltas.
-uint32_t    lastTraceTimestamp   = 0;
 
-
-//
-uint32_t traceGetTimestamp()
-{
-    return (uint32_t)clock();
-}
-
-//
-void traceOutputPacket()
-{
-    // Output the packet.
-    printf("Output packet.\n");
-
-    // Reset packet.
-    //tracePacket = &tempData[0];
-}
 
 //
 void traceDecodeUInt8( uint8_t** ptr, uint8_t* value, bool* lastFlag )
@@ -113,8 +96,6 @@ void traceDecodeUInt8( uint8_t** ptr, uint8_t* value, bool* lastFlag )
     // Copy the values out of the stream.
     *value      = **ptr;
     *lastFlag   = false;
-
-    //printf("[%02x]",*value);
 
     // If the top bit is set, this is the last byte in the value.
     if( ((*value)&0x80) != 0 )
@@ -138,8 +119,6 @@ void traceEncodeUInt8( uint8_t value, uint8_t** ptr, bool lastFlag )
     {
         value   |= 0x80;
     }
-
-    //printf("<%02x>",value);
 
     // Insert the value into the byte stream.
     **ptr   = value;
@@ -315,50 +294,13 @@ void traceDecodeUInt32( uint32_t* value, uint8_t** ptr )
 }
 
 
-//
-void traceOutput( uint32_t marker )
-{
-    // TODO: At start of packet, we need a full timestamp.
-
-    // Work out the time delta since we were last called.
-    uint32_t    timestamp       = traceGetTimestamp();
-    uint32_t    deltaTimestamp  = (timestamp - lastTraceTimestamp) / TRACE_TIMESTAMP_RESOLUTION;
-
-    printf("deltaTimestamp=%d\n",timestamp);
-
-    // Put the tokens into the stream.
-    traceEncodeUInt32( deltaTimestamp, &tracePacketPtr ); 
-    traceEncodeUInt32( marker, &tracePacketPtr ); 
-
-    // (Potentially) output the packet.
-    traceOutputPacket();
-
-    // Store the current timestamp so we can work out the delta for
-    // next time.
-    lastTraceTimestamp  = timestamp;
-}
-
-//
-void traceInput( uint32_t* timeDelta, uint32_t* marker )
-{
-    // Parse the tokens from the stream.
-    traceDecodeUInt32( timeDelta, &tracePacketPtr );
-    traceDecodeUInt32( marker, &tracePacketPtr );
-
-    // Multiply the timeDelta back up
-    *timeDelta   *= TRACE_TIMESTAMP_RESOLUTION;
-}
-
-
-
-
 
 //
 void traceEncodeHex( uint8_t* data, uint32_t numberOfBytes, uint8_t** ptr )
 {
     // Encode the type with the numberOfBytes.
     uint32_t    type    = 1;
-    uint32_t    value   = (numberOfBytes << 2) | type;
+    uint32_t    value   = (numberOfBytes << BITS_PER_TYPE) | type;
     traceEncodeUInt32( value, ptr );
 
     // Then simply copy the bytes into the stream.
@@ -377,7 +319,7 @@ void traceEncodeHex( uint8_t* data, uint32_t numberOfBytes, uint8_t** ptr )
 void traceEncodeMarker( uint32_t marker, uint8_t** ptr )
 {
     uint32_t    type    = Marker;
-    uint32_t    value   = (marker << 2) | type;
+    uint32_t    value   = (marker << BITS_PER_TYPE) | type;
 
     traceEncodeUInt32( value, ptr );
 }
@@ -392,7 +334,7 @@ uint32_t encodeConstantStringPointer( const char* text )
     // minus the base address.
     uintptr_t  address = (uintptr_t)text;
     address     -= rodataBase;
-    //printf("\n[%"PRIxPTR"]\n",address);
+
     uint32_t    encodedValue    = (uint32_t)address;
     return encodedValue;
 }
@@ -433,7 +375,7 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
 
     // Encode the type with the address.
     uint32_t    type    = PrintF;
-    uint32_t    value   = (address << 2) | type;
+    uint32_t    value   = (address << BITS_PER_TYPE) | type;
     traceEncodeUInt32( value, ptr );
 
     // ...then scan thru the string finding all the
@@ -583,7 +525,7 @@ void traceDecode( uint8_t** ptr )
     traceDecodeUInt32( &value, ptr );
 
     uint8_t     type    = value & 0x3;
-    value >>= 2;
+    value >>= BITS_PER_TYPE;
     
     // deserialise the text.
     switch( type )
