@@ -69,6 +69,19 @@
 #define SHIFT_B3                        (21)
 #define SHIFT_B4                        (28)
 
+
+//
+typedef enum
+{
+    Marker      = 0,
+    HexDump     = 1,
+    PrintF      = 2,
+    CachedBLOB  = 3,
+
+} TraceEntryType;
+
+
+
 // Packet & stream data.
 uint8_t     tracePacket[256];
 uint8_t*    tracePacketPtr  = NULL;
@@ -363,7 +376,7 @@ void traceEncodeHex( uint8_t* data, uint32_t numberOfBytes, uint8_t** ptr )
 //
 void traceEncodeMarker( uint32_t marker, uint8_t** ptr )
 {
-    uint32_t    type    = 0;
+    uint32_t    type    = Marker;
     uint32_t    value   = (marker << 2) | type;
 
     traceEncodeUInt32( value, ptr );
@@ -419,7 +432,7 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
     uint32_t    address = encodeConstantStringPointer( format );
 
     // Encode the type with the address.
-    uint32_t    type    = 2;
+    uint32_t    type    = PrintF;
     uint32_t    value   = (address << 2) | type;
     traceEncodeUInt32( value, ptr );
 
@@ -575,12 +588,12 @@ void traceDecode( uint8_t** ptr )
     // deserialise the text.
     switch( type )
     {
-        case 0:
+        case Marker:
             // Marker
             snprintf( &text[0], sizeof(text), "marker %d", value);
             break;
 
-        case 1:
+        case HexDump:
         {
             // Hex/binary data.
             uint32_t    numberOfBytes   = value;
@@ -597,7 +610,7 @@ void traceDecode( uint8_t** ptr )
             break;
         }
 
-        case 2:
+        case PrintF:
         {
             // Serialised printf.
             const char*   pAddress    = decodeConstantStringPointer( value );
@@ -605,7 +618,7 @@ void traceDecode( uint8_t** ptr )
             break;
         }
 
-        case 3:
+        case CachedBLOB:
             break;
 
         default:
@@ -647,7 +660,7 @@ int main()
     }
     //printf("]\n");
 
-#if 0
+#if 1
     // Decode
     tracePacketPtr  = &tracePacket[0];
 
