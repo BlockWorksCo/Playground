@@ -3,6 +3,7 @@
 
 #gcc -fsanitize=address  -g -O0 -o TraceTest TraceTest.c -Wl,-T TraceTest.ld -lasan
 gcc -g -O0 -o TraceTest TraceTest.c -Wl,-T TraceTest.ld 
+gcc -g -O0 -o TraceDecode TraceDecode.c 
 arm-linux-gnueabi-gcc -g -O0 -o TraceTest.arm TraceTest.c -Wl,-T TraceTest.ld 
 
 

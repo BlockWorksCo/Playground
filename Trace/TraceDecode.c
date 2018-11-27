@@ -53,6 +53,7 @@
 #include <time.h>
 #include <stddef.h>
 #include <inttypes.h>
+#include <stdlib.h>
 
 // The larger this value, the less data will be taken with timing info.
 #define TRACE_TIMESTAMP_RESOLUTION      (10)
@@ -295,145 +296,19 @@ void traceDecodeUInt32( uint32_t* value, uint8_t** ptr )
 
 
 
-//
-void traceEncodeHex( uint8_t* data, uint32_t numberOfBytes, uint8_t** ptr )
-{
-    // Encode the type with the numberOfBytes.
-    uint32_t    type    = HexDump;
-    uint32_t    value   = (numberOfBytes << BITS_PER_TYPE) | type;
-    traceEncodeUInt32( value, ptr );
-
-    // Then simply copy the bytes into the stream.
-    traceEncodeFixedSizeBLOB( data, numberOfBytes, ptr );
-}
 
 
+uintptr_t   rodataBase  = 6176;
+uint8_t*    image       = NULL;
 
 
-
-
-
-
-
-//
-void traceEncodeMarker( uint32_t marker, uint8_t** ptr )
-{
-    uint32_t    type    = Marker;
-    uint32_t    value   = (marker << BITS_PER_TYPE) | type;
-
-    traceEncodeUInt32( value, ptr );
-}
-
-
-uint32_t encodeConstantStringPointer( const char* text )
-{
-    extern const void * const rodata_start;
-    uintptr_t   rodataBase  = (uintptr_t)&rodata_start;
-
-    // first, determine the address of the format string identifier...
-    // minus the base address.
-    uintptr_t  address = (uintptr_t)text;
-    address     -= rodataBase;
-
-    uint32_t    encodedValue    = (uint32_t)address;
-    return encodedValue;
-}
 
 const char* decodeConstantStringPointer( uint32_t encodedValue )
 {
-    extern const void * const rodata_start;
-    uintptr_t   rodataBase  = (uintptr_t)&rodata_start;
-
     uintptr_t   address = (uintptr_t)encodedValue;
     address += rodataBase;
-    const char* text    = (const char*)address;
+    const char* text    = (const char*)&image[address];
     return text;
-}
-
-
-//
-// %c char single character
-// %d (%i) int signed integer
-// %e (%E) float or double exponential format
-// %f float or double signed decimal
-// %g (%G) float or double use %f or %e as required
-// %o int unsigned octal value
-// %p pointer address stored in pointer
-// %s array of char sequence of characters
-// %u int unsigned decimal
-// %x (%X) int unsigned hex value
-// %z size_t.
-//
-void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
-{
-    va_list args;
-    va_start(args, format);
-
-    // first, determine the address of the format string identifier...
-    // minus the base address.
-    uint32_t    address = encodeConstantStringPointer( format );
-
-    // Encode the type with the address.
-    uint32_t    type    = PrintF;
-    uint32_t    value   = (address << BITS_PER_TYPE) | type;
-    traceEncodeUInt32( value, ptr );
-
-    // ...then scan thru the string finding all the
-    // format specifiers, determine their size and output
-    // the binary data associated with them.
-    bool    percent = false;
-    for( uint32_t i=0; i<strlen(format); i++)
-    {
-        if( format[i] == '%' )
-        {
-            percent = true;
-        }
-        else if( percent == true )
-        {
-            char    type    = format[i];
-
-            //
-            switch(type)
-            {
-                case 'e':
-                case 'f':
-                case 'g':
-                {
-                    double  fValue  = va_arg( args, double );
-                    traceEncodeFixedSizeBLOB( (uint8_t*)&fValue, sizeof(fValue), ptr );
-                    break;
-                }
-
-                case 's':
-                {
-                    uint8_t*    sValue  = va_arg( args, char* );
-                    traceEncodeZeroTerminatedBLOB( &sValue[0], strlen(sValue), ptr );
-                    break;
-                }  
-
-                case 'c':
-                case 'd':
-                case 'o':
-                case 'p':
-                case 'u':
-                case 'x':
-                case 'z':
-                {
-                    traceEncodeUInt32( (uint32_t)va_arg(args,uint32_t), ptr );
-                    break;
-                }
-
-                default:
-                     traceEncodeUInt32( 0, ptr );
-                    break;
-            }
-
-            // For now, we only parse simple format-specifiers, i.e "%d".
-            percent = false;
-        }
-    }
-
-    va_end(args);
 }
 
 
@@ -576,31 +451,61 @@ void traceDecode( uint8_t** ptr )
 
 
 //
-int main()
+int main( int argc, char* argv[] )
 {
-    // Encode
+    FILE*       imageFile   = NULL;
+
+    //
+    imageFile   = fopen( argv[1], "rb" );
+    fseek( imageFile, 0L, SEEK_END );
+    long length = ftell( imageFile );
+    fseek( imageFile, 0L, SEEK_SET );
+    image   = (uint8_t*)malloc( length );
+    fread( image, length, 1, imageFile );
+    
+    printf("length = %ld\n", length);
+    printf("[%s]\n",&image[rodataBase]);
+
+    //
+    uint32_t    serialisedSize  = 0;
+    while( feof(stdin) == 0 ) 
+    {
+        uint8_t     hi  = fgetc(stdin);
+        uint8_t     lo  = fgetc(stdin);
+        printf("%c%c ",hi,lo);
+        hi  = (hi <= '9' ? hi-'0' : hi-'a' );
+        lo  = (lo <= '9' ? lo-'0' : lo-'a' );
+        uint8_t     value   = (hi<<4) | lo;
+
+        tracePacket[serialisedSize] = value;
+        serialisedSize++;
+    }
+
+    printf("\n[");
+    for(uint32_t i=0; i<serialisedSize; i++)
+    {
+        printf("%02x ",tracePacket[i]);
+    }
+    printf("]\n");
+
+    // Decode
     tracePacketPtr  = &tracePacket[0];
 
-    traceEncodeMarker( 1, &tracePacketPtr );
-    traceEncodeMarker( 2, &tracePacketPtr );
-    traceEncodeMarker( 3, &tracePacketPtr );
-    traceEncodePrintf( &tracePacketPtr, "Hello World." );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%d)", 123 );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%d, %d)", 456,789 );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%x, %x, %x)", 0xab,0xabcd, 0x0123abcd );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%c, %f, %g)", 'A',3.14, 304.0 );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%s)", "Blaa!" );
-    traceEncodePrintf( &tracePacketPtr, "This is a long message to see if it improves the compression ratio....");
-    uint8_t data[]  = {0x12,0x34,0x45,0x67,0x89,0xab,0xcd,0xef};
-    traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
 
-    ptrdiff_t   serialisedSize    = tracePacketPtr - &tracePacket[0];
-    //printf("\n[");
-    for(uint32_t i=0; i<serialisedSize; i++) 
-    {
-        printf("%02x",tracePacket[i]);
-    }
-    //printf("]\n");
+    printf("serialised size = %"PRIu32"\n", serialisedSize);
+    printf("deserialised size = %d\n", totalSize);
+    printf("serialise size = %.1f%%\n",(100.0/totalSize)*(float)serialisedSize);
 }
 
 
