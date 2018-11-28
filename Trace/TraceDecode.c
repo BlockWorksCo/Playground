@@ -45,6 +45,7 @@
 
 
 
+#include "Trace.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -54,9 +55,6 @@
 #include <stddef.h>
 #include <inttypes.h>
 #include <stdlib.h>
-
-// The larger this value, the less data will be taken with timing info.
-#define TRACE_TIMESTAMP_RESOLUTION      (10)
 
 // Masks for working out the 7-bit portions.
 #define MASK_B0                         (0x0000007f)
@@ -69,19 +67,6 @@
 #define SHIFT_B2                        (14)
 #define SHIFT_B3                        (21)
 #define SHIFT_B4                        (28)
-
-
-//
-typedef enum
-{
-    Marker      = 0,
-    HexDump     = 1,
-    PrintF      = 2,
-    CachedBLOB  = 3,
-
-} TraceEntryType;
-
-#define BITS_PER_TYPE               (3)
 
 
 // Packet & stream data.
