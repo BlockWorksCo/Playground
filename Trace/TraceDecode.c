@@ -74,6 +74,9 @@ uint8_t     tracePacket[256];
 uint8_t*    tracePacketPtr  = NULL;
 uint32_t    totalSize       = 0;
 
+uintptr_t   rodataBase  = 4464;
+uint8_t*    image       = NULL;
+
 
 
 //
@@ -283,9 +286,6 @@ void traceDecodeUInt32( uint32_t* value, uint8_t** ptr )
 
 
 
-uintptr_t   rodataBase  = 6176;
-uint8_t*    image       = NULL;
-
 
 
 const char* decodeConstantStringPointer( uint32_t encodedValue )
@@ -384,7 +384,7 @@ void traceDecode( uint8_t** ptr )
     uint32_t    value   = 0;
     traceDecodeUInt32( &value, ptr );
 
-    uint8_t     type    = value & 0x3;
+    uint8_t     type    = value & TYPE_MASK;
     value >>= BITS_PER_TYPE;
     
     // deserialise the text.

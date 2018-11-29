@@ -59,10 +59,13 @@ typedef enum
     TruncatedBLOB   = 4,
     OBISCode        = 5,
     IPv6Address     = 6,
+    EUI64           = 7,
+    LoadCache       = 8,
 
 } TraceEntryType;
 
 #define BITS_PER_TYPE               (3)
+#define TYPE_MASK                   (7)
 
 #endif
 

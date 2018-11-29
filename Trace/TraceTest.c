@@ -296,7 +296,7 @@ void traceEncodeHex( uint8_t* data, uint32_t numberOfBytes, uint8_t** ptr )
 
 
 
-
+// final 6267 given (0x19c8 - 0x238)+235
 
 
 
@@ -319,6 +319,8 @@ uint32_t encodeConstantStringPointer( const char* text )
     // minus the base address.
     uintptr_t  address = (uintptr_t)text;
     address     -= rodataBase;
+
+    //printf("%"PRIiPTR" %"PRIiPTR" = [%s]\n",rodataBase,address,text);
 
     uint32_t    encodedValue    = (uint32_t)address;
     return encodedValue;
@@ -422,140 +424,6 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
 }
 
 
-void traceDecodePrintf( uint8_t** ptr, char* output, uint32_t maxOutputSize, const char* format )
-{
-    // ...then scan thru the string finding all the
-    // format specifiers, determine their size and output
-    // the binary data associated with them.
-    bool    percent = false;
-    for( uint32_t i=0; i<strlen(format); i++)
-    {
-        if( format[i] == '%' )
-        {
-            percent = true;
-        }
-        else if( percent == true )
-        {
-            char    type            = format[i];
-            char    fieldText[64]   = {0};
-            char    formatText[8]   = {0};
-
-            //
-            formatText[0]   = '%';
-            formatText[1]   = type;
-            formatText[2]   = 0;
-
-            //
-            switch(type)
-            {
-                case 'e':
-                case 'f':
-                case 'g':
-                {
-                    double  fValue      = 0;
-                    traceDecodeFixedSizeBLOB( (uint8_t*)&fValue, sizeof(fValue),  ptr );
-                    snprintf( &fieldText[0], sizeof(fieldText), formatText, fValue );
-                    break;
-                }
-
-                case 's':
-                {
-                    uint8_t sValue[64];
-                    traceDecodeZeroTerminatedBLOB( (uint8_t*)&sValue, sizeof(sValue),  ptr );
-                    snprintf( &fieldText[0], sizeof(fieldText), formatText, sValue );
-                    break;
-                }
-
-                case 'c':
-                case 'd':
-                case 'o':
-                case 'p':
-                case 'u':
-                case 'x':
-                case 'z':
-                {
-                    uint32_t    value;
-                    traceDecodeUInt32( &value, ptr );
-                    snprintf( &fieldText[0], sizeof(fieldText), formatText, value );
-                    break;
-                }
-
-                default:
-                     traceEncodeUInt32( 0, ptr );
-                    break;
-            }
-
-            //
-            strcat( &output[0], &fieldText[0] );
-
-            // For now, we only parse simple format-specifiers, i.e "%d".
-            percent = false;
-        }
-        else 
-        {
-            uint32_t    currentLength   = strlen(output);
-            output[ currentLength+0 ]    = format[i];
-            output[ currentLength+1 ]    = 0;
-        }
-    }
-}
-
-
-
-//
-void traceDecode( uint8_t** ptr )
-{
-    char        text[128] = {0};
-    uint32_t    value   = 0;
-    traceDecodeUInt32( &value, ptr );
-
-    uint8_t     type    = value & 0x3;
-    value >>= BITS_PER_TYPE;
-    
-    // deserialise the text.
-    switch( type )
-    {
-        case Marker:
-            // Marker
-            snprintf( &text[0], sizeof(text), "marker %d", value);
-            break;
-
-        case HexDump:
-        {
-            // Hex/binary data.
-            uint32_t    numberOfBytes   = value;
-            static uint8_t  data[128]   = {0};
-            memcpy( &data[0], *ptr, numberOfBytes );
-            *ptr    += numberOfBytes;
-            snprintf( &text[0], sizeof(text), "%d bytes: ", numberOfBytes);
-            char    value[8];
-            for( uint32_t i=0; i<numberOfBytes; i++) 
-            {
-                snprintf( &value[0], sizeof(value), "%02x ",data[i] );
-                strcat( &text[0], &value[0] );
-            }
-            break;
-        }
-
-        case PrintF:
-        {
-            // Serialised printf.
-            const char*   pAddress    = decodeConstantStringPointer( value );
-            traceDecodePrintf( ptr, &text[0], sizeof(text), pAddress );
-            break;
-        }
-
-        case CachedBLOB:
-            break;
-
-        default:
-            break;
-    }
-
-    // output the text.
-    totalSize   += strlen(text);
-    puts( text );
-}
 
 
 
