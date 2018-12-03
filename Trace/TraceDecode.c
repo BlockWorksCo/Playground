@@ -74,8 +74,10 @@ uint8_t     tracePacket[256];
 uint8_t*    tracePacketPtr  = NULL;
 uint32_t    totalSize       = 0;
 
-uintptr_t   rodataBase  = 4464;
+uintptr_t   rodataBase  = 0;
 uint8_t*    image       = NULL;
+
+// 88 (marker 1) 90 (marker 2) 98 (marker 3) 06 82 (printf Hello World) 06 ea fb 07 fa 03 c8 06 95 09 aa 01 ab 02 57 cd 09 0e 57 cd 0a fa c1 1f 85 eb 51 b8 1e 09 40 00 00 00 00 00 00 73 40 0c fa 42 6c 61 61 21 00 0e c2 c1 12 34 45 67 89 ab cd ef �� 
 
 
 
@@ -100,82 +102,6 @@ void traceDecodeUInt8( uint8_t** ptr, uint8_t* value, bool* lastFlag )
 }
 
 //
-void traceEncodeUInt8( uint8_t value, uint8_t** ptr, bool lastFlag )
-{
-    // Set the top bit if its the last in the sequence, clear it otherwise.
-    value   &= 0x7f;
-    if( lastFlag == true )
-    {
-        value   |= 0x80;
-    }
-
-    // Insert the value into the byte stream.
-    **ptr   = value;
-    
-    // Move the head-of-stream pointer along.
-    *ptr    = (*ptr) + 1;
-}
-
-//
-// Encode a 29-bit value.
-//
-void traceEncodeUInt32( uint32_t value, uint8_t** ptr )
-{
-    if( value < 0x7f )
-    {
-        // 7-bit case.
-        traceEncodeUInt8( (value & MASK_B0) >> SHIFT_B0, ptr, true );
-    }
-    else if( value < 0x7fff )
-    {
-        // 14-bit case.
-        traceEncodeUInt8( (value & MASK_B1) >> SHIFT_B1, ptr, false );
-        traceEncodeUInt8( (value & MASK_B0) >> SHIFT_B0, ptr, true );
-    }
-    else if( value < 0x7fffff )
-    {
-        // 21-bit case.
-        traceEncodeUInt8( (value & MASK_B2) >> SHIFT_B2, ptr, false );
-        traceEncodeUInt8( (value & MASK_B1) >> SHIFT_B1, ptr, false );
-        traceEncodeUInt8( (value & MASK_B0) >> SHIFT_B0, ptr, true );
-    }
-    else if( value < 0xfffffff )
-    {
-        // 28-bit case.
-        traceEncodeUInt8( (value & MASK_B3) >> SHIFT_B3, ptr, false );
-        traceEncodeUInt8( (value & MASK_B2) >> SHIFT_B2, ptr, false );
-        traceEncodeUInt8( (value & MASK_B1) >> SHIFT_B1, ptr, false );
-        traceEncodeUInt8( (value & MASK_B0) >> SHIFT_B0, ptr, true );
-    }
-    else
-    {
-        // 32-bit case.
-        traceEncodeUInt8( (value & MASK_B4) >> SHIFT_B4, ptr, false );
-        traceEncodeUInt8( (value & MASK_B3) >> SHIFT_B3, ptr, false );
-        traceEncodeUInt8( (value & MASK_B2) >> SHIFT_B2, ptr, false );
-        traceEncodeUInt8( (value & MASK_B1) >> SHIFT_B1, ptr, false );
-        traceEncodeUInt8( (value & MASK_B0) >> SHIFT_B0, ptr, true );
-    }
-}
-
-//
-void traceEncodeZeroTerminatedBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr )
-{
-    // copy the string into the output.
-    for( uint32_t i=0; i<numberOfBytes; i++ )
-    {
-        uint8_t     c   = blob[i];
-        **ptr       = c;
-        *ptr        += 1;
-        **ptr       = 0;
-    }
-
-    // Don't forget about the zero-terminator.
-    **ptr       = 0;
-    *ptr        += 1;
-}
-
-//
 void traceDecodeZeroTerminatedBLOB( uint8_t* blob, uint32_t maxNumberOfBytes, uint8_t** ptr )
 {
     for( uint32_t i=0; i<maxNumberOfBytes; i++ )
@@ -196,44 +122,10 @@ void traceDecodeZeroTerminatedBLOB( uint8_t* blob, uint32_t maxNumberOfBytes, ui
 }
 
 //
-void traceEncodeFixedSizeBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr )
-{
-    memcpy( *ptr, blob, numberOfBytes );
-    *ptr    += numberOfBytes;
-}
-
-//
 void traceDecodeFixedSizeBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr )
 {
     memcpy( blob, *ptr, numberOfBytes );
     *ptr    += numberOfBytes;
-}
-
-
-//
-void traceEncodeBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr )
-{
-    // For every block of 7-bits in the BLOB, encode the byte.
-    uint32_t    numberOfBitsEncoded = 0;
-    for(uint32_t bitPosition=0; bitPosition<numberOfBytes*8; bitPosition+=7)
-    {
-        // Any single block of 7-bits may straddle a byte boundary,
-        // therefore we need to work out where the uint16_t value
-        // lies that can contain it completely and the corresponding
-        // mask for the value itself.
-        uint32_t    bytePosition                = bitPosition / 8;
-        uint32_t    bytePositionInBits          = bytePosition * 8;
-        uint32_t    offsetOfFirstBitIntoByte    = bitPosition - bytePositionInBits;
-        uint16_t    mask                        = 0x007f << offsetOfFirstBitIntoByte;
-        uint16_t    value16                     = *((uint16_t*)(blob+bytePosition)) & mask;
-        uint8_t     value8                      = value16 >> offsetOfFirstBitIntoByte;
-
-        // Is this the last one?
-        bool    lastFlag    = false;
-
-        // Output the 7-bits as an encoded byte.
-        traceEncodeUInt8( (uint32_t)value8, ptr, lastFlag );
-    }
 }
 
 
@@ -356,7 +248,6 @@ void traceDecodePrintf( uint8_t** ptr, char* output, uint32_t maxOutputSize, con
                 }
 
                 default:
-                     traceEncodeUInt32( 0, ptr );
                     break;
             }
 
@@ -386,7 +277,7 @@ void traceDecode( uint8_t** ptr )
 
     uint8_t     type    = value & TYPE_MASK;
     value >>= BITS_PER_TYPE;
-    
+
     // deserialise the text.
     switch( type )
     {
@@ -424,6 +315,8 @@ void traceDecode( uint8_t** ptr )
             break;
 
         default:
+            printf("\n[Unprocessed trace type %x]\n",type);
+            exit(-1);
             break;
     }
 
@@ -448,8 +341,14 @@ int main( int argc, char* argv[] )
     image   = (uint8_t*)malloc( length );
     fread( image, length, 1, imageFile );
     
+
+    //
+    rodataBase  = atoi( argv[2] );
+    printf("rodataBase = %"PRIiPTR"\n", rodataBase);
+
+    //
     printf("length = %ld\n", length);
-    printf("[%s]\n",&image[rodataBase]);
+    //printf("[%s]\n",&image[rodataBase]);
 
     //
     uint32_t    serialisedSize  = 0;
@@ -457,9 +356,8 @@ int main( int argc, char* argv[] )
     {
         uint8_t     hi  = fgetc(stdin);
         uint8_t     lo  = fgetc(stdin);
-        printf("%c%c ",hi,lo);
-        hi  = (hi <= '9' ? hi-'0' : hi-'a' );
-        lo  = (lo <= '9' ? lo-'0' : lo-'a' );
+        hi  = (hi <= '9' ? hi-'0' : (hi-'a')+10 );
+        lo  = (lo <= '9' ? lo-'0' : (lo-'a')+10 );
         uint8_t     value   = (hi<<4) | lo;
 
         tracePacket[serialisedSize] = value;

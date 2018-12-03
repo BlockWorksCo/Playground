@@ -23,3 +23,6 @@ echo $rodataOffset
 fileOffset=$(expr $rodataOffset - $startOffset)
 echo $fileOffset
 
+
+./TraceTest > out.hex
+./TraceDecode TraceTest.bin $fileOffset < out.hex 
