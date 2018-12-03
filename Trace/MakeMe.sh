@@ -24,5 +24,10 @@ fileOffset=$(expr $rodataOffset - $startOffset)
 echo $fileOffset
 
 
+#
+# Small demo of how to use it.
+# - TraceTest output hex trace packet.
+# - TraceDecode decodes the packet with appropriate parameters to output trace text.
+#
 ./TraceTest > out.hex
 ./TraceDecode TraceTest.bin $fileOffset < out.hex 
