@@ -291,7 +291,6 @@ void traceDecodePrintf( uint8_t** ptr, char* output, uint32_t maxOutputSize, con
 
                     // Only take that many byte from the input stream.
                     uint8_t temp[16];
-                    printf("<subTypeLenth = %d>",subTypeLength);
                     traceDecodeFixedSizeBLOB( (uint8_t*)&temp[0], subTypeLength,  ptr );
 
                     // Now do the formatted output.
