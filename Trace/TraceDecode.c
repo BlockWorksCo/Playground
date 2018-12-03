@@ -286,6 +286,7 @@ void traceDecode( uint8_t** ptr )
             snprintf( &text[0], sizeof(text), "marker %d", value);
             break;
 
+        case TruncatedBLOB:
         case HexDump:
         {
             // Hex/binary data.
@@ -299,6 +300,12 @@ void traceDecode( uint8_t** ptr )
             {
                 snprintf( &value[0], sizeof(value), "%02x ",data[i] );
                 strcat( &text[0], &value[0] );
+            }
+
+            // Append the ellipses to indicate the BLOB has been truncated.
+            if(type == TruncatedBLOB) 
+            {
+                strcat( &text[0], "..." );
             }
             break;
         }
@@ -374,6 +381,7 @@ int main( int argc, char* argv[] )
     // Decode
     tracePacketPtr  = &tracePacket[0];
 
+    traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );

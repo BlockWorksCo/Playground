@@ -71,29 +71,8 @@
 // Packet & stream data.
 uint8_t     tracePacket[256];
 uint8_t*    tracePacketPtr  = NULL;
-uint32_t    totalSize       = 0;
 
 
-
-//
-void traceDecodeUInt8( uint8_t** ptr, uint8_t* value, bool* lastFlag )
-{
-    // Copy the values out of the stream.
-    *value      = **ptr;
-    *lastFlag   = false;
-
-    // If the top bit is set, this is the last byte in the value.
-    if( ((*value)&0x80) != 0 )
-    {
-        *lastFlag   =  true;
-    }
-
-    // Clear the top bit as that carries a control value, not data.
-    *value  = *value & 0x7f;
-
-    // Move the stream pointer along.
-    *ptr = (*ptr) + 1;
-}
 
 //
 void traceEncodeUInt8( uint8_t value, uint8_t** ptr, bool lastFlag )
@@ -172,39 +151,11 @@ void traceEncodeZeroTerminatedBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8
 }
 
 //
-void traceDecodeZeroTerminatedBLOB( uint8_t* blob, uint32_t maxNumberOfBytes, uint8_t** ptr )
-{
-    for( uint32_t i=0; i<maxNumberOfBytes; i++ )
-    {
-        char    c   = **ptr;
-        if( c != 0 )
-        {
-            blob[i] = c;
-        }
-        else
-        {
-            blob[i] = 0;
-            break;
-        }
-
-        *ptr    += 1;
-    }
-}
-
-//
 void traceEncodeFixedSizeBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr )
 {
     memcpy( *ptr, blob, numberOfBytes );
     *ptr    += numberOfBytes;
 }
-
-//
-void traceDecodeFixedSizeBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr )
-{
-    memcpy( blob, *ptr, numberOfBytes );
-    *ptr    += numberOfBytes;
-}
-
 
 //
 void traceEncodeBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr )
@@ -233,52 +184,6 @@ void traceEncodeBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr )
 }
 
 
-//
-void traceDecodeBLOB( uint8_t* blob, uint32_t maxNumberOfBytes, uint8_t** ptr )
-{
-    bool        lastFlag        = true;
-    uint32_t    numberOfBits    = 0;
-
-    do
-    {
-        uint8_t value       = 0;
-
-        traceDecodeUInt8( ptr, &value, &lastFlag );
-        uint32_t    byteNumber  = numberOfBits / 8;
-
-        // next one...
-        numberOfBits    += 7;
-
-    } while( lastFlag == false );
-}
-
-//
-void traceDecodeUInt32( uint32_t* value, uint8_t** ptr )
-{
-    bool        lastFlag    = false;
-    
-    // Must start off with no bits set.
-    *value  = 0;
-
-    // Repeatedly read 7 bits from the stream until we get to
-    // a byte with the top bit set, then stop.
-    do
-    {
-        // Shift up the previous value by 7 bits (we start off with 0 so
-        // this is harmless initially).
-        *value  = (*value) << 7;
-
-        // Get the next byte out.
-        uint8_t     byteValue   = 0;
-        traceDecodeUInt8( ptr, &byteValue, &lastFlag );
-
-        // Combine the new byte with the existing value.
-        *value  = (*value) | byteValue;
-
-    } while( lastFlag == false );
-}
-
-
 
 //
 void traceEncodeHex( uint8_t* data, uint32_t numberOfBytes, uint8_t** ptr )
@@ -295,9 +200,25 @@ void traceEncodeHex( uint8_t* data, uint32_t numberOfBytes, uint8_t** ptr )
 
 
 
+//
+void traceEncodeTruncatedHex( uint8_t* data, uint32_t numberOfBytes, uint8_t** ptr )
+{
+    // Limit the number of bytes we actually output. This will be decoded
+    // with an ellipsis appended to it "..." to indicate this.
+    static const uint32_t   truncationLimit = 8;
+    if( numberOfBytes > truncationLimit )
+    {
+        numberOfBytes   = truncationLimit;
+    }
 
-// final 6267 given (0x19c8 - 0x238)+235
+    // Encode the type with the numberOfBytes.
+    uint32_t    type    = TruncatedBLOB;
+    uint32_t    value   = (numberOfBytes << BITS_PER_TYPE) | type;
+    traceEncodeUInt32( value, ptr );
 
+    // Then simply copy the bytes into the stream.
+    traceEncodeFixedSizeBLOB( data, numberOfBytes, ptr );
+}
 
 
 //
@@ -324,17 +245,6 @@ uint32_t encodeConstantStringPointer( const char* text )
 
     uint32_t    encodedValue    = (uint32_t)address;
     return encodedValue;
-}
-
-const char* decodeConstantStringPointer( uint32_t encodedValue )
-{
-    extern const void * const rodata_start;
-    uintptr_t   rodataBase  = (uintptr_t)&rodata_start;
-
-    uintptr_t   address = (uintptr_t)encodedValue;
-    address += rodataBase;
-    const char* text    = (const char*)address;
-    return text;
 }
 
 
@@ -446,6 +356,8 @@ int main()
     traceEncodePrintf( &tracePacketPtr, "This is a long message to see if it improves the compression ratio....");
     uint8_t data[]  = {0x12,0x34,0x45,0x67,0x89,0xab,0xcd,0xef};
     traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
+    uint8_t bigBLOB[]  = {0x12,0x34,0x45,0x67,0x89,0xab,0xcd,0xef, 0x01,0x35,0x46,0x10,0x19,0x23};
+    traceEncodeTruncatedHex( &bigBLOB[0], sizeof(bigBLOB), &tracePacketPtr );
 
     ptrdiff_t   serialisedSize    = tracePacketPtr - &tracePacket[0];
     //printf("\n[");
