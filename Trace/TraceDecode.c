@@ -189,6 +189,32 @@ const char* decodeConstantStringPointer( uint32_t encodedValue )
 }
 
 
+
+//
+void outputIPv6( uint8_t* text, uint32_t maxLength,  uint8_t value[16] )
+{
+    text[0]    = 0;
+    for( uint32_t i=0; i<8; i++) 
+    {
+        uint16_t    v0  = value[(i*2)+0];
+        uint16_t    v1  = value[(i*2)+1];
+        uint16_t    v   = (v0 << 8) | v1;
+        char    temp[32];
+        snprintf( &temp[0], sizeof(temp), "%04x:", v );
+        strcat( &text[0], &temp[0] );
+    }
+    text[ strlen(text)-1 ] = 0;
+
+}
+
+//
+void outputIPv4( uint8_t* text, uint32_t maxLength,  uint8_t value[16] )
+{
+    text[0]    = 0;
+    snprintf( &text[0], maxLength, "%d.%d.%d.%d", value[0],value[1],value[2],value[3] );
+
+}
+
 void traceDecodePrintf( uint8_t** ptr, char* output, uint32_t maxOutputSize, const char* format )
 {
     // ...then scan thru the string finding all the
@@ -268,17 +294,16 @@ void traceDecodePrintf( uint8_t** ptr, char* output, uint32_t maxOutputSize, con
                     printf("<subTypeLenth = %d>",subTypeLength);
                     traceDecodeFixedSizeBLOB( (uint8_t*)&temp[0], subTypeLength,  ptr );
 
-                    fieldText[0]    = 0;
-                    for( uint32_t i=0; i<8; i++) 
+                    // Now do the formatted output.
+                    switch( subType )
                     {
-                        uint16_t    v0  = temp[(i*2)+0];
-                        uint16_t    v1  = temp[(i*2)+1];
-                        uint16_t    v   = (v0 << 8) | v1;
-                        char    text[32];
-                        snprintf( &text[0], sizeof(text), "%04x:", v );
-                        strcat( &fieldText[0], &text[0] );
+                        case '6':   outputIPv6( &fieldText[0],sizeof(fieldText), &temp[0] ); break;
+                        case '4':   outputIPv4( &fieldText[0],sizeof(fieldText), &temp[0] ); break;
+                        case 'i':   break;
+                        case 'm':   break;
+                        case 'M':   break;
+                        case 'o':   break;
                     }
-                    fieldText[ strlen(fieldText)-1 ] = 0;
 
                     break;
                 }

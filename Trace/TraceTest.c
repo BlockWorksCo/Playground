@@ -389,7 +389,8 @@ int main()
     uint8_t bigBLOB[]  = {0x12,0x34,0x45,0x67,0x89,0xab,0xcd,0xef, 0x01,0x35,0x46,0x10,0x19,0x23};
     traceEncodeTruncatedHex( &bigBLOB[0], sizeof(bigBLOB), &tracePacketPtr );
     uint8_t ipv6Addr[16]  = {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f};
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%p6)", ipv6Addr );
+    uint32_t    ipv4Addr    = 0xc0108123;
+    traceEncodePrintf( &tracePacketPtr, "Hello World. (%p6) [%p4]", ipv6Addr, &ipv4Addr );
 
     ptrdiff_t   serialisedSize    = tracePacketPtr - &tracePacket[0];
     //printf("\n[");
