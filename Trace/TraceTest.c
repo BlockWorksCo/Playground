@@ -261,6 +261,15 @@ uint32_t encodeConstantStringPointer( const char* text )
 // %x (%X) int unsigned hex value
 // %z size_t.
 //
+//src/platform/core/jprintf.h
+//13: *  - %p  - Pointer
+//14: *  - %p6 - Pointer to IPadr
+//15: *  - %p4 - Pointer to IPv4adr
+//16: *  - %pi - Pointer to IID
+//17: *  - %pm - Pointer to 6 bytes (Ethernet EUI-48 MAC address)
+//18: *  - %pM - Pointer to 8 bytes (IEEE 802.15.4 EUI-64 address)
+//19: *  - %po - Pointer to 6 bytes (OBIS code)
+//
 void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
 {
     va_list args;
@@ -311,12 +320,33 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
                 case 'c':
                 case 'd':
                 case 'o':
-                case 'p':
                 case 'u':
                 case 'x':
                 case 'z':
                 {
                     traceEncodeUInt32( (uint32_t)va_arg(args,uint32_t), ptr );
+                    break;
+                }
+
+                case 'p':
+                {
+                    uint8_t     subType = format[i+1];
+                    uint32_t    subTypeLength   = 4;
+
+                    // Decide on how many bytes represent each display type.
+                    switch( subType )
+                    {
+                        case '6':   subTypeLength   = 16; break;
+                        case '4':   subTypeLength   = 4; break;
+                        case 'i':   subTypeLength   = 16; break;
+                        case 'm':   subTypeLength   = 6; break;
+                        case 'M':   subTypeLength   = 8; break;
+                        case 'o':   subTypeLength   = 6; break;
+                    }
+
+                    // Only put that many byte into the output stream.
+                    uint8_t*    pValue  = va_arg( args, char* );
+                    traceEncodeFixedSizeBLOB( pValue, subTypeLength, ptr );
                     break;
                 }
 
@@ -358,6 +388,8 @@ int main()
     traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
     uint8_t bigBLOB[]  = {0x12,0x34,0x45,0x67,0x89,0xab,0xcd,0xef, 0x01,0x35,0x46,0x10,0x19,0x23};
     traceEncodeTruncatedHex( &bigBLOB[0], sizeof(bigBLOB), &tracePacketPtr );
+    uint8_t ipv6Addr[16]  = {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f};
+    traceEncodePrintf( &tracePacketPtr, "Hello World. (%p6)", ipv6Addr );
 
     ptrdiff_t   serialisedSize    = tracePacketPtr - &tracePacket[0];
     //printf("\n[");

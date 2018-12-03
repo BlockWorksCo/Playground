@@ -236,7 +236,6 @@ void traceDecodePrintf( uint8_t** ptr, char* output, uint32_t maxOutputSize, con
                 case 'c':
                 case 'd':
                 case 'o':
-                case 'p':
                 case 'u':
                 case 'x':
                 case 'z':
@@ -244,6 +243,43 @@ void traceDecodePrintf( uint8_t** ptr, char* output, uint32_t maxOutputSize, con
                     uint32_t    value;
                     traceDecodeUInt32( &value, ptr );
                     snprintf( &fieldText[0], sizeof(fieldText), formatText, value );
+                    break;
+                }
+
+                case 'p':
+                {
+                    uint8_t     subType = format[i+1];
+                    uint32_t    subTypeLength   = 4;
+
+                    // Decide on how many bytes represent each display type.
+                    // If there is a subtype, consume that subType-byte also.
+                    switch( subType )
+                    {
+                        case '6':   subTypeLength   = 16; i++; break;
+                        case '4':   subTypeLength   = 4;  i++; break;
+                        case 'i':   subTypeLength   = 16; i++; break;
+                        case 'm':   subTypeLength   = 6;  i++; break;
+                        case 'M':   subTypeLength   = 8;  i++; break;
+                        case 'o':   subTypeLength   = 6;  i++; break;
+                    }
+
+                    // Only take that many byte from the input stream.
+                    uint8_t temp[16];
+                    printf("<subTypeLenth = %d>",subTypeLength);
+                    traceDecodeFixedSizeBLOB( (uint8_t*)&temp[0], subTypeLength,  ptr );
+
+                    fieldText[0]    = 0;
+                    for( uint32_t i=0; i<8; i++) 
+                    {
+                        uint16_t    v0  = temp[(i*2)+0];
+                        uint16_t    v1  = temp[(i*2)+1];
+                        uint16_t    v   = (v0 << 8) | v1;
+                        char    text[32];
+                        snprintf( &text[0], sizeof(text), "%04x:", v );
+                        strcat( &fieldText[0], &text[0] );
+                    }
+                    fieldText[ strlen(fieldText)-1 ] = 0;
+
                     break;
                 }
 
@@ -393,7 +429,9 @@ int main( int argc, char* argv[] )
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
 
+    printf("\nSummary:\n");
     printf("serialised size = %"PRIu32"\n", serialisedSize);
     printf("deserialised size = %d\n", totalSize);
     printf("serialise size = %.1f%%\n",(100.0/totalSize)*(float)serialisedSize);

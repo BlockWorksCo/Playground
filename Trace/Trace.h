@@ -57,10 +57,7 @@ typedef enum
     PrintF          = 2,
     CachedBLOB      = 3,
     TruncatedBLOB   = 4,
-    OBISCode        = 5,
-    IPv6Address     = 6,
-    EUI64           = 7,
-    LoadCache       = 8,
+    ReferencedBLOB  = 5,
 
 } TraceEntryType;
 
