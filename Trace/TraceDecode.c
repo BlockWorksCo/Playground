@@ -444,7 +444,7 @@ void traceDecode( uint8_t** ptr )
             if ( type == CachedBLOB )
             {
                 // cache hit!.
-                hash_t  hash    = (hash_t)hash;
+                hash_t  hash    = (hash_t)value;
 
                 // retrieve data from cache.
                 getValueForHash( hash, &data[0], &numberOfBytes );
@@ -452,12 +452,12 @@ void traceDecode( uint8_t** ptr )
             else
             {
                 // cache miss!.
-                hash_t  hash    = (hash_t)hash;
                 numberOfBytes   = value;
                 memmove( &data[0], *ptr, numberOfBytes );
-                *ptr    += numberOfBytes;
 
-                addHashToHistory( &data[0], numberOfBytes );
+                addHashToHistory( *ptr, numberOfBytes );
+
+                *ptr    += numberOfBytes;
             }
  
             //
