@@ -204,7 +204,6 @@ void outputIPv6( uint8_t* text, uint32_t maxLength,  uint8_t value[16] )
         strcat( &text[0], &temp[0] );
     }
     text[ strlen(text)-1 ] = 0;
-
 }
 
 //
@@ -212,7 +211,37 @@ void outputIPv4( uint8_t* text, uint32_t maxLength,  uint8_t value[16] )
 {
     text[0]    = 0;
     snprintf( &text[0], maxLength, "%d.%d.%d.%d", value[0],value[1],value[2],value[3] );
+}
 
+//
+void outputOBIS( uint8_t* text, uint32_t maxLength,  uint8_t value[16] )
+{
+    text[0]    = 0;
+    snprintf( &text[0], maxLength, "%d.%d.%d.%d.%d.%d", value[0],value[1],value[2],value[3], value[4], value[5] );
+}
+
+//
+void outputEUI64( uint8_t* text, uint32_t maxLength,  uint8_t value[16] )
+{
+    text[0]    = 0;
+    snprintf( &text[0], maxLength, "%02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x", 
+                                value[0],value[1],value[2],value[3], 
+                                value[4],value[6],value[6],value[7] );
+}
+
+//
+void outputEUI48( uint8_t* text, uint32_t maxLength,  uint8_t value[16] )
+{
+    text[0]    = 0;
+    snprintf( &text[0], maxLength, "%02x-%02x-%02x-%02x-%02x-%02x", 
+                                value[0],value[1],value[2],value[3], 
+                                value[4],value[6] );
+}
+
+//
+void outputIID( uint8_t* text, uint32_t maxLength,  uint8_t value[16] )
+{
+    outputIPv6( text, maxLength, value );
 }
 
 void traceDecodePrintf( uint8_t** ptr, char* output, uint32_t maxOutputSize, const char* format )
@@ -298,10 +327,10 @@ void traceDecodePrintf( uint8_t** ptr, char* output, uint32_t maxOutputSize, con
                     {
                         case '6':   outputIPv6( &fieldText[0],sizeof(fieldText), &temp[0] ); break;
                         case '4':   outputIPv4( &fieldText[0],sizeof(fieldText), &temp[0] ); break;
-                        case 'i':   break;
-                        case 'm':   break;
-                        case 'M':   break;
-                        case 'o':   break;
+                        case 'i':   outputIID( &fieldText[0],sizeof(fieldText), &temp[0] ); break;
+                        case 'm':   outputEUI48( &fieldText[0],sizeof(fieldText), &temp[0] ); break;
+                        case 'M':   outputEUI64( &fieldText[0],sizeof(fieldText), &temp[0] ); break;
+                        case 'o':   outputOBIS( &fieldText[0],sizeof(fieldText), &temp[0] ); break;
                     }
 
                     break;
