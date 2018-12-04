@@ -57,12 +57,16 @@ typedef enum
     PrintF          = 2,
     CachedBLOB      = 3,
     TruncatedBLOB   = 4,
-    ReferencedBLOB  = 5,
 
 } TraceEntryType;
 
 #define BITS_PER_TYPE               (3)
 #define TYPE_MASK                   (7)
+
+
+#define BITS_PER_HASH                   (24)
+#define HASH_HISTORY_SIZE               (100)
+
 
 #endif
 

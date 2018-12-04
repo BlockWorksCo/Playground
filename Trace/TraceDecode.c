@@ -55,6 +55,7 @@
 #include <stddef.h>
 #include <inttypes.h>
 #include <stdlib.h>
+#include "crc32.h"
 
 // Masks for working out the 7-bit portions.
 #define MASK_B0                         (0x0000007f)
@@ -78,6 +79,62 @@ uintptr_t   rodataBase  = 0;
 uint8_t*    image       = NULL;
 
 // 88 (marker 1) 90 (marker 2) 98 (marker 3) 06 82 (printf Hello World) 06 ea fb 07 fa 03 c8 06 95 09 aa 01 ab 02 57 cd 09 0e 57 cd 0a fa c1 1f 85 eb 51 b8 1e 09 40 00 00 00 00 00 00 73 40 0c fa 42 6c 61 61 21 00 0e c2 c1 12 34 45 67 89 ab cd ef �� 
+
+#define MAX_VALUE_SIZE      (128)
+
+typedef uint32_t    hash_t;
+struct
+{
+    hash_t      hash;
+    uint32_t    numberOfBytes;
+    uint8_t     value[MAX_VALUE_SIZE];
+
+} hashHistory[HASH_HISTORY_SIZE]  = {0};
+
+
+//
+hash_t generateHash( uint8_t* data, uint32_t numberOfBytes )
+{
+    hash_t  hash    = 0;
+    crc32( data, numberOfBytes, 0x00000000, &hash );
+    return hash;
+}
+
+
+//
+bool isHashInHistory( hash_t hash )
+{
+    return false;
+}
+
+//
+void addHashToHistory( uint8_t* value, uint32_t numberOfBytes )
+{
+    hash_t  hash    = generateHash( value, numberOfBytes );
+
+    memmove( &hashHistory[0], &hashHistory[1], sizeof(hashHistory)-sizeof(hashHistory[0]) );
+
+    hashHistory[ sizeof(hashHistory)/sizeof(hashHistory[0])-1 ].hash          = hash;
+    hashHistory[ sizeof(hashHistory)/sizeof(hashHistory[0])-1 ].numberOfBytes = numberOfBytes;
+    memcpy( &hashHistory[ sizeof(hashHistory)/sizeof(hashHistory[0])-1 ].value[0], value, numberOfBytes );
+}
+
+//
+void getValueForHash( hash_t hash, uint8_t* data, uint32_t* numberOfBytes )
+{
+    *numberOfBytes  = 0;
+    for(uint32_t i=0; i<sizeof(hashHistory)/sizeof(hashHistory[0]); i++) 
+    {
+        if( hashHistory[i].hash = hash )
+        {
+            *numberOfBytes  = hashHistory[i].numberOfBytes;
+            memcpy( data, &hashHistory[i].value[0], *numberOfBytes );
+            break;
+        }
+    }
+}
+
+
 
 
 
@@ -376,13 +433,35 @@ void traceDecode( uint8_t** ptr )
             break;
 
         case TruncatedBLOB:
+        case CachedBLOB:
         case HexDump:
         {
             // Hex/binary data.
-            uint32_t    numberOfBytes   = value;
+
+            uint32_t    numberOfBytes   = 0;
             static uint8_t  data[128]   = {0};
-            memcpy( &data[0], *ptr, numberOfBytes );
-            *ptr    += numberOfBytes;
+
+            if ( type == CachedBLOB )
+            {
+                // cache hit!.
+                hash_t  hash    = (hash_t)hash;
+
+                // retrieve data from cache.
+                getValueForHash( hash, &data[0], &numberOfBytes );
+            }
+            else
+            {
+                // cache miss!.
+                hash_t  hash    = (hash_t)hash;
+                numberOfBytes   = value;
+                memmove( &data[0], *ptr, numberOfBytes );
+                *ptr    += numberOfBytes;
+
+                addHashToHistory( &data[0], numberOfBytes );
+            }
+ 
+            //
+
             snprintf( &text[0], sizeof(text), "%d bytes: ", numberOfBytes);
             char    value[8];
             for( uint32_t i=0; i<numberOfBytes; i++) 
@@ -406,9 +485,6 @@ void traceDecode( uint8_t** ptr )
             traceDecodePrintf( ptr, &text[0], sizeof(text), pAddress );
             break;
         }
-
-        case CachedBLOB:
-            break;
 
         default:
             printf("\n[Unprocessed trace type %x]\n",type);
@@ -470,6 +546,10 @@ int main( int argc, char* argv[] )
     // Decode
     tracePacketPtr  = &tracePacket[0];
 
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );

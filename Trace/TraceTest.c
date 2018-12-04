@@ -54,6 +54,7 @@
 #include <time.h>
 #include <stddef.h>
 #include <inttypes.h>
+#include "crc32.h"
 
 // Masks for working out the 7-bit portions.
 #define MASK_B0                         (0x0000007f)
@@ -71,6 +72,41 @@
 // Packet & stream data.
 uint8_t     tracePacket[256];
 uint8_t*    tracePacketPtr  = NULL;
+
+
+typedef uint32_t    hash_t;
+hash_t    hashHistory[HASH_HISTORY_SIZE]  = {0};
+
+
+//
+hash_t generateHash( uint8_t* data, uint32_t numberOfBytes )
+{
+    hash_t  hash    = 0;
+    crc32( data, numberOfBytes, 0x00000000, &hash );
+    return hash;
+}
+
+
+//
+bool isHashInHistory( hash_t hash )
+{
+    for(uint32_t i=0; i<sizeof(hashHistory)/sizeof(hashHistory[0]); i++)
+    {
+        if( hashHistory[i] == hash ) 
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+//
+void addHashToHistory( hash_t hash )
+{
+    memmove( &hashHistory[0], &hashHistory[1], sizeof(hashHistory)-sizeof(hashHistory[0]) );
+    hashHistory[ sizeof(hashHistory)/sizeof(hashHistory[0])-1 ]   = hash;
+}
 
 
 
@@ -188,13 +224,30 @@ void traceEncodeBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr )
 //
 void traceEncodeHex( uint8_t* data, uint32_t numberOfBytes, uint8_t** ptr )
 {
-    // Encode the type with the numberOfBytes.
-    uint32_t    type    = HexDump;
-    uint32_t    value   = (numberOfBytes << BITS_PER_TYPE) | type;
-    traceEncodeUInt32( value, ptr );
+    hash_t  hash    = generateHash( data, numberOfBytes );
+    if( isHashInHistory( hash ) == true ) 
+    {
+        //printf("<cache hit!>\n");
+        // cache hit!
+        // Encode the type with the numberOfBytes.
+        uint32_t    type    = CachedBLOB;
+        uint32_t    value   = (hash << BITS_PER_TYPE) | type;
+        traceEncodeUInt32( value, ptr );
+    }
+    else
+    {
+        //printf("<cache miss!>\n");
+        // cache miss!
+        addHashToHistory( hash );
 
-    // Then simply copy the bytes into the stream.
-    traceEncodeFixedSizeBLOB( data, numberOfBytes, ptr );
+        // Encode the type with the numberOfBytes.
+        uint32_t    type    = HexDump;
+        uint32_t    value   = (numberOfBytes << BITS_PER_TYPE) | type;
+        traceEncodeUInt32( value, ptr );
+
+        // Then simply copy the bytes into the stream.
+        traceEncodeFixedSizeBLOB( data, numberOfBytes, ptr );
+    }
 }
 
 
@@ -385,6 +438,10 @@ int main()
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%s)", "Blaa!" );
     traceEncodePrintf( &tracePacketPtr, "This is a long message to see if it improves the compression ratio....");
     uint8_t data[]  = {0x12,0x34,0x45,0x67,0x89,0xab,0xcd,0xef};
+    traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
+    traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
+    traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
+    traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
     traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
     uint8_t bigBLOB[]  = {0x12,0x34,0x45,0x67,0x89,0xab,0xcd,0xef, 0x01,0x35,0x46,0x10,0x19,0x23};
     traceEncodeTruncatedHex( &bigBLOB[0], sizeof(bigBLOB), &tracePacketPtr );
