@@ -483,6 +483,10 @@ int main( int argc, char* argv[] )
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
+    traceDecode( &tracePacketPtr );
 
     printf("\nSummary:\n");
     printf("serialised size = %"PRIu32"\n", serialisedSize);
