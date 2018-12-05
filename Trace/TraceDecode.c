@@ -118,11 +118,14 @@ void addHashToHistory( uint8_t* value, uint32_t numberOfBytes )
     hashHistory[ sizeof(hashHistory)/sizeof(hashHistory[0])-1 ].hash          = hash;
     hashHistory[ sizeof(hashHistory)/sizeof(hashHistory[0])-1 ].numberOfBytes = numberOfBytes;
     memcpy( &hashHistory[ sizeof(hashHistory)/sizeof(hashHistory[0])-1 ].value[0], value, numberOfBytes );
+
+    //printf("- adding %d bytes for hash %08x-\n",numberOfBytes,hash);
 }
 
 //
 void getValueForHash( hash_t hash, uint8_t* data, uint32_t* numberOfBytes )
 {
+    //printf("-Wanting value for hash %08x-\n",hash);
     *numberOfBytes  = 0;
     for(uint32_t i=0; i<sizeof(hashHistory)/sizeof(hashHistory[0]); i++) 
     {

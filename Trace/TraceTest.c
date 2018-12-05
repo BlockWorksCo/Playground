@@ -138,13 +138,13 @@ void traceEncodeUInt32( uint32_t value, uint8_t** ptr )
         // 7-bit case.
         traceEncodeUInt8( (value & MASK_B0) >> SHIFT_B0, ptr, true );
     }
-    else if( value < 0x7fff )
+    else if( value < 0x3fff )
     {
         // 14-bit case.
         traceEncodeUInt8( (value & MASK_B1) >> SHIFT_B1, ptr, false );
         traceEncodeUInt8( (value & MASK_B0) >> SHIFT_B0, ptr, true );
     }
-    else if( value < 0x7fffff )
+    else if( value < 0x1fffff )
     {
         // 21-bit case.
         traceEncodeUInt8( (value & MASK_B2) >> SHIFT_B2, ptr, false );
@@ -438,7 +438,7 @@ int main()
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%c, %f, %g)", 'A',3.14, 304.0 );
     traceEncodePrintf( &tracePacketPtr, "Hello World. (%s)", "Blaa!" );
     traceEncodePrintf( &tracePacketPtr, "This is a long message to see if it improves the compression ratio....");
-    uint8_t data[]  = {0x12,0x34,0x45,0x67,0x89,0xab,0xcd,0xef};
+    uint8_t data[]  = {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x12,0x34,0x45,0x67,0x89,0xab,0xcd,0xef};
     traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
     traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
     traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
