@@ -125,7 +125,7 @@ void getValueForHash( hash_t hash, uint8_t* data, uint32_t* numberOfBytes )
     *numberOfBytes  = 0;
     for(uint32_t i=0; i<sizeof(hashHistory)/sizeof(hashHistory[0]); i++) 
     {
-        if( hashHistory[i].hash = hash )
+        if( hashHistory[i].hash == hash )
         {
             *numberOfBytes  = hashHistory[i].numberOfBytes;
             memcpy( data, &hashHistory[i].value[0], *numberOfBytes );
