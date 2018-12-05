@@ -83,6 +83,7 @@ hash_t generateHash( uint8_t* data, uint32_t numberOfBytes )
 {
     hash_t  hash    = 0;
     crc32( data, numberOfBytes, 0x00000000, &hash );
+    hash    &= ((uint32_t)(1<<BITS_PER_HASH))-1;
     return hash;
 }
 
