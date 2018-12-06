@@ -70,7 +70,6 @@
 
 
 
-typedef uint32_t    hash_t;
 hash_t    hashHistory[HASH_HISTORY_SIZE]  = {0};
 
 

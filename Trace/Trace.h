@@ -100,6 +100,11 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... );
 void traceUseImageFile( char* fileName, uint32_t baseAddressOfImage );
 void traceDecode( uint8_t** ptr );
 
+
+//
+void traceOutput( const char* text );
+
+
 #endif
 
 

@@ -69,14 +69,13 @@
 #define SHIFT_B3                        (21)
 #define SHIFT_B4                        (28)
 
+#define MAX_VALUE_SIZE      (128)
 
 
 uintptr_t   rodataBase  = 0;
 uint8_t*    image       = NULL;
 
-// 88 (marker 1) 90 (marker 2) 98 (marker 3) 06 82 (printf Hello World) 06 ea fb 07 fa 03 c8 06 95 09 aa 01 ab 02 57 cd 09 0e 57 cd 0a fa c1 1f 85 eb 51 b8 1e 09 40 00 00 00 00 00 00 73 40 0c fa 42 6c 61 61 21 00 0e c2 c1 12 34 45 67 89 ab cd ef �� 
 
-#define MAX_VALUE_SIZE      (128)
 
 typedef uint32_t    hash_t;
 struct
@@ -232,11 +231,6 @@ void traceDecodeUInt32( uint32_t* value, uint8_t** ptr )
 }
 
 
-
-
-
-
-
 const char* decodeConstantStringPointer( uint32_t encodedValue )
 {
     uintptr_t   address = (uintptr_t)encodedValue;
@@ -244,8 +238,6 @@ const char* decodeConstantStringPointer( uint32_t encodedValue )
     const char* text    = (const char*)&image[address];
     return text;
 }
-
-
 
 //
 void outputIPv6( uint8_t* text, uint32_t maxLength,  uint8_t value[16] )
@@ -413,7 +405,6 @@ void traceDecodePrintf( uint8_t** ptr, char* output, uint32_t maxOutputSize, con
 }
 
 
-
 //
 void traceDecode( uint8_t** ptr )
 {
@@ -493,11 +484,10 @@ void traceDecode( uint8_t** ptr )
     }
 
     // output the text.
-    //totalSize   += strlen(text);
-    puts( text );
+    traceOutput( text );
 }
 
-
+//
 void traceUseImageFile( char* fileName, uint32_t baseAddressOfImage )
 {
     FILE*       imageFile   = NULL;

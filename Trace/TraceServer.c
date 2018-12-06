@@ -49,13 +49,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdarg.h>
-#include <string.h>
-#include <time.h>
-#include <stddef.h>
-#include <inttypes.h>
 #include <stdlib.h>
-#include "crc32.h"
 
 
 // Packet & stream data.
@@ -65,17 +59,29 @@ uint32_t    totalSize       = 0;
 
 
 
-//
+
+// Output the text.
+void traceOutput( const char* text )
+{
+    static uint32_t lineCount   = 0;
+    printf( "[%08x] %s\n", lineCount, text );
+    lineCount++;
+
+    totalSize   += strlen(text);
+}
+
+
+// Entry point.
 int main( int argc, char* argv[] )
 {
-    //
+    // Work out the base address of the imagefile we're tracing.
     uintptr_t rodataBase  = atoi( argv[2] );
     printf("rodataBase = %"PRIiPTR"\n", rodataBase);
 
-    //
+    // Inform the library about the imagefile we're tracing.
     traceUseImageFile( argv[1], rodataBase );
 
-    //
+    // Read packet from stdin.
     uint32_t    serialisedSize  = 0;
     while( feof(stdin) == 0 ) 
     {
@@ -88,13 +94,6 @@ int main( int argc, char* argv[] )
         tracePacket[serialisedSize] = value;
         serialisedSize++;
     }
-
-    printf("\n[");
-    for(uint32_t i=0; i<serialisedSize; i++)
-    {
-        printf("%02x ",tracePacket[i]);
-    }
-    printf("]\n");
 
     // Decode
     tracePacketPtr  = &tracePacket[0];
@@ -121,6 +120,7 @@ int main( int argc, char* argv[] )
     traceDecode( &tracePacketPtr );
     traceDecode( &tracePacketPtr );
 
+    // Show some stats.
     printf("\nSummary:\n");
     printf("serialised size = %"PRIu32"\n", serialisedSize);
     printf("deserialised size = %d\n", totalSize);
