@@ -3,7 +3,7 @@
 
 #gcc -fsanitize=address  -g -O0 -o TraceTest TraceTest.c -Wl,-T TraceTest.ld -lasan
 gcc -fsanitize=address  -g -O0 -o TraceTest TraceTest.c crc32.c TraceEncode.c -Wl,-T TraceTest.ld  -lasan
-gcc -fsanitize=address  -g -O0 -o LogServer LogServer.c TraceDecode.c crc32.c  -lasan
+gcc -fsanitize=address  -g -O0 -o TraceServer TraceServer.c TraceDecode.c crc32.c  -lasan
 arm-linux-gnueabi-gcc -g -O0 -o TraceTest.arm TraceTest.c crc32.c TraceEncode.c -Wl,-T TraceTest.ld 
 
 
@@ -30,4 +30,4 @@ echo $fileOffset
 # - TraceDecode decodes the packet with appropriate parameters to output trace text.
 #
 ./TraceTest > out.hex
-./LogServer TraceTest.bin $fileOffset < out.hex 
+./TraceServer TraceTest.bin $fileOffset < out.hex 
