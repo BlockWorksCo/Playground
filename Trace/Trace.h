@@ -59,19 +59,6 @@
 
 
 
-#define MAX_VALUE_SIZE      (128)
-
-//
-typedef uint32_t    hash_t;
-
-hash_t generateHash( uint8_t* data, uint32_t numberOfBytes );
-bool isHashInHistory( hash_t hash );
-void addHashToHistory( hash_t hash );
-void getValueForHash( hash_t hash, uint8_t* data, uint32_t* numberOfBytes );
-void addHashAndValueToHistory( uint8_t* value, uint32_t numberOfBytes );
-
-
-
 //
 typedef enum
 {
@@ -88,7 +75,6 @@ typedef enum
 
 
 #define BITS_PER_HASH                   (24)
-#define HASH_HISTORY_SIZE               (100)
 
 
 
