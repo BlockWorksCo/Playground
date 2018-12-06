@@ -46,15 +46,13 @@
 
 
 #include "Trace.h"
+#include "TracePacket.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
 
-// Packet & stream data.
-uint8_t     tracePacket[256];
-uint8_t*    tracePacketPtr  = NULL;
 uint32_t    totalSize       = 0;
 
 
@@ -74,6 +72,8 @@ void traceOutput( const char* text )
 // Entry point.
 int main( int argc, char* argv[] )
 {
+    uint8_t     tracePacket[256];
+
     // Work out the base address of the imagefile we're tracing.
     uintptr_t rodataBase  = atoi( argv[2] );
     printf("rodataBase = %"PRIiPTR"\n", rodataBase);
@@ -96,29 +96,7 @@ int main( int argc, char* argv[] )
     }
 
     // Decode
-    tracePacketPtr  = &tracePacket[0];
-
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
+    traceDecodePacket( &tracePacket[0] );
 
     // Show some stats.
     printf("\nSummary:\n");

@@ -1,10 +1,9 @@
 #!/bin/sh
 
 
-#gcc -fsanitize=address  -g -O0 -o TraceTest TraceTest.c -Wl,-T TraceTest.ld -lasan
-gcc -fsanitize=address  -g -O0 -o TraceTest TraceTest.c crc32.c TraceEncode.c Hash.c -Wl,-T TraceTest.ld  -lasan
-gcc -fsanitize=address  -g -O0 -o TraceServer TraceServer.c TraceDecode.c Hash.c crc32.c  -lasan
-arm-linux-gnueabi-gcc -g -O0 -o TraceTest.arm TraceTest.c crc32.c TraceEncode.c -Wl,-T TraceTest.ld 
+gcc -fsanitize=address  -g -O0 -o TraceTest TraceTest.c crc32.c TraceEncode.c TraceDecode.c Hash.c TracePacket.c -Wl,-T TraceTest.ld  -lasan
+gcc -fsanitize=address  -g -O0 -o TraceServer TraceServer.c TraceDecode.c Hash.c crc32.c TracePacket.c  -lasan
+arm-linux-gnueabi-gcc -g -O0 -o TraceTest.arm TraceTest.c crc32.c TraceEncode.c Hash.c -Wl,-T TraceTest.ld 
 
 
 objcopy -S -O binary TraceTest TraceTest.bin

@@ -380,3 +380,7 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
 }
 
 
+//
+__attribute__((weak)) void traceOutput( const char* text )
+{
+}
