@@ -109,7 +109,7 @@ bool isHashInHistory( hash_t hash )
 }
 
 //
-void addHashToHistory( uint8_t* value, uint32_t numberOfBytes )
+void addHashAndValueToHistory( uint8_t* value, uint32_t numberOfBytes )
 {
     hash_t  hash    = generateHash( value, numberOfBytes );
 
@@ -459,7 +459,7 @@ void traceDecode( uint8_t** ptr )
                 numberOfBytes   = value;
                 memmove( &data[0], *ptr, numberOfBytes );
 
-                addHashToHistory( *ptr, numberOfBytes );
+                addHashAndValueToHistory( *ptr, numberOfBytes );
 
                 *ptr    += numberOfBytes;
             }

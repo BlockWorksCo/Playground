@@ -2,9 +2,9 @@
 
 
 #gcc -fsanitize=address  -g -O0 -o TraceTest TraceTest.c -Wl,-T TraceTest.ld -lasan
-gcc -fsanitize=address  -g -O0 -o TraceTest TraceTest.c crc32.c -Wl,-T TraceTest.ld  -lasan
+gcc -fsanitize=address  -g -O0 -o TraceTest TraceTest.c crc32.c TraceEncode.c -Wl,-T TraceTest.ld  -lasan
 gcc -fsanitize=address  -g -O0 -o TraceDecode TraceDecode.c crc32.c  -lasan
-arm-linux-gnueabi-gcc -g -O0 -o TraceTest.arm TraceTest.c crc32.c -Wl,-T TraceTest.ld 
+arm-linux-gnueabi-gcc -g -O0 -o TraceTest.arm TraceTest.c crc32.c TraceEncode.c -Wl,-T TraceTest.ld 
 
 
 objcopy -S -O binary TraceTest TraceTest.bin

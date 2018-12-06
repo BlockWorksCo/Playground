@@ -47,6 +47,21 @@
 #ifndef __TRACE_H__
 #define __TRACE_H__
 
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdarg.h>
+#include <string.h>
+#include <time.h>
+#include <stddef.h>
+#include <inttypes.h>
+#include "crc32.h"
+
+
+
+
+//
+typedef uint32_t    hash_t;
 
 
 //
@@ -67,6 +82,21 @@ typedef enum
 #define BITS_PER_HASH                   (24)
 #define HASH_HISTORY_SIZE               (100)
 
+
+
+hash_t generateHash( uint8_t* data, uint32_t numberOfBytes );
+bool isHashInHistory( hash_t hash );
+void addHashToHistory( hash_t hash );
+void traceEncodeUInt8( uint8_t value, uint8_t** ptr, bool lastFlag );
+void traceEncodeUInt32( uint32_t value, uint8_t** ptr );
+void traceEncodeZeroTerminatedBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr );
+void traceEncodeFixedSizeBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr );
+void traceEncodeBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr );
+void traceEncodeHex( uint8_t* data, uint32_t numberOfBytes, uint8_t** ptr );
+void traceEncodeTruncatedHex( uint8_t* data, uint32_t numberOfBytes, uint8_t** ptr );
+void traceEncodeMarker( uint32_t marker, uint8_t** ptr );
+uint32_t encodeConstantStringPointer( const char* text );
+void traceEncodePrintf( uint8_t** ptr, const char* format, ... );
 
 #endif
 
