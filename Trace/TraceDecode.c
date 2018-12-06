@@ -70,10 +70,6 @@
 #define SHIFT_B4                        (28)
 
 
-// Packet & stream data.
-uint8_t     tracePacket[256];
-uint8_t*    tracePacketPtr  = NULL;
-uint32_t    totalSize       = 0;
 
 uintptr_t   rodataBase  = 0;
 uint8_t*    image       = NULL;
@@ -497,85 +493,27 @@ void traceDecode( uint8_t** ptr )
     }
 
     // output the text.
-    totalSize   += strlen(text);
+    //totalSize   += strlen(text);
     puts( text );
 }
 
 
-
-
-//
-int main( int argc, char* argv[] )
+void traceUseImageFile( char* fileName, uint32_t baseAddressOfImage )
 {
     FILE*       imageFile   = NULL;
 
     //
-    imageFile   = fopen( argv[1], "rb" );
+    imageFile   = fopen( fileName, "rb" );
     fseek( imageFile, 0L, SEEK_END );
     long length = ftell( imageFile );
     fseek( imageFile, 0L, SEEK_SET );
     image   = (uint8_t*)malloc( length );
     fread( image, length, 1, imageFile );
-    
+    fclose( imageFile );
 
     //
-    rodataBase  = atoi( argv[2] );
-    printf("rodataBase = %"PRIiPTR"\n", rodataBase);
-
-    //
-    printf("length = %ld\n", length);
-    //printf("[%s]\n",&image[rodataBase]);
-
-    //
-    uint32_t    serialisedSize  = 0;
-    while( feof(stdin) == 0 ) 
-    {
-        uint8_t     hi  = fgetc(stdin);
-        uint8_t     lo  = fgetc(stdin);
-        hi  = (hi <= '9' ? hi-'0' : (hi-'a')+10 );
-        lo  = (lo <= '9' ? lo-'0' : (lo-'a')+10 );
-        uint8_t     value   = (hi<<4) | lo;
-
-        tracePacket[serialisedSize] = value;
-        serialisedSize++;
-    }
-
-    printf("\n[");
-    for(uint32_t i=0; i<serialisedSize; i++)
-    {
-        printf("%02x ",tracePacket[i]);
-    }
-    printf("]\n");
-
-    // Decode
-    tracePacketPtr  = &tracePacket[0];
-
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-    traceDecode( &tracePacketPtr );
-
-    printf("\nSummary:\n");
-    printf("serialised size = %"PRIu32"\n", serialisedSize);
-    printf("deserialised size = %d\n", totalSize);
-    printf("serialise size = %.1f%%\n",(100.0/totalSize)*(float)serialisedSize);
+    rodataBase  = baseAddressOfImage;
 }
+
 
 
