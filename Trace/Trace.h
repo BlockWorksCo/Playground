@@ -59,9 +59,17 @@
 
 
 
+#define MAX_VALUE_SIZE      (128)
 
 //
 typedef uint32_t    hash_t;
+
+hash_t generateHash( uint8_t* data, uint32_t numberOfBytes );
+bool isHashInHistory( hash_t hash );
+void addHashToHistory( hash_t hash );
+void getValueForHash( hash_t hash, uint8_t* data, uint32_t* numberOfBytes );
+void addHashAndValueToHistory( uint8_t* value, uint32_t numberOfBytes );
+
 
 
 //
@@ -84,9 +92,6 @@ typedef enum
 
 
 
-hash_t generateHash( uint8_t* data, uint32_t numberOfBytes );
-bool isHashInHistory( hash_t hash );
-void addHashToHistory( hash_t hash );
 void traceEncodeUInt8( uint8_t value, uint8_t** ptr, bool lastFlag );
 void traceEncodeUInt32( uint32_t value, uint8_t** ptr );
 void traceEncodeZeroTerminatedBLOB( uint8_t* blob, uint32_t numberOfBytes, uint8_t** ptr );
