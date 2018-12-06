@@ -71,40 +71,6 @@
 
 
 
-hash_t    hashHistory[HASH_HISTORY_SIZE]  = {0};
-
-
-//
-hash_t generateHash( uint8_t* data, uint32_t numberOfBytes )
-{
-    hash_t  hash    = 0;
-    crc32( data, numberOfBytes, 0x00000000, &hash );
-    hash    &= ((uint32_t)(1<<BITS_PER_HASH))-1;
-    return hash;
-}
-
-
-//
-bool isHashInHistory( hash_t hash )
-{
-    for(uint32_t i=0; i<sizeof(hashHistory)/sizeof(hashHistory[0]); i++)
-    {
-        if( hashHistory[i] == hash ) 
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-//
-void addHashToHistory( hash_t hash )
-{
-    memmove( &hashHistory[0], &hashHistory[1], sizeof(hashHistory)-sizeof(hashHistory[0]) );
-    hashHistory[ sizeof(hashHistory)/sizeof(hashHistory[0])-1 ]   = hash;
-}
-
 
 
 //
