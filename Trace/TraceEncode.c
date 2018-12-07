@@ -286,11 +286,8 @@ uint32_t encodeConstantStringPointer( const char* text )
 //18: *  - %pM - Pointer to 8 bytes (IEEE 802.15.4 EUI-64 address)
 //19: *  - %po - Pointer to 6 bytes (OBIS code)
 //
-void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
+void traceEncodePrintfVariadic( uint8_t** ptr, const char* format, va_list args )
 {
-    va_list args;
-    va_start(args, format);
-
     // first, determine the address of the format string identifier...
     // minus the base address.
     uint32_t    address = encodeConstantStringPointer( format );
@@ -375,10 +372,22 @@ void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
             percent = false;
         }
     }
-
-    va_end(args);
 }
 
+//
+void traceEncodePrintf( uint8_t** ptr, const char* format, ... )
+{
+    //
+    va_list args;
+    va_start( args, format );
+
+    //
+    traceEncodePrintf( ptr, format, args );
+    
+    //
+    va_end( args );
+
+}
 
 //
 __attribute__((weak)) void traceOutput( const char* text )

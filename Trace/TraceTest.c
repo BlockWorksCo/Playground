@@ -62,7 +62,7 @@
 
 // Packet & stream data.
 uint8_t     tracePacket[256];
-uint8_t*    tracePacketPtr  = NULL;
+
 
 //
 uint32_t traceGetTime()
@@ -75,52 +75,50 @@ uint32_t traceGetTime()
 //
 void traceTransmitPacket( uint8_t* packet, uint32_t numberOfBytes )
 {
+    for(uint32_t i=0; i<numberOfBytes; i++) 
+    {
+        printf("%02x",tracePacket[i]);
+    }
 }
 
 
 //
 int main()
 {
-    // Encode
-    tracePacketPtr  = &tracePacket[0];
+    //
+    traceNewPacket( &tracePacket[0], sizeof(tracePacket) );
 
-    traceEncodeMarker( 1, &tracePacketPtr );
-    traceEncodeMarker( 2, &tracePacketPtr );
-    traceEncodeMarker( 3, &tracePacketPtr );
-    traceEncodePrintf( &tracePacketPtr, "Hello World." );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%d)", 123 );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%d, %d)", 456,789 );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%x, %x, %x)", 0xab,0xabcd, 0x0123abcd );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%c, %f, %g)", 'A',3.14, 304.0 );
-    traceEncodePrintf( &tracePacketPtr, "Hello World. (%s)", "Blaa!" );
-    traceEncodePrintf( &tracePacketPtr, "This is a long message to see if it improves the compression ratio....");
+    //
+    tracePacketEncodeMarker( 1 );
+    tracePacketEncodeMarker( 2 );
+    tracePacketEncodeMarker( 3 );
+    tracePacketEncodePrintf( "Hello World." );
+    tracePacketEncodePrintf( "Hello World. (%d)", 123 );
+    tracePacketEncodePrintf( "Hello World. (%d, %d)", 456,789 );
+    tracePacketEncodePrintf( "Hello World. (%x, %x, %x)", 0xab,0xabcd, 0x0123abcd );
+    tracePacketEncodePrintf( "Hello World. (%c, %f, %g)", 'A',3.14, 304.0 );
+    tracePacketEncodePrintf( "Hello World. (%s)", "Blaa!" );
+    tracePacketEncodePrintf( "This is a long message to see if it improves the compression ratio....");
     uint8_t data[]  = {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x12,0x34,0x45,0x67,0x89,0xab,0xcd,0xef};
-    traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
-    traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
-    traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
-    traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
-    traceEncodeHex( &data[0], sizeof(data), &tracePacketPtr );
+    tracePacketEncodeHex( &data[0], sizeof(data) );
+    tracePacketEncodeHex( &data[0], sizeof(data) );
+    tracePacketEncodeHex( &data[0], sizeof(data) );
+    tracePacketEncodeHex( &data[0], sizeof(data) );
+    tracePacketEncodeHex( &data[0], sizeof(data) );
     uint8_t bigBLOB[]  = {0x12,0x34,0x45,0x67,0x89,0xab,0xcd,0xef, 0x01,0x35,0x46,0x10,0x19,0x23};
-    traceEncodeTruncatedHex( &bigBLOB[0], sizeof(bigBLOB), &tracePacketPtr );
+    tracePacketEncodeTruncatedHex( &bigBLOB[0], sizeof(bigBLOB) );
     uint8_t ipv6Addr[16]  = {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f};
     uint32_t    ipv4Addr    = 0xc0108123;
-    traceEncodePrintf( &tracePacketPtr, "IPv6. (%p6) IPv4 [%p4]", ipv6Addr, &ipv4Addr );
+    tracePacketEncodePrintf( "IPv6. (%p6) IPv4 [%p4]", ipv6Addr, &ipv4Addr );
     uint8_t iid[16]  = {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f};
-    traceEncodePrintf( &tracePacketPtr, "IID. (%pi)", iid );
+    tracePacketEncodePrintf( "IID. (%pi)", iid );
     uint8_t eui64[16]  = {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f};
-    traceEncodePrintf( &tracePacketPtr, "EUI 64. (%pm)", eui64 );
+    tracePacketEncodePrintf( "EUI 64. (%pm)", eui64 );
     uint8_t eui48[16]  = {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f};
-    traceEncodePrintf( &tracePacketPtr, "EUI 48. (%pM)", eui48 );
+    tracePacketEncodePrintf( "EUI 48. (%pM)", eui48 );
     uint8_t obis[6]  = {0x0a,0x0b,0x0c,0x0d,0x0e,0x0f};
-    traceEncodePrintf( &tracePacketPtr, "OBIS Code. (%po)", obis );
+    tracePacketEncodePrintf( "OBIS Code. (%po)", obis );
 
-    ptrdiff_t   serialisedSize    = tracePacketPtr - &tracePacket[0];
-    //printf("\n[");
-    for(uint32_t i=0; i<serialisedSize; i++) 
-    {
-        printf("%02x",tracePacket[i]);
-    }
-    //printf("]\n");
+    tracePacketFlush();
 }
-
 

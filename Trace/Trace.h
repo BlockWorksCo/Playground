@@ -87,9 +87,12 @@ void traceEncodeHex( uint8_t* data, uint32_t numberOfBytes, uint8_t** ptr );
 void traceEncodeTruncatedHex( uint8_t* data, uint32_t numberOfBytes, uint8_t** ptr );
 void traceEncodeMarker( uint32_t marker, uint8_t** ptr );
 uint32_t encodeConstantStringPointer( const char* text );
-void traceEncodePrintf( uint8_t** ptr, const char* format, ... );
 void traceUseImageFile( char* fileName, uint32_t baseAddressOfImage );
 void traceDecode( uint8_t** ptr );
+void traceEncodePrintfVariadic( uint8_t** ptr, const char* format, va_list args );
+void traceEncodePrintf( uint8_t** ptr, const char* format, ... );
+
+void tracePacketFlush();
 
 
 //
