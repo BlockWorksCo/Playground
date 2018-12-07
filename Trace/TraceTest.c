@@ -64,6 +64,13 @@
 uint8_t     tracePacket[256];
 uint8_t*    tracePacketPtr  = NULL;
 
+
+//
+void traceTransmitPacket( uint8_t* packet, uint32_t numberOfBytes )
+{
+}
+
+
 //
 int main()
 {

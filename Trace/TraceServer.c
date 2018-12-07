@@ -96,7 +96,7 @@ int main( int argc, char* argv[] )
     }
 
     // Decode
-    traceDecodePacket( &tracePacket[0] );
+    traceDecodePacket( &tracePacket[0], serialisedSize );
 
     // Show some stats.
     printf("\nSummary:\n");

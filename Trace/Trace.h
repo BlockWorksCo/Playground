@@ -94,6 +94,8 @@ void traceDecode( uint8_t** ptr );
 
 //
 void traceOutput( const char* text );
+void traceTransmitPacket( uint8_t* packet, uint32_t numberOfBytes );
+uint32_t traceGetTime();
 
 
 #endif
