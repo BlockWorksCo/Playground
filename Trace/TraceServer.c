@@ -57,6 +57,13 @@ uint32_t    totalSize       = 0;
 
 
 
+//
+uint32_t traceGetTime()
+{
+    static uint32_t counter = 0;
+    return counter++;
+}
+
 
 // Output the text.
 void traceOutput( const char* text )
@@ -96,7 +103,7 @@ int main( int argc, char* argv[] )
     }
 
     // Decode
-    traceDecodePacket( &tracePacket[0], serialisedSize );
+    traceDecodePacket( &tracePacket[0], serialisedSize-1 );
 
     // Show some stats.
     printf("\nSummary:\n");

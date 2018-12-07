@@ -64,6 +64,13 @@
 uint8_t     tracePacket[256];
 uint8_t*    tracePacketPtr  = NULL;
 
+//
+uint32_t traceGetTime()
+{
+    static uint32_t counter = 0;
+    return counter++;
+}
+
 
 //
 void traceTransmitPacket( uint8_t* packet, uint32_t numberOfBytes )
