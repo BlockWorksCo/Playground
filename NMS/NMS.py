@@ -47,9 +47,10 @@ def DistributionJob():
 #
 # Get DistributionJob status and results
 #
-@app.route('/API/DistributionJob', methods=['GET'])
-def GetDistributionJobStatus():
-    return '{Done}'
+@app.route('/API/DistributionJob/<jobId>', methods=['GET'])
+def GetDistributionJobStatus(jobId):
+    print('result of %s'%(jobId))
+    return jsonify({'JobID':jobId,'Results':['a','b']}) 
 
 
 
