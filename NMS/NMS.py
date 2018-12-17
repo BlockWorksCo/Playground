@@ -64,6 +64,24 @@ def GetDistributionJobStatus(jobId):
     return jsonify( result ) 
 
 
+#
+# Remove a DistributionJob results
+#
+@app.route('/API/DistributionJob/<jobId>', methods=['DELETE'])
+def RemoveDistributionJob(jobId):
+    print('remove of %s'%(jobId))
+    responseFiles = glob.glob('Jobs/%s_*.Response'%(jobId))
+    print( responseFiles )
+    
+    result  = {}
+    result['JobID'] = jobId
+    result['Results']   = []
+    for responseFile in responseFiles:
+        hashedNodeId  = re.compile("_(.*).Response").findall( responseFile )[0]
+        result['Results'].append( hashedNodeId )
+    return jsonify( result ) 
+
+
 
 
 if __name__ == "__main__":
