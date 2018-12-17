@@ -15,11 +15,17 @@ app = Flask(__name__)
 
 
 
+#
+# Get the address of a node ID (EUI-64)
+#
 def NodeAddressFromID(id):
     return '2a03:0500:0001::0200::%s'%(id)
 
 
-@app.route('/API/DistributionJob', methods=['POST','GET'])
+#
+# Create a DistributionJob
+#
+@app.route('/API/DistributionJob', methods=['POST'])
 def DistributionJob():
     targetList  = request.json['TargetList']
     blob  = request.json['BLOB']
@@ -37,6 +43,16 @@ def DistributionJob():
     response = jsonify({'JobID':tmp.name})
     response.status_code = 200
     return response 
+
+
+#
+# Get DistributionJob status
+#
+@app.route('/API/DistributionJob', methods=['GET'])
+def GetDistributionJobStatus():
+    return '{Done}'
+
+
 
 
 if __name__ == "__main__":
