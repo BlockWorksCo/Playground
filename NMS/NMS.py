@@ -10,6 +10,7 @@
 from flask import Flask, render_template, send_from_directory, request, jsonify
 import uuid
 import glob
+import re
 
 
 app = Flask(__name__)
@@ -58,7 +59,8 @@ def GetDistributionJobStatus(jobId):
     result['JobID'] = jobId
     result['Results']   = []
     for responseFile in responseFiles:
-        result['Results'].append( responseFile )
+        hashedNodeId  = re.compile("_(.*).Response").findall( responseFile )[0]
+        result['Results'].append( hashedNodeId )
     return jsonify( result ) 
 
 
