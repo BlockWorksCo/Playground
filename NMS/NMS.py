@@ -8,7 +8,7 @@
 
 
 from flask import Flask, render_template, send_from_directory, request, jsonify
-import json
+import tempfile
 
 
 app = Flask(__name__)
@@ -16,9 +16,19 @@ app = Flask(__name__)
 
 
 @app.route('/API/DistributionJob', methods=['POST','GET'])
-def Log():
-    print(request)
-    response = jsonify({'123123':'1231'})
+def DistributionJob():
+    targetList  = request.json['TargetList']
+    blob  = request.json['BLOB']
+    print(targetList)
+    print(blob)
+
+    tmp = tempfile.NamedTemporaryFile(delete=False)
+    with open(tmp.name, 'w') as f:
+        f.write(str(targetList))
+        f.write(blob)
+    f.close()
+
+    response = jsonify({'JobID':tmp.name})
     response.status_code = 200
     return response 
 
