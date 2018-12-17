@@ -8,7 +8,7 @@
 
 
 from flask import Flask, render_template, send_from_directory, request, jsonify
-import tempfile
+import uuid
 
 
 app = Flask(__name__)
@@ -32,21 +32,20 @@ def DistributionJob():
     print(targetList)
     print(blob)
 
-    tmp = tempfile.NamedTemporaryFile(delete=False,dir='Jobs',suffix='.Status')
+    jobId    = uuid.uuid4().hex
     for nodeId in targetList:
         nodeAddress = NodeAddressFromID( nodeId )
-        with open(tmp.name+'_%s.Request'%(nodeAddress), 'w') as f:
-            f.write(str(targetList))
+        with open('Jobs/%s_%s.Request'%(jobId,nodeAddress), 'w') as f:
             f.write(blob)
-        f.close()
+            f.close()
 
-    response = jsonify({'JobID':tmp.name})
+    response = jsonify({'JobID':jobId})
     response.status_code = 200
     return response 
 
 
 #
-# Get DistributionJob status
+# Get DistributionJob status and results
 #
 @app.route('/API/DistributionJob', methods=['GET'])
 def GetDistributionJobStatus():
