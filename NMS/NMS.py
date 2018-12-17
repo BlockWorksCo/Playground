@@ -9,6 +9,7 @@
 
 from flask import Flask, render_template, send_from_directory, request, jsonify
 import uuid
+import glob
 
 
 app = Flask(__name__)
@@ -50,7 +51,15 @@ def DistributionJob():
 @app.route('/API/DistributionJob/<jobId>', methods=['GET'])
 def GetDistributionJobStatus(jobId):
     print('result of %s'%(jobId))
-    return jsonify({'JobID':jobId,'Results':['a','b']}) 
+    responseFiles = glob.glob('Jobs/%s_*.Response'%(jobId))
+    print( responseFiles )
+    
+    result  = {}
+    result['JobID'] = jobId
+    result['Results']   = []
+    for responseFile in responseFiles:
+        result['Results'].append( responseFile )
+    return jsonify( result ) 
 
 
 
