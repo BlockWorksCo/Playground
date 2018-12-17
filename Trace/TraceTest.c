@@ -67,7 +67,7 @@ uint8_t     tracePacket[256];
 //
 uint32_t traceGetTime()
 {
-    static uint32_t counter = 0;
+    static uint32_t counter = 1000;
     return counter++;
 }
 
