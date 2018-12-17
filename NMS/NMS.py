@@ -18,8 +18,8 @@ app = Flask(__name__)
 #
 # Get the address of a node ID (EUI-64)
 #
-def NodeAddressFromID(id):
-    return '2a03:0500:0001::0200::%s'%(id)
+def HashedNodeId(id):
+    return '0123456789%s'%(id)
 
 
 #
@@ -34,7 +34,7 @@ def DistributionJob():
 
     jobId    = uuid.uuid4().hex
     for nodeId in targetList:
-        nodeAddress = NodeAddressFromID( nodeId )
+        nodeAddress = HashedNodeId( nodeId )
         with open('Jobs/%s_%s.Request'%(jobId,nodeAddress), 'w') as f:
             f.write(blob)
             f.close()
