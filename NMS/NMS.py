@@ -22,7 +22,7 @@ def DistributionJob():
     print(targetList)
     print(blob)
 
-    tmp = tempfile.NamedTemporaryFile(delete=False)
+    tmp = tempfile.NamedTemporaryFile(delete=False,dir='Jobs')
     with open(tmp.name, 'w') as f:
         f.write(str(targetList))
         f.write(blob)
