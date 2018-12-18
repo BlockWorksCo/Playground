@@ -11,6 +11,8 @@ from flask import Flask, render_template, send_from_directory, request, jsonify
 import uuid
 import glob
 import re
+import multiprocessing
+import time
 
 
 app = Flask(__name__)
@@ -84,8 +86,32 @@ def RemoveDistributionJob(jobId):
 
 
 
+
+
+
+#
+#
+#
+def Distributor():
+
+    while True:
+        print('tick...\n')
+        time.sleep(1.0)
+
+
+
+
+
 if __name__ == "__main__":
+
+    #
+    for i in range(4):
+        p   = multiprocessing.Process( target=Distributor )
+        p.start()
+
+    #
     app.run()
+
 
 
 
