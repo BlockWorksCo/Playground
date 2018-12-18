@@ -87,6 +87,9 @@ def RemoveDistributionJob(jobId):
 
 
 
+#
+def gatewayForNodeEUI( eui ):
+    return eui[:8]
 
 
 #
@@ -96,6 +99,43 @@ def Distributor():
 
     while True:
         print('tick...\n')
+
+        # Get a list of the outstanding jobs.
+        jobs    = glob.glob('Jobs/*.Request')
+
+        # Create a set of all the Nodes that the Jobs are targetting.
+        nodes    = set()
+        for job in jobs:
+            targetNode  = re.compile('[0-9a-fA-F]+_([0-9a-fA-F]+).Request').findall(job)[0]
+            nodes.add( targetNode )
+            
+        # Determine the set of gateways from the set of nodes.
+        gateways    = set()
+        for node in nodes:
+            targetGateway   = gatewayForNodeEUI( node )
+            gateways.add( targetGateway )
+
+        # Determine the Jobs for the first gateway in the set
+        gatewayToProcess    = gateways.pop()
+
+        # Find all the Jobs that target our chosen gateway
+        allJobs         = ' '.join( jobs )
+        jobsForGateway  = re.compile('([0-9a-fA-F]+_%s[0-9a-fA-F]+.Request)'%gatewayToProcess).findall( allJobs )
+
+        # For each job being sent to our chosen gateway, append the data to the payload.
+        payload = ''
+        for job in jobsForGateway:
+            payload += open( 'Jobs/'+job ).read()
+
+        # Send the payload to the gateway
+        print( payload )
+        
+        #
+        #print( jobsForGateway )
+        #print( gatewayToProcess )
+        #print( gateways )
+        print( nodes )
+
         time.sleep(1.0)
 
 
@@ -105,7 +145,7 @@ def Distributor():
 if __name__ == "__main__":
 
     #
-    for i in range(4):
+    for i in range(1):
         p   = multiprocessing.Process( target=Distributor )
         p.start()
 
