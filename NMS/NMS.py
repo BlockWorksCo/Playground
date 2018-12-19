@@ -132,7 +132,7 @@ def Distributor():
         allJobs         = ' '.join( jobs )
         jobsForGateway  = re.compile('([0-9a-fA-F]+_%s[0-9a-fA-F]+.Request)'%gatewayToProcess).findall( allJobs )
 
-        # For each job being sent to our chosen gateway, append the data to the payload.
+        # For each job being sent to our chosen gateway, append the data to the package.
         package = b''
         for job in jobsForGateway:
 
