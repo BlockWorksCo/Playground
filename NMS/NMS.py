@@ -13,6 +13,9 @@ import glob
 import re
 import multiprocessing
 import time
+import base64
+import ctypes
+import binascii
 
 
 app = Flask(__name__)
@@ -23,7 +26,7 @@ app = Flask(__name__)
 # Get the address of a node ID (EUI-64)
 #
 def HashedNodeId(id):
-    return '0123456789%s'%(id)
+    return '012345678%s'%(id)
 
 
 #
@@ -92,6 +95,13 @@ def gatewayForNodeEUI( eui ):
     return eui[:8]
 
 
+
+
+class MessageHeader(ctypes.Structure):
+    _pack_   = 1
+    _fields_ = [('eui64', ctypes.c_byte*8),
+                ('length', ctypes.c_int)]
+
 #
 #
 #
@@ -123,12 +133,31 @@ def Distributor():
         jobsForGateway  = re.compile('([0-9a-fA-F]+_%s[0-9a-fA-F]+.Request)'%gatewayToProcess).findall( allJobs )
 
         # For each job being sent to our chosen gateway, append the data to the payload.
-        payload = ''
+        package = b''
         for job in jobsForGateway:
-            payload += open( 'Jobs/'+job ).read()
+
+            # determine the target node from this job, make it into a binary value and
+            # pad it to the correct length
+            targetNodeHex  = re.compile('[0-9a-fA-F]+_([0-9a-fA-F]+).Request').findall(job)[0]
+            targetNode      = binascii.unhexlify( targetNodeHex )
+            targetNode      += (8-len(targetNode)) * b'\00'
+
+            # Get the payload data
+            thisPayloadBase64 = open( 'Jobs/'+job ).read()
+            thisPayload = base64.b64decode( thisPayloadBase64 )
+
+            # Create the payload header
+            header      = MessageHeader( (ctypes.c_byte*8)(*targetNode), len( thisPayload ) )
+
+            # Append the header then the payload to the package
+            package += header
+            package += thisPayload
+
+            print( binascii.hexlify(header) )
+            print( thisPayload )
 
         # Send the payload to the gateway
-        print( payload )
+        print( base64.b64encode( package ) )
         
         #
         #print( jobsForGateway )
