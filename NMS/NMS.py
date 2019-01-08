@@ -16,8 +16,15 @@ import time
 import base64
 import ctypes
 import binascii
+import socket
 
 
+
+
+
+#
+#
+#
 app = Flask(__name__)
 
 
@@ -107,6 +114,10 @@ class MessageHeader(ctypes.Structure):
 #
 def Distributor():
 
+    #
+    dataSocket = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+
+    #
     while True:
         print('tick...\n')
 
@@ -157,7 +168,9 @@ def Distributor():
             print( thisPayload )
 
         # Send the payload to the gateway
-        print( base64.b64encode( package ) )
+        data    = base64.b64encode( package )
+        #print( data )
+        dataSocket.sendto( data, ("fd09:2534:54fc::fb1", 5080) )
         
         #
         #print( jobsForGateway )
