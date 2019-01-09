@@ -6,6 +6,7 @@ import socket
 import ctypes
 import base64
 import binascii
+import multiprocessing
 
 
 
@@ -22,6 +23,23 @@ class MessageHeader(ctypes.Structure):
 
 
 
+
+def PacketReceiver():
+
+    sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+    sock.bind( ('::1', 5092) )
+
+    while True:
+        data, addr = sock.recvfrom(4096)
+        print( "received message from Agent:", data )
+
+
+
+
+# Start off the PacketReceiver To receive packets from the Agents.
+multiprocessing.Process( target=PacketReceiver ).start()
+
+# Get downstream packages from the NMS and buffer them.
 sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
 sock.bind( ('::1', 5080) )
 
