@@ -170,7 +170,7 @@ def Distributor():
         # Send the payload to the gateway
         data    = base64.b64encode( package )
         #print( data )
-        dataSocket.sendto( data, ("fd09:2534:54fc::fb1", 5080) )
+        dataSocket.sendto( data, ("::1", 5080) )
         
         #
         #print( jobsForGateway )
