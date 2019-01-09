@@ -33,6 +33,10 @@ def PacketReceiver():
         data, addr = sock.recvfrom(4096)
         print( "received message from Agent:", data )
 
+        data    = b''
+        sock.sendto( data, ("::1", 5091) )
+
+
 
 
 
