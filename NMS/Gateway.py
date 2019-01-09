@@ -10,6 +10,11 @@ import binascii
 
 
 
+
+downstreamBuffer    = {}
+upstreamBuffer      = {}
+
+
 class MessageHeader(ctypes.Structure):
     _pack_   = 1
     _fields_ = [('eui64', ctypes.c_byte*8),
@@ -44,7 +49,13 @@ while True:
         eui64           = binascii.hexlify(bytearray(header.eui64))
         packetSize      = header.length
         packetPayload   = package[ctypes.sizeof(MessageHeader):ctypes.sizeof(MessageHeader)+packetSize]
-        print( "%d/%d received %d bytes for EUI64: %s"%( packageCount, packetCount, len(packetPayload), eui64 ) )
+        print( "%d/%d received %d byte packet for device with EUI64: %s"%( packageCount, packetCount, len(packetPayload), eui64 ) )
+
+        # Store this packet in the downstream buffer for collection by the Agent.
+        try:
+            downstreamBuffer[eui64].append(packetPayload)
+        except KeyError:
+            downstreamBuffer[eui64] = [packetPayload]
 
         # Move onto the next packet in the package
         package     = package[ctypes.sizeof(MessageHeader)+packetSize:]
@@ -52,4 +63,7 @@ while True:
         packetCount = packetCount + 1
 
     packageCount    = packageCount + 1
+    
+    for eui in downstreamBuffer.keys():
+        print("[%s] %d"%(eui,len(downstreamBuffer[eui64])));
 
