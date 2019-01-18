@@ -16,11 +16,13 @@ void flashEraseSector( uint32_t sectorId )
 {
     FILE*   pFile   = NULL;
 
-    pFile   = fopen( FLASH_FILENAME, "wb+" );
+    pFile   = fopen( FLASH_FILENAME, "rwb+" );
     if( pFile != NULL )
     {
         uint8_t temp[FLASH_SECTOR_SIZE];
         memset( &temp[0], 0xff, sizeof(temp) );
+        fseek( pFile, FLASH_SECTOR_SIZE*sectorId, SEEK_SET );
+        printf("<pos=%ld\n",ftell(pFile));
         fwrite( &temp[0], 1, sizeof(temp), pFile );
         fclose(pFile);
     }
@@ -31,11 +33,13 @@ void flashWriteSector( uint32_t sectorId, uint32_t offset, uint8_t* bytes, uint3
 {
     FILE*   pFile   = NULL;
 
-    pFile   = fopen( FLASH_FILENAME, "wb+" );
+    pFile   = fopen( FLASH_FILENAME, "rwb+" );
     if( pFile != NULL )
     {
         fseek( pFile, (FLASH_SECTOR_SIZE*sectorId)+offset, SEEK_SET );
-        fwrite( &bytes[0], 1, numberOfBytes, pFile );
+        printf("<pos=%ld\n",ftell(pFile));
+        size_t  bytesWritten    = fwrite( &bytes[0], 1,numberOfBytes, pFile );
+        printf("<written=%zd\n",bytesWritten);
         fclose(pFile);
     }
 }
@@ -45,11 +49,13 @@ void flashReadSector( uint32_t sectorId, uint32_t offset, uint8_t* bytes, uint32
 {
     FILE*   pFile   = NULL;
 
-    pFile   = fopen( FLASH_FILENAME, "wb+" );
+    pFile   = fopen( FLASH_FILENAME, "rwb+" );
     if( pFile != NULL )
     {
         fseek( pFile, (FLASH_SECTOR_SIZE*sectorId)+offset, SEEK_SET );
-        fread( &bytes[0], 1, numberOfBytes, pFile );
+        printf("<pos=%ld\n",ftell(pFile));
+        size_t  bytesRead   = fread( &bytes[0], 1,numberOfBytes, pFile );
+        printf("<read=%zd\n",bytesRead);
         fclose(pFile);
     }
 }
@@ -96,8 +102,88 @@ void flashReadSector( uint32_t sectorId, uint32_t offset, uint8_t* bytes, uint32
 // This provides a version-controlled BLOB with automatic roll-back.
 //
 
+
+// Metadata post-pended to a span.
+typedef struct
+{
+    uint32_t    start;
+    uint32_t    end;
+    uint32_t    sequenceNumber;
+    uint32_t    crc;
+
+} SpanHeader;
+
+
+static void readHeaderOfSpan( uint32_t offset, SpanHeader* spanHeader )
+{
+    memset( &spanHeader, 0x00, sizeof(*spanHeader) );
+}
+
+
+static uint32_t sequenceNumberOfSpan( uint32_t offset )
+{
+    SpanHeader  spanHeader  = {0};
+    readHeaderOfSpan( offset, &spanHeader );
+    return spanHeader.sequenceNumber;
+}
+
+
+static uint32_t lengthOfSpan( uint32_t offset )
+{
+    SpanHeader  spanHeader  = {0};
+    readHeaderOfSpan( offset, &spanHeader );
+    return spanHeader.end - spanHeader.start;
+}
+
+
+static bool isGoodSpan( uint32_t offset )
+{
+    SpanHeader  spanHeader  = {0};
+    readHeaderOfSpan( offset, &spanHeader );
+
+    // check length is < MAX_SPAN_SIZE
+    // check start is < MAX_SPAN_SIZE
+    // check end is < MAX_SPAN_SIZE
+    // check CRC.
+    return true;
+}
+
+
+// end position is the address of the byte immediately
+// following the last (highest sequence numbered) span.
+static uint32_t findSequenceEndPosition()
+{
+    uint32_t    offset          = 0;
+    uint32_t    sequenceNumber  = 0;
+
+    while( isGoodSpan( offset ) == true )
+    {
+        uint32_t    thisSequenceNumber  = sequenceNumberOfSpan( offset );
+        if( thisSequenceNumber > sequenceNumber )
+        {
+            // This is within (not the end of) the chain.
+            sequenceNumber  = thisSequenceNumber;
+            offset  += lengthOfSpan( offset );
+        }
+        else
+        {
+            // End found.
+            break;
+        }
+    }
+
+    //
+    return offset;
+}
+
+
 void lsbWriteSpan( uint32_t offset, uint8_t* bytes, uint32_t numberOfBytes )
 {
+    // scan forward to find end of span-chain.
+
+    // write data to new span area.
+
+    // write header to new span area.
 }
 
 
