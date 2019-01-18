@@ -62,6 +62,37 @@ void flashReadSector( uint32_t sectorId, uint32_t offset, uint8_t* bytes, uint32
 
 
 /////////////////////////////////////////////////////////////////////
+
+
+uint32_t crc32_for_byte(uint32_t r) {
+  for(int j = 0; j < 8; ++j)
+    r = (r & 1? 0: (uint32_t)0xEDB88320L) ^ r >> 1;
+  return r ^ (uint32_t)0xFF000000L;
+}
+
+void crc32(const void *data, size_t n_bytes, uint32_t* crc) {
+  static uint32_t table[0x100];
+  if(!*table)
+    for(size_t i = 0; i < 0x100; ++i)
+      table[i] = crc32_for_byte(i);
+  for(size_t i = 0; i < n_bytes; ++i)
+    *crc = table[(uint8_t)*crc ^ ((uint8_t*)data)[i]] ^ *crc >> 8;
+}
+
+
+//
+//
+//
+uint32_t CRC32(uint32_t initialValue, uint8_t* data, uint32_t numberOfBytes)
+{
+    uint32_t    crc = initialValue;
+    
+    crc32( data, numberOfBytes, &crc );
+    return crc;
+}
+
+
+/////////////////////////////////////////////////////////////////////
 //
 //  |0................................................ ...n|
 //             |10...........................40|
@@ -114,6 +145,16 @@ typedef struct
 } SpanHeader;
 
 
+static uint32_t sectorIdFromStorageOffset( uint32_t blobOffset )
+{
+    return blobOffset / FLASH_SECTOR_SIZE;
+}
+
+static uint32_t sectorOffsetFromStorageOffset( uint32_t blobOffset )
+{
+    return blobOffset % FLASH_SECTOR_SIZE;
+}
+
 static void readHeaderOfSpan( uint32_t offset, SpanHeader* spanHeader )
 {
     memset( &spanHeader, 0x00, sizeof(*spanHeader) );
@@ -151,7 +192,7 @@ static bool isGoodSpan( uint32_t offset )
 
 // end position is the address of the byte immediately
 // following the last (highest sequence numbered) span.
-static uint32_t findSequenceEndPosition()
+static uint32_t findSequenceEndPosition( uint32_t* lastSequenceNumber )
 {
     uint32_t    offset          = 0;
     uint32_t    sequenceNumber  = 0;
@@ -172,7 +213,10 @@ static uint32_t findSequenceEndPosition()
         }
     }
 
-    //
+    // Return the last sequenceNumber.
+    *lastSequenceNumber = sequenceNumber;
+
+    // return the offset of the first free byte after the last span.
     return offset;
 }
 
@@ -180,8 +224,24 @@ static uint32_t findSequenceEndPosition()
 void lsbWriteSpan( uint32_t offset, uint8_t* bytes, uint32_t numberOfBytes )
 {
     // scan forward to find end of span-chain.
+    uint32_t    lastSequenceNumber      = 0;
+    uint32_t    endPositionInStorage    = findSequenceEndPosition( &lastSequenceNumber );
 
-    // write data to new span area.
+    // write data to new span area *first*.
+    //flashWriteSector( 10, 10, &stuff1[0], sizeof(stuff1) );
+
+    // write header with the crc *after* the data has been written.
+    SpanHeader  spanHeader  = 
+    {
+        .start          = offset,
+        .end            = offset+numberOfBytes,
+        .sequenceNumber = lastSequenceNumber+1,
+        .crc            = CRC32( 0, bytes, numberOfBytes ),
+    };
+    flashWriteSector(   sectorIdFromStorageOffset(endPositionInStorage), 
+                        sectorOffsetFromStorageOffset(endPositionInStorage), 
+                        (uint8_t*)&spanHeader, 
+                        sizeof(spanHeader) );
 
     // write header to new span area.
 }
