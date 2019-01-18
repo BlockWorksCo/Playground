@@ -125,12 +125,16 @@ uint32_t CRC32(uint32_t initialValue, uint8_t* data, uint32_t numberOfBytes)
 // the individual spans. The largest sequence number is the latest.
 //
 // Wear-levelling is obtained by over-allocating space for the LSB to
-// work within.
+// work within. All writes append to the circular buffer which eventually
+// wraps around, spreading the wear over all the allocated space.
 //
 // Bad-block management occurs by the non-critical erase-check that
 // will identify erase-failures.
+// The entire storage space is scanned to find the end of the sequence
+// thus any gaps are irrelevant.
 //
-// This provides a version-controlled BLOB with automatic roll-back.
+// This provides a version-controlled BLOB with automatic roll-back and
+// deterministic shutdown behaviour in the presence of power-failures.
 //
 
 
@@ -228,7 +232,10 @@ void lsbWriteSpan( uint32_t offset, uint8_t* bytes, uint32_t numberOfBytes )
     uint32_t    endPositionInStorage    = findSequenceEndPosition( &lastSequenceNumber );
 
     // write data to new span area *first*.
-    //flashWriteSector( 10, 10, &stuff1[0], sizeof(stuff1) );
+    flashWriteSector(   sectorIdFromStorageOffset(endPositionInStorage+sizeof(SpanHeader)), 
+                        sectorOffsetFromStorageOffset(endPositionInStorage+sizeof(SpanHeader)), 
+                        bytes, 
+                        numberOfBytes );
 
     // write header with the crc *after* the data has been written.
     SpanHeader  spanHeader  = 
