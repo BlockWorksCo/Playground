@@ -143,6 +143,7 @@ uint32_t CRC32(uint32_t initialValue, uint8_t* data, uint32_t numberOfBytes)
 //
 
 #define MAX_SPAN_SIZE       (128)
+#define MAX_OFFSET          (MAX_SPAN_SIZE * 32)
 #define SPAN_HEADER_MAGIC   (0xdeadbeef)
 
 // Metadata post-pended to a span.
@@ -206,19 +207,7 @@ static bool isGoodSpan( uint32_t offset )
     }
     
     // check length is < MAX_SPAN_SIZE
-    if( spanHeader.end-spanHeader.start >= MAX_SPAN_SIZE )
-    {
-        return false;
-    }
-
-    // check start is < MAX_SPAN_SIZE
-    if( spanHeader.start >= MAX_SPAN_SIZE )
-    {
-        return false;
-    }
-
-    // check end is < MAX_SPAN_SIZE
-    if( spanHeader.end >= MAX_SPAN_SIZE )
+    if( spanHeader.end-spanHeader.start > MAX_SPAN_SIZE )
     {
         return false;
     }
@@ -226,18 +215,44 @@ static bool isGoodSpan( uint32_t offset )
     // check CRC.
     // Do this last as this is the expensive check.
     uint8_t     spanData[MAX_SPAN_SIZE] = {0};
-    flashReadSector(    sectorIdFromStorageOffset(offset), 
-                        sectorOffsetFromStorageOffset(offset), 
+    flashReadSector(    sectorIdFromStorageOffset(offset+sizeof(spanHeader)), 
+                        sectorOffsetFromStorageOffset(offset+sizeof(spanHeader)), 
                         &spanData[0], 
                         spanHeader.end-spanHeader.start);
     uint32_t    spanDataCRC = CRC32( 0, &spanData[0], spanHeader.end-spanHeader.start );
     
-    if( spanHeader.crc > 0 )
+    if( spanHeader.crc != spanDataCRC )
     {
+        // CRC did not match, so not a good span.
         return false;
     }
 
     return true;
+}
+
+//
+static uint32_t findNextPossibleSpan( uint32_t offset )
+{
+    // Read a large buffer...
+    uint8_t     spanData[MAX_SPAN_SIZE] = {0};
+    flashReadSector(    sectorIdFromStorageOffset(offset), 
+                        sectorOffsetFromStorageOffset(offset), 
+                        &spanData[0], 
+                        sizeof(spanData) );
+
+    // ...then scan thru it to find the magic number.
+    for(uint32_t thisOffset=offset; offset<MAX_OFFSET; offset++)
+    {
+        SpanHeader* spanHeader  = (SpanHeader*)&spanData[thisOffset];
+        if( spanHeader->magic == SPAN_HEADER_MAGIC )
+        {
+            // We've found the offset of a magic-number, this is a 
+            // potential span so lets return.
+            return thisOffset;
+        }
+    }
+    
+    return (uint32_t)-1;
 }
 
 
@@ -245,30 +260,61 @@ static bool isGoodSpan( uint32_t offset )
 // following the last (highest sequence numbered) span.
 static uint32_t findSequenceEndPosition( uint32_t* lastSequenceNumber )
 {
-    uint32_t    offset          = 0;
-    uint32_t    sequenceNumber  = 0;
+    uint32_t    offset                          = 0;
+    uint32_t    highestSequenceNumber           = 0;
+    uint32_t    offsetOfHighestSequenceNumber   = 0;
+    uint32_t    numberOfSpans                   = 0;
 
-    while( isGoodSpan( offset ) == true )
+    // Find the offset of the span with the highest sequence number.
+    do
     {
-        uint32_t    thisSequenceNumber  = sequenceNumberOfSpan( offset );
-        if( thisSequenceNumber > sequenceNumber )
+        offset  = findNextPossibleSpan( offset );
+        if( offset < MAX_OFFSET )
         {
-            // This is within (not the end of) the chain.
-            sequenceNumber  = thisSequenceNumber;
-            offset  += lengthOfSpan( offset );
+            // We have a potential span...
+            if( isGoodSpan( offset ) == true )
+            {
+                // We have a good span, let check the sequence number
+                uint32_t    thisSequenceNumber  = sequenceNumberOfSpan( offset );
+                if( thisSequenceNumber >= highestSequenceNumber )
+                {
+                    // This is a new highest.
+                    highestSequenceNumber           = thisSequenceNumber;
+                    offsetOfHighestSequenceNumber   = offset;
+                }
+
+                // onwards...
+                offset  += lengthOfSpan( offset ) + sizeof(SpanHeader);
+                numberOfSpans++;
+            }
+            else
+            {
+                // this is a bad span, but it was a possible, so it must have
+                // been a spurious magic value.
+                // Lets skip over the magic value.
+                offset  += sizeof(uint32_t);
+            }
         }
-        else
-        {
-            // End found.
-            break;
-        }
+
+    } while( offset < MAX_OFFSET );
+
+    // Check for some corner cases.
+    if( numberOfSpans == 0 )
+    {
+        // We haven't found any spans, the end position is at offset zero.
+        *lastSequenceNumber   = 0;
+        return 0;
     }
+    else
+    {
+        // normal case... we have some spans and we found the end.
 
-    // Return the last sequenceNumber.
-    *lastSequenceNumber = sequenceNumber;
+        // Return the last sequenceNumber.
+        *lastSequenceNumber = highestSequenceNumber;
 
-    // return the offset of the first free byte after the last span.
-    return offset;
+        // return the offset of the first free byte after the last span.
+        return offsetOfHighestSequenceNumber + lengthOfSpan(offset);
+    }
 }
 
 
@@ -277,6 +323,8 @@ void lsbWriteSpan( uint32_t blobOffset, uint8_t* bytes, uint32_t numberOfBytes )
     // scan forward to find end of span-chain.
     uint32_t    lastSequenceNumber      = 0;
     uint32_t    endPositionInStorage    = findSequenceEndPosition( &lastSequenceNumber );
+
+    printf("[endPosition = %d]\n",endPositionInStorage);
 
     // write data to new span area *first*.
     flashWriteSector(   sectorIdFromStorageOffset(endPositionInStorage+sizeof(SpanHeader)), 
@@ -287,6 +335,7 @@ void lsbWriteSpan( uint32_t blobOffset, uint8_t* bytes, uint32_t numberOfBytes )
     // write header with the crc *after* the data has been written.
     SpanHeader  spanHeader  = 
     {
+        .magic          = SPAN_HEADER_MAGIC,
         .start          = blobOffset,
         .end            = blobOffset+numberOfBytes,
         .sequenceNumber = lastSequenceNumber+1,
@@ -314,11 +363,12 @@ int main()
     uint8_t     stuff1[]   = "Hello World!";
     flashWriteSector( 10, 10, &stuff1[0], sizeof(stuff1) );
 
-    uint8_t     stuff2[1024]    = {0};
+    uint8_t     stuff2[MAX_SPAN_SIZE]    = {0};
     flashReadSector( 10, 10, &stuff2[0], sizeof(stuff1) );
 
-    uint8_t     span1[1024]     = {0};
+    uint8_t     span1[MAX_SPAN_SIZE]     = {0};
     lsbWriteSpan( 0, &span1[0],sizeof(span1) );
+    lsbWriteSpan( 1024, &span1[0],sizeof(span1) );
 
     printf("[%s]\n", stuff2);
 }
