@@ -133,14 +133,22 @@ uint32_t CRC32(uint32_t initialValue, uint8_t* data, uint32_t numberOfBytes)
 // The entire storage space is scanned to find the end of the sequence
 // thus any gaps are irrelevant.
 //
+// When searching for valid spans throughout the storage, we don't want to
+// have to crc check everything from every byte position, so we place a
+// 'magic' value in the header and scan for that before performing any
+// further checks.
+//
 // This provides a version-controlled BLOB with automatic roll-back and
 // deterministic shutdown behaviour in the presence of power-failures.
 //
 
+#define MAX_SPAN_SIZE       (128)
+#define SPAN_HEADER_MAGIC   (0xdeadbeef)
 
 // Metadata post-pended to a span.
 typedef struct
 {
+    uint32_t    magic;      // used for quick identification.
     uint32_t    start;
     uint32_t    end;
     uint32_t    sequenceNumber;
@@ -148,7 +156,6 @@ typedef struct
 
 } SpanHeader;
 
-#define MAX_SPAN_SIZE       (128)
 
 
 static uint32_t sectorIdFromStorageOffset( uint32_t blobOffset )
@@ -191,6 +198,13 @@ static bool isGoodSpan( uint32_t offset )
     SpanHeader  spanHeader  = {0};
     readHeaderOfSpan( offset, &spanHeader );
 
+    // magic check.
+    // Do this first as this is the cheap check.
+    if( spanHeader.magic != SPAN_HEADER_MAGIC )
+    {
+        return false;
+    }
+    
     // check length is < MAX_SPAN_SIZE
     if( spanHeader.end-spanHeader.start >= MAX_SPAN_SIZE )
     {
@@ -210,6 +224,7 @@ static bool isGoodSpan( uint32_t offset )
     }
 
     // check CRC.
+    // Do this last as this is the expensive check.
     uint8_t     spanData[MAX_SPAN_SIZE] = {0};
     flashReadSector(    sectorIdFromStorageOffset(offset), 
                         sectorOffsetFromStorageOffset(offset), 
