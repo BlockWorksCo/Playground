@@ -148,6 +148,8 @@ typedef struct
 
 } SpanHeader;
 
+#define MAX_SPAN_SIZE       (128)
+
 
 static uint32_t sectorIdFromStorageOffset( uint32_t blobOffset )
 {
@@ -161,7 +163,10 @@ static uint32_t sectorOffsetFromStorageOffset( uint32_t blobOffset )
 
 static void readHeaderOfSpan( uint32_t offset, SpanHeader* spanHeader )
 {
-    memset( &spanHeader, 0x00, sizeof(*spanHeader) );
+    flashReadSector(    sectorIdFromStorageOffset(offset), 
+                        sectorOffsetFromStorageOffset(offset), 
+                        (uint8_t*)spanHeader, 
+                        sizeof(*spanHeader) );
 }
 
 
@@ -187,9 +192,36 @@ static bool isGoodSpan( uint32_t offset )
     readHeaderOfSpan( offset, &spanHeader );
 
     // check length is < MAX_SPAN_SIZE
+    if( spanHeader.end-spanHeader.start >= MAX_SPAN_SIZE )
+    {
+        return false;
+    }
+
     // check start is < MAX_SPAN_SIZE
+    if( spanHeader.start >= MAX_SPAN_SIZE )
+    {
+        return false;
+    }
+
     // check end is < MAX_SPAN_SIZE
+    if( spanHeader.end >= MAX_SPAN_SIZE )
+    {
+        return false;
+    }
+
     // check CRC.
+    uint8_t     spanData[MAX_SPAN_SIZE] = {0};
+    flashReadSector(    sectorIdFromStorageOffset(offset), 
+                        sectorOffsetFromStorageOffset(offset), 
+                        &spanData[0], 
+                        spanHeader.end-spanHeader.start);
+    uint32_t    spanDataCRC = CRC32( 0, &spanData[0], spanHeader.end-spanHeader.start );
+    
+    if( spanHeader.crc > 0 )
+    {
+        return false;
+    }
+
     return true;
 }
 
@@ -225,7 +257,7 @@ static uint32_t findSequenceEndPosition( uint32_t* lastSequenceNumber )
 }
 
 
-void lsbWriteSpan( uint32_t offset, uint8_t* bytes, uint32_t numberOfBytes )
+void lsbWriteSpan( uint32_t blobOffset, uint8_t* bytes, uint32_t numberOfBytes )
 {
     // scan forward to find end of span-chain.
     uint32_t    lastSequenceNumber      = 0;
@@ -240,8 +272,8 @@ void lsbWriteSpan( uint32_t offset, uint8_t* bytes, uint32_t numberOfBytes )
     // write header with the crc *after* the data has been written.
     SpanHeader  spanHeader  = 
     {
-        .start          = offset,
-        .end            = offset+numberOfBytes,
+        .start          = blobOffset,
+        .end            = blobOffset+numberOfBytes,
         .sequenceNumber = lastSequenceNumber+1,
         .crc            = CRC32( 0, bytes, numberOfBytes ),
     };
@@ -249,8 +281,6 @@ void lsbWriteSpan( uint32_t offset, uint8_t* bytes, uint32_t numberOfBytes )
                         sectorOffsetFromStorageOffset(endPositionInStorage), 
                         (uint8_t*)&spanHeader, 
                         sizeof(spanHeader) );
-
-    // write header to new span area.
 }
 
 
@@ -271,6 +301,9 @@ int main()
 
     uint8_t     stuff2[1024]    = {0};
     flashReadSector( 10, 10, &stuff2[0], sizeof(stuff1) );
+
+    uint8_t     span1[1024]     = {0};
+    lsbWriteSpan( 0, &span1[0],sizeof(span1) );
 
     printf("[%s]\n", stuff2);
 }
