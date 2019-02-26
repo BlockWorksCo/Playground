@@ -58,6 +58,7 @@ void scanForLatest( LogStructuredBLOB* blob )
 
     blob->latestSpan    = NULL;
 
+    // Iterate over the whole of the raw storage, trying to find spans.
     do
     {
         Span*       nextSpan    = NULL;
@@ -77,6 +78,8 @@ void scanForLatest( LogStructuredBLOB* blob )
         else {
 
             // bad span... do a span-scan.
+            // Note: We probably shouldn't do this as a psuedo-span could be embedded within the data
+            // causing a problem for this alg.
             do
             {
                 uint8_t*    temp    = (uint8_t*)span;
@@ -165,6 +168,11 @@ void addSpan( LogStructuredBLOB* blob, uint32_t start, uint8_t* data, uint32_t n
 }
 
 
+
+//
+Span* latestSpanContainingIndex( LogStructuredBLOB* blob, uint32_t index )
+{
+}
 
 // Walk backwards round the log, copying out the portions of spans that enter our desired range.
 // We finish the walkback when the entire set of bytes has been read out.
