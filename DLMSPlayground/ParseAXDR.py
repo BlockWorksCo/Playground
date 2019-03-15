@@ -29,6 +29,7 @@ DATE        = 0x1a
 TIME        = 0x1b
 
 GLO_ACTIONREQUEST   = 0xcb
+GLO_ACTIONRESPONSE  = 0xcf
 GET_REQUEST         = 0xc0
 SET_REQUEST         = 0xc1
 GET_RESPONSE        = 0xc4
@@ -276,8 +277,14 @@ def ParseField(pdu,position):
         position,typeString,value    = ParseDate(pdu,position)
     elif tag == GLO_ACTIONREQUEST:
         typeString  = 'glo_ActionRequest'
-        value       = binascii.hexlify( pdu[position:] )
-        position    = len(pdu)-1
+        ppp         = pdu[position+1]
+        value       = binascii.hexlify( pdu[position+1:] )
+        position    = len(pdu)
+    elif tag == GLO_ACTIONRESPONSE:
+        typeString  = 'glo_ActionResponse'
+        ppp         = pdu[position+1]
+        value       = binascii.hexlify( pdu[position+1:] )
+        position    = len(pdu)
     elif tag == GET_REQUEST:
         subType     = pdu[position]
         invokeId    = pdu[position+1]
@@ -285,9 +292,15 @@ def ParseField(pdu,position):
         classId     = pdu[position+3]
         obis        = pdu[position+4:position+10]
         attributeId = pdu[position+10]
+        accessType  = pdu[position+11]
         typeString  = 'GetRequest'
-        value       = (-1,'Structure-6', [(-1,'subType',ord(subType)), (-1,'invokeId',ord(invokeId)), (-1,'priority',ord(priority)), (-1,'classId',ord(classId)), (-1,'OBIS',binascii.hexlify(obis)), (-1,'attributeId',ord(attributeId)) ] )
-        position    = position+11
+        if ord(accessType) == 0:
+            value       = (-1,'Structure-6', [(-1,'subType',ord(subType)), (-1,'invokeId',ord(invokeId)), (-1,'priority',ord(priority)), (-1,'classId',ord(classId)), (-1,'OBIS',binascii.hexlify(obis)), (-1,'attributeId',ord(attributeId)) ] )
+            position    = position+12
+        if ord(accessType) == 1:
+            accessSelector = pdu[position+12]
+            position,parameterTypeString,parameterValue  = ParseField( pdu,position+13  )
+            value       = (-1,'Structure-6', [(-1,'subType',ord(subType)), (-1,'invokeId',ord(invokeId)), (-1,'priority',ord(priority)), (-1,'classId',ord(classId)), (-1,'OBIS',binascii.hexlify(obis)), (-1,'attributeId',ord(attributeId)), (-1,parameterTypeString,parameterValue) ] )
     elif tag == GET_RESPONSE:
         typeString  = 'GetResponse'
         subType     = pdu[position]

@@ -18,9 +18,23 @@ import ctypes
 import binascii
 import socket
 import os
+import sqlite3
 
 
 
+
+#
+#
+#
+db = sqlite3.connect('ACM.sqlite3') 
+cursor  = db.cursor()
+
+customers_sql = """
+CREATE TABLE outgoing (
+    endpoint text PRIMARY KEY,
+    first_name text NOT NULL,
+    last_name text NOT NULL)"""
+cur.execute(customers_sql)
 
 
 #
