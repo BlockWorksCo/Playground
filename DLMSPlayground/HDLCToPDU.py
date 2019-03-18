@@ -60,12 +60,15 @@ def ReadFrameFormat(position, hdlc):
     formatLo = ord(hdlc[position])
     position    = position+1
 
+    # form the 16-bit field.
     format  = (formatHi<<8) | formatLo
 
-    frameType   = format&0xf000
-    frameLength = format&0x7ff
+    # Green book 8.4.1.3
+    frameType           = format & 0xf000
+    segmentationFlag    = format & 0x0800
+    frameLength         = format & 0x07ff
 
-    return (frameType,frameLength,position)
+    return (frameType,segmentationFlag,frameLength,position)
 
 
 
@@ -119,7 +122,7 @@ def ParseHDLCPDU(hdlcHex):
         print('no HDLC framing detected.')
     else:
         position                    = 1
-        frameType,length,position   = ReadFrameFormat(position, hdlc)
+        frameType,segFlag,length,position   = ReadFrameFormat(position, hdlc)
         dstAddress,position         = ReadAddress(position, hdlc)
         srcAddress,position         = ReadAddress(position, hdlc)
         pollFinalFlag,iframeFlag,topField,bottomField,position       = ReadControlField(position, hdlc)
@@ -129,6 +132,7 @@ def ParseHDLCPDU(hdlcHex):
         FCS,position                = ReadCS(position, hdlc)
 
         result  = {}
+        result['segmentationFlag']  = segFlag
         result['pollFinalFlag']  = pollFinalFlag
         result['iframeFlag']  = iframeFlag
         result['topControlField']  = topField

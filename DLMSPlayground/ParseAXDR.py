@@ -34,7 +34,6 @@ GLO_GETREQUEST      = 0xc8
 GET_REQUEST         = 0xc0
 SET_REQUEST         = 0xc1
 GET_RESPONSE        = 0xc4
-NEXT_FRAME          = 0xcc
 
 def ParseLength(pdu, position):
     """
@@ -316,11 +315,6 @@ def ParseField(pdu,position):
         position,nestedTypeString,nestedValue  = ParseField( pdu,position+3 )
         value       = (-1,'Structure-4', [(-1,'subType',ord(subType)), (-1,'invokeId',ord(invokeId)), (-1,'priority',ord(priority)), (-1,nestedTypeString,nestedValue) ] )
         position    = len(pdu)-1
-    elif tag == NEXT_FRAME:
-        typeString  = 'NextFrame'
-        ppp         = pdu[position+1]
-        value       = binascii.hexlify( pdu[position+1:] )
-        position    = len(pdu)
     elif tag == NONE:
         #position    = ParseNone(pdu,position)
         #position    = position + 1

@@ -13,10 +13,14 @@ if __name__ == '__main__':
     hexPDU  = sys.argv[1]
 
     outerResult  = HDLCToPDU.ParseHDLCPDU( hexPDU )
-    innerResult  = ParseAXDR.ParseAXDR( outerResult['PDU'], 0 )
 
     combinedResult      = outerResult
-    combinedResult['PDU']  = innerResult
+    if combinedResult['segmentationFlag'] == 0:
+        innerResult  = ParseAXDR.ParseAXDR( outerResult['PDU'], 0 )
+        combinedResult['PDU']  = innerResult
+    else:
+        combinedResult['PDU']  = [(-1,'NextSegment',outerResult['PDU'])]
+        
 
     pprint.pprint(combinedResult)
 
