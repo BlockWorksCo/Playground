@@ -75,7 +75,13 @@ def ReadControlField(position, hdlc):
     control = ord(hdlc[position])
     position    = position+1
 
-    return (control,position)
+    # Green book 8.4.3.1
+    pollFinalFlag   = control & 0x10
+    iframeFlag      = control & 0x01
+    topField        = control & 0xe0;
+    bottomField     = control & 0x0e;
+
+    return (pollFinalFlag,iframeFlag,topField,bottomField,position)
 
 
 
@@ -116,14 +122,17 @@ def ParseHDLCPDU(hdlcHex):
         frameType,length,position   = ReadFrameFormat(position, hdlc)
         dstAddress,position         = ReadAddress(position, hdlc)
         srcAddress,position         = ReadAddress(position, hdlc)
-        controlField,position       = ReadControlField(position, hdlc)
+        pollFinalFlag,iframeFlag,topField,bottomField,position       = ReadControlField(position, hdlc)
         HCS,position                = ReadCS(position, hdlc)
         LLC,position                = ReadLLC(position, hdlc)
         pdu,position                = ReadPDU(position, hdlc)
         FCS,position                = ReadCS(position, hdlc)
 
         result  = {}
-        result['controlField']  = controlField
+        result['pollFinalFlag']  = pollFinalFlag
+        result['iframeFlag']  = iframeFlag
+        result['topControlField']  = topField
+        result['bottomControlField']  = bottomField
         result['frameFormat']   = frameType
         result['frameLength']   = length
         result['srcAddress']    = srcAddress
