@@ -82,7 +82,7 @@ def ReadControlField(position, hdlc):
     pollFinalFlag   = control & 0x10
     iframeFlag      = control & 0x01
     topField        = control & 0xe0;
-    bottomField     = control & 0x0e;
+    bottomField     = control & 0x0f;
 
     return (pollFinalFlag,iframeFlag,topField,bottomField,position)
 
