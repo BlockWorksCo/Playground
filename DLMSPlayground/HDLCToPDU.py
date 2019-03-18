@@ -37,13 +37,13 @@ def ReadCS(position, hdlc):
 def ReadLLC(position, hdlc):
     """
     """
-    remoteLSAP = ord(hdlc[position])
+    remoteLSAP = ord(hdlc[position])    # always 0xe6
     position    = position+1
 
-    localLSAP   = ord(hdlc[position])
+    localLSAP   = ord(hdlc[position])   # always 0xe6 or 0xe7
     position    = position+1
 
-    llcQuality  = ord(hdlc[position])
+    llcQuality  = ord(hdlc[position])   # always 0x00
     position    = position+1
 
     return (remoteLSAP,position)
@@ -97,7 +97,7 @@ def ReadAddress(position, hdlc):
         address     = (address << 8) | ord(hdlc[position])
         position    = position+1
 
-    return (address,position)
+    return (address>>1,position)
 
 
 def ParseHDLCPDU(hdlcHex):
