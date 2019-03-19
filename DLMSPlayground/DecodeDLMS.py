@@ -10,7 +10,10 @@ import pprint
 
 if __name__ == '__main__':
 
-    hexPDU  = sys.argv[1]
+    hexPDU  = sys.argv[1].rstrip()
+
+    print(hexPDU)
+    print()
 
     outerResult  = HDLCToPDU.ParseHDLCPDU( hexPDU )
 
@@ -21,7 +24,7 @@ if __name__ == '__main__':
         
         controlLS   =  combinedResult['bottomControlField']
         controlMS   =  combinedResult['topControlField']
-        print outerResult
+        #print outerResult
 
         if controlLS & 0x01 == 0x00:
             # This is an I-Frame.
@@ -57,6 +60,8 @@ if __name__ == '__main__':
         combinedResult['PDU']  = [(-1,'NextSegment',outerResult['PDU'])]
         
 
+    print
     pprint.pprint(combinedResult)
+    print
 
 

@@ -295,18 +295,22 @@ def ParseField(pdu,position):
         subType     = pdu[position]
         invokeId    = pdu[position+1]
         priority    = pdu[position+2]
-        classId     = pdu[position+3]
-        obis        = pdu[position+4:position+10]
-        attributeId = pdu[position+10]
-        accessType  = pdu[position+11]
-        typeString  = 'GetRequest'
-        if ord(accessType) == 0:
-            value       = (-1,'Structure-6', [(-1,'subType',ord(subType)), (-1,'invokeId',ord(invokeId)), (-1,'priority',ord(priority)), (-1,'classId',ord(classId)), (-1,'OBIS',binascii.hexlify(obis)), (-1,'attributeId',ord(attributeId)) ] )
-            position    = position+12
-        if ord(accessType) == 1:
-            accessSelector = pdu[position+12]
-            position,parameterTypeString,parameterValue  = ParseField( pdu,position+13  )
-            value       = (-1,'Structure-6', [(-1,'subType',ord(subType)), (-1,'invokeId',ord(invokeId)), (-1,'priority',ord(priority)), (-1,'classId',ord(classId)), (-1,'OBIS',binascii.hexlify(obis)), (-1,'attributeId',ord(attributeId)), (-1,parameterTypeString,parameterValue) ] )
+        if subType == 0x00:
+            typeString  = 'GetRequest'
+            classId     = pdu[position+3]
+            obis        = pdu[position+4:position+10]
+            attributeId = pdu[position+10]
+            accessType  = pdu[position+11]
+            if ord(accessType) == 0:
+                value       = (-1,'Structure-6', [(-1,'subType',ord(subType)), (-1,'invokeId',ord(invokeId)), (-1,'priority',ord(priority)), (-1,'classId',ord(classId)), (-1,'OBIS',binascii.hexlify(obis)), (-1,'attributeId',ord(attributeId)) ] )
+                position    = position+12
+            if ord(accessType) == 1:
+                accessSelector = pdu[position+12]
+                position,parameterTypeString,parameterValue  = ParseField( pdu,position+13  )
+                value       = (-1,'Structure-6', [(-1,'subType',ord(subType)), (-1,'invokeId',ord(invokeId)), (-1,'priority',ord(priority)), (-1,'classId',ord(classId)), (-1,'OBIS',binascii.hexlify(obis)), (-1,'attributeId',ord(attributeId)), (-1,parameterTypeString,parameterValue) ] )
+        if subType == 0x02:
+            typeString  = 'GetRequestForNextDataBlock'
+            value       = (-1,'attributeId',ord(attributeId)) 
     elif tag == GET_RESPONSE:
         typeString  = 'GetResponse'
         subType     = pdu[position]
