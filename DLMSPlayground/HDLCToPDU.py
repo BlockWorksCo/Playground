@@ -126,25 +126,31 @@ def ParseHDLCPDU(hdlcHex):
         dstAddress,position         = ReadAddress(position, hdlc)
         srcAddress,position         = ReadAddress(position, hdlc)
         pollFinalFlag,iframeFlag,topField,bottomField,position       = ReadControlField(position, hdlc)
-        HCS,position                = ReadCS(position, hdlc)
-        LLC,position                = ReadLLC(position, hdlc)
+        if len(hdlc)-position > 3:
+            # payload exists.
+            HCS,position                = ReadCS(position, hdlc)
+            LLC,position                = ReadLLC(position, hdlc)
+        else:
+            # no payload.
+            HCS                         = ''
+            LLC                         = ''
         pdu,position                = ReadPDU(position, hdlc)
         FCS,position                = ReadCS(position, hdlc)
 
         result  = {}
         result['segmentationFlag']  = segFlag
-        result['pollFinalFlag']  = pollFinalFlag
-        result['iframeFlag']  = iframeFlag
-        result['topControlField']  = topField
-        result['bottomControlField']  = bottomField
-        result['frameFormat']   = frameType
-        result['frameLength']   = length
-        result['srcAddress']    = srcAddress
-        result['dstAddress']    = dstAddress
-        result['LLC']           = LLC
-        result['HCS']           = HCS
-        result['PDU']           = binascii.hexlify(pdu)
-        result['FCS']           = FCS
+        result['pollFinalFlag']     = pollFinalFlag
+        result['iframeFlag']        = iframeFlag
+        result['topControlField']   = topField
+        result['bottomControlField']= bottomField
+        result['frameFormat']       = frameType
+        result['frameLength']       = length
+        result['srcAddress']        = srcAddress
+        result['dstAddress']        = dstAddress
+        result['LLC']               = LLC
+        result['HCS']               = HCS
+        result['PDU']               = binascii.hexlify(pdu)
+        result['FCS']               = FCS
 
         return result
 
