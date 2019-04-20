@@ -21,11 +21,11 @@ do_patch()
 
 # https://docs.python.org/3/library/ssl.html#ssl.SSLContext.set_ciphers
 context = ssl.create_default_context()
-context.set_ciphers('ECDHE-ECDSA-AES128-CCM-8')
+context.set_ciphers('ECDHE-ECDSA-AES128-CCM8')
 
 sock = socket(AF_INET, SOCK_DGRAM)
 sslsock = ssl.wrap_socket(sock)
-sslsock.connect(('172.16.32.106', 5684))
+sslsock.connect(('omnireltest2.dev.cyanconnode.com', 5684))
 sslsock.send('Hi there')
 
 
