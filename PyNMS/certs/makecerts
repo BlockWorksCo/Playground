@@ -34,3 +34,12 @@ cat tmp_server.key server-cert.pem > keycert.pem
 
 # Clean up
 rm tmp_ca.key tmp_server.key tmp_server.req ca-cert.srl
+
+
+openssl x509 -outform der -in ca-cert.pem -out ca-cert.der
+openssl x509 -outform der -in keycert.pem -out keycert.der
+openssl x509 -outform der -in server-cert.pem -out server-cert.der
+
+
+
+

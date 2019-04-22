@@ -22,17 +22,24 @@ import socket
 from os import path
 from logging import basicConfig, DEBUG
 basicConfig(level=DEBUG)  # set now for dtls import code
-from dtls.sslconnection import SSLConnection
+from dtls.sslconnection import *
 from dtls.err import SSLError, SSL_ERROR_WANT_READ, SSL_ERROR_ZERO_RETURN
+import time
+import ssl
 
 
 def main():
-    sck = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sck.bind(("127.0.0.1", 5684))
+    #ciphers='ECDHE-ECDSA-AES128-CCM8:AES128-SHA',
+
+    print(DTLS_OPENSSL_VERSION_INFO);
+
+    sck = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+    sck.bind(("fd00::1", 5684))
     sck.settimeout(30)
     cert_path = path.join(path.abspath(path.dirname(__file__)), "certs")
     scn = SSLConnection(
         sck,
+        ciphers='ECDHE-ECDSA-AES128-CCM8',
         keyfile=path.join(cert_path, "keycert.pem"),
         certfile=path.join(cert_path, "keycert.pem"),
         server_side=True,
@@ -42,13 +49,15 @@ def main():
 
     while True:
         cnt += 1
-        print "Listen invocation: %d" % cnt
+        print( "Listen invocation: %d" % cnt)
         peer_address = scn.listen()
         if peer_address:
-            print "Completed listening for peer: %s" % str(peer_address)
+            print( "Completed listening for peer: %s" % str(peer_address))
             break
+        else:
+            time.sleep(1.0)
 
-    print "Accepting..."
+    print("Accepting...")
     conn = scn.accept()[0]
     sck.settimeout(5)
     conn.get_socket(True).settimeout(5)
@@ -56,26 +65,26 @@ def main():
     cnt = 0
     while True:
         cnt += 1
-        print "Listen invocation: %d" % cnt
+        print( "Listen invocation: %d" % cnt)
         peer_address = scn.listen()
         assert not peer_address
-        print "Handshake invocation: %d" % cnt
+        print("Handshake invocation: %d" % cnt)
         try:
             conn.do_handshake()
         except SSLError as err:
             if err.errno == 504:
                 continue
             raise
-        print "Completed handshaking with peer"
+        print("Completed handshaking with peer")
         break
 
     cnt = 0
     while True:
         cnt += 1
-        print "Listen invocation: %d" % cnt
+        print("Listen invocation: %d" % cnt)
         peer_address = scn.listen()
         assert not peer_address
-        print "Read invocation: %d" % cnt
+        print("Read invocation: %d" % cnt)
         try:
             message = conn.read()
         except SSLError as err:
@@ -84,16 +93,16 @@ def main():
             if err.args[0] == SSL_ERROR_ZERO_RETURN:
                 break
             raise
-        print message
+        print(message)
         conn.write("Back to you: " + message)
 
     cnt = 0
     while True:
         cnt += 1
-        print "Listen invocation: %d" % cnt
+        print("Listen invocation: %d" % cnt)
         peer_address = scn.listen()
         assert not peer_address
-        print "Shutdown invocation: %d" % cnt
+        print("Shutdown invocation: %d" % cnt)
         try:
             s = conn.shutdown()
             s.shutdown(socket.SHUT_RDWR)
@@ -105,3 +114,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
