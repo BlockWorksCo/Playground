@@ -662,12 +662,17 @@ void start_server(int port, char *local_address) {
 		SSL_set_bio(ssl, bio, bio);
 		SSL_set_options(ssl, SSL_OP_COOKIE_EXCHANGE);
 
-		while (DTLSv1_listen(ssl, (BIO_ADDR *) &client_addr) <= 0);
+        int     rc = 0;
+        do {
+		    rc  = DTLSv1_listen(ssl, (BIO_ADDR *) &client_addr);
+        } while( rc <= 0);
 
 		info = (struct pass_info*) malloc (sizeof(struct pass_info));
 		memcpy(&info->server_addr, &server_addr, sizeof(struct sockaddr_storage));
 		memcpy(&info->client_addr, &client_addr, sizeof(struct sockaddr_storage));
 		info->ssl = ssl;
+
+        // https://github.com/nplab/DTLS-Examples.git
 
 #ifdef WIN32
 		if (CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) connection_handle, info, 0, &tid) == NULL) {
