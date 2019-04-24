@@ -602,7 +602,7 @@ void start_server(int port, char *local_address) {
 	/* We accept all ciphers, including NULL.
 	 * Not recommended beyond testing and debugging
 	 */
-	//SSL_CTX_set_cipher_list(ctx, "ALL:NULL:eNULL:aNULL");
+	SSL_CTX_set_cipher_list(ctx, "ALL:NULL:eNULL:aNULL");
 	SSL_CTX_set_session_cache_mode(ctx, SSL_SESS_CACHE_OFF);
 
 	if (!SSL_CTX_use_certificate_file(ctx, "certs/server-cert.pem", SSL_FILETYPE_PEM))
