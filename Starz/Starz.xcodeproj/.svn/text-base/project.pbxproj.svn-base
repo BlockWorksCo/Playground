@@ -1,0 +1,329 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1D3623260D0F684500981E51 /* StarzAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* StarzAppDelegate.m */; };
+		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
+		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
+		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */; };
+		2899E5600DE3E45000AC0155 /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2899E55F0DE3E45000AC0155 /* RootViewController.xib */; };
+		28AD73600D9D9599002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD735F0D9D9599002E5188 /* MainWindow.xib */; };
+		28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C286E00D94DF7D0034E888 /* RootViewController.m */; };
+		AA776A330FF6850400CB04DB /* GameListView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA776A320FF6850400CB04DB /* GameListView.xib */; };
+		AA776A380FF6852B00CB04DB /* GameListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA776A370FF6852B00CB04DB /* GameListViewController.m */; };
+		AA776A410FF6869D00CB04DB /* MapView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA776A400FF6869D00CB04DB /* MapView.xib */; };
+		AA776A460FF686C500CB04DB /* MapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA776A450FF686C500CB04DB /* MapViewController.m */; };
+		AA776A4D0FF6885600CB04DB /* PlanetView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA776A4C0FF6885600CB04DB /* PlanetView.xib */; };
+		AA776A590FF688CC00CB04DB /* PlanetDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA776A580FF688CC00CB04DB /* PlanetDetailsViewController.m */; };
+		AA776A940FF6CB1D00CB04DB /* MapScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = AA776A930FF6CB1D00CB04DB /* MapScrollView.m */; };
+		AA973A2010068FD900197218 /* Planet.m in Sources */ = {isa = PBXBuildFile; fileRef = AA973A1F10068FD900197218 /* Planet.m */; };
+		AA973A331006934F00197218 /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = AA973A321006934F00197218 /* Model.m */; };
+		AABFD6200FFAC312002ED6E3 /* ShipDesignList.xib in Resources */ = {isa = PBXBuildFile; fileRef = AABFD61F0FFAC312002ED6E3 /* ShipDesignList.xib */; };
+		AABFD6250FFAC33B002ED6E3 /* ShipDesignListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AABFD6240FFAC33B002ED6E3 /* ShipDesignListViewController.m */; };
+		AABFD6520FFBF975002ED6E3 /* DataModel.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = AABFD6510FFBF975002ED6E3 /* DataModel.xcdatamodel */; };
+		AABFD6580FFBFD92002ED6E3 /* Game.m in Sources */ = {isa = PBXBuildFile; fileRef = AABFD6570FFBFD92002ED6E3 /* Game.m */; };
+		AABFD6880FFC145B002ED6E3 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AABFD6870FFC145B002ED6E3 /* CoreData.framework */; };
+		AAFB7BAB10014DEB00AE6C8E /* MapView.m in Sources */ = {isa = PBXBuildFile; fileRef = AAFB7BAA10014DEB00AE6C8E /* MapView.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		1D3623240D0F684500981E51 /* StarzAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StarzAppDelegate.h; path = Classes/StarzAppDelegate.h; sourceTree = "<group>"; };
+		1D3623250D0F684500981E51 /* StarzAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StarzAppDelegate.m; path = Classes/StarzAppDelegate.m; sourceTree = "<group>"; };
+		1D6058910D05DD3D006BFB54 /* Starz.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Starz.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		2899E55F0DE3E45000AC0155 /* RootViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RootViewController.xib; sourceTree = "<group>"; };
+		28A0AAE50D9B0CCF005BE974 /* Starz_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Starz_Prefix.pch; sourceTree = "<group>"; };
+		28AD735F0D9D9599002E5188 /* MainWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
+		28C286DF0D94DF7D0034E888 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RootViewController.h; path = Classes/RootViewController.h; sourceTree = "<group>"; };
+		28C286E00D94DF7D0034E888 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RootViewController.m; path = Classes/RootViewController.m; sourceTree = "<group>"; };
+		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA776A320FF6850400CB04DB /* GameListView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GameListView.xib; sourceTree = "<group>"; };
+		AA776A360FF6852B00CB04DB /* GameListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameListViewController.h; sourceTree = "<group>"; };
+		AA776A370FF6852B00CB04DB /* GameListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameListViewController.m; sourceTree = "<group>"; };
+		AA776A400FF6869D00CB04DB /* MapView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MapView.xib; sourceTree = "<group>"; };
+		AA776A440FF686C500CB04DB /* MapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapViewController.h; sourceTree = "<group>"; };
+		AA776A450FF686C500CB04DB /* MapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapViewController.m; sourceTree = "<group>"; };
+		AA776A4C0FF6885600CB04DB /* PlanetView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PlanetView.xib; sourceTree = "<group>"; };
+		AA776A570FF688CC00CB04DB /* PlanetDetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlanetDetailsViewController.h; sourceTree = "<group>"; };
+		AA776A580FF688CC00CB04DB /* PlanetDetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlanetDetailsViewController.m; sourceTree = "<group>"; };
+		AA776A920FF6CB1D00CB04DB /* MapScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapScrollView.h; sourceTree = "<group>"; };
+		AA776A930FF6CB1D00CB04DB /* MapScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapScrollView.m; sourceTree = "<group>"; };
+		AA973A1E10068FD900197218 /* Planet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Planet.h; sourceTree = "<group>"; };
+		AA973A1F10068FD900197218 /* Planet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Planet.m; sourceTree = "<group>"; };
+		AA973A311006934F00197218 /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Model.h; sourceTree = "<group>"; };
+		AA973A321006934F00197218 /* Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Model.m; sourceTree = "<group>"; };
+		AABFD61F0FFAC312002ED6E3 /* ShipDesignList.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ShipDesignList.xib; sourceTree = "<group>"; };
+		AABFD6230FFAC33B002ED6E3 /* ShipDesignListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShipDesignListViewController.h; sourceTree = "<group>"; };
+		AABFD6240FFAC33B002ED6E3 /* ShipDesignListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShipDesignListViewController.m; sourceTree = "<group>"; };
+		AABFD6510FFBF975002ED6E3 /* DataModel.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
+		AABFD6560FFBFD92002ED6E3 /* Game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Game.h; sourceTree = "<group>"; };
+		AABFD6570FFBFD92002ED6E3 /* Game.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Game.m; sourceTree = "<group>"; };
+		AABFD6870FFC145B002ED6E3 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		AAFB7BA910014DEB00AE6C8E /* MapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapView.h; sourceTree = "<group>"; };
+		AAFB7BAA10014DEB00AE6C8E /* MapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapView.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1D60588F0D05DD3D006BFB54 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
+				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
+				2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */,
+				AABFD6880FFC145B002ED6E3 /* CoreData.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1D6058910D05DD3D006BFB54 /* Starz.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
+			isa = PBXGroup;
+			children = (
+				29B97316FDCFA39411CA2CEA /* main.m */,
+				AA776A360FF6852B00CB04DB /* GameListViewController.h */,
+				AA776A370FF6852B00CB04DB /* GameListViewController.m */,
+				AA776A440FF686C500CB04DB /* MapViewController.h */,
+				AA776A450FF686C500CB04DB /* MapViewController.m */,
+				AABFD6230FFAC33B002ED6E3 /* ShipDesignListViewController.h */,
+				AABFD6240FFAC33B002ED6E3 /* ShipDesignListViewController.m */,
+				28C286DF0D94DF7D0034E888 /* RootViewController.h */,
+				28C286E00D94DF7D0034E888 /* RootViewController.m */,
+				1D3623240D0F684500981E51 /* StarzAppDelegate.h */,
+				1D3623250D0F684500981E51 /* StarzAppDelegate.m */,
+				AA973A1E10068FD900197218 /* Planet.h */,
+				AA973A1F10068FD900197218 /* Planet.m */,
+				AABFD6560FFBFD92002ED6E3 /* Game.h */,
+				AABFD6570FFBFD92002ED6E3 /* Game.m */,
+				AA973A311006934F00197218 /* Model.h */,
+				AA973A321006934F00197218 /* Model.m */,
+				AABFD6510FFBF975002ED6E3 /* DataModel.xcdatamodel */,
+				AA776A920FF6CB1D00CB04DB /* MapScrollView.h */,
+				AA776A930FF6CB1D00CB04DB /* MapScrollView.m */,
+				AA776A570FF688CC00CB04DB /* PlanetDetailsViewController.h */,
+				AA776A580FF688CC00CB04DB /* PlanetDetailsViewController.m */,
+				AAFB7BA910014DEB00AE6C8E /* MapView.h */,
+				AAFB7BAA10014DEB00AE6C8E /* MapView.m */,
+				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				29B97317FDCFA39411CA2CEA /* Resources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = CustomTemplate;
+			sourceTree = "<group>";
+		};
+		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				28A0AAE50D9B0CCF005BE974 /* Starz_Prefix.pch */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		29B97317FDCFA39411CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AA776A320FF6850400CB04DB /* GameListView.xib */,
+				AABFD61F0FFAC312002ED6E3 /* ShipDesignList.xib */,
+				AA776A400FF6869D00CB04DB /* MapView.xib */,
+				AA776A4C0FF6885600CB04DB /* PlanetView.xib */,
+				2899E55F0DE3E45000AC0155 /* RootViewController.xib */,
+				28AD735F0D9D9599002E5188 /* MainWindow.xib */,
+				8D1107310486CEB800E47090 /* Info.plist */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AABFD6870FFC145B002ED6E3 /* CoreData.framework */,
+				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
+				1D30AB110D05D00D00671497 /* Foundation.framework */,
+				2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1D6058900D05DD3D006BFB54 /* Starz */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "Starz" */;
+			buildPhases = (
+				1D60588D0D05DD3D006BFB54 /* Resources */,
+				1D60588E0D05DD3D006BFB54 /* Sources */,
+				1D60588F0D05DD3D006BFB54 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Starz;
+			productName = Starz;
+			productReference = 1D6058910D05DD3D006BFB54 /* Starz.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Starz" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+				en,
+			);
+			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1D6058900D05DD3D006BFB54 /* Starz */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1D60588D0D05DD3D006BFB54 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28AD73600D9D9599002E5188 /* MainWindow.xib in Resources */,
+				2899E5600DE3E45000AC0155 /* RootViewController.xib in Resources */,
+				AA776A330FF6850400CB04DB /* GameListView.xib in Resources */,
+				AA776A410FF6869D00CB04DB /* MapView.xib in Resources */,
+				AA776A4D0FF6885600CB04DB /* PlanetView.xib in Resources */,
+				AABFD6200FFAC312002ED6E3 /* ShipDesignList.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1D60588E0D05DD3D006BFB54 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
+				1D3623260D0F684500981E51 /* StarzAppDelegate.m in Sources */,
+				28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */,
+				AA776A380FF6852B00CB04DB /* GameListViewController.m in Sources */,
+				AA776A460FF686C500CB04DB /* MapViewController.m in Sources */,
+				AA776A590FF688CC00CB04DB /* PlanetDetailsViewController.m in Sources */,
+				AA776A940FF6CB1D00CB04DB /* MapScrollView.m in Sources */,
+				AABFD6250FFAC33B002ED6E3 /* ShipDesignListViewController.m in Sources */,
+				AABFD6520FFBF975002ED6E3 /* DataModel.xcdatamodel in Sources */,
+				AABFD6580FFBFD92002ED6E3 /* Game.m in Sources */,
+				AAFB7BAB10014DEB00AE6C8E /* MapView.m in Sources */,
+				AA973A2010068FD900197218 /* Planet.m in Sources */,
+				AA973A331006934F00197218 /* Model.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1D6058940D05DD3E006BFB54 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Starz_Prefix.pch;
+				INFOPLIST_FILE = Info.plist;
+				PRODUCT_NAME = Starz;
+			};
+			name = Debug;
+		};
+		1D6058950D05DD3E006BFB54 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Starz_Prefix.pch;
+				INFOPLIST_FILE = Info.plist;
+				PRODUCT_NAME = Starz;
+			};
+			name = Release;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Steve Tickle";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				SDKROOT = iphoneos3.0;
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Steve Tickle";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				SDKROOT = iphoneos3.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "Starz" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1D6058940D05DD3E006BFB54 /* Debug */,
+				1D6058950D05DD3E006BFB54 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Starz" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}

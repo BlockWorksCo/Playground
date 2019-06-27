@@ -1,0 +1,22 @@
+//
+//  MapViewController.h
+//  Starz
+//
+//  Created by Steve Tickle on 27/06/2009.
+//  Copyright 2009 ZooKoo. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "Model.h"
+
+
+@interface MapViewController : UIViewController {
+    
+    IBOutlet id  theMapScrollView;
+    IBOutlet UIToolbar*     theToolbar;
+
+}
+
+- (id)getNavigationController;
+
+@end

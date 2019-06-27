@@ -1,0 +1,801 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1D3623260D0F684500981E51 /* StarzAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* StarzAppDelegate.m */; };
+		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
+		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
+		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */; };
+		2899E5600DE3E45000AC0155 /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2899E55F0DE3E45000AC0155 /* RootViewController.xib */; };
+		28AD73600D9D9599002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD735F0D9D9599002E5188 /* MainWindow.xib */; };
+		28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C286E00D94DF7D0034E888 /* RootViewController.m */; };
+		AA046378106501A1001203B3 /* Hull.m in Sources */ = {isa = PBXBuildFile; fileRef = AA046377106501A1001203B3 /* Hull.m */; };
+		AA10E3B31044920400DEC77B /* Background8.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AA10E3B11044920400DEC77B /* Background8.jpg */; };
+		AA10E3B41044920400DEC77B /* Background7.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AA10E3B21044920400DEC77B /* Background7.jpg */; };
+		AA215A101037FD0D00DCA117 /* DefaultProductionItems.plist in Resources */ = {isa = PBXBuildFile; fileRef = AA215A0F1037FD0D00DCA117 /* DefaultProductionItems.plist */; };
+		AA2A6169101CFEF2005FFBDA /* GameSetupItemHelpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA2A6167101CFEF2005FFBDA /* GameSetupItemHelpViewController.m */; };
+		AA2A653E1020D399005FFBDA /* Player.m in Sources */ = {isa = PBXBuildFile; fileRef = AA2A653D1020D399005FFBDA /* Player.m */; };
+		AA2A65481020D5A7005FFBDA /* AIPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = AA2A65471020D5A7005FFBDA /* AIPlayer.m */; };
+		AA2A654D1020D5DA005FFBDA /* HumanPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = AA2A654C1020D5DA005FFBDA /* HumanPlayer.m */; };
+		AA2A66881020FFAF005FFBDA /* SwitchTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = AA2A66861020FFAF005FFBDA /* SwitchTableCell.m */; };
+		AA2A670010222E1A005FFBDA /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA2A66FF10222E1A005FFBDA /* QuartzCore.framework */; };
+		AA2A67C110231F98005FFBDA /* MapView.m in Sources */ = {isa = PBXBuildFile; fileRef = AA2A67C010231F98005FFBDA /* MapView.m */; };
+		AA2A68BC10237CEA005FFBDA /* MapTiledLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = AA2A68BB10237CEA005FFBDA /* MapTiledLayer.m */; };
+		AA2A69B2102475B1005FFBDA /* NameGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = AA2A69B1102475B1005FFBDA /* NameGenerator.m */; };
+		AA2A69B61024771C005FFBDA /* asteroids.txt in Resources */ = {isa = PBXBuildFile; fileRef = AA2A69B51024771C005FFBDA /* asteroids.txt */; };
+		AA36E2901045112B007B0189 /* Game.m in Sources */ = {isa = PBXBuildFile; fileRef = AA36E28F1045112B007B0189 /* Game.m */; };
+		AA36E2991045115C007B0189 /* Ship.m in Sources */ = {isa = PBXBuildFile; fileRef = AA36E2981045115C007B0189 /* Ship.m */; };
+		AA36E29C10451168007B0189 /* Fleet.m in Sources */ = {isa = PBXBuildFile; fileRef = AA36E29B10451168007B0189 /* Fleet.m */; };
+		AA36E2E910465C99007B0189 /* ShipTemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = AA36E2E810465C99007B0189 /* ShipTemplate.m */; };
+		AA603B2310384D0E00D1BFDD /* ProductionItem.m in Sources */ = {isa = PBXBuildFile; fileRef = AA603B2210384D0E00D1BFDD /* ProductionItem.m */; };
+		AA603CB21039FEE100D1BFDD /* ShipDesignerView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA603CB11039FEE100D1BFDD /* ShipDesignerView.xib */; };
+		AA603CB71039FEFD00D1BFDD /* ShipDesignerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA603CB61039FEFD00D1BFDD /* ShipDesignerViewController.m */; };
+		AA603CEF103B3FFC00D1BFDD /* ShipDesignerView.m in Sources */ = {isa = PBXBuildFile; fileRef = AA603CEE103B3FFC00D1BFDD /* ShipDesignerView.m */; };
+		AA603D68103C837C00D1BFDD /* DefaultHulls.plist in Resources */ = {isa = PBXBuildFile; fileRef = AA603D67103C837C00D1BFDD /* DefaultHulls.plist */; };
+		AA603E75103D27A200D1BFDD /* DefaultTechnologyItems.plist in Resources */ = {isa = PBXBuildFile; fileRef = AA603E74103D27A200D1BFDD /* DefaultTechnologyItems.plist */; };
+		AA604079103F389500D1BFDD /* HullChooserView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA604078103F389500D1BFDD /* HullChooserView.xib */; };
+		AA604088103F38F500D1BFDD /* HullChooserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA604087103F38F500D1BFDD /* HullChooserViewController.m */; };
+		AA6040C0103F463600D1BFDD /* TechnologyItemChooserView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA6040BF103F463600D1BFDD /* TechnologyItemChooserView.xib */; };
+		AA6040C5103F468700D1BFDD /* TechnologyItemChooserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA6040C4103F468700D1BFDD /* TechnologyItemChooserViewController.m */; };
+		AA6043201040993200D1BFDD /* Starz.xcclassmodel in Resources */ = {isa = PBXBuildFile; fileRef = AA60431F1040993200D1BFDD /* Starz.xcclassmodel */; };
+		AA60435A10418EFA00D1BFDD /* Background1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AA60435910418EFA00D1BFDD /* Background1.jpg */; };
+		AA6043B61041A04300D1BFDD /* Background5.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AA6043B21041A04300D1BFDD /* Background5.jpg */; };
+		AA6043B71041A04300D1BFDD /* Background4.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AA6043B31041A04300D1BFDD /* Background4.jpg */; };
+		AA6043B81041A04300D1BFDD /* Background3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AA6043B41041A04300D1BFDD /* Background3.jpg */; };
+		AA6043B91041A04300D1BFDD /* Background2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AA6043B51041A04300D1BFDD /* Background2.jpg */; };
+		AA6043C31041A8F000D1BFDD /* Background6.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AA6043C21041A8F000D1BFDD /* Background6.jpg */; };
+		AA6043CC1041ADD500D1BFDD /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = AA6043CB1041ADD500D1BFDD /* Default.png */; };
+		AA6043FA1041DB4500D1BFDD /* LogView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA6043F91041DB4500D1BFDD /* LogView.xib */; };
+		AA6043FF1041DB6300D1BFDD /* LogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA6043FE1041DB6300D1BFDD /* LogViewController.m */; };
+		AA6044421041E62100D1BFDD /* LogEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = AA6044411041E62100D1BFDD /* LogEntry.m */; };
+		AA6044DC1043368400D1BFDD /* Background0.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AA6044DB1043368400D1BFDD /* Background0.jpg */; };
+		AA6B25E510179E6B006081C4 /* SliderTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = AA6B25E410179E6B006081C4 /* SliderTableCell.m */; };
+		AA6B26161017A293006081C4 /* GameSetupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA6B26151017A293006081C4 /* GameSetupViewController.m */; };
+		AA6B26231017A339006081C4 /* GameSetupView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA6B26221017A339006081C4 /* GameSetupView.xib */; };
+		AA776A330FF6850400CB04DB /* GameListView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA776A320FF6850400CB04DB /* GameListView.xib */; };
+		AA776A380FF6852B00CB04DB /* GameListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA776A370FF6852B00CB04DB /* GameListViewController.m */; };
+		AA776A410FF6869D00CB04DB /* MapView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA776A400FF6869D00CB04DB /* MapView.xib */; };
+		AA776A460FF686C500CB04DB /* MapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA776A450FF686C500CB04DB /* MapViewController.m */; };
+		AA776A4D0FF6885600CB04DB /* PlanetView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA776A4C0FF6885600CB04DB /* PlanetView.xib */; };
+		AA776A590FF688CC00CB04DB /* PlanetDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA776A580FF688CC00CB04DB /* PlanetDetailsViewController.m */; };
+		AA776A940FF6CB1D00CB04DB /* MapScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = AA776A930FF6CB1D00CB04DB /* MapScrollView.m */; };
+		AA973A331006934F00197218 /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = AA973A321006934F00197218 /* Model.m */; };
+		AAAFC0A01053AE2E001941AE /* GameModel.m in Sources */ = {isa = PBXBuildFile; fileRef = AAAFC09F1053AE2E001941AE /* GameModel.m */; };
+		AAB3C78B105AE3690055A0FA /* Condition.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB3C78A105AE3690055A0FA /* Condition.m */; };
+		AAB3C790105AE3A00055A0FA /* ConditionEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB3C78F105AE3A00055A0FA /* ConditionEvaluator.m */; };
+		AAB3C82D105C2D350055A0FA /* Motivation.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB3C82C105C2D350055A0FA /* Motivation.m */; };
+		AAB3C833105C2E2E0055A0FA /* Task.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB3C832105C2E2E0055A0FA /* Task.m */; };
+		AAB3C836105C31290055A0FA /* AIEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB3C835105C31290055A0FA /* AIEngine.m */; };
+		AAB3C853105D50790055A0FA /* GrowPopulation.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB3C852105D50790055A0FA /* GrowPopulation.m */; };
+		AAB3C859105D51C30055A0FA /* Aggression.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB3C858105D51C30055A0FA /* Aggression.m */; };
+		AAB3C85C105D51E50055A0FA /* Expansion.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB3C85B105D51E50055A0FA /* Expansion.m */; };
+		AAB3C861105D5ABF0055A0FA /* IncreaseResearch.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB3C860105D5ABF0055A0FA /* IncreaseResearch.m */; };
+		AAB3C864105D5AEF0055A0FA /* DecreaseResearch.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB3C863105D5AEF0055A0FA /* DecreaseResearch.m */; };
+		AAB3C867105D5B1C0055A0FA /* IncreaseMineProduction.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB3C866105D5B1C0055A0FA /* IncreaseMineProduction.m */; };
+		AAB3C86A105D5B380055A0FA /* DecreaseMineProduction.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB3C869105D5B380055A0FA /* DecreaseMineProduction.m */; };
+		AAB3C86D105D5B7F0055A0FA /* IncreaseFactoryProduction.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB3C86C105D5B7F0055A0FA /* IncreaseFactoryProduction.m */; };
+		AAB3C871105D64130055A0FA /* DecreaseFactoryProduction.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB3C870105D64130055A0FA /* DecreaseFactoryProduction.m */; };
+		AAB50C87104E4C5E005FA2B0 /* TechnologyItem.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB50C86104E4C5E005FA2B0 /* TechnologyItem.m */; };
+		AAB50C8B104F020F005FA2B0 /* TechFixing.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB50C8A104F020F005FA2B0 /* TechFixing.m */; };
+		AAB50D691051A761005FA2B0 /* UniverseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB50D681051A761005FA2B0 /* UniverseModel.m */; };
+		AAB50D6C1051A7B3005FA2B0 /* PlayerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB50D6B1051A7B3005FA2B0 /* PlayerModel.m */; };
+		AAB50D6F1051A843005FA2B0 /* CoreDataUser.m in Sources */ = {isa = PBXBuildFile; fileRef = AAB50D6E1051A843005FA2B0 /* CoreDataUser.m */; };
+		AAB50D881051C31D005FA2B0 /* PlayerModel.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = AAB50D871051C31D005FA2B0 /* PlayerModel.xcdatamodel */; };
+		AABEB0A8101CEEC200F2AB3C /* GameSetupItemHelpView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AABEB0A6101CEEC100F2AB3C /* GameSetupItemHelpView.xib */; };
+		AABFD6200FFAC312002ED6E3 /* ShipDesignList.xib in Resources */ = {isa = PBXBuildFile; fileRef = AABFD61F0FFAC312002ED6E3 /* ShipDesignList.xib */; };
+		AABFD6250FFAC33B002ED6E3 /* ShipDesignListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AABFD6240FFAC33B002ED6E3 /* ShipDesignListViewController.m */; };
+		AABFD6520FFBF975002ED6E3 /* DataModel.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = AABFD6510FFBF975002ED6E3 /* DataModel.xcdatamodel */; };
+		AABFD6880FFC145B002ED6E3 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AABFD6870FFC145B002ED6E3 /* CoreData.framework */; };
+		AAD02A571028D3DA0044B9A4 /* countries.txt in Resources */ = {isa = PBXBuildFile; fileRef = AAD02A561028D3DA0044B9A4 /* countries.txt */; };
+		AAD02A6C1028D5830044B9A4 /* alien_races.txt in Resources */ = {isa = PBXBuildFile; fileRef = AAD02A6B1028D5830044B9A4 /* alien_races.txt */; };
+		AAD02B04102B60910044B9A4 /* PlanetView.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD02B03102B60910044B9A4 /* PlanetView.m */; };
+		AAD02E00102D767C0044B9A4 /* Turn.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD02DFF102D767C0044B9A4 /* Turn.m */; };
+		AAD02E05102D768F0044B9A4 /* Action.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD02E04102D768F0044B9A4 /* Action.m */; };
+		AAD02E0F102D77450044B9A4 /* Planner.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD02E0E102D77450044B9A4 /* Planner.m */; };
+		AAD02E12102D78050044B9A4 /* Goal.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD02E11102D78050044B9A4 /* Goal.m */; };
+		AAD02F07102ECE5E0044B9A4 /* GoalStack.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD02F06102ECE5E0044B9A4 /* GoalStack.m */; };
+		AAD033451034A6600044B9A4 /* ProductionQueueView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AAD033441034A6600044B9A4 /* ProductionQueueView.xib */; };
+		AAD0334A1034A6920044B9A4 /* ProductionQueueViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD033491034A6920044B9A4 /* ProductionQueueViewController.m */; };
+		AAD03457103597810044B9A4 /* Planet.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD03456103597810044B9A4 /* Planet.m */; };
+		AAD0345B103597AC0044B9A4 /* SpaceObject.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD0345A103597AC0044B9A4 /* SpaceObject.m */; };
+		AAD0346C1035C1760044B9A4 /* ProductionQueueItem.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD0346B1035C1760044B9A4 /* ProductionQueueItem.m */; };
+		AAD0379A1037217C0044B9A4 /* ProductionItemChooserView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AAD037991037217C0044B9A4 /* ProductionItemChooserView.xib */; };
+		AAD0379F103721A60044B9A4 /* ProductionItemChooserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AAD0379E103721A60044B9A4 /* ProductionItemChooserViewController.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		1D3623240D0F684500981E51 /* StarzAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StarzAppDelegate.h; path = Classes/StarzAppDelegate.h; sourceTree = "<group>"; };
+		1D3623250D0F684500981E51 /* StarzAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StarzAppDelegate.m; path = Classes/StarzAppDelegate.m; sourceTree = "<group>"; };
+		1D6058910D05DD3D006BFB54 /* Starz.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Starz.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		2899E55F0DE3E45000AC0155 /* RootViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RootViewController.xib; sourceTree = "<group>"; };
+		28A0AAE50D9B0CCF005BE974 /* Starz_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Starz_Prefix.pch; sourceTree = "<group>"; };
+		28AD735F0D9D9599002E5188 /* MainWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
+		28C286DF0D94DF7D0034E888 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RootViewController.h; path = Classes/RootViewController.h; sourceTree = "<group>"; };
+		28C286E00D94DF7D0034E888 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RootViewController.m; path = Classes/RootViewController.m; sourceTree = "<group>"; };
+		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA046376106501A1001203B3 /* Hull.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Hull.h; sourceTree = "<group>"; };
+		AA046377106501A1001203B3 /* Hull.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Hull.m; sourceTree = "<group>"; };
+		AA10E3B11044920400DEC77B /* Background8.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Background8.jpg; sourceTree = "<group>"; };
+		AA10E3B21044920400DEC77B /* Background7.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Background7.jpg; sourceTree = "<group>"; };
+		AA215A0F1037FD0D00DCA117 /* DefaultProductionItems.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = DefaultProductionItems.plist; sourceTree = "<group>"; };
+		AA2A6167101CFEF2005FFBDA /* GameSetupItemHelpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameSetupItemHelpViewController.m; sourceTree = "<group>"; };
+		AA2A6168101CFEF2005FFBDA /* GameSetupItemHelpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameSetupItemHelpViewController.h; sourceTree = "<group>"; };
+		AA2A653C1020D399005FFBDA /* Player.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Player.h; sourceTree = "<group>"; };
+		AA2A653D1020D399005FFBDA /* Player.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Player.m; sourceTree = "<group>"; };
+		AA2A65461020D5A7005FFBDA /* AIPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AIPlayer.h; sourceTree = "<group>"; };
+		AA2A65471020D5A7005FFBDA /* AIPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AIPlayer.m; sourceTree = "<group>"; };
+		AA2A654B1020D5DA005FFBDA /* HumanPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HumanPlayer.h; sourceTree = "<group>"; };
+		AA2A654C1020D5DA005FFBDA /* HumanPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HumanPlayer.m; sourceTree = "<group>"; };
+		AA2A66861020FFAF005FFBDA /* SwitchTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwitchTableCell.m; sourceTree = "<group>"; };
+		AA2A66871020FFAF005FFBDA /* SwitchTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwitchTableCell.h; sourceTree = "<group>"; };
+		AA2A66FF10222E1A005FFBDA /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		AA2A67BF10231F98005FFBDA /* MapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapView.h; sourceTree = "<group>"; };
+		AA2A67C010231F98005FFBDA /* MapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapView.m; sourceTree = "<group>"; };
+		AA2A68BA10237CEA005FFBDA /* MapTiledLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapTiledLayer.h; sourceTree = "<group>"; };
+		AA2A68BB10237CEA005FFBDA /* MapTiledLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapTiledLayer.m; sourceTree = "<group>"; };
+		AA2A69B0102475B1005FFBDA /* NameGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NameGenerator.h; sourceTree = "<group>"; };
+		AA2A69B1102475B1005FFBDA /* NameGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NameGenerator.m; sourceTree = "<group>"; };
+		AA2A69B51024771C005FFBDA /* asteroids.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = asteroids.txt; sourceTree = "<group>"; };
+		AA36E28E1045112B007B0189 /* Game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Game.h; sourceTree = "<group>"; };
+		AA36E28F1045112B007B0189 /* Game.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Game.m; sourceTree = "<group>"; };
+		AA36E2971045115C007B0189 /* Ship.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ship.h; sourceTree = "<group>"; };
+		AA36E2981045115C007B0189 /* Ship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Ship.m; sourceTree = "<group>"; };
+		AA36E29A10451168007B0189 /* Fleet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Fleet.h; sourceTree = "<group>"; };
+		AA36E29B10451168007B0189 /* Fleet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Fleet.m; sourceTree = "<group>"; };
+		AA36E2E710465C99007B0189 /* ShipTemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShipTemplate.h; sourceTree = "<group>"; };
+		AA36E2E810465C99007B0189 /* ShipTemplate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShipTemplate.m; sourceTree = "<group>"; };
+		AA603B2110384D0E00D1BFDD /* ProductionItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductionItem.h; sourceTree = "<group>"; };
+		AA603B2210384D0E00D1BFDD /* ProductionItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductionItem.m; sourceTree = "<group>"; };
+		AA603CB11039FEE100D1BFDD /* ShipDesignerView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ShipDesignerView.xib; sourceTree = "<group>"; };
+		AA603CB51039FEFD00D1BFDD /* ShipDesignerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShipDesignerViewController.h; sourceTree = "<group>"; };
+		AA603CB61039FEFD00D1BFDD /* ShipDesignerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShipDesignerViewController.m; sourceTree = "<group>"; };
+		AA603CED103B3FFC00D1BFDD /* ShipDesignerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShipDesignerView.h; sourceTree = "<group>"; };
+		AA603CEE103B3FFC00D1BFDD /* ShipDesignerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShipDesignerView.m; sourceTree = "<group>"; };
+		AA603D67103C837C00D1BFDD /* DefaultHulls.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = DefaultHulls.plist; sourceTree = "<group>"; };
+		AA603E74103D27A200D1BFDD /* DefaultTechnologyItems.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = DefaultTechnologyItems.plist; sourceTree = "<group>"; };
+		AA604078103F389500D1BFDD /* HullChooserView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HullChooserView.xib; sourceTree = "<group>"; };
+		AA604086103F38F500D1BFDD /* HullChooserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HullChooserViewController.h; sourceTree = "<group>"; };
+		AA604087103F38F500D1BFDD /* HullChooserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HullChooserViewController.m; sourceTree = "<group>"; };
+		AA6040BF103F463600D1BFDD /* TechnologyItemChooserView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TechnologyItemChooserView.xib; sourceTree = "<group>"; };
+		AA6040C3103F468700D1BFDD /* TechnologyItemChooserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TechnologyItemChooserViewController.h; sourceTree = "<group>"; };
+		AA6040C4103F468700D1BFDD /* TechnologyItemChooserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TechnologyItemChooserViewController.m; sourceTree = "<group>"; };
+		AA60431F1040993200D1BFDD /* Starz.xcclassmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcclassmodel; path = Starz.xcclassmodel; sourceTree = "<group>"; };
+		AA60435910418EFA00D1BFDD /* Background1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Background1.jpg; sourceTree = "<group>"; };
+		AA6043B21041A04300D1BFDD /* Background5.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Background5.jpg; sourceTree = "<group>"; };
+		AA6043B31041A04300D1BFDD /* Background4.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Background4.jpg; sourceTree = "<group>"; };
+		AA6043B41041A04300D1BFDD /* Background3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Background3.jpg; sourceTree = "<group>"; };
+		AA6043B51041A04300D1BFDD /* Background2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Background2.jpg; sourceTree = "<group>"; };
+		AA6043C21041A8F000D1BFDD /* Background6.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Background6.jpg; sourceTree = "<group>"; };
+		AA6043CB1041ADD500D1BFDD /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		AA6043F91041DB4500D1BFDD /* LogView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LogView.xib; sourceTree = "<group>"; };
+		AA6043FD1041DB6300D1BFDD /* LogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogViewController.h; sourceTree = "<group>"; };
+		AA6043FE1041DB6300D1BFDD /* LogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogViewController.m; sourceTree = "<group>"; };
+		AA6044401041E62100D1BFDD /* LogEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogEntry.h; sourceTree = "<group>"; };
+		AA6044411041E62100D1BFDD /* LogEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogEntry.m; sourceTree = "<group>"; };
+		AA6044DB1043368400D1BFDD /* Background0.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Background0.jpg; sourceTree = "<group>"; };
+		AA6B25E310179E6B006081C4 /* SliderTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SliderTableCell.h; sourceTree = "<group>"; };
+		AA6B25E410179E6B006081C4 /* SliderTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SliderTableCell.m; sourceTree = "<group>"; };
+		AA6B26141017A293006081C4 /* GameSetupViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameSetupViewController.h; sourceTree = "<group>"; };
+		AA6B26151017A293006081C4 /* GameSetupViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameSetupViewController.m; sourceTree = "<group>"; };
+		AA6B26221017A339006081C4 /* GameSetupView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GameSetupView.xib; sourceTree = "<group>"; };
+		AA776A320FF6850400CB04DB /* GameListView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GameListView.xib; sourceTree = "<group>"; };
+		AA776A360FF6852B00CB04DB /* GameListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameListViewController.h; sourceTree = "<group>"; };
+		AA776A370FF6852B00CB04DB /* GameListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameListViewController.m; sourceTree = "<group>"; };
+		AA776A400FF6869D00CB04DB /* MapView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MapView.xib; sourceTree = "<group>"; };
+		AA776A440FF686C500CB04DB /* MapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapViewController.h; sourceTree = "<group>"; };
+		AA776A450FF686C500CB04DB /* MapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapViewController.m; sourceTree = "<group>"; };
+		AA776A4C0FF6885600CB04DB /* PlanetView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PlanetView.xib; sourceTree = "<group>"; };
+		AA776A570FF688CC00CB04DB /* PlanetDetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlanetDetailsViewController.h; sourceTree = "<group>"; };
+		AA776A580FF688CC00CB04DB /* PlanetDetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlanetDetailsViewController.m; sourceTree = "<group>"; };
+		AA776A920FF6CB1D00CB04DB /* MapScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapScrollView.h; sourceTree = "<group>"; };
+		AA776A930FF6CB1D00CB04DB /* MapScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapScrollView.m; sourceTree = "<group>"; };
+		AA973A311006934F00197218 /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Model.h; sourceTree = "<group>"; };
+		AA973A321006934F00197218 /* Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Model.m; sourceTree = "<group>"; };
+		AAAFC09E1053AE2E001941AE /* GameModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameModel.h; sourceTree = "<group>"; };
+		AAAFC09F1053AE2E001941AE /* GameModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameModel.m; sourceTree = "<group>"; };
+		AAB3C789105AE3690055A0FA /* Condition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Condition.h; sourceTree = "<group>"; };
+		AAB3C78A105AE3690055A0FA /* Condition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Condition.m; sourceTree = "<group>"; };
+		AAB3C78E105AE3A00055A0FA /* ConditionEvaluator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConditionEvaluator.h; sourceTree = "<group>"; };
+		AAB3C78F105AE3A00055A0FA /* ConditionEvaluator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConditionEvaluator.m; sourceTree = "<group>"; };
+		AAB3C82B105C2D350055A0FA /* Motivation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Motivation.h; sourceTree = "<group>"; };
+		AAB3C82C105C2D350055A0FA /* Motivation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Motivation.m; sourceTree = "<group>"; };
+		AAB3C831105C2E2E0055A0FA /* Task.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Task.h; sourceTree = "<group>"; };
+		AAB3C832105C2E2E0055A0FA /* Task.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Task.m; sourceTree = "<group>"; };
+		AAB3C834105C31290055A0FA /* AIEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AIEngine.h; sourceTree = "<group>"; };
+		AAB3C835105C31290055A0FA /* AIEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AIEngine.m; sourceTree = "<group>"; };
+		AAB3C851105D50790055A0FA /* GrowPopulation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GrowPopulation.h; sourceTree = "<group>"; };
+		AAB3C852105D50790055A0FA /* GrowPopulation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GrowPopulation.m; sourceTree = "<group>"; };
+		AAB3C857105D51C30055A0FA /* Aggression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Aggression.h; sourceTree = "<group>"; };
+		AAB3C858105D51C30055A0FA /* Aggression.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Aggression.m; sourceTree = "<group>"; };
+		AAB3C85A105D51E50055A0FA /* Expansion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Expansion.h; sourceTree = "<group>"; };
+		AAB3C85B105D51E50055A0FA /* Expansion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Expansion.m; sourceTree = "<group>"; };
+		AAB3C85F105D5ABF0055A0FA /* IncreaseResearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IncreaseResearch.h; sourceTree = "<group>"; };
+		AAB3C860105D5ABF0055A0FA /* IncreaseResearch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IncreaseResearch.m; sourceTree = "<group>"; };
+		AAB3C862105D5AEF0055A0FA /* DecreaseResearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DecreaseResearch.h; sourceTree = "<group>"; };
+		AAB3C863105D5AEF0055A0FA /* DecreaseResearch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DecreaseResearch.m; sourceTree = "<group>"; };
+		AAB3C865105D5B1C0055A0FA /* IncreaseMineProduction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IncreaseMineProduction.h; sourceTree = "<group>"; };
+		AAB3C866105D5B1C0055A0FA /* IncreaseMineProduction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IncreaseMineProduction.m; sourceTree = "<group>"; };
+		AAB3C868105D5B380055A0FA /* DecreaseMineProduction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DecreaseMineProduction.h; sourceTree = "<group>"; };
+		AAB3C869105D5B380055A0FA /* DecreaseMineProduction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DecreaseMineProduction.m; sourceTree = "<group>"; };
+		AAB3C86B105D5B7F0055A0FA /* IncreaseFactoryProduction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IncreaseFactoryProduction.h; sourceTree = "<group>"; };
+		AAB3C86C105D5B7F0055A0FA /* IncreaseFactoryProduction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IncreaseFactoryProduction.m; sourceTree = "<group>"; };
+		AAB3C86F105D64130055A0FA /* DecreaseFactoryProduction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DecreaseFactoryProduction.h; sourceTree = "<group>"; };
+		AAB3C870105D64130055A0FA /* DecreaseFactoryProduction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DecreaseFactoryProduction.m; sourceTree = "<group>"; };
+		AAB50C85104E4C5E005FA2B0 /* TechnologyItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TechnologyItem.h; sourceTree = "<group>"; };
+		AAB50C86104E4C5E005FA2B0 /* TechnologyItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TechnologyItem.m; sourceTree = "<group>"; };
+		AAB50C89104F020F005FA2B0 /* TechFixing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TechFixing.h; sourceTree = "<group>"; };
+		AAB50C8A104F020F005FA2B0 /* TechFixing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TechFixing.m; sourceTree = "<group>"; };
+		AAB50D671051A761005FA2B0 /* UniverseModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UniverseModel.h; sourceTree = "<group>"; };
+		AAB50D681051A761005FA2B0 /* UniverseModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UniverseModel.m; sourceTree = "<group>"; };
+		AAB50D6A1051A7B3005FA2B0 /* PlayerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerModel.h; sourceTree = "<group>"; };
+		AAB50D6B1051A7B3005FA2B0 /* PlayerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerModel.m; sourceTree = "<group>"; };
+		AAB50D6D1051A843005FA2B0 /* CoreDataUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreDataUser.h; sourceTree = "<group>"; };
+		AAB50D6E1051A843005FA2B0 /* CoreDataUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreDataUser.m; sourceTree = "<group>"; };
+		AAB50D871051C31D005FA2B0 /* PlayerModel.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; path = PlayerModel.xcdatamodel; sourceTree = "<group>"; };
+		AABEB0A6101CEEC100F2AB3C /* GameSetupItemHelpView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GameSetupItemHelpView.xib; sourceTree = "<group>"; };
+		AABFD61F0FFAC312002ED6E3 /* ShipDesignList.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ShipDesignList.xib; sourceTree = "<group>"; };
+		AABFD6230FFAC33B002ED6E3 /* ShipDesignListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShipDesignListViewController.h; sourceTree = "<group>"; };
+		AABFD6240FFAC33B002ED6E3 /* ShipDesignListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShipDesignListViewController.m; sourceTree = "<group>"; };
+		AABFD6510FFBF975002ED6E3 /* DataModel.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
+		AABFD6870FFC145B002ED6E3 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		AAD02A561028D3DA0044B9A4 /* countries.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = countries.txt; sourceTree = "<group>"; };
+		AAD02A6B1028D5830044B9A4 /* alien_races.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = alien_races.txt; sourceTree = "<group>"; };
+		AAD02B02102B60910044B9A4 /* PlanetView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlanetView.h; sourceTree = "<group>"; };
+		AAD02B03102B60910044B9A4 /* PlanetView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlanetView.m; sourceTree = "<group>"; };
+		AAD02DFE102D767C0044B9A4 /* Turn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Turn.h; sourceTree = "<group>"; };
+		AAD02DFF102D767C0044B9A4 /* Turn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Turn.m; sourceTree = "<group>"; };
+		AAD02E03102D768F0044B9A4 /* Action.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Action.h; sourceTree = "<group>"; };
+		AAD02E04102D768F0044B9A4 /* Action.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Action.m; sourceTree = "<group>"; };
+		AAD02E0D102D77450044B9A4 /* Planner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Planner.h; sourceTree = "<group>"; };
+		AAD02E0E102D77450044B9A4 /* Planner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Planner.m; sourceTree = "<group>"; };
+		AAD02E10102D78050044B9A4 /* Goal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Goal.h; sourceTree = "<group>"; };
+		AAD02E11102D78050044B9A4 /* Goal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Goal.m; sourceTree = "<group>"; };
+		AAD02F05102ECE5E0044B9A4 /* GoalStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoalStack.h; sourceTree = "<group>"; };
+		AAD02F06102ECE5E0044B9A4 /* GoalStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoalStack.m; sourceTree = "<group>"; };
+		AAD033441034A6600044B9A4 /* ProductionQueueView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ProductionQueueView.xib; sourceTree = "<group>"; };
+		AAD033481034A6920044B9A4 /* ProductionQueueViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductionQueueViewController.h; sourceTree = "<group>"; };
+		AAD033491034A6920044B9A4 /* ProductionQueueViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductionQueueViewController.m; sourceTree = "<group>"; };
+		AAD03455103597810044B9A4 /* Planet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Planet.h; sourceTree = "<group>"; };
+		AAD03456103597810044B9A4 /* Planet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Planet.m; sourceTree = "<group>"; };
+		AAD03459103597AC0044B9A4 /* SpaceObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpaceObject.h; sourceTree = "<group>"; };
+		AAD0345A103597AC0044B9A4 /* SpaceObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpaceObject.m; sourceTree = "<group>"; };
+		AAD0346A1035C1760044B9A4 /* ProductionQueueItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductionQueueItem.h; sourceTree = "<group>"; };
+		AAD0346B1035C1760044B9A4 /* ProductionQueueItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductionQueueItem.m; sourceTree = "<group>"; };
+		AAD037991037217C0044B9A4 /* ProductionItemChooserView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ProductionItemChooserView.xib; sourceTree = "<group>"; };
+		AAD0379D103721A60044B9A4 /* ProductionItemChooserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProductionItemChooserViewController.h; sourceTree = "<group>"; };
+		AAD0379E103721A60044B9A4 /* ProductionItemChooserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProductionItemChooserViewController.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1D60588F0D05DD3D006BFB54 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
+				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
+				2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */,
+				AABFD6880FFC145B002ED6E3 /* CoreData.framework in Frameworks */,
+				AA2A670010222E1A005FFBDA /* QuartzCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1D6058910D05DD3D006BFB54 /* Starz.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
+			isa = PBXGroup;
+			children = (
+				AAD02E16102D7A570044B9A4 /* UserInterface */,
+				AAD02E14102D788D0044B9A4 /* Application */,
+				AAD02E0A102D76CC0044B9A4 /* AIPlayer */,
+				AA2A66C610221968005FFBDA /* Display */,
+				AA2A66C51022193C005FFBDA /* Model */,
+				AA2A66C4102218E9005FFBDA /* Game Setup */,
+				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				29B97317FDCFA39411CA2CEA /* Resources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+				AA60431F1040993200D1BFDD /* Starz.xcclassmodel */,
+			);
+			name = CustomTemplate;
+			sourceTree = "<group>";
+		};
+		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				28A0AAE50D9B0CCF005BE974 /* Starz_Prefix.pch */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		29B97317FDCFA39411CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AA6043F91041DB4500D1BFDD /* LogView.xib */,
+				AA6040BF103F463600D1BFDD /* TechnologyItemChooserView.xib */,
+				AA604078103F389500D1BFDD /* HullChooserView.xib */,
+				AA603CB11039FEE100D1BFDD /* ShipDesignerView.xib */,
+				AAD037991037217C0044B9A4 /* ProductionItemChooserView.xib */,
+				AAD033441034A6600044B9A4 /* ProductionQueueView.xib */,
+				AABEB0A6101CEEC100F2AB3C /* GameSetupItemHelpView.xib */,
+				AA776A320FF6850400CB04DB /* GameListView.xib */,
+				AABFD61F0FFAC312002ED6E3 /* ShipDesignList.xib */,
+				AA776A400FF6869D00CB04DB /* MapView.xib */,
+				AA776A4C0FF6885600CB04DB /* PlanetView.xib */,
+				2899E55F0DE3E45000AC0155 /* RootViewController.xib */,
+				28AD735F0D9D9599002E5188 /* MainWindow.xib */,
+				8D1107310486CEB800E47090 /* Info.plist */,
+				AA6B26221017A339006081C4 /* GameSetupView.xib */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AA2A66FF10222E1A005FFBDA /* QuartzCore.framework */,
+				AABFD6870FFC145B002ED6E3 /* CoreData.framework */,
+				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
+				1D30AB110D05D00D00671497 /* Foundation.framework */,
+				2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		AA2A66C4102218E9005FFBDA /* Game Setup */ = {
+			isa = PBXGroup;
+			children = (
+				AA2A66861020FFAF005FFBDA /* SwitchTableCell.m */,
+				AA2A66871020FFAF005FFBDA /* SwitchTableCell.h */,
+				AA2A6167101CFEF2005FFBDA /* GameSetupItemHelpViewController.m */,
+				AA2A6168101CFEF2005FFBDA /* GameSetupItemHelpViewController.h */,
+				AA6B25E310179E6B006081C4 /* SliderTableCell.h */,
+				AA6B25E410179E6B006081C4 /* SliderTableCell.m */,
+				AA6B26141017A293006081C4 /* GameSetupViewController.h */,
+				AA6B26151017A293006081C4 /* GameSetupViewController.m */,
+			);
+			name = "Game Setup";
+			sourceTree = "<group>";
+		};
+		AA2A66C51022193C005FFBDA /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				AA046376106501A1001203B3 /* Hull.h */,
+				AA046377106501A1001203B3 /* Hull.m */,
+				AAB50D6A1051A7B3005FA2B0 /* PlayerModel.h */,
+				AAB50D6B1051A7B3005FA2B0 /* PlayerModel.m */,
+				AAB50D6D1051A843005FA2B0 /* CoreDataUser.h */,
+				AAB50D6E1051A843005FA2B0 /* CoreDataUser.m */,
+				AAB50C89104F020F005FA2B0 /* TechFixing.h */,
+				AAB50C8A104F020F005FA2B0 /* TechFixing.m */,
+				AAB50C85104E4C5E005FA2B0 /* TechnologyItem.h */,
+				AAB50C86104E4C5E005FA2B0 /* TechnologyItem.m */,
+				AA36E2E710465C99007B0189 /* ShipTemplate.h */,
+				AA36E2E810465C99007B0189 /* ShipTemplate.m */,
+				AA36E29A10451168007B0189 /* Fleet.h */,
+				AA36E29B10451168007B0189 /* Fleet.m */,
+				AA36E2971045115C007B0189 /* Ship.h */,
+				AA36E2981045115C007B0189 /* Ship.m */,
+				AA36E28E1045112B007B0189 /* Game.h */,
+				AA36E28F1045112B007B0189 /* Game.m */,
+				AA6044401041E62100D1BFDD /* LogEntry.h */,
+				AA6044411041E62100D1BFDD /* LogEntry.m */,
+				AA603B2110384D0E00D1BFDD /* ProductionItem.h */,
+				AA603B2210384D0E00D1BFDD /* ProductionItem.m */,
+				AAD0346A1035C1760044B9A4 /* ProductionQueueItem.h */,
+				AAD0346B1035C1760044B9A4 /* ProductionQueueItem.m */,
+				AAD03459103597AC0044B9A4 /* SpaceObject.h */,
+				AAD0345A103597AC0044B9A4 /* SpaceObject.m */,
+				AAD03455103597810044B9A4 /* Planet.h */,
+				AAD03456103597810044B9A4 /* Planet.m */,
+				AAD02A6B1028D5830044B9A4 /* alien_races.txt */,
+				AAD02A561028D3DA0044B9A4 /* countries.txt */,
+				AA2A69B51024771C005FFBDA /* asteroids.txt */,
+				AA973A311006934F00197218 /* Model.h */,
+				AA973A321006934F00197218 /* Model.m */,
+				AA603E74103D27A200D1BFDD /* DefaultTechnologyItems.plist */,
+				AABFD6510FFBF975002ED6E3 /* DataModel.xcdatamodel */,
+				AA2A654B1020D5DA005FFBDA /* HumanPlayer.h */,
+				AA2A654C1020D5DA005FFBDA /* HumanPlayer.m */,
+				AA2A653C1020D399005FFBDA /* Player.h */,
+				AA2A653D1020D399005FFBDA /* Player.m */,
+				AA2A69B0102475B1005FFBDA /* NameGenerator.h */,
+				AA2A69B1102475B1005FFBDA /* NameGenerator.m */,
+				AAD02DFE102D767C0044B9A4 /* Turn.h */,
+				AAD02DFF102D767C0044B9A4 /* Turn.m */,
+				AAD02E03102D768F0044B9A4 /* Action.h */,
+				AAD02E04102D768F0044B9A4 /* Action.m */,
+				AA215A0F1037FD0D00DCA117 /* DefaultProductionItems.plist */,
+				AA603D67103C837C00D1BFDD /* DefaultHulls.plist */,
+				AAB50D671051A761005FA2B0 /* UniverseModel.h */,
+				AAB50D681051A761005FA2B0 /* UniverseModel.m */,
+				AAB50D871051C31D005FA2B0 /* PlayerModel.xcdatamodel */,
+				AAAFC09E1053AE2E001941AE /* GameModel.h */,
+				AAAFC09F1053AE2E001941AE /* GameModel.m */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		AA2A66C610221968005FFBDA /* Display */ = {
+			isa = PBXGroup;
+			children = (
+				AA10E3B11044920400DEC77B /* Background8.jpg */,
+				AA10E3B21044920400DEC77B /* Background7.jpg */,
+				AA6044DB1043368400D1BFDD /* Background0.jpg */,
+				AA6043C21041A8F000D1BFDD /* Background6.jpg */,
+				AA6043B21041A04300D1BFDD /* Background5.jpg */,
+				AA6043B31041A04300D1BFDD /* Background4.jpg */,
+				AA6043B41041A04300D1BFDD /* Background3.jpg */,
+				AA6043B51041A04300D1BFDD /* Background2.jpg */,
+				AA60435910418EFA00D1BFDD /* Background1.jpg */,
+				AAD02B02102B60910044B9A4 /* PlanetView.h */,
+				AAD02B03102B60910044B9A4 /* PlanetView.m */,
+				AA776A440FF686C500CB04DB /* MapViewController.h */,
+				AA776A450FF686C500CB04DB /* MapViewController.m */,
+				AA776A920FF6CB1D00CB04DB /* MapScrollView.h */,
+				AA776A930FF6CB1D00CB04DB /* MapScrollView.m */,
+				AA2A67BF10231F98005FFBDA /* MapView.h */,
+				AA2A67C010231F98005FFBDA /* MapView.m */,
+				AA2A68BA10237CEA005FFBDA /* MapTiledLayer.h */,
+				AA2A68BB10237CEA005FFBDA /* MapTiledLayer.m */,
+			);
+			name = Display;
+			sourceTree = "<group>";
+		};
+		AA2F83B410585DD7003A4072 /* AIKit */ = {
+			isa = PBXGroup;
+			children = (
+				AAD02E0D102D77450044B9A4 /* Planner.h */,
+				AAD02E0E102D77450044B9A4 /* Planner.m */,
+				AAD02E10102D78050044B9A4 /* Goal.h */,
+				AAD02E11102D78050044B9A4 /* Goal.m */,
+				AAD02F05102ECE5E0044B9A4 /* GoalStack.h */,
+				AAD02F06102ECE5E0044B9A4 /* GoalStack.m */,
+				AAB3C789105AE3690055A0FA /* Condition.h */,
+				AAB3C78A105AE3690055A0FA /* Condition.m */,
+				AAB3C78E105AE3A00055A0FA /* ConditionEvaluator.h */,
+				AAB3C78F105AE3A00055A0FA /* ConditionEvaluator.m */,
+				AAB3C82B105C2D350055A0FA /* Motivation.h */,
+				AAB3C82C105C2D350055A0FA /* Motivation.m */,
+				AAB3C831105C2E2E0055A0FA /* Task.h */,
+				AAB3C832105C2E2E0055A0FA /* Task.m */,
+				AAB3C834105C31290055A0FA /* AIEngine.h */,
+				AAB3C835105C31290055A0FA /* AIEngine.m */,
+			);
+			name = AIKit;
+			sourceTree = "<group>";
+		};
+		AA2F83B510585E00003A4072 /* StarzGoals */ = {
+			isa = PBXGroup;
+			children = (
+				AAB3C868105D5B380055A0FA /* DecreaseMineProduction.h */,
+				AAB3C869105D5B380055A0FA /* DecreaseMineProduction.m */,
+				AAB3C86B105D5B7F0055A0FA /* IncreaseFactoryProduction.h */,
+				AAB3C86C105D5B7F0055A0FA /* IncreaseFactoryProduction.m */,
+				AAB3C851105D50790055A0FA /* GrowPopulation.h */,
+				AAB3C852105D50790055A0FA /* GrowPopulation.m */,
+				AAB3C85A105D51E50055A0FA /* Expansion.h */,
+				AAB3C85B105D51E50055A0FA /* Expansion.m */,
+				AAB3C857105D51C30055A0FA /* Aggression.h */,
+				AAB3C858105D51C30055A0FA /* Aggression.m */,
+				AAB3C85F105D5ABF0055A0FA /* IncreaseResearch.h */,
+				AAB3C860105D5ABF0055A0FA /* IncreaseResearch.m */,
+				AAB3C865105D5B1C0055A0FA /* IncreaseMineProduction.h */,
+				AAB3C866105D5B1C0055A0FA /* IncreaseMineProduction.m */,
+				AAB3C862105D5AEF0055A0FA /* DecreaseResearch.h */,
+				AAB3C863105D5AEF0055A0FA /* DecreaseResearch.m */,
+				AAB3C86F105D64130055A0FA /* DecreaseFactoryProduction.h */,
+				AAB3C870105D64130055A0FA /* DecreaseFactoryProduction.m */,
+			);
+			name = StarzGoals;
+			sourceTree = "<group>";
+		};
+		AAD02E0A102D76CC0044B9A4 /* AIPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				AA2F83B510585E00003A4072 /* StarzGoals */,
+				AA2F83B410585DD7003A4072 /* AIKit */,
+				AA2A65461020D5A7005FFBDA /* AIPlayer.h */,
+				AA2A65471020D5A7005FFBDA /* AIPlayer.m */,
+			);
+			name = AIPlayer;
+			sourceTree = "<group>";
+		};
+		AAD02E14102D788D0044B9A4 /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				AA6043CB1041ADD500D1BFDD /* Default.png */,
+				28C286DF0D94DF7D0034E888 /* RootViewController.h */,
+				28C286E00D94DF7D0034E888 /* RootViewController.m */,
+				1D3623240D0F684500981E51 /* StarzAppDelegate.h */,
+				1D3623250D0F684500981E51 /* StarzAppDelegate.m */,
+				29B97316FDCFA39411CA2CEA /* main.m */,
+				AA6043FD1041DB6300D1BFDD /* LogViewController.h */,
+				AA6043FE1041DB6300D1BFDD /* LogViewController.m */,
+			);
+			name = Application;
+			sourceTree = "<group>";
+		};
+		AAD02E16102D7A570044B9A4 /* UserInterface */ = {
+			isa = PBXGroup;
+			children = (
+				AA6040C3103F468700D1BFDD /* TechnologyItemChooserViewController.h */,
+				AA6040C4103F468700D1BFDD /* TechnologyItemChooserViewController.m */,
+				AAD0379D103721A60044B9A4 /* ProductionItemChooserViewController.h */,
+				AAD0379E103721A60044B9A4 /* ProductionItemChooserViewController.m */,
+				AAD033481034A6920044B9A4 /* ProductionQueueViewController.h */,
+				AAD033491034A6920044B9A4 /* ProductionQueueViewController.m */,
+				AA776A360FF6852B00CB04DB /* GameListViewController.h */,
+				AA776A370FF6852B00CB04DB /* GameListViewController.m */,
+				AABFD6230FFAC33B002ED6E3 /* ShipDesignListViewController.h */,
+				AABFD6240FFAC33B002ED6E3 /* ShipDesignListViewController.m */,
+				AA776A570FF688CC00CB04DB /* PlanetDetailsViewController.h */,
+				AA776A580FF688CC00CB04DB /* PlanetDetailsViewController.m */,
+				AA603CB51039FEFD00D1BFDD /* ShipDesignerViewController.h */,
+				AA603CB61039FEFD00D1BFDD /* ShipDesignerViewController.m */,
+				AA603CED103B3FFC00D1BFDD /* ShipDesignerView.h */,
+				AA603CEE103B3FFC00D1BFDD /* ShipDesignerView.m */,
+				AA604086103F38F500D1BFDD /* HullChooserViewController.h */,
+				AA604087103F38F500D1BFDD /* HullChooserViewController.m */,
+			);
+			name = UserInterface;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1D6058900D05DD3D006BFB54 /* Starz */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "Starz" */;
+			buildPhases = (
+				1D60588D0D05DD3D006BFB54 /* Resources */,
+				1D60588E0D05DD3D006BFB54 /* Sources */,
+				1D60588F0D05DD3D006BFB54 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Starz;
+			productName = Starz;
+			productReference = 1D6058910D05DD3D006BFB54 /* Starz.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Starz" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+				en,
+			);
+			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1D6058900D05DD3D006BFB54 /* Starz */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1D60588D0D05DD3D006BFB54 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28AD73600D9D9599002E5188 /* MainWindow.xib in Resources */,
+				2899E5600DE3E45000AC0155 /* RootViewController.xib in Resources */,
+				AA776A330FF6850400CB04DB /* GameListView.xib in Resources */,
+				AA776A410FF6869D00CB04DB /* MapView.xib in Resources */,
+				AA776A4D0FF6885600CB04DB /* PlanetView.xib in Resources */,
+				AABFD6200FFAC312002ED6E3 /* ShipDesignList.xib in Resources */,
+				AA6B26231017A339006081C4 /* GameSetupView.xib in Resources */,
+				AABEB0A8101CEEC200F2AB3C /* GameSetupItemHelpView.xib in Resources */,
+				AA2A69B61024771C005FFBDA /* asteroids.txt in Resources */,
+				AAD02A571028D3DA0044B9A4 /* countries.txt in Resources */,
+				AAD02A6C1028D5830044B9A4 /* alien_races.txt in Resources */,
+				AAD033451034A6600044B9A4 /* ProductionQueueView.xib in Resources */,
+				AAD0379A1037217C0044B9A4 /* ProductionItemChooserView.xib in Resources */,
+				AA215A101037FD0D00DCA117 /* DefaultProductionItems.plist in Resources */,
+				AA603CB21039FEE100D1BFDD /* ShipDesignerView.xib in Resources */,
+				AA603D68103C837C00D1BFDD /* DefaultHulls.plist in Resources */,
+				AA603E75103D27A200D1BFDD /* DefaultTechnologyItems.plist in Resources */,
+				AA604079103F389500D1BFDD /* HullChooserView.xib in Resources */,
+				AA6040C0103F463600D1BFDD /* TechnologyItemChooserView.xib in Resources */,
+				AA6043201040993200D1BFDD /* Starz.xcclassmodel in Resources */,
+				AA60435A10418EFA00D1BFDD /* Background1.jpg in Resources */,
+				AA6043B61041A04300D1BFDD /* Background5.jpg in Resources */,
+				AA6043B71041A04300D1BFDD /* Background4.jpg in Resources */,
+				AA6043B81041A04300D1BFDD /* Background3.jpg in Resources */,
+				AA6043B91041A04300D1BFDD /* Background2.jpg in Resources */,
+				AA6043C31041A8F000D1BFDD /* Background6.jpg in Resources */,
+				AA6043CC1041ADD500D1BFDD /* Default.png in Resources */,
+				AA6043FA1041DB4500D1BFDD /* LogView.xib in Resources */,
+				AA6044DC1043368400D1BFDD /* Background0.jpg in Resources */,
+				AA10E3B31044920400DEC77B /* Background8.jpg in Resources */,
+				AA10E3B41044920400DEC77B /* Background7.jpg in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1D60588E0D05DD3D006BFB54 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
+				1D3623260D0F684500981E51 /* StarzAppDelegate.m in Sources */,
+				28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */,
+				AA776A380FF6852B00CB04DB /* GameListViewController.m in Sources */,
+				AA776A460FF686C500CB04DB /* MapViewController.m in Sources */,
+				AA776A590FF688CC00CB04DB /* PlanetDetailsViewController.m in Sources */,
+				AA776A940FF6CB1D00CB04DB /* MapScrollView.m in Sources */,
+				AABFD6250FFAC33B002ED6E3 /* ShipDesignListViewController.m in Sources */,
+				AABFD6520FFBF975002ED6E3 /* DataModel.xcdatamodel in Sources */,
+				AA973A331006934F00197218 /* Model.m in Sources */,
+				AA6B25E510179E6B006081C4 /* SliderTableCell.m in Sources */,
+				AA6B26161017A293006081C4 /* GameSetupViewController.m in Sources */,
+				AA2A6169101CFEF2005FFBDA /* GameSetupItemHelpViewController.m in Sources */,
+				AA2A653E1020D399005FFBDA /* Player.m in Sources */,
+				AA2A65481020D5A7005FFBDA /* AIPlayer.m in Sources */,
+				AA2A654D1020D5DA005FFBDA /* HumanPlayer.m in Sources */,
+				AA2A66881020FFAF005FFBDA /* SwitchTableCell.m in Sources */,
+				AA2A67C110231F98005FFBDA /* MapView.m in Sources */,
+				AA2A68BC10237CEA005FFBDA /* MapTiledLayer.m in Sources */,
+				AA2A69B2102475B1005FFBDA /* NameGenerator.m in Sources */,
+				AAD02B04102B60910044B9A4 /* PlanetView.m in Sources */,
+				AAD02E00102D767C0044B9A4 /* Turn.m in Sources */,
+				AAD02E05102D768F0044B9A4 /* Action.m in Sources */,
+				AAD02E0F102D77450044B9A4 /* Planner.m in Sources */,
+				AAD02E12102D78050044B9A4 /* Goal.m in Sources */,
+				AAD02F07102ECE5E0044B9A4 /* GoalStack.m in Sources */,
+				AAD0334A1034A6920044B9A4 /* ProductionQueueViewController.m in Sources */,
+				AAD03457103597810044B9A4 /* Planet.m in Sources */,
+				AAD0345B103597AC0044B9A4 /* SpaceObject.m in Sources */,
+				AAD0346C1035C1760044B9A4 /* ProductionQueueItem.m in Sources */,
+				AAD0379F103721A60044B9A4 /* ProductionItemChooserViewController.m in Sources */,
+				AA603B2310384D0E00D1BFDD /* ProductionItem.m in Sources */,
+				AA603CB71039FEFD00D1BFDD /* ShipDesignerViewController.m in Sources */,
+				AA603CEF103B3FFC00D1BFDD /* ShipDesignerView.m in Sources */,
+				AA604088103F38F500D1BFDD /* HullChooserViewController.m in Sources */,
+				AA6040C5103F468700D1BFDD /* TechnologyItemChooserViewController.m in Sources */,
+				AA6043FF1041DB6300D1BFDD /* LogViewController.m in Sources */,
+				AA6044421041E62100D1BFDD /* LogEntry.m in Sources */,
+				AA36E2901045112B007B0189 /* Game.m in Sources */,
+				AA36E2991045115C007B0189 /* Ship.m in Sources */,
+				AA36E29C10451168007B0189 /* Fleet.m in Sources */,
+				AA36E2E910465C99007B0189 /* ShipTemplate.m in Sources */,
+				AAB50C87104E4C5E005FA2B0 /* TechnologyItem.m in Sources */,
+				AAB50C8B104F020F005FA2B0 /* TechFixing.m in Sources */,
+				AAB50D691051A761005FA2B0 /* UniverseModel.m in Sources */,
+				AAB50D6C1051A7B3005FA2B0 /* PlayerModel.m in Sources */,
+				AAB50D6F1051A843005FA2B0 /* CoreDataUser.m in Sources */,
+				AAB50D881051C31D005FA2B0 /* PlayerModel.xcdatamodel in Sources */,
+				AAAFC0A01053AE2E001941AE /* GameModel.m in Sources */,
+				AAB3C78B105AE3690055A0FA /* Condition.m in Sources */,
+				AAB3C790105AE3A00055A0FA /* ConditionEvaluator.m in Sources */,
+				AAB3C82D105C2D350055A0FA /* Motivation.m in Sources */,
+				AAB3C833105C2E2E0055A0FA /* Task.m in Sources */,
+				AAB3C836105C31290055A0FA /* AIEngine.m in Sources */,
+				AAB3C853105D50790055A0FA /* GrowPopulation.m in Sources */,
+				AAB3C859105D51C30055A0FA /* Aggression.m in Sources */,
+				AAB3C85C105D51E50055A0FA /* Expansion.m in Sources */,
+				AAB3C861105D5ABF0055A0FA /* IncreaseResearch.m in Sources */,
+				AAB3C864105D5AEF0055A0FA /* DecreaseResearch.m in Sources */,
+				AAB3C867105D5B1C0055A0FA /* IncreaseMineProduction.m in Sources */,
+				AAB3C86A105D5B380055A0FA /* DecreaseMineProduction.m in Sources */,
+				AAB3C86D105D5B7F0055A0FA /* IncreaseFactoryProduction.m in Sources */,
+				AAB3C871105D64130055A0FA /* DecreaseFactoryProduction.m in Sources */,
+				AA046378106501A1001203B3 /* Hull.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1D6058940D05DD3E006BFB54 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Starz_Prefix.pch;
+				INFOPLIST_FILE = Info.plist;
+				PRODUCT_NAME = Starz;
+			};
+			name = Debug;
+		};
+		1D6058950D05DD3E006BFB54 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Starz_Prefix.pch;
+				INFOPLIST_FILE = Info.plist;
+				PRODUCT_NAME = Starz;
+			};
+			name = Release;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Steve Tickle";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				SDKROOT = iphoneos3.0;
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Steve Tickle";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				SDKROOT = iphoneos3.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "Starz" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1D6058940D05DD3E006BFB54 /* Debug */,
+				1D6058950D05DD3E006BFB54 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Starz" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}

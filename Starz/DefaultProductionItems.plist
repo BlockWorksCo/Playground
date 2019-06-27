@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>KeyPath</key>
+		<string>keypath1</string>
+		<key>Name</key>
+		<string>Ship One</string>
+	</dict>
+	<dict>
+		<key>KeyPath</key>
+		<string>keypath2</string>
+		<key>Name</key>
+		<string>Ship Two</string>
+	</dict>
+	<dict>
+		<key>KeyPath</key>
+		<string>keypath3</string>
+		<key>Name</key>
+		<string>Ship Three</string>
+	</dict>
+	<dict>
+		<key>KeyPath</key>
+		<string>keypath4</string>
+		<key>Name</key>
+		<string>Ship Four</string>
+	</dict>
+	<dict>
+		<key>KeyPath</key>
+		<string>keypath5</string>
+		<key>Name</key>
+		<string>Ship Five</string>
+	</dict>
+	<dict>
+		<key>KeyPath</key>
+		<string>keypath6</string>
+		<key>Name</key>
+		<string>Ship Six</string>
+	</dict>
+	<dict>
+		<key>KeyPath</key>
+		<string>keypath7</string>
+		<key>Name</key>
+		<string>Ship Seven</string>
+	</dict>
+	<dict>
+		<key>KeyPath</key>
+		<string>keypath8</string>
+		<key>Name</key>
+		<string>Ship Eight</string>
+	</dict>
+	<dict>
+		<key>KeyPath</key>
+		<string>keypath9</string>
+		<key>Name</key>
+		<string>Ship Nine</string>
+	</dict>
+</array>
+</plist>

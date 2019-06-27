@@ -1,0 +1,1386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>Name</key>
+		<string>Rhino Scanner</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Jump Gate</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Stargate any/any</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Gravity Terraform +/- 15</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Stargate 100/any</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Trans Galactic Mizer Scoop</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Enigma Pulsar</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Anti Matter Torpedo</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Stargate any/800</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Multi Function Pod</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Stargate 150/600</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Doomsday Missile</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Gravity Terraform +/- 11</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Langston Shell</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Stargate 300/500</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Juggernaut Missile</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Alpha Drive 8</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Jihad Missile</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Stargate any/300</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Radiating Hydro-Ram Scoop</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Upsilon Torpedo</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Gravity Terraform +/- 7</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>RNA Scanner</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Stargate 100/250</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Speed Trap 50</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Daddy Long Legs</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Super Fuel Tank</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>DNA Scanner</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Speed Trap 30</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Long Hump 6</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Delta Torpedo</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Speed Trap 20</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Beta Torpedo</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Quick Jump 5</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Settler&apos;s Delight</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Omega Torpedo</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Annihilator Bomb</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Armaggedon Missile</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Big Mutha Cannon</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Peerless Bomb</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Doomsday Missile</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Disruptor</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Rho Torpedo</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Gatling Neutrino Cannon</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Radiation Terraform +/- 11</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Heavy Blaster</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Enriched Neutron Bomb</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>LBU-74 Bomb</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Epsilon Torpedo</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Cherry Bomb</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Hush-a-Boom</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Anti-matter Generator</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Anti Matter Torpedo</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>M-80 Bomb</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Gatling Gun</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Genesis Device</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Delta Torpedo</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Radiation Terraform +/- 11</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Neutron Bomb</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Retro Bomb</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>M-70 Bomb</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Beam Deflector</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Yakimora Light Phaser</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Beta Torpedo</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Radiation Terraform +/- 7</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Smart Bomb</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>LBU-17 Bomb</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Black Cat Bomb</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Lady Finger Bomb</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Alpha Torpedo</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Laser</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Complete Phase Shield</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Multi Contained Munition</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Genesis Device</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Ultra Driver 11</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Jump Gate</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Temp Terraform +/-15</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Planetary Shield</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Ultra Driver 10</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Mega Poly-Shell</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Gorilla Delegator</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Heavy Dispenser 200</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Energy Dampener</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Flux Capacitor</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Langston Shell</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Synchro Sapper</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Temp Terraform +/-11</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Bear Neutrino Barrier</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Robber Baron Scanner</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Laser Battery</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Battle Nexus</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Mass Driver 7</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Tachyon Detector</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Jammer 30</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Phased Sapper</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Enigma Pulsar</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Shadow Shield</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Croby Sharmour</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Peerless Scanner</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Energy Capacitor</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Wolverine Diffuse Shield</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Eagle Eye Scanner</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Elephant Scanner</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Mine Dispenser</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Beam Deflector</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Super Fuel Tank</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Alien Miner</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Multi Cargo Pod</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Cheetah Scanner</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Dolphin Scanner</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Missile Battery</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Snooper 500x</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Heavy Dispenser 50</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Overthruster</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Galaxy Scoop</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Battle Super Computer</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Pulsed Sapper</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Gazelle Scanner</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Pick Pocket Scanner</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Snooper 400x</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Mass Driver 5</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Trans Galactic Super Scoop</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Jammer 20</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Super Stealth Cloak</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Fielded Kelarium</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Cow-Hide Shield</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Ferret Scanner</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Chameleon Scanner</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Snooper 320x</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Mine Dispenser 80</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Super Cargo Pod</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Mine Dispenser 50</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Manouvering Jet</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Sub Galactic Field Scoop</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Moleskin Shield</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Trans-Galactic Field Scoop</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Jammer 10</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+	<dict>
+		<key>Name</key>
+		<string>Radiating Hydro Ram Scoop</string>
+		<key>Germanium</key>
+		<integer>1</integer>
+		<key>Ironium</key>
+		<integer>2</integer>
+		<key>Boranium</key>
+		<integer>3</integer>
+	</dict>
+</array>
+</plist>

@@ -1,0 +1,44 @@
+//
+//  Model.h
+//  Starz
+//
+//  Created by Steve Tickle on 09/07/2009.
+//  Copyright 2009 ZooKoo. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import <CoreData/CoreData.h>
+#import "Game.h"
+#import "Planet.h"
+
+
+@interface Model : NSObject <NSFetchedResultsControllerDelegate>
+{
+	NSFetchedResultsController*     fetchedResultsController;
+	NSManagedObjectContext*         managedObjectContext;
+    NSManagedObjectModel *managedObjectModel;
+    NSPersistentStoreCoordinator *persistentStoreCoordinator;
+    
+    
+}
+
+@property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;
+@property (nonatomic, retain, readonly) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, retain, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
+
+@property (nonatomic, readonly) NSString *applicationDocumentsDirectory;
+
+@property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
+
+
+- (void)GetData;
+- (void)initData;
+
++ (Model *)instance;
+- (int)NumberOfGames;
+- (void)addNewGame;
+- (NSString*)nameOfGame:(NSIndexPath*)indexPath;
+- (void)removeGame:(NSIndexPath*)indexPath;
+- (void)applyActions;
+
+@end

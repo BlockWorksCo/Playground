@@ -1,0 +1,54 @@
+//
+//  StarzAppDelegate.m
+//  Starz
+//
+//  Created by Steve Tickle on 27/06/2009.
+//  Copyright ZooKoo 2009. All rights reserved.
+//
+
+#import "StarzAppDelegate.h"
+#import "RootViewController.h"
+#import "Model.h"
+
+@implementation StarzAppDelegate
+
+@synthesize window;
+@synthesize navigationController;
+
+
+- (void)applicationDidFinishLaunching:(UIApplication *)application
+{
+    RootViewController *rootViewController = (RootViewController *)[navigationController topViewController];
+    
+    //
+    // Set the managedObjectContext in the other classes.
+    //
+    [[Model instance] initData];
+    [[Model instance] GetData];
+	
+	// Configure and show the window
+	[window addSubview:[navigationController view]];
+	[window makeKeyAndVisible];
+}
+
+
+- (void)applicationWillTerminate:(UIApplication *)application 
+{
+    //
+    // Save the data
+    //
+    [[Model instance] saveData];
+}
+
+
+- (void)dealloc {
+	[navigationController release];
+	[window release];
+	[super dealloc];
+}
+
+
+
+
+
+@end

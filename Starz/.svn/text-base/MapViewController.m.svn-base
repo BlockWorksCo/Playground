@@ -1,0 +1,94 @@
+//
+//  MapViewController.m
+//  Starz
+//
+//  Created by Steve Tickle on 27/06/2009.
+//  Copyright 2009 ZooKoo. All rights reserved.
+//
+
+#import "MapViewController.h"
+
+
+@implementation MapViewController
+
+
+// The designated initializer. Override to perform setup that is required before the view is loaded.
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        // Custom initialization
+        [self setTitle:@"Map View"];
+    }
+    return self;
+}
+
+
+/*
+// Implement loadView to create a view hierarchy programmatically, without using a nib.
+- (void)loadView {
+}
+*/
+
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    theToolbar.hidden   = YES;
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    theToolbar.hidden   = NO;
+}
+
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [theMapScrollView viewDidLoad];
+    
+    UINavigationController* navController   = [self.parentViewController view];
+    
+    //
+    //
+    //
+    [theToolbar sizeToFit];
+    CGFloat toolbarHeight = [theToolbar frame].size.height;
+    CGRect rootViewBounds = self.parentViewController.view.bounds;
+    CGFloat rootViewHeight = CGRectGetHeight(rootViewBounds);
+    
+    //Get the width of the parent view,
+    CGFloat rootViewWidth = CGRectGetWidth(rootViewBounds);
+    
+    //Create a rectangle for the toolbar
+    CGRect rectArea = CGRectMake(0, rootViewHeight - toolbarHeight, rootViewWidth, toolbarHeight);
+    
+    //Reposition and resize the receiver
+    [theToolbar setFrame:rectArea];
+    
+    [navController addSubview:theToolbar];
+}
+
+/*
+// Override to allow orientations other than the default portrait orientation.
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    // Return YES for supported orientations
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+*/
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
+    // Release anything that's not essential, such as cached data
+}
+
+
+- (void)dealloc {
+    [super dealloc];
+}
+
+- (id)getNavigationController
+{
+    return self.navigationController;
+}
+
+
+
+@end

@@ -1,0 +1,58 @@
+//
+//  MapView.m
+//  Starz
+//
+//  Created by Steve Tickle on 05/07/2009.
+//  Copyright 2009 ZooKoo. All rights reserved.
+//
+
+#import "MapView.h"
+
+
+@implementation MapView
+
+
+- (id)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        // Initialization code
+        //[self setContentSize: CGSizeMake(3000, 3000)];
+
+    }
+    return self;
+}
+
+
+- (void)drawPlanet:(CGContextRef)ctx:(int)x:(int)y:(int)size
+{
+    CGContextSetRGBFillColor(ctx, 255, 0, 0, 1);
+    CGRect  planet  = CGRectMake(x,y,size,size);
+    CGContextFillEllipseInRect(ctx, planet);
+
+    CGContextSetRGBFillColor(ctx, 0, 255, 0, 1);
+    planet  = CGRectMake(x+3,y+3,size-6,size-6);
+    CGContextFillEllipseInRect(ctx, planet);
+}
+
+- (void)drawRect:(CGRect)rect
+{
+    // Get the graphics context and clear it
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+    CGContextClearRect(ctx, CGRectMake(0,0,3000,3000));
+    // Draw a green solid circle
+    
+    for(int i=0; i<100; i++)
+    {
+        int size    = (rand()%50) + 25;        
+        int x       = rand()%2000;
+        int y       = rand()%2000;
+        [self drawPlanet:ctx:x:y:size];
+    }
+}
+
+
+- (void)dealloc {
+    [super dealloc];
+}
+
+
+@end

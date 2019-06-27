@@ -1,0 +1,47 @@
+//
+//  Planet.h
+//  Starz
+//
+//  Created by Steve Tickle on 09/07/2009.
+//  Copyright 2009 ZooKoo. All rights reserved.
+//
+
+#import <CoreData/CoreData.h>
+
+
+@interface Planet :  NSManagedObject  
+{
+}
+
+@property (nonatomic, retain) NSNumber * Temperature;
+@property (nonatomic, retain) NSNumber * DefenseCount;
+@property (nonatomic, retain) NSNumber * FactoryCount;
+@property (nonatomic, retain) NSNumber * ScannerType;
+@property (nonatomic, retain) NSNumber * Population;
+@property (nonatomic, retain) NSNumber * StarbaseDamage;
+@property (nonatomic, retain) NSNumber * Gravity;
+@property (nonatomic, retain) NSNumber * ScannerRange;
+@property (nonatomic, retain) NSString * Name;
+@property (nonatomic, retain) NSNumber * XPosition;
+@property (nonatomic, retain) NSNumber * Diameter;
+@property (nonatomic, retain) NSNumber * StarbaseType;
+@property (nonatomic, retain) NSNumber * StarbaseArmour;
+@property (nonatomic, retain) NSNumber * StarbaseShields;
+@property (nonatomic, retain) NSNumber * BoraniumStock;
+@property (nonatomic, retain) NSNumber * GermaniumStock;
+@property (nonatomic, retain) NSNumber * DefenseCoverage;
+@property (nonatomic, retain) NSNumber * Radiation;
+@property (nonatomic, retain) NSNumber * YPosition;
+@property (nonatomic, retain) NSNumber * DefenseType;
+@property (nonatomic, retain) NSNumber * IroniumStock;
+@property (nonatomic, retain) NSNumber * MineCount;
+@property (nonatomic, retain) NSManagedObject * PlanetToPlayer;
+@property (nonatomic, retain) NSManagedObject * PlanetToGame;
+
+@property (nonatomic, retain) NSSet* PlanetToProductionQueueItem;
+
+
+@end
+
+
+

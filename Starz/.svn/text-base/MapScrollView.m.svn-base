@@ -1,0 +1,77 @@
+//
+//  MapScrollView.m
+//  Starz
+//
+//  Created by Steve Tickle on 27/06/2009.
+//  Copyright 2009 ZooKoo. All rights reserved.
+//
+
+#import "MapScrollView.h"
+#import "MapViewController.h"
+#import "PlanetDetailsViewController.h"
+#import "ShipDesignListViewController.h"
+
+
+@implementation MapScrollView
+
+
+- (id)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        
+        [self setContentSize: CGSizeMake(100, 100)];
+        // Initialization code
+    }
+    return self;
+}
+
+
+- (void)viewDidLoad
+{
+    [self setContentSize: CGSizeMake(1000, 1000)];
+}
+
+- (void)dealloc {
+    [super dealloc];
+}
+
+
+
+- (void) touchesEnded: (NSSet *) touches withEvent: (UIEvent *) event
+{
+    id  navController   = [theMapViewController getNavigationController];
+    
+    // Navigation logic may go here. Create and push another view controller.
+	PlanetDetailsViewController *planetDetailsViewController = [[PlanetDetailsViewController alloc] initWithNibName:@"PlanetView" bundle:nil];
+
+	[navController pushViewController:planetDetailsViewController animated:YES];
+	[planetDetailsViewController release];
+}
+
+
+
+
+- (IBAction)TurnButtonPressed:(id)sender
+{
+}
+
+- (IBAction)ShipsButtonPressed:(id)sender
+{
+    id  navController   = [theMapViewController getNavigationController];
+    
+    // Navigation logic may go here. Create and push another view controller.
+	ShipDesignListViewController *shipDesignListViewController = [[ShipDesignListViewController alloc] initWithNibName:@"ShipDesignList" bundle:nil];
+    
+	[navController pushViewController:shipDesignListViewController animated:YES];
+	[shipDesignListViewController release];
+}
+
+- (IBAction)OrdersButtonPressed:(id)sender
+{
+}
+
+- (IBAction)StatisticsButtonPressed:(id)sender
+{
+}
+
+
+@end

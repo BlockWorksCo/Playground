@@ -1,0 +1,349 @@
+//
+//  Model.m
+//  Starz
+//
+//  Created by Steve Tickle on 09/07/2009.
+//  Copyright 2009 ZooKoo. All rights reserved.
+//
+
+#import "Model.h"
+
+
+@implementation Model
+
+
+//
+//
+//
+@synthesize fetchedResultsController;
+@synthesize managedObjectContext;
+
+
+
+
+//
+//
+//
+- (id)init
+{
+    [super init];
+
+
+    return self;
+}
+
+
+
+//
+//
+//
+- (void)GetData
+{
+    //
+    // Perform the fetch.
+    //
+	NSError *error;
+	if (![[self fetchedResultsController] performFetch:&error])
+    {
+		// Handle the error...
+	}
+    
+    //int n = [self NumberOfGames];
+}
+
+//
+// Maintain the singleton.
+//
++ (Model *)instance
+{
+    static Model*   instance;
+    
+    @synchronized(self)
+    {
+        if (!instance)
+        {
+            instance = [[Model alloc] init];
+        }
+        
+        return instance;
+    }
+    
+    return NULL;
+}
+
+
+
+
+
+//
+// accessor
+//
+- (NSFetchedResultsController *)fetchedResultsController
+{
+    //
+    // Only initialise it if it hasnt already been.
+    //
+    if (fetchedResultsController != nil) 
+    {
+        return fetchedResultsController;
+    }
+
+    //
+	// Set up the fetched results controller.
+    //
+    
+    //
+	// Create the fetch request for the entity.
+    //
+	NSFetchRequest*     fetchRequest        = [[NSFetchRequest alloc] init];
+    
+    //
+	// Edit the entity name as appropriate.
+    //
+	NSEntityDescription*    entity          = [NSEntityDescription entityForName:@"Game" inManagedObjectContext:managedObjectContext];
+	[fetchRequest setEntity:entity];
+	
+	// Edit the sort key as appropriate.
+	NSSortDescriptor*       sortDescriptor  = [[NSSortDescriptor alloc] initWithKey:@"Name" ascending:YES];
+	NSArray*                sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
+	
+	[fetchRequest setSortDescriptors:sortDescriptors];
+	
+    //
+	// Edit the section name key path and cache name if appropriate.
+    // nil for section name key path means "no sections".
+    //
+	NSFetchedResultsController* aFetchedResultsController   = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:managedObjectContext sectionNameKeyPath:nil cacheName:@"Root"];
+    aFetchedResultsController.delegate  = self;
+	self.fetchedResultsController       = aFetchedResultsController;
+	
+    //
+    // Clean up.
+    //
+	[aFetchedResultsController release];
+	[fetchRequest release];
+	[sortDescriptor release];
+	[sortDescriptors release];
+	
+	return fetchedResultsController;
+}    
+
+
+
+
+//
+//
+//
+- (void)removeGame:(NSIndexPath*)indexPath
+{
+    //
+    // Delete the managed object for the given index path
+    //
+    NSManagedObjectContext*     context     = [fetchedResultsController managedObjectContext];
+    [context deleteObject:[fetchedResultsController objectAtIndexPath:indexPath]];
+    
+    //
+    // Save the context.
+    //
+    NSError *error;
+    if (![context save:&error])
+    {
+        // Handle the error...
+    }    
+}
+
+
+
+//
+//
+//
+- (NSString*)nameOfGame:(NSIndexPath*)indexPath
+{    
+    //
+	// Configure the cell.
+    //
+	NSManagedObject*    managedObject   = [fetchedResultsController objectAtIndexPath:indexPath];    
+	NSString*           text            = [[managedObject valueForKey:@"Name"] description];
+    
+    return text;
+}
+
+
+
+//
+// Called to add a new game to the DB.
+//
+- (void)addNewGame
+{
+	//
+	// Create a new instance of the entity managed by the fetched results controller.
+    //
+	NSManagedObjectContext* context             = [fetchedResultsController managedObjectContext];
+	NSEntityDescription*    entity              = [[fetchedResultsController fetchRequest] entity];
+	NSManagedObject*        newManagedObject    = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+    
+    //
+    // Create a string from the current data and time.
+    //
+    NSDate*                 date                = [NSDate date];
+    NSDateFormatter*        dateFormatter       = [[[NSDateFormatter alloc] init] autorelease];
+    [dateFormatter setDateStyle:NSDateFormatterLongStyle];
+    [dateFormatter setTimeStyle:NSDateFormatterMediumStyle];
+    NSString*               dateString          = [dateFormatter stringFromDate:date];
+    
+    //
+	// Set the name of the new Game object to the date/time string.
+    //
+	[newManagedObject setValue:dateString forKey:@"Name"];
+	
+	// Save the context.
+    NSError *error;
+    if (![context save:&error]) 
+    {
+		// Handle the error...
+    }
+}
+
+
+
+
+
+
+/**
+ Returns the managed object context for the application.
+ If the context doesn't already exist, it is created and bound to the persistent store coordinator for the application.
+ */
+- (NSManagedObjectContext *) managedObjectContext {
+	
+    if (managedObjectContext != nil) {
+        return managedObjectContext;
+    }
+	
+    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
+    if (coordinator != nil) {
+        managedObjectContext = [[NSManagedObjectContext alloc] init];
+        [managedObjectContext setPersistentStoreCoordinator: coordinator];
+    }
+    return managedObjectContext;
+}
+
+
+
+/**
+ Returns the managed object model for the application.
+ If the model doesn't already exist, it is created by merging all of the models found in the application bundle.
+ */
+- (NSManagedObjectModel *)managedObjectModel {
+	
+    if (managedObjectModel != nil) {
+        return managedObjectModel;
+    }
+    managedObjectModel = [[NSManagedObjectModel mergedModelFromBundles:nil] retain];    
+    return managedObjectModel;
+}
+
+
+/**
+ Returns the persistent store coordinator for the application.
+ If the coordinator doesn't already exist, it is created and the application's store added to it.
+ */
+- (NSPersistentStoreCoordinator *)persistentStoreCoordinator {
+	
+    if (persistentStoreCoordinator != nil) {
+        return persistentStoreCoordinator;
+    }
+	
+    NSURL *storeUrl = [NSURL fileURLWithPath: [[self applicationDocumentsDirectory] stringByAppendingPathComponent: @"CD1.sqlite"]];
+	
+	NSError *error;
+    persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
+    if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeUrl options:nil error:&error]) {
+        // Handle error
+    }    
+	
+    return persistentStoreCoordinator;
+}
+
+
+#pragma mark -
+#pragma mark Application's documents directory
+
+/**
+ Returns the path to the application's documents directory.
+ */
+- (NSString *)applicationDocumentsDirectory {
+	
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+    return basePath;
+}
+
+
+
+- (void)initData
+{
+    //
+    // Set the managedObjectContext in the other classes.
+    //
+	managedObjectContext = self.managedObjectContext;
+}
+
+
+
+
+/**
+ Performs the save action for the application, which is to send the save:
+ message to the application's managed object context.
+ */
+- (void)saveData
+{
+    NSError *error;
+    if (![[self managedObjectContext] save:&error]) 
+    {
+		// Handle error
+		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+		exit(-1);  // Fail
+    }
+}
+
+
+
+
+
+
+//
+//
+//
+- (int)NumberOfGames
+{
+    //
+    //
+    //
+    NSArray* array    = [fetchedResultsController sections];
+    int elementsInArray = [array count];
+    if(elementsInArray > 0)
+    {
+        id <NSFetchedResultsSectionInfo>    sectionInfo     = [array objectAtIndex:0];
+        return [sectionInfo numberOfObjects];
+    }
+    else
+    {
+        return 0;
+    }
+    
+}
+
+
+//
+//
+//
+- (void)applyActions
+{
+    //
+    // Look at action data (for all players) and apply it to the model.
+    //
+}
+
+
+
+@end

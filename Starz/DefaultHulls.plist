@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>Type</key>
+		<integer>1</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Death Star</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>1</integer>
+		<key>ShapeMask</key>
+		<string>     xy          xy          xy                                         </string>
+		<key>Name</key>
+		<string>Ultra Station</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>1</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Space Dock</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>1</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Orbital Fort</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Meta morph</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Mini Morph</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Nubian</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Super Mine Layer</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Mini Mine Layer</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Super Fuel Transport</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Fuel Transport</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Ultra Miner</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Maxi Miner</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Miner</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Mini Miner</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Midget Miner</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>B-52 Bomber</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Stealth Bomber</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xy         xyxy       xyxyxy                                       </string>
+		<key>Name</key>
+		<string>B-17 Bomber</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Mini Bomber</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Colony Ship</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Mini Colony Ship</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Galleon</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Rogue</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Privateer</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Dreadnought</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Battle Cruiser</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Cruiser</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Destroyer</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Frigate</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Scout</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx                                         </string>
+		<key>Name</key>
+		<string>Small Freighter</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx          xx                             </string>
+		<key>Name</key>
+		<string>Medium Freighter</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx         xxxx        xxxx         xx          xx     </string>
+		<key>Name</key>
+		<string>Large Freighter</string>
+	</dict>
+	<dict>
+		<key>Type</key>
+		<integer>0</integer>
+		<key>ShapeMask</key>
+		<string>     xx          xx          xx          xx          xx          xx     </string>
+		<key>Name</key>
+		<string>Super Freighter</string>
+	</dict>
+</array>
+</plist>
