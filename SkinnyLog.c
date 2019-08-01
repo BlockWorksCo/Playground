@@ -32,7 +32,7 @@ void lprintf(const char* format, ...)
 
 int main()
 {
-    lprintf("  [%d]   -%d-   %d",1,2,3);
+    lprintf("  [%d]   -%d-   %d",(uint8_t)1,2,(uint8_t)3);
 }
 
 
