@@ -10,12 +10,12 @@
 
 typedef enum
 {
-    TypeInt8        = 0,
-    TypeInt16,
-    TypeInt24,
-    TypeInt32,
-    TypeInt64,
-    TypeText,
+    //TypeInt8        = 0,
+    //TypeInt16,
+    //TypeInt24,
+    //TypeInt32,
+    //TypeInt64,
+    //TypeText,
     TypePrintfFormat,
     TypeImageHash,
     TypeTimeBase,
@@ -49,9 +49,9 @@ void OutputInt32( uint8_t** packet, size_t* packetSpaceAvailable, uint32_t value
 {
     printf("Int32[%08x]\n",value);
 
-    *packet[0]   = TypeInt32;
-    *packet  += 1;
-    *packetSpaceAvailable   -= 1;
+    //*packet[0]   = TypeInt32;
+    //*packet  += 1;
+    //*packetSpaceAvailable   -= 1;
     memcpy( *packet, &value, sizeof(value) );
     *packet  += sizeof(value);
     *packetSpaceAvailable   -= sizeof(value);
@@ -61,9 +61,9 @@ void OutputInt8( uint8_t** packet, size_t* packetSpaceAvailable, uint8_t value )
 {
     printf("Int8[%02x]\n",value);
 
-    *packet[0]   = TypeInt8;
-    *packet  += 1;
-    *packetSpaceAvailable   -= 1;
+    //*packet[0]   = TypeInt8;
+    //*packet  += 1;
+    //*packetSpaceAvailable   -= 1;
     memcpy( *packet, &value, sizeof(value) );
     *packet  += sizeof(value);
     *packetSpaceAvailable   -= sizeof(value);
@@ -73,9 +73,9 @@ void OutputText( uint8_t** packet, size_t* packetSpaceAvailable, char* value )
 {
     printf("Text[%zd,%s]\n",strlen(value),value);
 
-    *packet[0]   = TypeText;
-    *packet  += 1;
-    *packetSpaceAvailable   -= 1;
+    //*packet[0]   = TypeText;
+    //*packet  += 1;
+    //*packetSpaceAvailable   -= 1;
     *packet[0]   = strlen(value);
     *packet  += 1;
     *packetSpaceAvailable   -= 1;
@@ -183,7 +183,7 @@ void rprintf( uint8_t** packet, size_t packetSize, char* format )
             switch(typeCode) {
                 case 'c':
                 {
-                    *packet += 1;
+                    //*packet += 1;
                     uint8_t    value   = 0;
                     memcpy( &value, *packet, sizeof(value) );
                     *packet += sizeof(value);
@@ -195,7 +195,7 @@ void rprintf( uint8_t** packet, size_t packetSize, char* format )
                 case 'u':
                 case 'x':
                 {
-                    *packet += 1;
+                    //*packet += 1;
                     uint32_t    value   = 0;
                     memcpy( &value, *packet, sizeof(value) );
                     *packet += sizeof(value);
@@ -205,7 +205,7 @@ void rprintf( uint8_t** packet, size_t packetSize, char* format )
 
                 case 's':
                 {
-                    *packet += 1;
+                    //*packet += 1;
                     uint8_t numberOfBytes   = 0;
                     memcpy( &numberOfBytes, *packet, sizeof(numberOfBytes) );
                     *packet += sizeof(numberOfBytes);
