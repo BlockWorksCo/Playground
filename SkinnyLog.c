@@ -96,6 +96,7 @@ void lprintf( uint8_t** packet, size_t* packetSpaceAvailable, const char* format
 
             // types.
             switch(typeCode) {
+
                 case 'c':
                 {
                     uint32_t    value   = va_arg(ap, uint32_t);
@@ -143,7 +144,7 @@ void OutputSkinnyLogHeader()
 
 
 
-void rprintf( uint8_t** packet, size_t packetSize, char* format )
+void rprintf( uint8_t** packet, size_t* packetSize, char* format )
 {
     printf( "PrintfFormat[%s]\n", format );
 
@@ -166,12 +167,13 @@ void rprintf( uint8_t** packet, size_t packetSize, char* format )
 
             // types.
             switch(typeCode) {
+
                 case 'c':
                 {
-                    //*packet += 1;
                     uint8_t    value   = 0;
                     memcpy( &value, *packet, sizeof(value) );
                     *packet += sizeof(value);
+                    *packetSize -= sizeof(value);
                     printf("Int8[%08x]\n",value);
                     break;
                 }
@@ -180,24 +182,25 @@ void rprintf( uint8_t** packet, size_t packetSize, char* format )
                 case 'u':
                 case 'x':
                 {
-                    //*packet += 1;
                     uint32_t    value   = 0;
                     memcpy( &value, *packet, sizeof(value) );
                     *packet += sizeof(value);
+                    *packetSize -= sizeof(value);
                     printf("Int32[%08x]\n",value);
                     break;
                 }
 
                 case 's':
                 {
-                    //*packet += 1;
                     uint8_t numberOfBytes   = 0;
                     memcpy( &numberOfBytes, *packet, sizeof(numberOfBytes) );
                     *packet += sizeof(numberOfBytes);
+                    *packetSize -= sizeof(numberOfBytes);
 
                     char    value[256]   = {0};
                     memcpy( &value, *packet, numberOfBytes );
                     *packet += numberOfBytes;
+                    *packetSize -= strlen(value);
                     printf("Text[%s]\n",value);
                 };
 
@@ -239,16 +242,15 @@ void consumePacket( uint8_t** packet, size_t packetSize )
                 ptrdiff_t   value   = 0;
                 memcpy( &value, *packet, sizeof(value) );
                 *packet += sizeof(value);
+                packetSize -= sizeof(value);
                 char*   format  = ((char*)&rodata_start) + value;
-                rprintf( packet, packetSize, format );
+                rprintf( packet, &packetSize, format );
                 break;
             }
 
             default:
                 break;
         }
-
-        break;
     }
 }
 
