@@ -19,6 +19,7 @@ typedef enum
     TypePrintfFormat,
     TypeImageHash,
     TypeTimeBase,
+    TypeMachineID,
 
 } ValueType;
 
@@ -182,8 +183,11 @@ void rprintf( uint8_t** packet, size_t packetSize, char* format )
             switch(typeCode) {
                 case 'c':
                 {
-                    //uint32_t    value   = va_arg(ap, uint32_t);
-                    //OutputInt8( packet,packetSize, value );
+                    *packet += 1;
+                    uint8_t    value   = 0;
+                    memcpy( &value, *packet, sizeof(value) );
+                    *packet += sizeof(value);
+                    printf("Int8[%08x]\n",value);
                     break;
                 }
 
@@ -191,15 +195,25 @@ void rprintf( uint8_t** packet, size_t packetSize, char* format )
                 case 'u':
                 case 'x':
                 {
-                    //uint32_t    value   = va_arg(ap, uint32_t);
-                    //OutputInt32( packet,packetSize, value );
+                    *packet += 1;
+                    uint32_t    value   = 0;
+                    memcpy( &value, *packet, sizeof(value) );
+                    *packet += sizeof(value);
+                    printf("Int32[%08x]\n",value);
                     break;
                 }
 
                 case 's':
                 {
-                    //char*   value   = va_arg(ap, char*);
-                    //OutputText( packet,packetSize, value );
+                    *packet += 1;
+                    uint8_t numberOfBytes   = 0;
+                    memcpy( &numberOfBytes, *packet, sizeof(numberOfBytes) );
+                    *packet += sizeof(numberOfBytes);
+
+                    char    value[256]   = {0};
+                    memcpy( &value, *packet, numberOfBytes );
+                    *packet += numberOfBytes;
+                    printf("Text[%s]\n",value);
                 };
 
                 default:
@@ -229,12 +243,17 @@ void consumePacket( uint8_t** packet, size_t packetSize )
                 // load appropriate image file with matching hash.
                 break;
 
+            case TypeMachineID:
+                // Output machineID to support multiple sources. Maybe use sourceIP instead?
+                break;
+
             case TypePrintfFormat:
             {
                 // printf operation.
                 extern uint32_t rodata_start;
                 ptrdiff_t   value   = 0;
                 memcpy( &value, *packet, sizeof(value) );
+                *packet += sizeof(value);
                 char*   format  = ((char*)&rodata_start) + value;
                 rprintf( packet, packetSize, format );
                 break;
@@ -266,7 +285,16 @@ int main()
     //
     //
     //
+    printf("\n");
     ptrdiff_t   numberOfBytesInPacket   = packet - &outputPacket[0];
+    for(uint32_t i=0; i<numberOfBytesInPacket; i++) {
+        printf("%02x ",outputPacket[i]);
+    }
+    printf("\n");
+
+    //
+    //
+    //
     printf("\n");
     printf("%ld bytes in packet.\n",numberOfBytesInPacket);
 
