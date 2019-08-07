@@ -10,16 +10,10 @@
 
 typedef enum
 {
-    //TypeInt8        = 0,
-    //TypeInt16,
-    //TypeInt24,
-    //TypeInt32,
-    //TypeInt64,
-    //TypeText,
-    TypePrintfFormat,
-    TypeImageHash,
-    TypeTimeBase,
-    TypeMachineID,
+    TypePrintfFormat,       // The format of the log-entry.
+    TypeVersionHash,        // To identify image on host in a way that the source can generate easily.
+    TypeTimeBase,           // log-entry timestamp is timebase+linenumber.
+    TypeMachineID,          // Because source-ip may be dynamic.
 
 } ValueType;
 
@@ -49,9 +43,6 @@ void OutputInt32( uint8_t** packet, size_t* packetSpaceAvailable, uint32_t value
 {
     printf("Int32[%08x]\n",value);
 
-    //*packet[0]   = TypeInt32;
-    //*packet  += 1;
-    //*packetSpaceAvailable   -= 1;
     memcpy( *packet, &value, sizeof(value) );
     *packet  += sizeof(value);
     *packetSpaceAvailable   -= sizeof(value);
@@ -61,9 +52,6 @@ void OutputInt8( uint8_t** packet, size_t* packetSpaceAvailable, uint8_t value )
 {
     printf("Int8[%02x]\n",value);
 
-    //*packet[0]   = TypeInt8;
-    //*packet  += 1;
-    //*packetSpaceAvailable   -= 1;
     memcpy( *packet, &value, sizeof(value) );
     *packet  += sizeof(value);
     *packetSpaceAvailable   -= sizeof(value);
@@ -73,9 +61,6 @@ void OutputText( uint8_t** packet, size_t* packetSpaceAvailable, char* value )
 {
     printf("Text[%zd,%s]\n",strlen(value),value);
 
-    //*packet[0]   = TypeText;
-    //*packet  += 1;
-    //*packetSpaceAvailable   -= 1;
     *packet[0]   = strlen(value);
     *packet  += 1;
     *packetSpaceAvailable   -= 1;
@@ -239,8 +224,8 @@ void consumePacket( uint8_t** packet, size_t packetSize )
                 // store as current timebase.
                 break;
 
-            case TypeImageHash:
-                // load appropriate image file with matching hash.
+            case TypeVersionHash:
+                // load appropriate image file with matching version-hash.
                 break;
 
             case TypeMachineID:
