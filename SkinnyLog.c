@@ -17,6 +17,8 @@ typedef enum
     TypeInt64,
     TypeText,
     TypePrintfFormat,
+    TypeImageHash,
+    TypeTimeBase,
 
 } ValueType;
 
@@ -27,7 +29,7 @@ typedef enum
 /*------------------------------------------------------------------------*/
 
 
-void OutputPrintfFormat( uint8_t** packet, size_t packetSize, const void* value )
+void OutputPrintfFormat( uint8_t** packet, size_t* packetSpaceAvailable, const void* value )
 {
     extern uint32_t rodata_start;
     ptrdiff_t offsetFromRODataOrigin = value - (void*)&rodata_start;
@@ -36,49 +38,58 @@ void OutputPrintfFormat( uint8_t** packet, size_t packetSize, const void* value 
 
     *packet[0]   = TypePrintfFormat;
     *packet  += 1;
+    *packetSpaceAvailable   -= 1;
     memcpy( *packet, &offsetFromRODataOrigin, sizeof(offsetFromRODataOrigin) );
     *packet  += sizeof(offsetFromRODataOrigin);
+    *packetSpaceAvailable   -= sizeof(offsetFromRODataOrigin);
 } 
 
-void OutputInt32( uint8_t** packet, size_t packetSize, uint32_t value )
+void OutputInt32( uint8_t** packet, size_t* packetSpaceAvailable, uint32_t value )
 {
     printf("Int32[%08x]\n",value);
 
     *packet[0]   = TypeInt32;
     *packet  += 1;
+    *packetSpaceAvailable   -= 1;
     memcpy( *packet, &value, sizeof(value) );
     *packet  += sizeof(value);
+    *packetSpaceAvailable   -= sizeof(value);
 } 
 
-void OutputInt8( uint8_t** packet, size_t packetSize, uint8_t value )
+void OutputInt8( uint8_t** packet, size_t* packetSpaceAvailable, uint8_t value )
 {
     printf("Int8[%02x]\n",value);
 
     *packet[0]   = TypeInt8;
     *packet  += 1;
+    *packetSpaceAvailable   -= 1;
     memcpy( *packet, &value, sizeof(value) );
     *packet  += sizeof(value);
+    *packetSpaceAvailable   -= sizeof(value);
 } 
 
-void OutputText( uint8_t** packet, size_t packetSize, char* value )
+void OutputText( uint8_t** packet, size_t* packetSpaceAvailable, char* value )
 {
     printf("Text[%zd,%s]\n",strlen(value),value);
 
     *packet[0]   = TypeText;
     *packet  += 1;
+    *packetSpaceAvailable   -= 1;
     *packet[0]   = strlen(value);
     *packet  += 1;
+    *packetSpaceAvailable   -= 1;
     memcpy( *packet, value, strlen(value) );
     *packet  += strlen(value);
+    *packetSpaceAvailable   -= sizeof(value);
 } 
 
-void lprintf( uint8_t** packet, size_t packetSize, const char* format, ... )
+void lprintf( uint8_t** packet, size_t* packetSpaceAvailable, const char* format, ... )
 {
     va_list ap;
 
     va_start(ap, format);
 
-    OutputPrintfFormat( packet,packetSize, format );
+    OutputPrintfFormat( packet,packetSpaceAvailable, format );
 
     for(uint32_t i=0; i<strlen(format); i++ ) {
 
@@ -102,7 +113,7 @@ void lprintf( uint8_t** packet, size_t packetSize, const char* format, ... )
                 case 'c':
                 {
                     uint32_t    value   = va_arg(ap, uint32_t);
-                    OutputInt8( packet,packetSize, value );
+                    OutputInt8( packet,packetSpaceAvailable, value );
                     break;
                 }
 
@@ -111,14 +122,14 @@ void lprintf( uint8_t** packet, size_t packetSize, const char* format, ... )
                 case 'x':
                 {
                     uint32_t    value   = va_arg(ap, uint32_t);
-                    OutputInt32( packet,packetSize, value );
+                    OutputInt32( packet,packetSpaceAvailable, value );
                     break;
                 }
 
                 case 's':
                 {
                     char*   value   = va_arg(ap, char*);
-                    OutputText( packet,packetSize, value );
+                    OutputText( packet,packetSpaceAvailable, value );
                 };
 
                 default:
@@ -146,6 +157,97 @@ void OutputSkinnyLogHeader()
 
 
 
+void rprintf( uint8_t** packet, size_t packetSize, char* format )
+{
+    printf( "PrintfFormat[%s]\n", format );
+
+    for(uint32_t i=0; i<strlen(format); i++ ) {
+
+        if( format[i] == '%' ) {
+
+            //
+            uint8_t     typeCode    = format[i+1];
+            uint32_t    length      = 0;
+            i++;
+
+            // length modifier.
+            if( typeCode == '0' ) {
+                typeCode = format[i+2];
+                length   = format[i+1] - '0';    
+                //printf("length is %d\n",length);
+                i   += 2;
+            }
+
+            // types.
+            switch(typeCode) {
+                case 'c':
+                {
+                    //uint32_t    value   = va_arg(ap, uint32_t);
+                    //OutputInt8( packet,packetSize, value );
+                    break;
+                }
+
+                case 'd':
+                case 'u':
+                case 'x':
+                {
+                    //uint32_t    value   = va_arg(ap, uint32_t);
+                    //OutputInt32( packet,packetSize, value );
+                    break;
+                }
+
+                case 's':
+                {
+                    //char*   value   = va_arg(ap, char*);
+                    //OutputText( packet,packetSize, value );
+                };
+
+                default:
+                    break;
+            }
+
+        }
+    }
+
+}
+
+void consumePacket( uint8_t** packet, size_t packetSize )
+{
+    while( packetSize > 0 ) {
+
+        ValueType type    = (ValueType) *packet[0];
+        *packet += 1;
+        packetSize--;
+
+        switch( type ) {
+
+            case TypeTimeBase:
+                // store as current timebase.
+                break;
+
+            case TypeImageHash:
+                // load appropriate image file with matching hash.
+                break;
+
+            case TypePrintfFormat:
+            {
+                // printf operation.
+                extern uint32_t rodata_start;
+                ptrdiff_t   value   = 0;
+                memcpy( &value, *packet, sizeof(value) );
+                char*   format  = ((char*)&rodata_start) + value;
+                rprintf( packet, packetSize, format );
+                break;
+            }
+
+            default:
+                break;
+        }
+
+        break;
+    }
+}
+
 
 /*------------------------------------------------------------------------*/
 
@@ -156,9 +258,10 @@ int main()
     //
     uint8_t     outputPacket[1024]  = {0};
     uint8_t*    packet              = &outputPacket[0];
+    size_t      packetSpaceAvailable= sizeof(outputPacket);
 
     char    temp1[16]   = "Hello World";
-    lprintf( &packet,sizeof(outputPacket), "  [%d]   -%01c-   %d %s",(uint8_t)1,2,(uint8_t)3,temp1);
+    lprintf( &packet,&packetSpaceAvailable, "  [%d]   -%01c-   %d %s",(uint8_t)1,2,(uint8_t)3,temp1);
 
     //
     //
@@ -166,6 +269,9 @@ int main()
     ptrdiff_t   numberOfBytesInPacket   = packet - &outputPacket[0];
     printf("\n");
     printf("%ld bytes in packet.\n",numberOfBytesInPacket);
+
+    packet  = &outputPacket[0];
+    consumePacket( &packet, numberOfBytesInPacket );
 }
 
 

@@ -1,5 +1,5 @@
 #!/bin/sh
 
 
-gcc -o SkinnyLog SkinnyLog.c -T RODataOrigin.ld
+gcc -g -o SkinnyLog SkinnyLog.c -T RODataOrigin.ld
 
