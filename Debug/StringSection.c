@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <inttypes.h>
+#include <stddef.h>
 
 
 
@@ -20,7 +21,7 @@ void myLoggingFn(const char* format, ...)
  
     extern const void * const logdebug_start;
     uintptr_t   logdebugBase  = (uintptr_t)&logdebug_start;
-    printf("[%p]\n", format-logdebugBase);
+    printf("<%td"">\n", (ptrdiff_t)(format-logdebugBase));
  
     va_end(args);
 }
