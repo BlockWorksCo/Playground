@@ -5,7 +5,7 @@
 %}
 struct Entry
 {
-    char*       name;
+    char*       input;
     uint16_t    ddd;
 };
 %%

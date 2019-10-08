@@ -14,7 +14,7 @@ objcopy --remove-section .logdebug StringSection
 # Generate the gperf source.
 
 # Generate the lookup-code from gperf source.
-gperf StringSection.gperf -t > lut.c
+gperf StringSection.gperf -t --slot-name=input --duplicates > lut.c
 gcc -o lut lut.c
 
 # example.
