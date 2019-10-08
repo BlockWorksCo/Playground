@@ -21,7 +21,22 @@ void myLoggingFn(const char* format, ...)
  
     extern const void * const logdebug_start;
     uintptr_t   logdebugBase  = (uintptr_t)&logdebug_start;
-    printf("<%td"">\n", (ptrdiff_t)(format-logdebugBase));
+
+    printf("format(%td),\n", (ptrdiff_t)(format-logdebugBase));
+
+    while (*format != '\0') {
+        if (*format == 'd') {
+            int i = va_arg(args, int);
+            printf("int(%d),", i);
+        } else if (*format == 'c') {
+            int c = va_arg(args, int);
+            printf("char(%c),", c);
+        } else if (*format == 'f') {
+            double d = va_arg(args, double);
+            printf("float(%f)\n", d);
+        }
+        ++format;
+    }
  
     va_end(args);
 }
