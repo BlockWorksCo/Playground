@@ -1,8 +1,8 @@
 #!/bin/sh
 
 
-# Compile executable.
-gcc -g -o StringSection StringSection.c
+# Compile executable using a .ld file that adds a marker to the base address.
+gcc -g -o StringSection StringSection.c -Wl,-T StringSection.ld
 
 # Copy .logdebug section out of executable.
 objcopy --dump-section .logdebug=StringSection.logdebug StringSection
