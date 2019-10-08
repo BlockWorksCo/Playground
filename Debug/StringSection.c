@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <stdarg.h>
 
 
 
@@ -16,6 +17,12 @@ char* normalString  = "Hello Hello Hello";
 
 void myLoggingFn(const char* format, ...)
 {
+    va_list args;
+    va_start(args, format);
+ 
+    printf("[%p]\n", format);
+ 
+    va_end(args);
 }
 
 #define LOG_DEBUG(format, ... ) {static const char t[] __attribute__ ((__section__(".logdebug"))) =format;myLoggingFn( t, ## __VA_ARGS__ );}
