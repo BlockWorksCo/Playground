@@ -16,7 +16,7 @@ char* normalString  = "Hello Hello Hello";
 
 uint32_t paramTypeListForStringId( uint32_t stringId )
 {
-    return 0xabcdef00;
+    return 0x00abcdef;
 }
 
 //
@@ -25,6 +25,10 @@ uint32_t paramTypeListForStringId( uint32_t stringId )
 // 1 = %d = int32_t
 // 2 = %u = uint32_t
 // 3 = %s = null-terminated-string.
+// 4 = 
+// 5 = 
+// 6 = 
+// 7 = 
 //
 void myLoggingFn(const char* format, ...)
 {
@@ -45,7 +49,7 @@ void myLoggingFn(const char* format, ...)
     do {
         paramType   = paramTypeList & 0x3;
         printf("<%d>",paramType);
-        paramTypeList   >>= 2; 
+        paramTypeList   >>= 3; 
         paramIndex++;
     } while( (paramType != 0) && (paramIndex<8) );
 
@@ -62,7 +66,7 @@ int main()
     printf("[%s]\n\n",normalString);
 
     LOG_DEBUG("One two three %d", 1);
-    LOG_DEBUG("four five six %d", 2);
+    LOG_DEBUG("four five six %d this is a much longer string", 2);
     LOG_DEBUG("seven eight nine");
 }
 

@@ -11,5 +11,13 @@ objcopy --dump-section .logdebug=StringSection.logdebug StringSection
 cp StringSection StringSection.original
 objcopy --remove-section .logdebug StringSection
 
+# Generate the gperf source.
+
+# Generate the lookup-code from gperf source.
+gperf StringSection.gperf -t > lut.c
+gcc -o lut lut.c
+
+# example.
+./lut
 
 
