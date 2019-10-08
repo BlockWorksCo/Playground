@@ -14,6 +14,18 @@ char* normalString  = "Hello Hello Hello";
 
 #define LOG_DEBUG(format, ... ) {static const char t[] __attribute__ ((__section__(".logdebug"))) =format;myLoggingFn( t, ## __VA_ARGS__ );}
 
+uint32_t paramTypeListForStringId( uint32_t stringId )
+{
+    return 0xabcdef00;
+}
+
+//
+// Supports the following types:
+// 0 = list-terminator.
+// 1 = %d = int32_t
+// 2 = %u = uint32_t
+// 3 = %s = null-terminated-string.
+//
 void myLoggingFn(const char* format, ...)
 {
     va_list args;
@@ -22,21 +34,24 @@ void myLoggingFn(const char* format, ...)
     extern const void * const logdebug_start;
     uintptr_t   logdebugBase  = (uintptr_t)&logdebug_start;
 
-    printf("format(%td),\n", (ptrdiff_t)(format-logdebugBase));
+    ptrdiff_t   stringOffset    = (ptrdiff_t)format-logdebugBase;
+    uint32_t    stringId        = (uint32_t)stringOffset;
+    printf("format(%"PRIu32"),", stringId );
 
-    while (*format != '\0') {
-        if (*format == 'd') {
-            int i = va_arg(args, int);
-            printf("int(%d),", i);
-        } else if (*format == 'c') {
-            int c = va_arg(args, int);
-            printf("char(%c),", c);
-        } else if (*format == 'f') {
-            double d = va_arg(args, double);
-            printf("float(%f)\n", d);
-        }
-        ++format;
-    }
+    uint16_t    paramTypeList   = paramTypeListForStringId(stringId);
+
+    uint8_t     paramIndex      = 0;
+    uint8_t     paramType       = 0;
+    do {
+        paramType   = paramTypeList & 0x3;
+        printf("<%d>",paramType);
+        paramTypeList   >>= 2; 
+        paramIndex++;
+    } while( (paramType != 0) && (paramIndex<8) );
+
+            //int i = va_arg(args, int);
+            //int c = va_arg(args, int);
+            //double d = va_arg(args, double);
  
     va_end(args);
 }
@@ -44,7 +59,7 @@ void myLoggingFn(const char* format, ...)
 
 int main()
 {
-    printf("[%s]",normalString);
+    printf("[%s]\n\n",normalString);
 
     LOG_DEBUG("One two three %d", 1);
     LOG_DEBUG("four five six %d", 2);
