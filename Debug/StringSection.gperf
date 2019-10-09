@@ -9,20 +9,29 @@ struct Entry
     uint16_t    ddd;
 };
 %%
-0x10, 0
-0x20, 1
-0x30, 4
-0x40, 4
-0x80, 4
+000010, 0
+000020, 1
+000030, 4
+000040, 4
+000080, 4
 %%
+
+uint16_t paramTypeListForStringID( uint32_t stringId )
+{
+    char    stringIdText[16]    = {0};
+    snprintf( &stringIdText[0],sizeof(stringIdText), "%06x", stringId);
+    uint16_t    paramTypeList   = in_word_set( &stringIdText[0], strlen(stringIdText) )->ddd;
+
+    return paramTypeList;
+}
 
 int main()
 {
-    printf("[%d]",in_word_set("0x10",4)->ddd);
-    printf("[%d]",in_word_set("0x20",4)->ddd);
-    printf("[%d]",in_word_set("0x30",4)->ddd);
-    printf("[%d]",in_word_set("0x40",4)->ddd);
-    printf("[%d]",in_word_set("0x80",4)->ddd);
+    printf("[%04x]\n",paramTypeListForStringID(0x10));
+    printf("[%04x]\n",paramTypeListForStringID(0x20));
+    printf("[%04x]\n",paramTypeListForStringID(0x30));
+    printf("[%04x]\n",paramTypeListForStringID(0x40));
+    printf("[%04x]\n",paramTypeListForStringID(0x80));
 }
 
 
