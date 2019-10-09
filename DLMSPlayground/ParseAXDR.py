@@ -1,5 +1,12 @@
+#!/usr/bin/env python
 
 
+"""
+Use as follows:
+    ./ParseAXDR.py 02110d040725403905000000000500000000050000069e050000465005000046500500000000050000000005000000000500000000050000000005000000000500000000050000000005000000000500000000090c07e3090dff0a0dffff80007605296d2a0d
+or:
+    ./ParseAXDR.py 0206090c07e3091e05070f00ffffc40011840600000000060000000006000000000600000000
+"""
 
 
 
@@ -19,6 +26,7 @@ UINT32      = 0x06
 OCTET_STRING= 0x09
 STRING      = 0x0a
 STRING_UTF8 = 0x0c
+BCD         = 0x0d
 INT8        = 0x0f
 UINT8       = 0x11
 UINT16      = 0x12
@@ -86,6 +94,18 @@ def DLMSDateTimeToText(dlmsDatetime):
     text    =  "{}:{}:{}:{} {}/{}/{}".format(hour, minute, second, hundreths, dayOfMonth, month, year)
     return text
 
+
+def ParseBCD(pdu,position):
+    """
+    """
+    if position == len(pdu):
+        return position
+
+    length = ord(pdu[position])
+    value   = pdu[position+1:position+1+length]
+    value   = binascii.hexlify(value)
+
+    return position+1+length,"BCD-%d"%length,value
 
 def ParseOctetString(pdu,position):
     """
@@ -215,6 +235,20 @@ def ParseFloat32(pdu,position):
     return position+4,"Float32",value
 
 
+def ParseInt32(pdu,position):
+    """
+    """
+    if position == len(pdu):
+        return position
+
+    b0  = ord(pdu[position+0])
+    b1  = ord(pdu[position+1])
+    b2  = ord(pdu[position+2])
+    b3  = ord(pdu[position+3])
+
+    return position+4,"Int32","%02x%02x%02x%02x"%(b0,b1,b2,b3)
+
+
 def ParseUint32(pdu,position):
     """
     """
@@ -264,6 +298,8 @@ def ParseField(pdu,position):
         position,typeString,value    = ParseOctetString(pdu,position)
     elif tag == INT8:
         position,typeString,value    = ParseInt8(pdu,position)
+    elif tag == INT32:
+        position,typeString,value    = ParseInt32(pdu,position)
     elif tag == ENUM:
         position,typeString,value    = ParseEnum(pdu,position)
     elif tag == BOOLEAN:
@@ -276,6 +312,8 @@ def ParseField(pdu,position):
         position,typeString,value    = ParseUint32(pdu,position)
     elif tag == DATE:
         position,typeString,value    = ParseDate(pdu,position)
+    elif tag == BCD:
+        position,typeString,value    = ParseBCD(pdu,position)
     elif tag == GLO_ACTIONREQUEST:
         typeString  = 'glo_ActionRequest'
         ppp         = pdu[position+1]
@@ -334,13 +372,15 @@ def ParseAXDR(pduHex,position):
     """
 
     # convert from hex to binary
-    pdu = binascii.unhexlify(pduHex.replace('\n',''))
+    pdu = binascii.unhexlify(pduHex)
+    #print('[%s]'%(binascii.hexlify(pdu)))
 
     if position == len(pdu):
         return position
 
     result  = []
     while position < len(pdu):
+        #print('parsing field at position %d/%d'%(position,len(pdu)))
         position,typeString,value    = ParseField(pdu,position)
         result.append( (position,typeString,value) )
 
@@ -399,10 +439,15 @@ def ParseDLMS(pdu, position):
 
 if __name__ == '__main__':
 
-    pduHex=open(sys.argv[1]).read()
-    pdu     = binascii.unhexlify(pduHex.replace('\n',''))
-    ParseAXDR(pdu,0)
+    #pduHex=open(sys.argv[1]).read().splitlines()[0]
+    #pdu     = binascii.unhexlify(pduHex)
+    #p=ParseAXDR(pduHex,0)
+    #print(p)
 
     #ParseDLMS(binascii.unhexlify('C0018100070100630100FF0201010204020412000809060000010000FF0F02120000090C07E007170600000000000000090C07E00719010B0300000000000100'), 0)
+    #result  = ParseAXDR('0206090c07e3091e05070f00ffffc40011840600000000060000000006000000000600000000', 0)
+    result  = ParseAXDR(sys.argv[1], 0)
+    import pprint
+    pprint.pprint(result)
 
 
