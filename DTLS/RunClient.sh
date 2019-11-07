@@ -1,7 +1,7 @@
 
 
 
-openssl s_client -dtls1_2 -connect 127.0.0.1:4444 -debug -cert cert.pem -key key.pem -cipher ECDHE-ECDSA-AES128-CCM8
+openssl s_client -dtls1_2 -connect 127.0.0.1:4444 -debug -cert cert.pem -key key.pem -cipher ECDHE-ECDSA-AES128-GCM-SHA256
 
 
 
