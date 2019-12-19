@@ -26,7 +26,6 @@ CFLAGS  += -mfloat-abi=soft
 CFLAGS  += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS  += -fno-builtin --short-enums
 
-AFLAGS  += -x assembler-with-cpp
 AFLAGS  += -DSOFTDEVICE_PRESENT
 AFLAGS  += -DNRF51
 AFLAGS  += -DS110
@@ -34,7 +33,8 @@ AFLAGS  += -DBLE_STACK_SUPPORT_REQD
 AFLAGS  += -DSWI_DISABLE0
 
 
-LDFLAGS += -mthumb -mabi=aapcs -Tnrf51_xxaa.ld
+LDFLAGS += -L../
+LDFLAGS += -mthumb -mabi=aapcs -T../nrf51_xxaa.ld
 LDFLAGS += -mcpu=cortex-m0
 LDFLAGS += -Wl,--gc-sections
 LDFLAGS += --specs=nano.specs -lc -lnosys
@@ -146,7 +146,7 @@ clean:
 
 app.elf: $(OBJS)
 	@$(ECHO) Linking $@.
-	@$(LD) -o $@ $^
+	@$(LD) $(LDFLAGS) -o $@ $^
 
 
 
@@ -159,7 +159,7 @@ app.elf: $(OBJS)
 
 .s.o:
 	@$(ECHO) Assembling $^
-	@$(AS) $(AFLAGS) -o $@ $^
+	@$(AS) $(AFLAGS) -o $@ -c $<
 
 
 
