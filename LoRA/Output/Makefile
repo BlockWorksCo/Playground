@@ -36,6 +36,7 @@ VPATH   += ../stm_lib/src
 VPATH   += ../cmsis
 VPATH   += ../cmsis_boot
 VPATH   += ../cmsis_boot/startup
+VPATH   += ../liblora
 
 
 
@@ -46,6 +47,9 @@ OBJS    += stm32f10x_rcc.o
 OBJS    += stm32f10x_gpio.o
 OBJS    += stm32f10x_spi.o
 OBJS    += stm32f10x_tim.o
+OBJS    += RFsx1276.o
+OBJS    += sx1276-LoRa.o
+OBJS    += sx1276-LoRaMisc.o
 
 
 
@@ -53,6 +57,7 @@ INCLUDES   += -I../
 INCLUDES   += -I../stm_lib/inc
 INCLUDES   += -I../cmsis
 INCLUDES   += -I../cmsis_boot
+INCLUDES   += -I../liblora
 
 
 all: app.elf
