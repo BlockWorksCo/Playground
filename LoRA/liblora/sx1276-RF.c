@@ -2,7 +2,7 @@
 
 
 
-#include "RFsx1276.h"
+#include "sx1276-RF.h"
 #include "stm32f10x.h"
 #include "stm32f10x_spi.h"
 #include "stm32f10x_rcc.h"

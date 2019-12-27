@@ -8,6 +8,7 @@
 ********************************************************************************/
 
 #include "sx1276-LoRa.h"
+#include "sx1276-PhysicalInterface.h"
 #include "delay.h"
 #include "SPIBus.h"
 #include <stdio.h>
@@ -20,8 +21,6 @@
 #define CR    0x04 
 #define CRC_EN   0x00  //CRC Enable
 
- uint8_t gtmp;
- 
  
 /**********************************************************
 **Parameter table define
@@ -56,98 +55,6 @@ const uint8_t RFM96SpreadFactorTbl[6] =
 
  const uint8_t  RFM96Data[] = {"1234567890ABCDEFGHIJK"};
 
-
-
-
-
-/**********************************************************
-**Name:     RegisterRead
-**Function: SPI Read CMD
-**Input:    adr -> address for read
-**Output:   None
-**********************************************************/
-uint8_t RegisterRead(uint8_t adr)
-{
-    uint8_t tmp; 
-
-    spiBusSelectSlave( SlaveA );
-
-    spiBusWriteOneByte(adr&0x7f);                                        //Send address first
-    tmp = spiBusReadOneByte();  
-
-    spiBusDeselectSlave( SlaveA );
-
-    return(tmp);
-}
-
-
-/**********************************************************
-**Name:     RegisterWrite
-**Function: SPI Write CMD
-**Input:    WrPara -> address & data
-**Output:   None
-**********************************************************/
-void RegisterWrite(uint16_t WrPara)                
-{                                                       
-    spiBusSelectSlave( SlaveA );
-
-    WrPara |= 0x8000;                                        //MSB must be "1" for write 
-    spiBusWriteOneByte(WrPara>>8);//	15->0
-    spiBusWriteOneByte((uint8_t)WrPara);	
-
-    spiBusDeselectSlave( SlaveA );
-}
-
-
-/**********************************************************
-**Name:     SPIBurstRead
-**Function: SPI burst read mode
-**Input:    adr-----address for read
-**          ptr-----data buffer point for read
-**          length--how many bytes for read
-**Output:   None
-**********************************************************/
-void SPIBurstRead(uint8_t adr, uint8_t *ptr, uint8_t length)
-{
-  uint8_t i;
-  if(length<=1)                                            //length must more than one
-  {
-    return;
-  }
-  else
-  {
-    spiBusSelectSlave( SlaveA );
-
-    spiBusWriteOneByte(adr&0x7f); 
-    for(i=0;i<length;i++)
-    {
-        ptr[i] = spiBusWriteOneByte(0xff);
-    }
-
-    spiBusDeselectSlave( SlaveA );
-  }
-}
-
-/**********************************************************
-**Name:     SPIBurstWrite
-**Function: SPI burst write mode
-**Input:    adr-----address for write
-**          ptr-----data buffer point for write
-**          length--how many bytes for write
-**Output:   none
-**********************************************************/
-void BurstWrite(uint8_t adr, uint8_t *ptr, uint8_t length)
-{ 
-    spiBusSelectSlave( SlaveA );
-    
-    spiBusWriteOneByte(adr|0x80);
-    for(uint8_t i=0;i<length;i++)
-    {
-    	spiBusWriteOneByte(ptr[i]);
-    }
-
-    spiBusDeselectSlave( SlaveA );
-}
 
 
 
@@ -199,44 +106,6 @@ void RFM96_EntryLoRa(void)
 void RFM96_LoRaClearIrq(void)
 {
   RegisterWrite(LR_RegIrqFlags+0xFF);
-}
-
-
-
-void sx1276Reset()
-{
-#if 0
-    GPIO_ResetBits(GPIOA, RF_RST);//REST_Low XL1278-D01;
-    GPIO_ResetBits(GPIOB, RF_RST_1);//REST_Low  XL1278-SMT;
-
-    for(i=100;i!=0;i--)                                      //Delay
-    {
-        delay_us(10); 
-    }
-  
-    GPIO_SetBits(GPIOA, RF_RST);//REST_High XL1278-D01;
-	GPIO_SetBits(GPIOB, RF_RST_1);//REST_High XL1278-SMT;
-
-    for(i=250;i!=0;i--)                                      //Delay
-    {
-        delay_us(10);  
-    }
-#endif
-}
-
-
-bool sx1276IsIRQPinAsserted()
-{
-#if 0
-    if(GPIO_ReadInputDataBit(RF_GPIO, RF_IRQ_PIN) != 0) {
-        return true;
-    }
-    else {
-        return false;
-    }
-#else
-    return false;
-#endif
 }
 
 /**********************************************************
@@ -380,7 +249,6 @@ uint8_t RFM96_LoRaRxPacket(uint8_t *buf)
 				else
 					packet_size = RegisterRead((uint8_t)(LR_RegRxNbBytes>>8));     //Number for received bytes    
 
-				gtmp= packet_size;
 				SPIBurstRead(0x00, buf, packet_size);
 
 				RFM96_LoRaClearIrq();

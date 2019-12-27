@@ -47,9 +47,10 @@ OBJS    += stm32f10x_rcc.o
 OBJS    += stm32f10x_gpio.o
 OBJS    += stm32f10x_spi.o
 OBJS    += stm32f10x_tim.o
-OBJS    += RFsx1276.o
+OBJS    += sx1276-RF.o
 OBJS    += sx1276-LoRa.o
 OBJS    += sx1276-LoRaMisc.o
+OBJS    += sx1276-PhysicalInterface.o
 OBJS    += SPIBus.o
 
 
