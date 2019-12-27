@@ -44,6 +44,8 @@ OBJS    += system_stm32f10x.o
 OBJS    += startup_stm32f10x_md.o
 OBJS    += stm32f10x_rcc.o
 OBJS    += stm32f10x_gpio.o
+OBJS    += stm32f10x_spi.o
+OBJS    += stm32f10x_tim.o
 
 
 
