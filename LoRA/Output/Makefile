@@ -50,6 +50,7 @@ OBJS    += stm32f10x_tim.o
 OBJS    += RFsx1276.o
 OBJS    += sx1276-LoRa.o
 OBJS    += sx1276-LoRaMisc.o
+OBJS    += SPIBus.o
 
 
 
