@@ -6,6 +6,7 @@
 #include "stm32f10x_spi.h"
 #include "SPIBus.h"
 #include "sx1276-PhysicalInterface.h"
+#include "sx1276-LoRa.h"
 
 
 int main(void)
@@ -49,6 +50,8 @@ int main(void)
     spiBusInit();
 
     sx1276PhysicalInterfaceInit();
+
+    RFM96_LoRaEntryRx();
 
   while (1) {
 

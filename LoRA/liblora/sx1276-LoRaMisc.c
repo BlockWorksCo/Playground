@@ -28,10 +28,6 @@
  */
 
 
-#if defined( USE_SX1276_RADIO )
-
-//#include "sx1276-Hal.h"
-//#include "sx1276.h"
 #include "sx1276-RF.h"
 #include <stdint.h>
 #include <stdbool.h>
@@ -415,4 +411,3 @@ uint8_t SX1276LoRaGetNbTrigPeaks( void )
     return ( SX1276LR->RegTestReserved31 & 0x07 );
 }
 
-#endif // USE_SX1276_RADIO
