@@ -5,6 +5,7 @@
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_spi.h"
 #include "SPIBus.h"
+#include "sx1276-PhysicalInterface.h"
 
 
 int main(void)
@@ -46,6 +47,8 @@ int main(void)
 #endif
 
     spiBusInit();
+
+    sx1276PhysicalInterfaceInit();
 
   while (1) {
 

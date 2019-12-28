@@ -49,5 +49,42 @@ void sx1276Reset();
 
 bool sx1276IsIRQPinAsserted();
 
+void SX1276SetReset( uint8_t state );
+
+void SX1276WriteBuffer( uint8_t addr, uint8_t *buffer, uint8_t size );
+
+void SX1276ReadBuffer( uint8_t addr, uint8_t *buffer, uint8_t size );
+
+void SX1276Write( uint8_t addr, uint8_t data );
+
+void SX1276Read( uint8_t addr, uint8_t *data );
+
+void SX1276SetIdleState(void);
+
+void SX1276WriteFifo( uint8_t *buffer, uint8_t size );
+
+void SX1276ReadFifo( uint8_t *buffer, uint8_t size );
+
+uint8_t SX1276ReadDio0( void );
+
+uint8_t SX1276ReadDio1( void );
+
+uint8_t SX1276ReadDio2( void );
+
+uint8_t SX1276ReadDio3( void );
+
+uint8_t SX1276ReadDio4( void );
+
+uint8_t SX1276ReadDio5( void );
+
+void SX1276WriteRxTx( uint8_t txEnable );
+
+void SX1276Reset( void );
+
+void sx1276PhysicalInterfaceInit();
+
+uint8_t SPICmd8bit(uint8_t WrPara);
+
+
 #endif
 

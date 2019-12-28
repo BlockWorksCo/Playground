@@ -15,30 +15,6 @@ typedef struct
   uint8_t  buffer_size;
 }RF;
 
-#define RESET_IOPORT                                GPIOC
-#define RESET_PIN                                   GPIO_Pin_4
-
-#define NSS_IOPORT                                  GPIOA
-#define NSS_PIN                                     GPIO_Pin_4
-
-#define DIO0_IOPORT                                 GPIOA
-#define DIO0_PIN                                    GPIO_Pin_1
-
-#define DIO1_IOPORT                                 GPIOB
-#define DIO1_PIN                                    GPIO_Pin_11 
-
-#define DIO2_IOPORT                                 GPIOB
-#define DIO2_PIN                                    GPIO_Pin_10
-
-#define DIO3_IOPORT                                 GPIOB
-#define DIO3_PIN                                    GPIO_Pin_1
-
-#define DIO4_IOPORT                                 GPIOB
-#define DIO4_PIN                                    GPIO_Pin_0 
-
-#define DIO5_IOPORT                                 GPIOC
-#define DIO5_PIN                                    GPIO_Pin_5
-
 
 typedef enum
 {
