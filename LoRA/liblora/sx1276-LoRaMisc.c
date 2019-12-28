@@ -30,11 +30,15 @@
 
 #if defined( USE_SX1276_RADIO )
 
-#include "sx1276-Hal.h"
-#include "sx1276.h"
+//#include "sx1276-Hal.h"
+//#include "sx1276.h"
+#include "sx1276-RF.h"
+#include <stdint.h>
+#include <stdbool.h>
 
 #include "sx1276-LoRa.h"
 #include "sx1276-LoRaMisc.h"
+#include "sx1276-PhysicalInterface.h"
 
 /*!
  * SX1276 definitions
@@ -168,7 +172,7 @@ uint8_t SX1276LoRaGetSignalBandwidth( void )
 
 void SX1276LoRaSetSpreadingFactor( uint8_t factor )
 {
-    uint8 len;
+    uint8_t len;
     if( factor > 12 )
     {
         factor = 12;

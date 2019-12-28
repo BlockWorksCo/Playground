@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "stm32f10x_gpio.h"
+#include "sx1276-LoRaMisc.h"
 
 
 
@@ -2005,6 +2006,13 @@ typedef struct sSX1276
 
 #define NOISE_FIGURE_LF                                4.0
 #define NOISE_FIGURE_HF                                6.0 
+
+
+
+tSX1276* SX1276;
+tSX1276LR* SX1276LR;
+
+
 
 void  SX1276StartRx(void);
 uint32_t SX1276Process(void); //根据状态处理所有

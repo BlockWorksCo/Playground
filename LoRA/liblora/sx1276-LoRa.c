@@ -292,7 +292,9 @@ uint8_t RFM96_LoRaEntryTx(uint8_t packet_length)
 			break; 
 		}
 		if(SysTime>=3)	
+        {
 			return 0;
+        }
 	}
  
     return 	packet_length;
