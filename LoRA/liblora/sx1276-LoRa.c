@@ -133,7 +133,7 @@ void RFM96_Config(uint8_t mode)
 
 
      {
-		//volatile uint8_t	Sx1276VerNO = RegisterRead((uint8_t)(REG_LR_VERSION>>8)); //获取SX1276 版本号 是0X11(V1A版本 工程版） 或者是 0X12（V1B 正式版）
+		//volatile uint8_t	Sx1276VerNO = RegisterRead((uint8_t)(REG_LR_VERSION_LONG>>8)); //获取SX1276 版本号 是0X11(V1A版本 工程版） 或者是 0X12（V1B 正式版）
 //		 printf("sx1278(V12) v:%02X",Sx1276VerNO);
 	//	 RegisterWrite(RFM96FreqTbl[0]); 
 	//	 Sx1276VerNO=RegisterRead((uint8_t)(RFM96FreqTbl[0]>>8));
@@ -177,7 +177,7 @@ void RFM96_Config(uint8_t mode)
     RegisterWrite(LR_RegPreambleMsb + 0);                       //RegPreambleMsb 
     RegisterWrite(LR_RegPreambleLsb + 12);                      //RegPreambleLsb 8+4=12byte Preamble
     
-    RegisterWrite(REG_LR_DIOMAPPING2+0x01);                     //RegDioMapping2 DIO5=00, DIO4=01
+    RegisterWrite(REG_LR_DIOMAPPING2_LONG+0x01);                     //RegDioMapping2 DIO5=00, DIO4=01
     RFM96_Standby();                                         //Entry standby mode
 }
 
@@ -195,7 +195,7 @@ void RFM96_LoRaEntryRx(void)
   
   RegisterWrite(0x4D00+0x84);                                   //Normal and Rx
   RegisterWrite(LR_RegHopPeriod+0xFF);                          //RegHopPeriod NO FHSS
-  RegisterWrite(REG_LR_DIOMAPPING1+0x01);                       //DIO0=00, DIO1=00, DIO2=00, DIO3=01  DIO0=00--RXDONE
+  RegisterWrite(REG_LR_DIOMAPPING1_LONG+0x01);                       //DIO0=00, DIO1=00, DIO2=00, DIO3=01  DIO0=00--RXDONE
       
   RegisterWrite(LR_RegIrqFlagsMask+0x3F);                       //Open RxDone interrupt & Timeout
   RFM96_LoRaClearIrq();   
@@ -275,7 +275,7 @@ uint8_t RFM96_LoRaEntryTx(uint8_t packet_length)
 		delay_us(1000);
 		RegisterWrite(0x4D00+0x87);                                   //发射功率 for 20dBm
 		RegisterWrite(LR_RegHopPeriod);                               //RegHopPeriod NO FHSS
-		RegisterWrite(REG_LR_DIOMAPPING1+0x41);                       //DIO0=01, DIO1=00, DIO2=00, DIO3=01
+		RegisterWrite(REG_LR_DIOMAPPING1_LONG+0x41);                       //DIO0=01, DIO1=00, DIO2=00, DIO3=01
 
 		RFM96_LoRaClearIrq();
 		RegisterWrite(LR_RegIrqFlagsMask+0xF7);                       //Open TxDone interrupt

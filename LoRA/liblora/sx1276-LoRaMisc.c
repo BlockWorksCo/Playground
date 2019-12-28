@@ -172,7 +172,7 @@ uint8_t SX1276LoRaGetSignalBandwidth( void )
 
 void SX1276LoRaSetSpreadingFactor( uint8_t factor )
 {
-    uint8_t len;
+    //uint8_t len;
     if( factor > 12 )
     {
         factor = 12;
@@ -185,12 +185,12 @@ void SX1276LoRaSetSpreadingFactor( uint8_t factor )
     if( factor == 6 )
     {
         //SX1276LoRaSetNbTrigPeaks( 5 );
-        len=5;
+        //len=5;
     }
     else
     {
         //SX1276LoRaSetNbTrigPeaks( 3 );
-		len=3;
+		//len=3;
     }
 	 SX1276Write( 0x31, SX1276LR->RegTestReserved31 );
 

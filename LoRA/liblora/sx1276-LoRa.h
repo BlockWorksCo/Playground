@@ -134,20 +134,20 @@ void delayms(unsigned int t);
 #define LR_RegModemConfig3                         0x2600//Modem PHY config 3
 
 // I/O settings
-#define REG_LR_DIOMAPPING1                          0x4000
-#define REG_LR_DIOMAPPING2                          0x4100
+#define REG_LR_DIOMAPPING1_LONG                          0x4000
+#define REG_LR_DIOMAPPING2_LONG                          0x4100
 // Version
-#define REG_LR_VERSION                              0x4200
+#define REG_LR_VERSION_LONG                              0x4200
 // Additional settings
-#define REG_LR_PLLHOP                               0x4400
-#define REG_LR_TCXO                                 0x4B00//TCXO or XTAL input setting
-#define REG_LR_PADAC                                0x4D00//Higher power settings of the PA
-#define REG_LR_FORMERTEMP                           0x5B00//Stored temperature during the former IQ Calibration
+#define REG_LR_PLLHOP_LONG                               0x4400
+#define REG_LR_TCXO_LONG                                 0x4B00//TCXO or XTAL input setting
+#define REG_LR_PADAC_LONG                                0x4D00//Higher power settings of the PA
+#define REG_LR_FORMERTEMP_LONG                           0x5B00//Stored temperature during the former IQ Calibration
 
-#define REG_LR_AGCREF                               0x6100//Adjustment of the AGC thresholds
-#define REG_LR_AGCTHRESH1                           0x6200
-#define REG_LR_AGCTHRESH2                           0x6300
-#define REG_LR_AGCTHRESH3                           0x6400
+#define REG_LR_AGCREF_LONG                               0x6100//Adjustment of the AGC thresholds
+#define REG_LR_AGCTHRESH1_LONG                           0x6200
+#define REG_LR_AGCTHRESH2_LONG                           0x6300
+#define REG_LR_AGCTHRESH3_LONG                           0x6400
 
 #endif //__SX1276_LORA_H__
 
