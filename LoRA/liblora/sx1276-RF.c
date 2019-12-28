@@ -239,6 +239,8 @@ void SX1276LoRaSetDefaults( void )
 {
     SX1276Read( REG_LR_VERSION, &SX1276LR->RegVersion );
 }
+
+#if 0
 void SX1276LoRaSetRFFrequency( uint32_t freq )
 {
     LoRaSettings.RFFrequency = freq;
@@ -329,12 +331,14 @@ void SX1276LoRaSetLowDatarateOptimize( bool enable )
     SX1276LR->RegModemConfig3 = ( SX1276LR->RegModemConfig3 & RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_MASK ) | ( enable << 3 );
     SX1276Write( REG_LR_MODEMCONFIG3, SX1276LR->RegModemConfig3 );
 }
+#endif
 void SX1276LoRaSetPAOutput( uint8_t outputPin )
 {
     SX1276Read( REG_LR_PACONFIG, &SX1276LR->RegPaConfig );
     SX1276LR->RegPaConfig = (SX1276LR->RegPaConfig & RFLR_PACONFIG_PASELECT_MASK ) | outputPin;
     SX1276Write( REG_LR_PACONFIG, SX1276LR->RegPaConfig );
 }
+#if 0
 void SX1276LoRaSetPa20dBm( bool enale )
 {
     SX1276Read( REG_LR_PADAC, &SX1276LR->RegPaDac );
@@ -353,6 +357,7 @@ void SX1276LoRaSetPa20dBm( bool enale )
     }
     SX1276Write( REG_LR_PADAC, SX1276LR->RegPaDac );
 }
+
 void SX1276LoRaSetRFPower( int8_t power )
 {
     SX1276Read( REG_LR_PACONFIG, &SX1276LR->RegPaConfig );
@@ -403,6 +408,10 @@ void SX1276LoRaSetRFPower( int8_t power )
     SX1276Write( REG_LR_PACONFIG, SX1276LR->RegPaConfig );
     LoRaSettings.Power = power;
 }
+
+#endif
+
+
 void SX1276LoRaInit( void )
 {
     RFLRState = RFLR_STATE_IDLE;
