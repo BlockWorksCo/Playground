@@ -130,23 +130,7 @@ void BurstWrite(uint8_t adr, uint8_t *ptr, uint8_t length)
 
 void sx1276Reset()
 {
-#if 0
-    GPIO_ResetBits(GPIOA, RF_RST);//REST_Low XL1278-D01;
-    GPIO_ResetBits(GPIOB, RF_RST_1);//REST_Low  XL1278-SMT;
-
-    for(i=100;i!=0;i--)                                      //Del
-    {
-        delay_us(10); 
-    }
-  
-    GPIO_SetBits(GPIOA, RF_RST);//REST_High XL1278-D01;
-    GPIO_SetBits(GPIOB, RF_RST_1);//REST_High XL1278-SMT;
-
-    for(i=250;i!=0;i--)                                      //Del
-    {
-        delay_us(10);  
-    }
-#endif
+    SX1276Reset();
 }
 
 
@@ -173,20 +157,20 @@ void SX1276SetReset( uint8_t state )
     if( state == RADIO_RESET_ON )
     {
         // Set RESET pin to 0
-        GPIO_WriteBit( RESET_IOPORT, RESET_PIN, Bit_RESET );
+        GPIO_WriteBit( GPIOB, GPIO_Pin_12, Bit_RESET );
         // Configure RESET as output
         GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
         GPIO_InitStructure.GPIO_Pin = RESET_PIN;
-        GPIO_Init( RESET_IOPORT, &GPIO_InitStructure );
+        GPIO_Init( GPIOB, &GPIO_InitStructure );
     }
     else
     {
         // Configure RESET as input
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-        GPIO_InitStructure.GPIO_Pin =  RESET_PIN;
-        GPIO_Init( RESET_IOPORT, &GPIO_InitStructure );
+        GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12;
+        GPIO_Init( GPIOB, &GPIO_InitStructure );
     }
 }
 
