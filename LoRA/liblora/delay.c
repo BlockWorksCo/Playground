@@ -7,13 +7,13 @@
 
 void delay_ms(uint32_t ms)
 {
-    for(uint32_t i=0; i<100000; i++);
+    delay_us(1000);
 }
 
 
 void delay_us(uint32_t us)
 {
-    for(uint32_t i=0; i<1000; i++);
+    for(uint32_t i=0; i<5000*us; i++);
 }
 
 

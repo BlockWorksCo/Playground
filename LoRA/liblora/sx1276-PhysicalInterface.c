@@ -8,12 +8,6 @@
 #include "sx1276-RF.h" // TODO: remove the need for this
 
 
-#define RESET_IOPORT                                GPIOC
-#define RESET_PIN                                   GPIO_Pin_4
-
-#define NSS_IOPORT                                  GPIOA
-#define NSS_PIN                                     GPIO_Pin_4
-
 #define DIO0_IOPORT                                 GPIOA
 #define DIO0_PIN                                    GPIO_Pin_1
 
@@ -31,7 +25,6 @@
 
 #define DIO5_IOPORT                                 GPIOC
 #define DIO5_PIN                                    GPIO_Pin_5
-
 
 static uint8_t RFState = RF_STATE_IDLE;
 
@@ -161,8 +154,11 @@ void SX1276SetReset( uint8_t state )
         // Configure RESET as output
         GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-        GPIO_InitStructure.GPIO_Pin = RESET_PIN;
+        GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
         GPIO_Init( GPIOB, &GPIO_InitStructure );
+
+        GPIOB->ODR &= ~GPIO_Pin_12;
+        GPIOB->ODR &= ~GPIO_Pin_13;
     }
     else
     {
@@ -171,6 +167,9 @@ void SX1276SetReset( uint8_t state )
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
         GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12;
         GPIO_Init( GPIOB, &GPIO_InitStructure );
+
+        GPIOB->ODR |= GPIO_Pin_12;
+        GPIOB->ODR |= GPIO_Pin_13;
     }
 }
 
@@ -178,21 +177,21 @@ void SX1276WriteBuffer( uint8_t addr, uint8_t *buffer, uint8_t size )
 {
     uint8_t i;
     //NSS = 0;
-    GPIO_WriteBit( NSS_IOPORT, NSS_PIN, Bit_RESET );
+    spiBusSelectSlave( SlaveA );
     spiBusWriteOneByte( addr | 0x80 );
     for( i = 0; i < size; i++ )
     {
         spiBusWriteOneByte( buffer[i] );
     }
     //NSS = 1;
-    GPIO_WriteBit( NSS_IOPORT, NSS_PIN, Bit_SET );
+    spiBusDeselectSlave( SlaveA );
 }
 
 void SX1276ReadBuffer( uint8_t addr, uint8_t *buffer, uint8_t size )
 {
     uint8_t i;
     //NSS = 0;
-    GPIO_WriteBit( NSS_IOPORT, NSS_PIN, Bit_RESET );
+    spiBusSelectSlave( SlaveA );
 
     spiBusWriteOneByte( addr & 0x7F );
 
@@ -200,7 +199,7 @@ void SX1276ReadBuffer( uint8_t addr, uint8_t *buffer, uint8_t size )
     {
         buffer[i] = spiBusWriteOneByte( 0 );
     }
-    GPIO_WriteBit( NSS_IOPORT, NSS_PIN, Bit_SET );
+    spiBusDeselectSlave( SlaveA );
 }
 
 void SX1276Write( uint8_t addr, uint8_t data )
@@ -268,13 +267,14 @@ void SX1276Reset( void )
     SX1276SetReset( RADIO_RESET_ON );
     delay_ms(1);
     SX1276SetReset( RADIO_RESET_OFF );
-    delay_ms(6);
+    delay_ms(10);
 }
 
 
 
 void sx1276PhysicalInterfaceInit()
 {
+#if 0
    GPIO_InitTypeDef GPIO_InitStructure;
 
     RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC, ENABLE );
@@ -282,11 +282,6 @@ void sx1276PhysicalInterfaceInit()
     GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 
-    // Configure NSS as output
-    GPIO_WriteBit( NSS_IOPORT, NSS_PIN, Bit_SET );
-    GPIO_InitStructure.GPIO_Pin = NSS_PIN;
-    GPIO_Init( NSS_IOPORT, &GPIO_InitStructure );
-		
     // Configure radio DIO as inputs
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
 
@@ -309,7 +304,7 @@ void sx1276PhysicalInterfaceInit()
     // Configure DIO5 as input
     GPIO_InitStructure.GPIO_Pin =  DIO5_PIN;
     GPIO_Init( DIO5_IOPORT, &GPIO_InitStructure );
-
+#endif
 }
 
 

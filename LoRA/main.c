@@ -7,11 +7,13 @@
 #include "SPIBus.h"
 #include "sx1276-PhysicalInterface.h"
 #include "sx1276-LoRa.h"
+#include "delay.h"
+
+void ReadTemperature();
 
 
 int main(void)
 {
-  int i;
   GPIO_InitTypeDef  GPIO_InitStructure;
 
   /* Initialize LED which connected to PC13 */
@@ -32,7 +34,6 @@ int main(void)
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-  //GPIO_SetBits(GPIOC, GPIO_Pin_13); // Set C13 to High level ("1")
   GPIO_ResetBits(GPIOC, GPIO_Pin_13); // Set C13 to Low level ("0")
   GPIO_ResetBits(GPIOB, GPIO_Pin_10); // Set C13 to Low level ("0")
 
@@ -49,6 +50,10 @@ int main(void)
 
     spiBusInit();
 
+  	GPIOB->ODR ^= GPIO_Pin_10; // Invert C13
+    delay_ms(1000);
+  	GPIOB->ODR ^= GPIO_Pin_10; // Invert C13
+
     sx1276PhysicalInterfaceInit();
 
     RFM96_LoRaEntryRx();
@@ -60,33 +65,15 @@ int main(void)
     	GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
 
     	/* delay */
-    	for(i=0;i<0x100000;i++);
+        delay_ms(100);
 
     	/* Toggle LED which connected to PC13*/
     	GPIOB->ODR ^= GPIO_Pin_10; // Invert C13
     	GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
 
-    	/* delay */
-    	for(i=0;i<0x100000;i++);
-
-#if 0
-	if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_0) != 0) {
-    	/* Toggle LED which connected to PC13*/
-    	GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
+        ReadTemperature();
 
     	/* delay */
-    	for(i=0;i<0x100000;i++);
-
-    	/* Toggle LED which connected to PC13*/
-    	GPIOC->ODR ^= GPIO_Pin_13;
-
-    	/* delay */
-    	for(i=0;i<0x100000;i++);
-    }
-    else {
-    	GPIO_SetBits(GPIOC, GPIO_Pin_13);
-    }
-#endif
-
+        delay_ms(100);
   }
 }

@@ -22,6 +22,7 @@ void spiBusInit()
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
+
     //
     // Init SlaveSelect2.
     //
@@ -30,6 +31,10 @@ void spiBusInit()
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+    // deselect slave1
+    GPIO_SetBits(GPIOB, GPIO_Pin_0);
+    GPIO_SetBits(GPIOB, GPIO_Pin_1);
 
     /*
      * configure pins used for SPI1
@@ -70,7 +75,7 @@ void spiBusInit()
     SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
     SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
     SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-    SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;
+    SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256;
     SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
     SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
     SPI_Init(SPI1, &SPI_InitStructure);
@@ -80,12 +85,12 @@ void spiBusInit()
 
 void spiBusSelectSlave( SPISlaveID slaveID )
 {
-    GPIO_ResetBits(GPIOB, GPIO_Pin_1);
+    GPIO_ResetBits(GPIOB, GPIO_Pin_1|GPIO_Pin_10);
 }
 
 void spiBusDeselectSlave( SPISlaveID slaveID )
 {
-    GPIO_SetBits(GPIOB, GPIO_Pin_1);
+    GPIO_SetBits(GPIOB, GPIO_Pin_1|GPIO_Pin_10);
 }
 
 uint8_t spiBusWriteOneByte( uint8_t byte )

@@ -121,10 +121,7 @@ void RFM96_Config(uint8_t mode)
     sx1276Reset();
     
   RFM96_Sleep();                                           //Change modem mode Must in Sleep mode 
-  for(i=250;i!=0;i--)                                      //Delay
-  {
-    delay_us(1);  
-  }
+  delay_ms(1);  
 
 
 	  
@@ -179,6 +176,7 @@ void RFM96_Config(uint8_t mode)
     
     RegisterWrite(REG_LR_DIOMAPPING2_LONG+0x01);                     //RegDioMapping2 DIO5=00, DIO4=01
     RFM96_Standby();                                         //Entry standby mode
+
 }
 
 /**********************************************************
@@ -187,10 +185,11 @@ void RFM96_Config(uint8_t mode)
 **Input:    None
 **Output:   None
 **********************************************************/
+uint8_t version = 0x0a;
 void RFM96_LoRaEntryRx(void)
 {
   uint8_t addr; 
-        
+
   RFM96_Config(0);                                         //setting base parameter
   
   RegisterWrite(0x4D00+0x84);                                   //Normal and Rx
@@ -206,7 +205,17 @@ void RFM96_LoRaEntryRx(void)
   addr = RegisterRead((uint8_t)(LR_RegFifoRxBaseAddr>>8));           //Read RxBaseAddr
   RegisterWrite(LR_RegFifoAddrPtr+addr);                        //RxBaseAddr -> FiFoAddrPtr¡¡ 
   RegisterWrite(LR_RegOpMode+0x0D);                        //Continuous Rx Mode
-  
+
+
+    version = RegisterRead(0x42);
+    while( version != 0x12 );
+}
+
+
+uint8_t temperature = 0xaa;
+void ReadTemperature()
+{
+    temperature = RegisterRead(0x03);
 }
 
 /**********************************************************
