@@ -1,5 +1,6 @@
 
 
+#include "Common.h"
 #include "sx1276-PhysicalInterface.h"
 #include "SPIBus.h"
 #include "stm32f10x_gpio.h"
@@ -40,12 +41,12 @@ uint8_t RegisterRead( SPISlaveID id, uint8_t adr)
 {   
     uint8_t tmp;
     
-    spiBusSelectSlave( SlaveA );
+    spiBusSelectSlave( id );
     
     spiBusWriteOneByte(adr&0x7f);
     tmp = spiBusReadOneByte();
     
-    spiBusDeselectSlave( SlaveA );
+    spiBusDeselectSlave( id );
     
     return(tmp);
 }
@@ -58,13 +59,13 @@ uint8_t RegisterRead( SPISlaveID id, uint8_t adr)
 **********************************************************/
 void RegisterWrite( SPISlaveID id, uint16_t WrPara)                
 {                                                  
-    spiBusSelectSlave( SlaveA );                   
+    spiBusSelectSlave( id );                   
     
     WrPara |= 0x8000;                                       
     spiBusWriteOneByte(WrPara>>8);//    15->0
     spiBusWriteOneByte((uint8_t)WrPara);    
     
-    spiBusDeselectSlave( SlaveA );
+    spiBusDeselectSlave( id );
 }   
 
 
@@ -85,7 +86,7 @@ void SPIBurstRead( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
   } 
   else
   {
-    spiBusSelectSlave( SlaveA );
+    spiBusSelectSlave( id );
     
     spiBusWriteOneByte(adr&0x7f);
     for(i=0;i<length;i++)
@@ -93,7 +94,7 @@ void SPIBurstRead( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
         ptr[i] = spiBusWriteOneByte(0xff);
     }   
     
-    spiBusDeselectSlave( SlaveA );
+    spiBusDeselectSlave( id );
   } 
 } 
 
@@ -108,7 +109,7 @@ void SPIBurstRead( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
 **********************************************************/
 void BurstWrite( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
 { 
-    spiBusSelectSlave( SlaveA );
+    spiBusSelectSlave( id );
     
     spiBusWriteOneByte(adr|0x80);
     for(uint8_t i=0;i<length;i++)
@@ -116,7 +117,7 @@ void BurstWrite( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
         spiBusWriteOneByte(ptr[i]);
     }   
     
-    spiBusDeselectSlave( SlaveA );
+    spiBusDeselectSlave( id );
 }   
 
 
@@ -129,16 +130,26 @@ void sx1276Reset(SPISlaveID id)
 
 bool sx1276IsIRQPinAsserted(SPISlaveID id)
 {
-#if 0
-    if(GPIO_ReadInputDataBit(RF_GPIO, RF_IRQ_PIN) != 0) {
-        return true;
+    if(id == SlaveA) {
+        if(GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10) != 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
-    else {
-        return false;
+
+    if(id == SlaveB) {
+        if(GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_11) != 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
-#else
+
+    PANIC("Unimplemented");
     return false;
-#endif
 }
 
 
@@ -147,52 +158,78 @@ void SX1276SetReset( SPISlaveID id, uint8_t state )
 {
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    if( state == RADIO_RESET_ON )
-    {
-        // Set RESET pin to 0
-        GPIO_WriteBit( GPIOB, GPIO_Pin_13, Bit_RESET );
-        GPIO_WriteBit( GPIOB, GPIO_Pin_12, Bit_RESET );
-        // Configure RESET as output
-        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
-        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-        GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12|GPIO_Pin_13;
-        GPIO_Init( GPIOB, &GPIO_InitStructure );
+    if( id == SlaveA ) {
+        if( state == RADIO_RESET_ON )
+        {
+            // Set RESET pin to 0
+            GPIO_WriteBit( GPIOB, GPIO_Pin_12, Bit_RESET );
+            // Configure RESET as output
+            GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
+            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+            GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
+            GPIO_Init( GPIOB, &GPIO_InitStructure );
 
-        GPIOB->ODR &= ~GPIO_Pin_12;
-        GPIOB->ODR &= ~GPIO_Pin_13;
-    }
-    else
-    {
-        // Configure RESET as input
-        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-        GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12|GPIO_Pin_13;
-        GPIO_Init( GPIOB, &GPIO_InitStructure );
+            GPIOB->ODR &= ~GPIO_Pin_12;
+        }
+        else
+        {
+            // Configure RESET as input
+            GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+            GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12;
+            GPIO_Init( GPIOB, &GPIO_InitStructure );
 
-        GPIOB->ODR |= GPIO_Pin_12;
-        GPIOB->ODR |= GPIO_Pin_13;
+            GPIOB->ODR |= GPIO_Pin_12;
+        }
     }
+
+    if( id == SlaveB ) {
+        if( state == RADIO_RESET_ON )
+        {
+            // Set RESET pin to 0
+            GPIO_WriteBit( GPIOB, GPIO_Pin_13, Bit_RESET );
+            // Configure RESET as output
+            GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
+            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+            GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
+            GPIO_Init( GPIOB, &GPIO_InitStructure );
+
+            GPIOB->ODR &= ~GPIO_Pin_13;
+        }
+        else
+        {
+            // Configure RESET as input
+            GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+            GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_13;
+            GPIO_Init( GPIOB, &GPIO_InitStructure );
+
+            GPIOB->ODR |= GPIO_Pin_13;
+        }
+    }
+
+
 }
 
 void SX1276WriteBuffer( SPISlaveID id, uint8_t addr, uint8_t *buffer, uint8_t size )
 {
     uint8_t i;
     //NSS = 0;
-    spiBusSelectSlave( SlaveA );
+    spiBusSelectSlave( id );
     spiBusWriteOneByte( addr | 0x80 );
     for( i = 0; i < size; i++ )
     {
         spiBusWriteOneByte( buffer[i] );
     }
     //NSS = 1;
-    spiBusDeselectSlave( SlaveA );
+    spiBusDeselectSlave( id );
 }
 
 void SX1276ReadBuffer( SPISlaveID id, uint8_t addr, uint8_t *buffer, uint8_t size )
 {
     uint8_t i;
     //NSS = 0;
-    spiBusSelectSlave( SlaveA );
+    spiBusSelectSlave( id );
 
     spiBusWriteOneByte( addr & 0x7F );
 
@@ -200,7 +237,7 @@ void SX1276ReadBuffer( SPISlaveID id, uint8_t addr, uint8_t *buffer, uint8_t siz
     {
         buffer[i] = spiBusWriteOneByte( 0 );
     }
-    spiBusDeselectSlave( SlaveA );
+    spiBusDeselectSlave( id );
 }
 
 void SX1276Write( SPISlaveID id, uint8_t addr, uint8_t data )
@@ -215,7 +252,7 @@ void SX1276Read( SPISlaveID id, uint8_t addr, uint8_t *data )
 
 void SX1276SetIdleState(SPISlaveID id)
 {
- RFState=RF_STATE_IDLE;
+    RFState=RF_STATE_IDLE;
 }
 
 void SX1276WriteFifo( SPISlaveID id, uint8_t *buffer, uint8_t size )
@@ -227,6 +264,7 @@ void SX1276ReadFifo( SPISlaveID id, uint8_t *buffer, uint8_t size )
 {
     SX1276ReadBuffer( id,  0, buffer, size );
 }
+#if 0
 
 uint8_t SX1276ReadDio0( SPISlaveID id )
 {
@@ -242,7 +280,6 @@ uint8_t SX1276ReadDio2( SPISlaveID id )
 {
     return GPIO_ReadInputDataBit( DIO2_IOPORT, DIO2_PIN );
 }
-
 uint8_t SX1276ReadDio3( SPISlaveID id )
 {
 	  return GPIO_ReadInputDataBit( DIO3_IOPORT, DIO3_PIN );
@@ -262,6 +299,7 @@ void SX1276WriteRxTx( SPISlaveID id, uint8_t txEnable )
 {
 
 }
+#endif
 
 void SX1276Reset( SPISlaveID id )
 {
