@@ -85,12 +85,12 @@ void spiBusInit()
 
 void spiBusSelectSlave( SPISlaveID slaveID )
 {
-    GPIO_ResetBits(GPIOB, GPIO_Pin_1|GPIO_Pin_10);
+    GPIO_ResetBits(GPIOB, GPIO_Pin_1);
 }
 
 void spiBusDeselectSlave( SPISlaveID slaveID )
 {
-    GPIO_SetBits(GPIOB, GPIO_Pin_1|GPIO_Pin_10);
+    GPIO_SetBits(GPIOB, GPIO_Pin_1);
 }
 
 uint8_t spiBusWriteOneByte( uint8_t byte )

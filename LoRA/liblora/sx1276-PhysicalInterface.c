@@ -150,11 +150,12 @@ void SX1276SetReset( uint8_t state )
     if( state == RADIO_RESET_ON )
     {
         // Set RESET pin to 0
+        GPIO_WriteBit( GPIOB, GPIO_Pin_13, Bit_RESET );
         GPIO_WriteBit( GPIOB, GPIO_Pin_12, Bit_RESET );
         // Configure RESET as output
         GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-        GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
+        GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12|GPIO_Pin_13;
         GPIO_Init( GPIOB, &GPIO_InitStructure );
 
         GPIOB->ODR &= ~GPIO_Pin_12;
@@ -165,7 +166,7 @@ void SX1276SetReset( uint8_t state )
         // Configure RESET as input
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-        GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12;
+        GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12|GPIO_Pin_13;
         GPIO_Init( GPIOB, &GPIO_InitStructure );
 
         GPIOB->ODR |= GPIO_Pin_12;
