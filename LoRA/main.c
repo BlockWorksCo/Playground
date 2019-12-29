@@ -73,16 +73,14 @@ int main(void)
   GPIO_ResetBits(GPIOB, GPIO_Pin_14); // Set C13 to Low level ("0")
   GPIO_ResetBits(GPIOB, GPIO_Pin_15); // Set C13 to Low level ("0")
 
-#if 0
-  /* Initialize Button input PB0 */
+  /* Initialize Button input PB10 PB11*/
   // Enable PORTB Clock
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
   /* Configure the GPIO_BUTTON pin */
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10|GPIO_Pin_11;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
   GPIO_Init(GPIOB, &GPIO_InitStructure);
-#endif
 
     spiBusInit();
 
@@ -97,7 +95,9 @@ int main(void)
   while (1) {
 
     	/* Toggle LED which connected to PC13*/
-    	GPIOB->ODR ^= GPIO_Pin_15; // Invert C13
+        if(SX1276ReadDio0() == true) {
+        	GPIOB->ODR ^= GPIO_Pin_15; // Invert C13
+        }
     	GPIOB->ODR ^= GPIO_Pin_14; // Invert C13
     	GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
 
@@ -112,5 +112,10 @@ int main(void)
 
     	/* delay */
         delay_ms(100);
+
+        //
+        //
+        //
+        loraReceivePacket( &receiveBuffer[0] );
   }
 }

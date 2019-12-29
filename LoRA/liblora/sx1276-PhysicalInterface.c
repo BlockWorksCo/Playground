@@ -230,7 +230,7 @@ void SX1276ReadFifo( uint8_t *buffer, uint8_t size )
 
 uint8_t SX1276ReadDio0( void )
 {
-    return GPIO_ReadInputDataBit( DIO0_IOPORT, DIO0_PIN );
+    return GPIO_ReadInputDataBit( GPIOB, GPIO_Pin_11 );
 }
 
 uint8_t SX1276ReadDio1( void )
