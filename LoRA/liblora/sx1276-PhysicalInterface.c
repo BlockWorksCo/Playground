@@ -20,16 +20,16 @@ static uint8_t RFState = RF_STATE_IDLE;
 **Output:   None
 **********************************************************/
 uint8_t RegisterRead( SPISlaveID id, uint8_t adr)
-{   
+{
     uint8_t tmp;
-    
+
     spiBusSelectSlave( id );
-    
+
     spiBusWriteOneByte(adr&0x7f);
     tmp = spiBusReadOneByte();
-    
+
     spiBusDeselectSlave( id );
-    
+
     return(tmp);
 }
 
@@ -39,16 +39,16 @@ uint8_t RegisterRead( SPISlaveID id, uint8_t adr)
 **Input:    WrPara -> address & data
 **Output:   None
 **********************************************************/
-void RegisterWrite( SPISlaveID id, uint16_t WrPara)                
-{                                                  
-    spiBusSelectSlave( id );                   
-    
-    WrPara |= 0x8000;                                       
+void RegisterWrite( SPISlaveID id, uint16_t WrPara)
+{
+    spiBusSelectSlave( id );
+
+    WrPara |= 0x8000;
     spiBusWriteOneByte(WrPara>>8);//    15->0
-    spiBusWriteOneByte((uint8_t)WrPara);    
-    
+    spiBusWriteOneByte((uint8_t)WrPara);
+
     spiBusDeselectSlave( id );
-}   
+}
 
 
 /**********************************************************
@@ -61,24 +61,24 @@ void RegisterWrite( SPISlaveID id, uint16_t WrPara)
 **********************************************************/
 void SPIBurstRead( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
 {
-  uint8_t i;
-  if(length<=1)                                            //lengt
-  {
-    return;
-  } 
-  else
-  {
-    spiBusSelectSlave( id );
-    
-    spiBusWriteOneByte(adr&0x7f);
-    for(i=0;i<length;i++)
+    uint8_t i;
+    if(length<=1)                                            //lengt
     {
-        ptr[i] = spiBusWriteOneByte(0xff);
-    }   
-    
-    spiBusDeselectSlave( id );
-  } 
-} 
+        return;
+    }
+    else
+    {
+        spiBusSelectSlave( id );
+
+        spiBusWriteOneByte(adr&0x7f);
+        for(i=0; i<length; i++)
+        {
+            ptr[i] = spiBusWriteOneByte(0xff);
+        }
+
+        spiBusDeselectSlave( id );
+    }
+}
 
 
 /**********************************************************
@@ -90,17 +90,17 @@ void SPIBurstRead( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
 **Output:   none
 **********************************************************/
 void BurstWrite( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
-{ 
+{
     spiBusSelectSlave( id );
-    
+
     spiBusWriteOneByte(adr|0x80);
-    for(uint8_t i=0;i<length;i++)
+    for(uint8_t i=0; i<length; i++)
     {
         spiBusWriteOneByte(ptr[i]);
-    }   
-    
+    }
+
     spiBusDeselectSlave( id );
-}   
+}
 
 
 
