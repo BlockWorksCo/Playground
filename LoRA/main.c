@@ -95,9 +95,6 @@ int main(void)
   while (1) {
 
     	/* Toggle LED which connected to PC13*/
-        if(SX1276ReadDio0() == true) {
-        	GPIOB->ODR ^= GPIO_Pin_15; // Invert C13
-        }
     	GPIOB->ODR ^= GPIO_Pin_14; // Invert C13
     	GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
 
@@ -116,6 +113,19 @@ int main(void)
         //
         //
         //
-        loraReceivePacket( &receiveBuffer[0] );
+        uint8_t length  = loraReceivePacket( &receiveBuffer[0] );
+        if(length > 0) {
+        	GPIOB->ODR |= GPIO_Pin_15; // Invert C13
+            delay_ms(100);
+        	GPIOB->ODR &= ~GPIO_Pin_15; // Invert C13
+        }
+
+        static uint32_t count    = 0;
+        count++;
+        if(count > 10) {
+            count   = 0;
+            uint8_t     packet[32]  = {0,1,2,3,4,5};
+            loraTransmitPacket( &packet[0], sizeof(packet) );
+        }
   }
 }
