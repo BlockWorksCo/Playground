@@ -22,7 +22,7 @@ uint8_t loraReceivePacket( SPISlaveID id, uint8_t* buf )
 
     if ( GPIO_ReadInputDataBit( GPIOB, GPIO_Pin_10 ) != 0 )
     {
-        length = RFM96_LoRaRxPacket( &receiveBuffer[0] );
+        length = RFM96_LoRaRxPacket( id, &receiveBuffer[0] );
 
         RFM96_LoRaEntryRx( id );
     }
@@ -35,8 +35,8 @@ uint8_t loraTransmitPacket( SPISlaveID id, uint8_t* buf, uint8_t size )
 {
     int ret = 0;
 
-    ret = RFM96_LoRaEntryTx(size);
-    ret = RFM96_LoRaTxPacket(buf,size);
+    ret = RFM96_LoRaEntryTx(id, size);
+    ret = RFM96_LoRaTxPacket(id, buf,size);
 
     delay_ms( 10 );
     RFM96_LoRaEntryRx( id );

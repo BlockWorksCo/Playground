@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "SPIBus.h"
 
 
 /**********************************************************
@@ -15,7 +16,7 @@
 **Input:    adr -> address for read
 **Output:   None
 **********************************************************/
-uint8_t RegisterRead(uint8_t adr);
+uint8_t RegisterRead( SPISlaveID id, uint8_t adr);
 
 /**********************************************************
 **Name:     RegisterWrite
@@ -23,7 +24,7 @@ uint8_t RegisterRead(uint8_t adr);
 **Input:    WrPara -> address & data
 **Output:   None
 **********************************************************/
-void RegisterWrite(uint16_t WrPara);
+void RegisterWrite( SPISlaveID id, uint16_t WrPara);
 
 /**********************************************************
 **Name:     SPIBurstRead

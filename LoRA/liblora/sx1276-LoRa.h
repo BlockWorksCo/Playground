@@ -88,9 +88,9 @@ u8 SPIRead(u8 adr);
 void SPIBurstRead(u8 adr, u8 *ptr, u8 length);
 void SX1276ReadBuffer( uint8_t addr, uint8_t *buffer, uint8_t size );
 void RFM96_LoRaEntryRx( SPISlaveID id );
-u8 RFM96_LoRaRxPacket(u8 *buf);
-u8 RFM96_LoRaEntryTx(u8 packet_length);
-u8 RFM96_LoRaTxPacket(u8 *buf,u8 len);
+u8 RFM96_LoRaRxPacket(SPISlaveID id, u8 *buf);
+u8 RFM96_LoRaEntryTx(SPISlaveID id, u8 packet_length);
+u8 RFM96_LoRaTxPacket(SPISlaveID id, u8 *buf,u8 len);
 void delayms(unsigned int t);
 /*!
  * SX1276 Internal registers Address

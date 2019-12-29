@@ -36,7 +36,7 @@ static uint8_t RFState = RF_STATE_IDLE;
 **Input:    adr -> address for read
 **Output:   None
 **********************************************************/
-uint8_t RegisterRead(uint8_t adr)
+uint8_t RegisterRead( SPISlaveID id, uint8_t adr)
 {   
     uint8_t tmp;
     
@@ -56,7 +56,7 @@ uint8_t RegisterRead(uint8_t adr)
 **Input:    WrPara -> address & data
 **Output:   None
 **********************************************************/
-void RegisterWrite(uint16_t WrPara)                
+void RegisterWrite( SPISlaveID id, uint16_t WrPara)                
 {                                                  
     spiBusSelectSlave( SlaveA );                   
     
