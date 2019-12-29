@@ -46,45 +46,45 @@ void SPIBurstRead( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length);
 **********************************************************/
 void BurstWrite( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length);
 
-void sx1276Reset();
+void sx1276Reset( SPISlaveID id );
 
-bool sx1276IsIRQPinAsserted();
+bool sx1276IsIRQPinAsserted( SPISlaveID id );
 
-void SX1276SetReset( uint8_t state );
+void SX1276SetReset( SPISlaveID id, uint8_t state );
 
-void SX1276WriteBuffer( uint8_t addr, uint8_t *buffer, uint8_t size );
+void SX1276WriteBuffer( SPISlaveID id, uint8_t addr, uint8_t *buffer, uint8_t size );
 
-void SX1276ReadBuffer( uint8_t addr, uint8_t *buffer, uint8_t size );
+void SX1276ReadBuffer( SPISlaveID id, uint8_t addr, uint8_t *buffer, uint8_t size );
 
-void SX1276Write( uint8_t addr, uint8_t data );
+void SX1276Write( SPISlaveID id, uint8_t addr, uint8_t data );
 
-void SX1276Read( uint8_t addr, uint8_t *data );
+void SX1276Read( SPISlaveID id, uint8_t addr, uint8_t *data );
 
-void SX1276SetIdleState(void);
+void SX1276SetIdleState( SPISlaveID id );
 
-void SX1276WriteFifo( uint8_t *buffer, uint8_t size );
+void SX1276WriteFifo( SPISlaveID id, uint8_t *buffer, uint8_t size );
 
-void SX1276ReadFifo( uint8_t *buffer, uint8_t size );
+void SX1276ReadFifo( SPISlaveID id, uint8_t *buffer, uint8_t size );
 
-uint8_t SX1276ReadDio0( void );
+uint8_t SX1276ReadDio0(  SPISlaveID id  );
 
-uint8_t SX1276ReadDio1( void );
+uint8_t SX1276ReadDio1(  SPISlaveID id  );
 
-uint8_t SX1276ReadDio2( void );
+uint8_t SX1276ReadDio2(  SPISlaveID id  );
 
-uint8_t SX1276ReadDio3( void );
+uint8_t SX1276ReadDio3(  SPISlaveID id  );
 
-uint8_t SX1276ReadDio4( void );
+uint8_t SX1276ReadDio4(  SPISlaveID id  );
 
-uint8_t SX1276ReadDio5( void );
+uint8_t SX1276ReadDio5(  SPISlaveID id  );
 
-void SX1276WriteRxTx( uint8_t txEnable );
+void SX1276WriteRxTx( SPISlaveID id, uint8_t txEnable );
 
-void SX1276Reset( void );
+void SX1276Reset(  SPISlaveID id  );
 
-void sx1276PhysicalInterfaceInit();
+void sx1276PhysicalInterfaceInit(SPISlaveID id);
 
-uint8_t SPICmd8bit(uint8_t WrPara);
+uint8_t SPICmd8bit(SPISlaveID id, uint8_t WrPara);
 
 
 #endif

@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include "stm32f10x_gpio.h"
 #include "sx1276-LoRaMisc.h"
+#include "SPIBus.h"
 
 
 
@@ -863,7 +864,7 @@ typedef struct sSX1276
 #define RFLR_MODEMCONFIG3_AGCAUTO_ON                0x04 // Default 
 #define RFLR_MODEMCONFIG3_AGCAUTO_OFF               0x00 
 
-#define RXTX( txEnable )                            SX1276WriteRxTx( txEnable );
+#define RXTX( txEnable )                            SX1276WriteRxTx( id, txEnable );
 
 
 /*!
@@ -1990,12 +1991,12 @@ typedef struct sSX1276
 #define MODULE_SX1276RF1JAS                         0
 #define MODULE_SX1276RF1KAS                         1
 
-#define DIO0                                        SX1276ReadDio0( )
-#define DIO1                                        SX1276ReadDio1( )
-#define DIO2                                        SX1276ReadDio2( )
-#define DIO3                                        SX1276ReadDio3( )
-#define DIO4                                        SX1276ReadDio4( )
-#define DIO5                                        SX1276ReadDio5( )
+#define DIO0                                        SX1276ReadDio0( id )
+#define DIO1                                        SX1276ReadDio1( id )
+#define DIO2                                        SX1276ReadDio2( id )
+//#define DIO3                                        SX1276ReadDio3( )
+//#define DIO4                                        SX1276ReadDio4( )
+//#define DIO5                                        SX1276ReadDio5( )
 /*!
  * Constant values need to compute the RSSI value
  */
@@ -2014,12 +2015,11 @@ tSX1276LR* SX1276LR;
 
 
 
-void  SX1276StartRx(void);
-uint32_t SX1276Process(void); //根据状态处理所有
-void RF_Sx1276_Init(void);
-void SX1276SetIdleState(void);
-void SX1276GetRxPacket( void *buffer, uint16_t *size );
-void SX1276SetTxPacket( const void *buffer, uint16_t size );
-void SX1276LoRaSetRFFrequency( uint32_t freq );
+void  SX1276StartRx( SPISlaveID id );
+//void RF_Sx1276_Init(void);
+void SX1276SetIdleState( SPISlaveID id );
+void SX1276GetRxPacket( SPISlaveID id, void *buffer, uint16_t *size );
+void SX1276SetTxPacket( SPISlaveID id, const void *buffer, uint16_t size );
+void SX1276LoRaSetRFFrequency( SPISlaveID id, uint32_t freq );
 
 #endif 

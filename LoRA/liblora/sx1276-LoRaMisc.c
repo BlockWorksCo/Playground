@@ -44,7 +44,7 @@
 
 extern tLoRaSettings LoRaSettings;
 
-void SX1276LoRaSetRFFrequency( uint32_t freq )
+void SX1276LoRaSetRFFrequency( SPISlaveID id, uint32_t freq )
 {
     LoRaSettings.RFFrequency = freq;
 
@@ -52,10 +52,10 @@ void SX1276LoRaSetRFFrequency( uint32_t freq )
     SX1276LR->RegFrfMsb = ( uint8_t )( ( freq >> 16 ) & 0xFF );
     SX1276LR->RegFrfMid = ( uint8_t )( ( freq >> 8 ) & 0xFF );
     SX1276LR->RegFrfLsb = ( uint8_t )( freq & 0xFF );
-    SX1276WriteBuffer( REG_LR_FRFMSB, &SX1276LR->RegFrfMsb, 3 );
+    SX1276WriteBuffer( id,  REG_LR_FRFMSB, &SX1276LR->RegFrfMsb, 3 );
 	
 //下面设置PA 功率，如果频率低于860Mhz 的就设置输出功率可以20dbm
-    SX1276Read( REG_LR_PACONFIG, &SX1276LR->RegPaConfig );
+    SX1276Read( id,  REG_LR_PACONFIG, &SX1276LR->RegPaConfig );
 
     if( LoRaSettings.RFFrequency > 860000000 )
     {
@@ -65,22 +65,22 @@ void SX1276LoRaSetRFFrequency( uint32_t freq )
     {
         SX1276LR->RegPaConfig = ( SX1276LR->RegPaConfig & RFLR_PACONFIG_PASELECT_MASK ) | RFLR_PACONFIG_PASELECT_PABOOST;
     } 
-    SX1276Write( REG_LR_PACONFIG, SX1276LR->RegPaConfig );   
+    SX1276Write( id,  REG_LR_PACONFIG, SX1276LR->RegPaConfig );   
 }
 
-uint32_t SX1276LoRaGetRFFrequency( void )
+uint32_t SX1276LoRaGetRFFrequency( SPISlaveID id )
 {
-    SX1276ReadBuffer( REG_LR_FRFMSB, &SX1276LR->RegFrfMsb, 3 );
+    SX1276ReadBuffer( id,  REG_LR_FRFMSB, &SX1276LR->RegFrfMsb, 3 );
     LoRaSettings.RFFrequency = ( ( uint32_t )SX1276LR->RegFrfMsb << 16 ) | ( ( uint32_t )SX1276LR->RegFrfMid << 8 ) | ( ( uint32_t )SX1276LR->RegFrfLsb );
     LoRaSettings.RFFrequency = ( uint32_t )( ( double )LoRaSettings.RFFrequency * ( double )FREQ_STEP );
 
     return LoRaSettings.RFFrequency;
 }
 
-void SX1276LoRaSetRFPower( int8_t power )
+void SX1276LoRaSetRFPower( SPISlaveID id, int8_t power )
 {
-    SX1276Read( REG_LR_PACONFIG, &SX1276LR->RegPaConfig );
-    SX1276Read( REG_LR_PADAC, &SX1276LR->RegPaDac );
+    SX1276Read( id,  REG_LR_PACONFIG, &SX1276LR->RegPaConfig );
+    SX1276Read( id,  REG_LR_PADAC, &SX1276LR->RegPaDac );
     
     if( ( SX1276LR->RegPaConfig & RFLR_PACONFIG_PASELECT_PABOOST ) == RFLR_PACONFIG_PASELECT_PABOOST )
     {
@@ -124,14 +124,14 @@ void SX1276LoRaSetRFPower( int8_t power )
         SX1276LR->RegPaConfig = ( SX1276LR->RegPaConfig & RFLR_PACONFIG_MAX_POWER_MASK ) | 0x70;
         SX1276LR->RegPaConfig = ( SX1276LR->RegPaConfig & RFLR_PACONFIG_OUTPUTPOWER_MASK ) | ( uint8_t )( ( uint16_t )( power + 1 ) & 0x0F );
     }
-    SX1276Write( REG_LR_PACONFIG, SX1276LR->RegPaConfig );
+    SX1276Write( id,  REG_LR_PACONFIG, SX1276LR->RegPaConfig );
     LoRaSettings.Power = power;
 }
 
-int8_t SX1276LoRaGetRFPower( void )
+int8_t SX1276LoRaGetRFPower( SPISlaveID id )
 {
-    SX1276Read( REG_LR_PACONFIG, &SX1276LR->RegPaConfig );
-    SX1276Read( REG_LR_PADAC, &SX1276LR->RegPaDac );
+    SX1276Read( id,  REG_LR_PACONFIG, &SX1276LR->RegPaConfig );
+    SX1276Read( id,  REG_LR_PADAC, &SX1276LR->RegPaDac );
 
     if( ( SX1276LR->RegPaConfig & RFLR_PACONFIG_PASELECT_PABOOST ) == RFLR_PACONFIG_PASELECT_PABOOST )
     {
@@ -151,22 +151,22 @@ int8_t SX1276LoRaGetRFPower( void )
     return LoRaSettings.Power;
 }
 
-void SX1276LoRaSetSignalBandwidth( uint8_t bw )
+void SX1276LoRaSetSignalBandwidth( SPISlaveID id, uint8_t bw )
 {
-    SX1276Read( REG_LR_MODEMCONFIG1, &SX1276LR->RegModemConfig1 );
+    SX1276Read( id,  REG_LR_MODEMCONFIG1, &SX1276LR->RegModemConfig1 );
     SX1276LR->RegModemConfig1 = ( SX1276LR->RegModemConfig1 & RFLR_MODEMCONFIG1_BW_MASK ) | ( bw << 4 );
-    SX1276Write( REG_LR_MODEMCONFIG1, SX1276LR->RegModemConfig1 );
+    SX1276Write( id,  REG_LR_MODEMCONFIG1, SX1276LR->RegModemConfig1 );
     LoRaSettings.SignalBw = bw;
 }
 
-uint8_t SX1276LoRaGetSignalBandwidth( void )
+uint8_t SX1276LoRaGetSignalBandwidth( SPISlaveID id )
 {
-    SX1276Read( REG_LR_MODEMCONFIG1, &SX1276LR->RegModemConfig1 );
+    SX1276Read( id,  REG_LR_MODEMCONFIG1, &SX1276LR->RegModemConfig1 );
     LoRaSettings.SignalBw = ( SX1276LR->RegModemConfig1 & ~RFLR_MODEMCONFIG1_BW_MASK ) >> 4;
     return LoRaSettings.SignalBw;
 }
 
-void SX1276LoRaSetSpreadingFactor( uint8_t factor )
+void SX1276LoRaSetSpreadingFactor( SPISlaveID id, uint8_t factor )
 {
     //uint8_t len;
     if( factor > 12 )
@@ -188,153 +188,153 @@ void SX1276LoRaSetSpreadingFactor( uint8_t factor )
         //SX1276LoRaSetNbTrigPeaks( 3 );
 		//len=3;
     }
-	 SX1276Write( 0x31, SX1276LR->RegTestReserved31 );
+	 SX1276Write( id,  0x31, SX1276LR->RegTestReserved31 );
 
-    SX1276Read( REG_LR_MODEMCONFIG2, &SX1276LR->RegModemConfig2 );    
+    SX1276Read( id,  REG_LR_MODEMCONFIG2, &SX1276LR->RegModemConfig2 );    
     SX1276LR->RegModemConfig2 = ( SX1276LR->RegModemConfig2 & RFLR_MODEMCONFIG2_SF_MASK ) | ( factor << 4 );
-    SX1276Write( REG_LR_MODEMCONFIG2, SX1276LR->RegModemConfig2 );    
+    SX1276Write( id,  REG_LR_MODEMCONFIG2, SX1276LR->RegModemConfig2 );    
     LoRaSettings.SpreadingFactor = factor;
 }
 
-uint8_t SX1276LoRaGetSpreadingFactor( void )
+uint8_t SX1276LoRaGetSpreadingFactor( SPISlaveID id )
 {
-    SX1276Read( REG_LR_MODEMCONFIG2, &SX1276LR->RegModemConfig2 );   
+    SX1276Read( id,  REG_LR_MODEMCONFIG2, &SX1276LR->RegModemConfig2 );   
     LoRaSettings.SpreadingFactor = ( SX1276LR->RegModemConfig2 & ~RFLR_MODEMCONFIG2_SF_MASK ) >> 4;
     return LoRaSettings.SpreadingFactor;
 }
 
-void SX1276LoRaSetErrorCoding( uint8_t value )
+void SX1276LoRaSetErrorCoding( SPISlaveID id, uint8_t value )
 {
-    SX1276Read( REG_LR_MODEMCONFIG1, &SX1276LR->RegModemConfig1 );
+    SX1276Read( id,  REG_LR_MODEMCONFIG1, &SX1276LR->RegModemConfig1 );
     SX1276LR->RegModemConfig1 = ( SX1276LR->RegModemConfig1 & RFLR_MODEMCONFIG1_CODINGRATE_MASK ) | ( value << 1 );
-    SX1276Write( REG_LR_MODEMCONFIG1, SX1276LR->RegModemConfig1 );
+    SX1276Write( id,  REG_LR_MODEMCONFIG1, SX1276LR->RegModemConfig1 );
     LoRaSettings.ErrorCoding = value;
 }
 
-uint8_t SX1276LoRaGetErrorCoding( void )
+uint8_t SX1276LoRaGetErrorCoding( SPISlaveID id )
 {
-    SX1276Read( REG_LR_MODEMCONFIG1, &SX1276LR->RegModemConfig1 );
+    SX1276Read( id,  REG_LR_MODEMCONFIG1, &SX1276LR->RegModemConfig1 );
     LoRaSettings.ErrorCoding = ( SX1276LR->RegModemConfig1 & ~RFLR_MODEMCONFIG1_CODINGRATE_MASK ) >> 1;
     return LoRaSettings.ErrorCoding;
 }
 
-void SX1276LoRaSetPacketCrcOn( bool enable )
+void SX1276LoRaSetPacketCrcOn( SPISlaveID id, bool enable )
 {
-    SX1276Read( REG_LR_MODEMCONFIG2, &SX1276LR->RegModemConfig2 );
+    SX1276Read( id,  REG_LR_MODEMCONFIG2, &SX1276LR->RegModemConfig2 );
     SX1276LR->RegModemConfig2 = ( SX1276LR->RegModemConfig2 & RFLR_MODEMCONFIG2_RXPAYLOADCRC_MASK ) | ( enable << 2 );
-    SX1276Write( REG_LR_MODEMCONFIG2, SX1276LR->RegModemConfig2 );
+    SX1276Write( id,  REG_LR_MODEMCONFIG2, SX1276LR->RegModemConfig2 );
     LoRaSettings.CrcOn = enable;
 }
 
-void SX1276LoRaSetPreambleLength( uint16_t value )
+void SX1276LoRaSetPreambleLength( SPISlaveID id, uint16_t value )
 {
-    SX1276ReadBuffer( REG_LR_PREAMBLEMSB, &SX1276LR->RegPreambleMsb, 2 );
+    SX1276ReadBuffer( id,  REG_LR_PREAMBLEMSB, &SX1276LR->RegPreambleMsb, 2 );
 
     SX1276LR->RegPreambleMsb = ( value >> 8 ) & 0x00FF;
     SX1276LR->RegPreambleLsb = value & 0xFF;
-    SX1276WriteBuffer( REG_LR_PREAMBLEMSB, &SX1276LR->RegPreambleMsb, 2 );
+    SX1276WriteBuffer( id,  REG_LR_PREAMBLEMSB, &SX1276LR->RegPreambleMsb, 2 );
 }
 
-uint16_t SX1276LoRaGetPreambleLength( void )
+uint16_t SX1276LoRaGetPreambleLength( SPISlaveID id )
 {
-    SX1276ReadBuffer( REG_LR_PREAMBLEMSB, &SX1276LR->RegPreambleMsb, 2 );
+    SX1276ReadBuffer( id,  REG_LR_PREAMBLEMSB, &SX1276LR->RegPreambleMsb, 2 );
     return ( ( SX1276LR->RegPreambleMsb & 0x00FF ) << 8 ) | SX1276LR->RegPreambleLsb;
 }
 
-bool SX1276LoRaGetPacketCrcOn( void )
+bool SX1276LoRaGetPacketCrcOn( SPISlaveID id )
 {
-    SX1276Read( REG_LR_MODEMCONFIG2, &SX1276LR->RegModemConfig2 );
+    SX1276Read( id,  REG_LR_MODEMCONFIG2, &SX1276LR->RegModemConfig2 );
     LoRaSettings.CrcOn = ( SX1276LR->RegModemConfig2 & RFLR_MODEMCONFIG2_RXPAYLOADCRC_ON ) >> 1;
     return LoRaSettings.CrcOn;
 }
 
-void SX1276LoRaSetImplicitHeaderOn( bool enable )
+void SX1276LoRaSetImplicitHeaderOn( SPISlaveID id, bool enable )
 {
-    SX1276Read( REG_LR_MODEMCONFIG1, &SX1276LR->RegModemConfig1 );
+    SX1276Read( id,  REG_LR_MODEMCONFIG1, &SX1276LR->RegModemConfig1 );
     SX1276LR->RegModemConfig1 = ( SX1276LR->RegModemConfig1 & RFLR_MODEMCONFIG1_IMPLICITHEADER_MASK ) | ( enable );
-    SX1276Write( REG_LR_MODEMCONFIG1, SX1276LR->RegModemConfig1 );
+    SX1276Write( id,  REG_LR_MODEMCONFIG1, SX1276LR->RegModemConfig1 );
     LoRaSettings.ImplicitHeaderOn = enable;
 }
 
-bool SX1276LoRaGetImplicitHeaderOn( void )
+bool SX1276LoRaGetImplicitHeaderOn( SPISlaveID id )
 {
-    SX1276Read( REG_LR_MODEMCONFIG1, &SX1276LR->RegModemConfig1 );
+    SX1276Read( id,  REG_LR_MODEMCONFIG1, &SX1276LR->RegModemConfig1 );
     LoRaSettings.ImplicitHeaderOn = ( SX1276LR->RegModemConfig1 & RFLR_MODEMCONFIG1_IMPLICITHEADER_ON );
     return LoRaSettings.ImplicitHeaderOn;
 }
 
-void SX1276LoRaSetRxSingleOn( bool enable )
+void SX1276LoRaSetRxSingleOn( SPISlaveID id, bool enable )
 {
     LoRaSettings.RxSingleOn = enable;
 }
 
-bool SX1276LoRaGetRxSingleOn( void )
+bool SX1276LoRaGetRxSingleOn( SPISlaveID id )
 {
     return LoRaSettings.RxSingleOn;
 }
 
-void SX1276LoRaSetFreqHopOn( bool enable )
+void SX1276LoRaSetFreqHopOn( SPISlaveID id, bool enable )
 {
     LoRaSettings.FreqHopOn = enable;
 }
 
-bool SX1276LoRaGetFreqHopOn( void )
+bool SX1276LoRaGetFreqHopOn( SPISlaveID id )
 {
     return LoRaSettings.FreqHopOn;
 }
 
-void SX1276LoRaSetHopPeriod( uint8_t value )
+void SX1276LoRaSetHopPeriod( SPISlaveID id, uint8_t value )
 {
     SX1276LR->RegHopPeriod = value;
-    SX1276Write( REG_LR_HOPPERIOD, SX1276LR->RegHopPeriod );
+    SX1276Write( id,  REG_LR_HOPPERIOD, SX1276LR->RegHopPeriod );
     LoRaSettings.HopPeriod = value;
 }
 
-uint8_t SX1276LoRaGetHopPeriod( void )
+uint8_t SX1276LoRaGetHopPeriod( SPISlaveID id )
 {
-    SX1276Read( REG_LR_HOPPERIOD, &SX1276LR->RegHopPeriod );
+    SX1276Read( id,  REG_LR_HOPPERIOD, &SX1276LR->RegHopPeriod );
     LoRaSettings.HopPeriod = SX1276LR->RegHopPeriod;
     return LoRaSettings.HopPeriod;
 }
 
-void SX1276LoRaSetTxPacketTimeout( uint32_t value )
+void SX1276LoRaSetTxPacketTimeout( SPISlaveID id, uint32_t value )
 {
     LoRaSettings.TxPacketTimeout = value;
 }
 
-uint32_t SX1276LoRaGetTxPacketTimeout( void )
+uint32_t SX1276LoRaGetTxPacketTimeout( SPISlaveID id )
 {
     return LoRaSettings.TxPacketTimeout;
 }
 
-void SX1276LoRaSetRxPacketTimeout( uint32_t value )
+void SX1276LoRaSetRxPacketTimeout( SPISlaveID id, uint32_t value )
 {
     LoRaSettings.RxPacketTimeout = value;
 }
 
-uint32_t SX1276LoRaGetRxPacketTimeout( void )
+uint32_t SX1276LoRaGetRxPacketTimeout( SPISlaveID id )
 {
     return LoRaSettings.RxPacketTimeout;
 }
 
-void SX1276LoRaSetPayloadLength( uint8_t value )
+void SX1276LoRaSetPayloadLength( SPISlaveID id, uint8_t value )
 {
     SX1276LR->RegPayloadLength = value;
-    SX1276Write( REG_LR_PAYLOADLENGTH, SX1276LR->RegPayloadLength );
+    SX1276Write( id,  REG_LR_PAYLOADLENGTH, SX1276LR->RegPayloadLength );
     LoRaSettings.PayloadLength = value;
 }
 
-uint8_t SX1276LoRaGetPayloadLength( void )
+uint8_t SX1276LoRaGetPayloadLength( SPISlaveID id )
 {
-    SX1276Read( REG_LR_PAYLOADLENGTH, &SX1276LR->RegPayloadLength );
+    SX1276Read( id,  REG_LR_PAYLOADLENGTH, &SX1276LR->RegPayloadLength );
     LoRaSettings.PayloadLength = SX1276LR->RegPayloadLength;
     return LoRaSettings.PayloadLength;
 }
 
-void SX1276LoRaSetPa20dBm( bool enale )
+void SX1276LoRaSetPa20dBm( SPISlaveID id, bool enale )
 {
-    SX1276Read( REG_LR_PADAC, &SX1276LR->RegPaDac );
-    SX1276Read( REG_LR_PACONFIG, &SX1276LR->RegPaConfig );
+    SX1276Read( id,  REG_LR_PADAC, &SX1276LR->RegPaDac );
+    SX1276Read( id,  REG_LR_PACONFIG, &SX1276LR->RegPaConfig );
 
     if( ( SX1276LR->RegPaConfig & RFLR_PACONFIG_PASELECT_PABOOST ) == RFLR_PACONFIG_PASELECT_PABOOST )
     {    
@@ -347,67 +347,67 @@ void SX1276LoRaSetPa20dBm( bool enale )
     {
         SX1276LR->RegPaDac = 0x84;
     }
-    SX1276Write( REG_LR_PADAC, SX1276LR->RegPaDac );
+    SX1276Write( id,  REG_LR_PADAC, SX1276LR->RegPaDac );
 }
 
-bool SX1276LoRaGetPa20dBm( void )
+bool SX1276LoRaGetPa20dBm( SPISlaveID id )
 {
-    SX1276Read( REG_LR_PADAC, &SX1276LR->RegPaDac );
+    SX1276Read( id,  REG_LR_PADAC, &SX1276LR->RegPaDac );
     
     return ( ( SX1276LR->RegPaDac & 0x07 ) == 0x07 ) ? true : false;
 }
 
-void SX1276LoRaSetPaRamp( uint8_t value )
+void SX1276LoRaSetPaRamp( SPISlaveID id, uint8_t value )
 {
-    SX1276Read( REG_LR_PARAMP, &SX1276LR->RegPaRamp );
+    SX1276Read( id,  REG_LR_PARAMP, &SX1276LR->RegPaRamp );
     SX1276LR->RegPaRamp = ( SX1276LR->RegPaRamp & RFLR_PARAMP_MASK ) | ( value & ~RFLR_PARAMP_MASK );
-    SX1276Write( REG_LR_PARAMP, SX1276LR->RegPaRamp );
+    SX1276Write( id,  REG_LR_PARAMP, SX1276LR->RegPaRamp );
 }
 
-uint8_t SX1276LoRaGetPaRamp( void )
+uint8_t SX1276LoRaGetPaRamp( SPISlaveID id )
 {
-    SX1276Read( REG_LR_PARAMP, &SX1276LR->RegPaRamp );
+    SX1276Read( id,  REG_LR_PARAMP, &SX1276LR->RegPaRamp );
     return SX1276LR->RegPaRamp & ~RFLR_PARAMP_MASK;
 }
 
-void SX1276LoRaSetSymbTimeout( uint16_t value )
+void SX1276LoRaSetSymbTimeout( SPISlaveID id, uint16_t value )
 {
-    SX1276ReadBuffer( REG_LR_MODEMCONFIG2, &SX1276LR->RegModemConfig2, 2 );
+    SX1276ReadBuffer( id,  REG_LR_MODEMCONFIG2, &SX1276LR->RegModemConfig2, 2 );
 
     SX1276LR->RegModemConfig2 = ( SX1276LR->RegModemConfig2 & RFLR_MODEMCONFIG2_SYMBTIMEOUTMSB_MASK ) | ( ( value >> 8 ) & ~RFLR_MODEMCONFIG2_SYMBTIMEOUTMSB_MASK );
     SX1276LR->RegSymbTimeoutLsb = value & 0xFF;
-    SX1276WriteBuffer( REG_LR_MODEMCONFIG2, &SX1276LR->RegModemConfig2, 2 );
+    SX1276WriteBuffer( id,  REG_LR_MODEMCONFIG2, &SX1276LR->RegModemConfig2, 2 );
 }
 
-uint16_t SX1276LoRaGetSymbTimeout( void )
+uint16_t SX1276LoRaGetSymbTimeout( SPISlaveID id )
 {
-    SX1276ReadBuffer( REG_LR_MODEMCONFIG2, &SX1276LR->RegModemConfig2, 2 );
+    SX1276ReadBuffer( id,  REG_LR_MODEMCONFIG2, &SX1276LR->RegModemConfig2, 2 );
     return ( ( SX1276LR->RegModemConfig2 & ~RFLR_MODEMCONFIG2_SYMBTIMEOUTMSB_MASK ) << 8 ) | SX1276LR->RegSymbTimeoutLsb;
 }
 
-void SX1276LoRaSetLowDatarateOptimize( bool enable )
+void SX1276LoRaSetLowDatarateOptimize( SPISlaveID id, bool enable )
 {
-    SX1276Read( REG_LR_MODEMCONFIG3, &SX1276LR->RegModemConfig3 );
+    SX1276Read( id,  REG_LR_MODEMCONFIG3, &SX1276LR->RegModemConfig3 );
     SX1276LR->RegModemConfig3 = ( SX1276LR->RegModemConfig3 & RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_MASK ) | ( enable << 3 );
-    SX1276Write( REG_LR_MODEMCONFIG3, SX1276LR->RegModemConfig3 );
+    SX1276Write( id,  REG_LR_MODEMCONFIG3, SX1276LR->RegModemConfig3 );
 }
 
-bool SX1276LoRaGetLowDatarateOptimize( void )
+bool SX1276LoRaGetLowDatarateOptimize( SPISlaveID id )
 {
-    SX1276Read( REG_LR_MODEMCONFIG3, &SX1276LR->RegModemConfig3 );
+    SX1276Read( id,  REG_LR_MODEMCONFIG3, &SX1276LR->RegModemConfig3 );
     return ( ( SX1276LR->RegModemConfig3 & RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_ON ) >> 3 );
 }
 
-void SX1276LoRaSetNbTrigPeaks( uint8_t value )
+void SX1276LoRaSetNbTrigPeaks( SPISlaveID id, uint8_t value )
 {
-    SX1276Read( 0x31, &SX1276LR->RegTestReserved31 );
+    SX1276Read( id,  0x31, &SX1276LR->RegTestReserved31 );
     SX1276LR->RegTestReserved31 = ( SX1276LR->RegTestReserved31 & 0xF8 ) | value;
-    SX1276Write( 0x31, SX1276LR->RegTestReserved31 );
+    SX1276Write( id,  0x31, SX1276LR->RegTestReserved31 );
 }
 
-uint8_t SX1276LoRaGetNbTrigPeaks( void )
+uint8_t SX1276LoRaGetNbTrigPeaks( SPISlaveID id )
 {
-    SX1276Read( 0x31, &SX1276LR->RegTestReserved31 );
+    SX1276Read( id,  0x31, &SX1276LR->RegTestReserved31 );
     return ( SX1276LR->RegTestReserved31 & 0x07 );
 }
 

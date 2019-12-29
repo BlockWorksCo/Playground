@@ -118,7 +118,7 @@ void RFM96_Config( SPISlaveID id, uint8_t mode)
 {
   uint8_t i; 
     
-    sx1276Reset();
+    sx1276Reset(id);
     
   RFM96_Sleep(id);                                           //Change modem mode Must in Sleep mode 
   delay_ms(1);  

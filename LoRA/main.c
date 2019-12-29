@@ -88,7 +88,8 @@ int main(void)
     delay_ms(1000);
   	GPIOB->ODR ^= GPIO_Pin_15; // Invert C13
 
-    sx1276PhysicalInterfaceInit();
+    sx1276PhysicalInterfaceInit( SlaveA );
+    sx1276PhysicalInterfaceInit( SlaveB );
 
     RFM96_LoRaEntryRx( SlaveA );
     RFM96_LoRaEntryRx( SlaveB );
