@@ -20,6 +20,9 @@
  */
 #ifndef __SX1276_LORA_H__
 #define __SX1276_LORA_H__
+
+
+#include "SPIBus.h"
    
 /*   
   #define LED_TX           PD_ODR_ODR7
@@ -84,7 +87,7 @@ typedef unsigned char INT8U;
 u8 SPIRead(u8 adr);
 void SPIBurstRead(u8 adr, u8 *ptr, u8 length);
 void SX1276ReadBuffer( uint8_t addr, uint8_t *buffer, uint8_t size );
-void RFM96_LoRaEntryRx(void);
+void RFM96_LoRaEntryRx( SPISlaveID id );
 u8 RFM96_LoRaRxPacket(u8 *buf);
 u8 RFM96_LoRaEntryTx(u8 packet_length);
 u8 RFM96_LoRaTxPacket(u8 *buf,u8 len);

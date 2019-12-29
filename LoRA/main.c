@@ -16,7 +16,7 @@ uint8_t receiveBuffer[128]  = {0};
 
 
 
-uint8_t loraReceivePacket( uint8_t* buf )
+uint8_t loraReceivePacket( SPISlaveID id, uint8_t* buf )
 {
     uint8_t length = 0;
 
@@ -24,14 +24,14 @@ uint8_t loraReceivePacket( uint8_t* buf )
     {
         length = RFM96_LoRaRxPacket( &receiveBuffer[0] );
 
-        RFM96_LoRaEntryRx();
+        RFM96_LoRaEntryRx( id );
     }
 
     return length;
 }
 
 
-uint8_t loraTransmitPacket( uint8_t* buf, uint8_t size )
+uint8_t loraTransmitPacket( SPISlaveID id, uint8_t* buf, uint8_t size )
 {
     int ret = 0;
 
@@ -39,7 +39,7 @@ uint8_t loraTransmitPacket( uint8_t* buf, uint8_t size )
     ret = RFM96_LoRaTxPacket(buf,size);
 
     delay_ms( 10 );
-    RFM96_LoRaEntryRx();
+    RFM96_LoRaEntryRx( id );
 
     return ret;
 }
@@ -90,7 +90,8 @@ int main(void)
 
     sx1276PhysicalInterfaceInit();
 
-    RFM96_LoRaEntryRx();
+    RFM96_LoRaEntryRx( SlaveA );
+    RFM96_LoRaEntryRx( SlaveB );
 
   while (1) {
 
@@ -113,7 +114,7 @@ int main(void)
         //
         //
         //
-        uint8_t length  = loraReceivePacket( &receiveBuffer[0] );
+        uint8_t length  = loraReceivePacket( SlaveA, &receiveBuffer[0] );
         if(length > 0) {
         	GPIOB->ODR |= GPIO_Pin_15; // Invert C13
             delay_ms(100);
@@ -125,7 +126,7 @@ int main(void)
         if(count > 10) {
             count   = 0;
             uint8_t     packet[32]  = {0,1,2,3,4,5};
-            loraTransmitPacket( &packet[0], sizeof(packet) );
+            loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
         }
   }
 }

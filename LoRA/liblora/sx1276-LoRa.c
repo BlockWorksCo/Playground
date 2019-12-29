@@ -186,27 +186,30 @@ void RFM96_Config(uint8_t mode)
 **Output:   None
 **********************************************************/
 uint8_t version = 0x0a;
-void RFM96_LoRaEntryRx(void)
+void RFM96_LoRaEntryRx( SPISlaveID id )
 {
-  uint8_t addr; 
+    uint8_t addr; 
 
-  RFM96_Config(0);                                         //setting base parameter
-  
-  RegisterWrite(0x4D00+0x84);                                   //Normal and Rx
-  RegisterWrite(LR_RegHopPeriod+0xFF);                          //RegHopPeriod NO FHSS
-  RegisterWrite(REG_LR_DIOMAPPING1_LONG+0x01);                       //DIO0=00, DIO1=00, DIO2=00, DIO3=01  DIO0=00--RXDONE
+    RFM96_Config(0);                                         //setting base parameter
+
+    RegisterWrite(0x4D00+0x84);                                   //Normal and Rx
+    RegisterWrite(LR_RegHopPeriod+0xFF);                          //RegHopPeriod NO FHSS
+    RegisterWrite(REG_LR_DIOMAPPING1_LONG+0x01);                       //DIO0=00, DIO1=00, DIO2=00, DIO3=01  DIO0=00--RXDONE
       
-  RegisterWrite(LR_RegIrqFlagsMask+0x3F);                       //Open RxDone interrupt & Timeout
-  RFM96_LoRaClearIrq();   
-  
-  //TODO
-  RegisterWrite(LR_RegPayloadLength+21);                       //RegPayloadLength  21byte(this register must difine when the data long of one byte in SF is 6)
-    
-  addr = RegisterRead((uint8_t)(LR_RegFifoRxBaseAddr>>8));           //Read RxBaseAddr
-  RegisterWrite(LR_RegFifoAddrPtr+addr);                        //RxBaseAddr -> FiFoAddrPtr¡¡ 
-  RegisterWrite(LR_RegOpMode+0x0D);                        //Continuous Rx Mode
+    RegisterWrite(LR_RegIrqFlagsMask+0x3F);                       //Open RxDone interrupt & Timeout
+    RFM96_LoRaClearIrq();   
+
+    //TODO
+    RegisterWrite(LR_RegPayloadLength+21);                       //RegPayloadLength  21byte(this register must difine when the data long of one byte in SF is 6)
+
+    addr = RegisterRead((uint8_t)(LR_RegFifoRxBaseAddr>>8));           //Read RxBaseAddr
+    RegisterWrite(LR_RegFifoAddrPtr+addr);                        //RxBaseAddr -> FiFoAddrPtr¡¡ 
+    RegisterWrite(LR_RegOpMode+0x0D);                        //Continuous Rx Mode
 
 
+    //
+    // Identifier check (version == 0x12)
+    //
     version = RegisterRead(0x42);
     while( version != 0x12 );
 }
