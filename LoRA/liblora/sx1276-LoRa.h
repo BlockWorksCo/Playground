@@ -1,18 +1,18 @@
 /*
- * THE FOLLOWING FIRMWARE IS PROVIDED: (1) "AS IS" WITH NO WARRANTY; AND 
+ * THE FOLLOWING FIRMWARE IS PROVIDED: (1) "AS IS" WITH NO WARRANTY; AND
  * (2)TO ENABLE ACCESS TO CODING INFORMATION TO GUIDE AND FACILITATE CUSTOMER.
  * CONSEQUENTLY, SEMTECH SHALL NOT BE HELD LIABLE FOR ANY DIRECT, INDIRECT OR
  * CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE CONTENT
  * OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING INFORMATION
  * CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
- * 
+ *
  * Copyright (C) SEMTECH S.A.
  */
-/*! 
+/*!
  * \file       sx1276-LoRa.h
  * \brief      SX1276 RF chip driver mode LoRa
  *
- * \version    2.0.B2 
+ * \version    2.0.B2
  * \date       May 6 2013
  * \author     Gregory Cristian
  *
@@ -23,8 +23,8 @@
 
 
 #include "SPIBus.h"
-   
-/*   
+
+/*
   #define LED_TX           PD_ODR_ODR7
 #define LED_RX           PD_ODR_ODR6
 
@@ -42,14 +42,14 @@
 #define RF_RST        PD_ODR_ODR5//pc5--rf rst
 #define RF_SCK        PB_ODR_ODR5//
 #define RF_MISO       PB_IDR_IDR7 //INPUT
-#define RF_MOSI       PB_ODR_ODR6 
+#define RF_MOSI       PB_ODR_ODR6
 #define RF_NSEL_PIN   PD_ODR_ODR4//pb4 ---片选
 #define RF_RXTXSWITH  PB_ODR_ODR3//天线开关
 
 
 #define SCK        PB_ODR_ODR5
 #define MISO       PB_IDR_IDR7 //INPUT
-#define MOSI       PB_ODR_ODR6 
+#define MOSI       PB_ODR_ODR6
 #define nCS   PD_ODR_ODR4
 #define RF_RXTXSWITH  PB_ODR_ODR3
 
@@ -64,8 +64,8 @@
 #define  RF_RST	 GPIO_Pin_8        //XL1278-SD01 REST
 #define	RF_RST_1  GPIO_Pin_11     //xl1278-smt rest 
 
-   
-   
+
+
 
 
 
