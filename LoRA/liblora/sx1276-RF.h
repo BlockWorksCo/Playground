@@ -10,12 +10,12 @@
 
 
 
-typedef struct 	
+typedef struct
 {
-	uint8_t  buffer[50];
-	uint8_t  buffer_buckup[50];
-  uint8_t  buffer_size;
-}RF;
+    uint8_t  buffer[50];
+    uint8_t  buffer_buckup[50];
+    uint8_t  buffer_size;
+} RF;
 
 
 typedef enum
@@ -31,7 +31,7 @@ typedef enum
     RFLR_STATE_TX_TIMEOUT,
     RFLR_STATE_CAD_INIT,
     RFLR_STATE_CAD_RUNNING,
-}tRFLRStates;
+} tRFLRStates;
 
 typedef enum
 {
@@ -44,7 +44,7 @@ typedef enum
     RF_LEN_ERROR,
     RF_CHANNEL_EMPTY,
     RF_CHANNEL_ACTIVITY_DETECTED,
-}tRFProcessReturnCodes;
+} tRFProcessReturnCodes;
 
 typedef enum
 {
@@ -60,13 +60,13 @@ typedef enum
     RF_STATE_TX_RUNNING,
     RF_STATE_TX_DONE,
     RF_STATE_TX_TIMEOUT,
-}tRFStates;
+} tRFStates;
 
 typedef enum
 {
-	RADIO_RESET_OFF,
-	RADIO_RESET_ON,
-}tRadioResetState;
+    RADIO_RESET_OFF,
+    RADIO_RESET_ON,
+} tRadioResetState;
 
 typedef struct sRadioDriver
 {
@@ -76,7 +76,7 @@ typedef struct sRadioDriver
     void ( *GetRxPacket )( void *buffer, uint16_t *size );
     void ( *SetTxPacket )( const void *buffer, uint16_t size );
     uint32_t ( *Process )( void );
-}tRadioDriver;
+} tRadioDriver;
 
 typedef struct sFskSettings
 {
@@ -89,77 +89,77 @@ typedef struct sFskSettings
     bool CrcOn;
     bool AfcOn;
     uint8_t PayloadLength;
-}tFskSettings;
+} tFskSettings;
 
 typedef struct sLoRaSettings
 {
     uint32_t RFFrequency;
     int8_t Power;
-    uint8_t SignalBw;                   
-                                         
-    uint8_t SpreadingFactor;            
-    uint8_t ErrorCoding;                
-    bool CrcOn;                         
-    bool ImplicitHeaderOn;              
-    bool RxSingleOn;                   
-    bool FreqHopOn;                     
-    uint8_t HopPeriod;                 
+    uint8_t SignalBw;
+
+    uint8_t SpreadingFactor;
+    uint8_t ErrorCoding;
+    bool CrcOn;
+    bool ImplicitHeaderOn;
+    bool RxSingleOn;
+    bool FreqHopOn;
+    uint8_t HopPeriod;
     uint32_t TxPacketTimeout;
     uint32_t RxPacketTimeout;
     uint8_t PayloadLength;
-}tLoRaSettings;
+} tLoRaSettings;
 
 typedef struct sSX1276LR
 {
-    uint8_t RegFifo;                                // 0x00 
+    uint8_t RegFifo;                                // 0x00
     // Common settings
-    uint8_t RegOpMode;                              // 0x01 
-    uint8_t RegRes02;                               // 0x02 
-    uint8_t RegRes03;                               // 0x03 
-    uint8_t RegBandSetting;                         // 0x04 
-    uint8_t RegRes05;                               // 0x05 
-    uint8_t RegFrfMsb;                              // 0x06 
-    uint8_t RegFrfMid;                              // 0x07 
-    uint8_t RegFrfLsb;                              // 0x08 
+    uint8_t RegOpMode;                              // 0x01
+    uint8_t RegRes02;                               // 0x02
+    uint8_t RegRes03;                               // 0x03
+    uint8_t RegBandSetting;                         // 0x04
+    uint8_t RegRes05;                               // 0x05
+    uint8_t RegFrfMsb;                              // 0x06
+    uint8_t RegFrfMid;                              // 0x07
+    uint8_t RegFrfLsb;                              // 0x08
     // Tx settings
-    uint8_t RegPaConfig;                            // 0x09 
-    uint8_t RegPaRamp;                              // 0x0A 
-    uint8_t RegOcp;                                 // 0x0B 
+    uint8_t RegPaConfig;                            // 0x09
+    uint8_t RegPaRamp;                              // 0x0A
+    uint8_t RegOcp;                                 // 0x0B
     // Rx settings
-    uint8_t RegLna;                                 // 0x0C 
+    uint8_t RegLna;                                 // 0x0C
     // LoRa registers
-    uint8_t RegFifoAddrPtr;                         // 0x0D 
-    uint8_t RegFifoTxBaseAddr;                      // 0x0E 
-    uint8_t RegFifoRxBaseAddr;                      // 0x0F 
-    uint8_t RegFifoRxCurrentAddr;                   // 0x10 
-    uint8_t RegIrqFlagsMask;                        // 0x11 
-    uint8_t RegIrqFlags;                            // 0x12 
-    uint8_t RegNbRxBytes;                           // 0x13 
-    uint8_t RegRxHeaderCntValueMsb;                 // 0x14 
-    uint8_t RegRxHeaderCntValueLsb;                 // 0x15 
-    uint8_t RegRxPacketCntValueMsb;                 // 0x16 
-    uint8_t RegRxPacketCntValueLsb;                 // 0x17 
-    uint8_t RegModemStat;                           // 0x18 
-    uint8_t RegPktSnrValue;                         // 0x19 
-    uint8_t RegPktRssiValue;                        // 0x1A 
-    uint8_t RegRssiValue;                           // 0x1B 
-    uint8_t RegHopChannel;                          // 0x1C 
-    uint8_t RegModemConfig1;                        // 0x1D 
-    uint8_t RegModemConfig2;                        // 0x1E 
-    uint8_t RegSymbTimeoutLsb;                      // 0x1F 
-    uint8_t RegPreambleMsb;                         // 0x20 
-    uint8_t RegPreambleLsb;                         // 0x21 
-    uint8_t RegPayloadLength;                       // 0x22 
-    uint8_t RegMaxPayloadLength;                    // 0x23 
-    uint8_t RegHopPeriod;                           // 0x24 
+    uint8_t RegFifoAddrPtr;                         // 0x0D
+    uint8_t RegFifoTxBaseAddr;                      // 0x0E
+    uint8_t RegFifoRxBaseAddr;                      // 0x0F
+    uint8_t RegFifoRxCurrentAddr;                   // 0x10
+    uint8_t RegIrqFlagsMask;                        // 0x11
+    uint8_t RegIrqFlags;                            // 0x12
+    uint8_t RegNbRxBytes;                           // 0x13
+    uint8_t RegRxHeaderCntValueMsb;                 // 0x14
+    uint8_t RegRxHeaderCntValueLsb;                 // 0x15
+    uint8_t RegRxPacketCntValueMsb;                 // 0x16
+    uint8_t RegRxPacketCntValueLsb;                 // 0x17
+    uint8_t RegModemStat;                           // 0x18
+    uint8_t RegPktSnrValue;                         // 0x19
+    uint8_t RegPktRssiValue;                        // 0x1A
+    uint8_t RegRssiValue;                           // 0x1B
+    uint8_t RegHopChannel;                          // 0x1C
+    uint8_t RegModemConfig1;                        // 0x1D
+    uint8_t RegModemConfig2;                        // 0x1E
+    uint8_t RegSymbTimeoutLsb;                      // 0x1F
+    uint8_t RegPreambleMsb;                         // 0x20
+    uint8_t RegPreambleLsb;                         // 0x21
+    uint8_t RegPayloadLength;                       // 0x22
+    uint8_t RegMaxPayloadLength;                    // 0x23
+    uint8_t RegHopPeriod;                           // 0x24
     uint8_t RegFifoRxByteAddr;                      // 0x25
     uint8_t RegModemConfig3;                        // 0x26
     uint8_t RegTestReserved27[0x30 - 0x27];         // 0x27-0x30
     uint8_t RegTestReserved31;                      // 0x31
     uint8_t RegTestReserved32[0x40 - 0x32];         // 0x32-0x40
-    // I/O settings                
-    uint8_t RegDioMapping1;                         // 0x40 
-    uint8_t RegDioMapping2;                         // 0x41 
+    // I/O settings
+    uint8_t RegDioMapping1;                         // 0x40
+    uint8_t RegDioMapping2;                         // 0x41
     // Version
     uint8_t RegVersion;                             // 0x42
     // Additional settings
@@ -193,7 +193,7 @@ typedef struct sSX1276LR
     uint8_t RegFormerTemp;                          // 0x6C
     // Test
     uint8_t RegTestReserved6D[0x71 - 0x6D];         // 0x6D-0x70
-}tSX1276LR;
+} tSX1276LR;
 
 typedef struct sSX1276
 {
@@ -307,7 +307,7 @@ typedef struct sSX1276
     uint8_t RegTestReserved6D[0x70 - 0x6D];         // 0x6D-0x6F
     // Additional settings
     uint8_t RegBitrateFrac;                         // 0x70
-}tSX1276;
+} tSX1276;
 
 /*!
  * RF packet definition
@@ -326,44 +326,44 @@ typedef struct sSX1276
 /*!
  * SX1276 Internal registers Address
  */
-#define REG_LR_FIFO                                 0x00 
+#define REG_LR_FIFO                                 0x00
 // Common settings
-#define REG_LR_OPMODE                               0x01 
+#define REG_LR_OPMODE                               0x01
 #define REG_LR_BANDSETTING                          0x04
-#define REG_LR_FRFMSB                               0x06 
+#define REG_LR_FRFMSB                               0x06
 #define REG_LR_FRFMID                               0x07
-#define REG_LR_FRFLSB                               0x08 
+#define REG_LR_FRFLSB                               0x08
 // Tx settings
-#define REG_LR_PACONFIG                             0x09 
-#define REG_LR_PARAMP                               0x0A 
-#define REG_LR_OCP                                  0x0B 
+#define REG_LR_PACONFIG                             0x09
+#define REG_LR_PARAMP                               0x0A
+#define REG_LR_OCP                                  0x0B
 // Rx settings
-#define REG_LR_LNA                                  0x0C 
+#define REG_LR_LNA                                  0x0C
 // LoRa registers
-#define REG_LR_FIFOADDRPTR                          0x0D 
-#define REG_LR_FIFOTXBASEADDR                       0x0E 
-#define REG_LR_FIFORXBASEADDR                       0x0F 
-#define REG_LR_FIFORXCURRENTADDR                    0x10 
-#define REG_LR_IRQFLAGSMASK                         0x11 
-#define REG_LR_IRQFLAGS                             0x12 
-#define REG_LR_NBRXBYTES                            0x13 
-#define REG_LR_RXHEADERCNTVALUEMSB                  0x14 
-#define REG_LR_RXHEADERCNTVALUELSB                  0x15 
-#define REG_LR_RXPACKETCNTVALUEMSB                  0x16 
-#define REG_LR_RXPACKETCNTVALUELSB                  0x17 
-#define REG_LR_MODEMSTAT                            0x18 
-#define REG_LR_PKTSNRVALUE                          0x19 
-#define REG_LR_PKTRSSIVALUE                         0x1A 
-#define REG_LR_RSSIVALUE                            0x1B 
-#define REG_LR_HOPCHANNEL                           0x1C 
-#define REG_LR_MODEMCONFIG1                         0x1D 
-#define REG_LR_MODEMCONFIG2                         0x1E 
-#define REG_LR_SYMBTIMEOUTLSB                       0x1F 
-#define REG_LR_PREAMBLEMSB                          0x20 
-#define REG_LR_PREAMBLELSB                          0x21 
-#define REG_LR_PAYLOADLENGTH                        0x22 
-#define REG_LR_PAYLOADMAXLENGTH                     0x23 
-#define REG_LR_HOPPERIOD                            0x24 
+#define REG_LR_FIFOADDRPTR                          0x0D
+#define REG_LR_FIFOTXBASEADDR                       0x0E
+#define REG_LR_FIFORXBASEADDR                       0x0F
+#define REG_LR_FIFORXCURRENTADDR                    0x10
+#define REG_LR_IRQFLAGSMASK                         0x11
+#define REG_LR_IRQFLAGS                             0x12
+#define REG_LR_NBRXBYTES                            0x13
+#define REG_LR_RXHEADERCNTVALUEMSB                  0x14
+#define REG_LR_RXHEADERCNTVALUELSB                  0x15
+#define REG_LR_RXPACKETCNTVALUEMSB                  0x16
+#define REG_LR_RXPACKETCNTVALUELSB                  0x17
+#define REG_LR_MODEMSTAT                            0x18
+#define REG_LR_PKTSNRVALUE                          0x19
+#define REG_LR_PKTRSSIVALUE                         0x1A
+#define REG_LR_RSSIVALUE                            0x1B
+#define REG_LR_HOPCHANNEL                           0x1C
+#define REG_LR_MODEMCONFIG1                         0x1D
+#define REG_LR_MODEMCONFIG2                         0x1E
+#define REG_LR_SYMBTIMEOUTLSB                       0x1F
+#define REG_LR_PREAMBLEMSB                          0x20
+#define REG_LR_PREAMBLELSB                          0x21
+#define REG_LR_PAYLOADLENGTH                        0x22
+#define REG_LR_PAYLOADMAXLENGTH                     0x23
+#define REG_LR_HOPPERIOD                            0x24
 #define REG_LR_FIFORXBYTEADDR                       0x25
 #define REG_LR_MODEMCONFIG3                         0x26
 // end of documented register in datasheet
@@ -383,32 +383,32 @@ typedef struct sSX1276
 #define REG_LR_AGCTHRESH2                           0x63
 #define REG_LR_AGCTHRESH3                           0x64
 
-#define RFLR_OPMODE_LONGRANGEMODE_MASK              0x7F 
+#define RFLR_OPMODE_LONGRANGEMODE_MASK              0x7F
 #define RFLR_OPMODE_LONGRANGEMODE_OFF               0x00 // Default
-#define RFLR_OPMODE_LONGRANGEMODE_ON                0x80 
+#define RFLR_OPMODE_LONGRANGEMODE_ON                0x80
 
-#define RFLR_OPMODE_ACCESSSHAREDREG_MASK            0xBF 
-#define RFLR_OPMODE_ACCESSSHAREDREG_ENABLE          0x40 
+#define RFLR_OPMODE_ACCESSSHAREDREG_MASK            0xBF
+#define RFLR_OPMODE_ACCESSSHAREDREG_ENABLE          0x40
 #define RFLR_OPMODE_ACCESSSHAREDREG_DISABLE         0x00 // Default
 
 #define RFLR_OPMODE_FREQMODE_ACCESS_MASK            0xF7
 #define RFLR_OPMODE_FREQMODE_ACCESS_LF              0x08 // Default
-#define RFLR_OPMODE_FREQMODE_ACCESS_HF              0x00 
+#define RFLR_OPMODE_FREQMODE_ACCESS_HF              0x00
 
-#define RFLR_OPMODE_MASK                            0xF8 
-#define RFLR_OPMODE_SLEEP                           0x00 
+#define RFLR_OPMODE_MASK                            0xF8
+#define RFLR_OPMODE_SLEEP                           0x00
 #define RFLR_OPMODE_STANDBY                         0x01 // Default
-#define RFLR_OPMODE_SYNTHESIZER_TX                  0x02 
-#define RFLR_OPMODE_TRANSMITTER                     0x03 
-#define RFLR_OPMODE_SYNTHESIZER_RX                  0x04 
-#define RFLR_OPMODE_RECEIVER                        0x05 
+#define RFLR_OPMODE_SYNTHESIZER_TX                  0x02
+#define RFLR_OPMODE_TRANSMITTER                     0x03
+#define RFLR_OPMODE_SYNTHESIZER_RX                  0x04
+#define RFLR_OPMODE_RECEIVER                        0x05
 // LoRa specific modes
-#define RFLR_OPMODE_RECEIVER_SINGLE                 0x06 
-#define RFLR_OPMODE_CAD                             0x07 
+#define RFLR_OPMODE_RECEIVER_SINGLE                 0x06
+#define RFLR_OPMODE_CAD                             0x07
 /*!
- * RegBandSetting 
+ * RegBandSetting
  */
-#define RFLR_BANDSETTING_MASK                    0x3F 
+#define RFLR_BANDSETTING_MASK                    0x3F
 #define RFLR_BANDSETTING_AUTO                    0x00 // Default
 #define RFLR_BANDSETTING_DIV_BY_1                0x40
 #define RFLR_BANDSETTING_DIV_BY_2                0x80
@@ -485,9 +485,9 @@ typedef struct sSX1276
 #define RFLR_FRFMSB_914_MHZ                         0xE4
 #define RFLR_FRFMID_914_MHZ                         0x80
 #define RFLR_FRFLSB_914_MHZ                         0x00
-#define RFLR_FRFMSB_915_MHZ                         0xE4  
-#define RFLR_FRFMID_915_MHZ                         0xC0  
-#define RFLR_FRFLSB_915_MHZ                         0x00 
+#define RFLR_FRFMSB_915_MHZ                         0xE4
+#define RFLR_FRFMID_915_MHZ                         0xC0
+#define RFLR_FRFLSB_915_MHZ                         0x00
 #define RFLR_FRFMSB_916_MHZ                         0xE5
 #define RFLR_FRFMID_916_MHZ                         0x00
 #define RFLR_FRFLSB_916_MHZ                         0x00
@@ -531,100 +531,100 @@ typedef struct sSX1276
 /*!
  * RegPaConfig
  */
-#define RFLR_PACONFIG_PASELECT_MASK                 0x7F 
-#define RFLR_PACONFIG_PASELECT_PABOOST              0x80 
+#define RFLR_PACONFIG_PASELECT_MASK                 0x7F
+#define RFLR_PACONFIG_PASELECT_PABOOST              0x80
 #define RFLR_PACONFIG_PASELECT_RFO                  0x00 // Default
 
 #define RFLR_PACONFIG_MAX_POWER_MASK                0x8F
 
-#define RFLR_PACONFIG_OUTPUTPOWER_MASK              0xF0 
- 
+#define RFLR_PACONFIG_OUTPUTPOWER_MASK              0xF0
+
 /*!
  * RegPaRamp
  */
-#define RFLR_PARAMP_TXBANDFORCE_MASK                0xEF 
-#define RFLR_PARAMP_TXBANDFORCE_BAND_SEL            0x10 
+#define RFLR_PARAMP_TXBANDFORCE_MASK                0xEF
+#define RFLR_PARAMP_TXBANDFORCE_BAND_SEL            0x10
 #define RFLR_PARAMP_TXBANDFORCE_AUTO                0x00 // Default
 
-#define RFLR_PARAMP_MASK                            0xF0 
-#define RFLR_PARAMP_3400_US                         0x00 
-#define RFLR_PARAMP_2000_US                         0x01 
+#define RFLR_PARAMP_MASK                            0xF0
+#define RFLR_PARAMP_3400_US                         0x00
+#define RFLR_PARAMP_2000_US                         0x01
 #define RFLR_PARAMP_1000_US                         0x02
-#define RFLR_PARAMP_0500_US                         0x03 
-#define RFLR_PARAMP_0250_US                         0x04 
-#define RFLR_PARAMP_0125_US                         0x05 
-#define RFLR_PARAMP_0100_US                         0x06 
-#define RFLR_PARAMP_0062_US                         0x07 
-#define RFLR_PARAMP_0050_US                         0x08 
+#define RFLR_PARAMP_0500_US                         0x03
+#define RFLR_PARAMP_0250_US                         0x04
+#define RFLR_PARAMP_0125_US                         0x05
+#define RFLR_PARAMP_0100_US                         0x06
+#define RFLR_PARAMP_0062_US                         0x07
+#define RFLR_PARAMP_0050_US                         0x08
 #define RFLR_PARAMP_0040_US                         0x09 // Default
-#define RFLR_PARAMP_0031_US                         0x0A 
-#define RFLR_PARAMP_0025_US                         0x0B 
-#define RFLR_PARAMP_0020_US                         0x0C 
-#define RFLR_PARAMP_0015_US                         0x0D 
-#define RFLR_PARAMP_0012_US                         0x0E 
-#define RFLR_PARAMP_0010_US                         0x0F 
+#define RFLR_PARAMP_0031_US                         0x0A
+#define RFLR_PARAMP_0025_US                         0x0B
+#define RFLR_PARAMP_0020_US                         0x0C
+#define RFLR_PARAMP_0015_US                         0x0D
+#define RFLR_PARAMP_0012_US                         0x0E
+#define RFLR_PARAMP_0010_US                         0x0F
 
 /*!
  * RegOcp
  */
-#define RFLR_OCP_MASK                               0xDF 
+#define RFLR_OCP_MASK                               0xDF
 #define RFLR_OCP_ON                                 0x20 // Default
-#define RFLR_OCP_OFF                                0x00   
+#define RFLR_OCP_OFF                                0x00
 
 #define RFLR_OCP_TRIM_MASK                          0xE0
 #define RFLR_OCP_TRIM_045_MA                        0x00
-#define RFLR_OCP_TRIM_050_MA                        0x01   
-#define RFLR_OCP_TRIM_055_MA                        0x02 
-#define RFLR_OCP_TRIM_060_MA                        0x03 
-#define RFLR_OCP_TRIM_065_MA                        0x04 
-#define RFLR_OCP_TRIM_070_MA                        0x05 
-#define RFLR_OCP_TRIM_075_MA                        0x06 
-#define RFLR_OCP_TRIM_080_MA                        0x07  
+#define RFLR_OCP_TRIM_050_MA                        0x01
+#define RFLR_OCP_TRIM_055_MA                        0x02
+#define RFLR_OCP_TRIM_060_MA                        0x03
+#define RFLR_OCP_TRIM_065_MA                        0x04
+#define RFLR_OCP_TRIM_070_MA                        0x05
+#define RFLR_OCP_TRIM_075_MA                        0x06
+#define RFLR_OCP_TRIM_080_MA                        0x07
 #define RFLR_OCP_TRIM_085_MA                        0x08
-#define RFLR_OCP_TRIM_090_MA                        0x09 
-#define RFLR_OCP_TRIM_095_MA                        0x0A 
+#define RFLR_OCP_TRIM_090_MA                        0x09
+#define RFLR_OCP_TRIM_095_MA                        0x0A
 #define RFLR_OCP_TRIM_100_MA                        0x0B  // Default
-#define RFLR_OCP_TRIM_105_MA                        0x0C 
-#define RFLR_OCP_TRIM_110_MA                        0x0D 
-#define RFLR_OCP_TRIM_115_MA                        0x0E 
-#define RFLR_OCP_TRIM_120_MA                        0x0F 
+#define RFLR_OCP_TRIM_105_MA                        0x0C
+#define RFLR_OCP_TRIM_110_MA                        0x0D
+#define RFLR_OCP_TRIM_115_MA                        0x0E
+#define RFLR_OCP_TRIM_120_MA                        0x0F
 #define RFLR_OCP_TRIM_130_MA                        0x10
-#define RFLR_OCP_TRIM_140_MA                        0x11   
-#define RFLR_OCP_TRIM_150_MA                        0x12 
-#define RFLR_OCP_TRIM_160_MA                        0x13 
-#define RFLR_OCP_TRIM_170_MA                        0x14 
-#define RFLR_OCP_TRIM_180_MA                        0x15 
-#define RFLR_OCP_TRIM_190_MA                        0x16 
-#define RFLR_OCP_TRIM_200_MA                        0x17  
+#define RFLR_OCP_TRIM_140_MA                        0x11
+#define RFLR_OCP_TRIM_150_MA                        0x12
+#define RFLR_OCP_TRIM_160_MA                        0x13
+#define RFLR_OCP_TRIM_170_MA                        0x14
+#define RFLR_OCP_TRIM_180_MA                        0x15
+#define RFLR_OCP_TRIM_190_MA                        0x16
+#define RFLR_OCP_TRIM_200_MA                        0x17
 #define RFLR_OCP_TRIM_210_MA                        0x18
-#define RFLR_OCP_TRIM_220_MA                        0x19 
-#define RFLR_OCP_TRIM_230_MA                        0x1A 
+#define RFLR_OCP_TRIM_220_MA                        0x19
+#define RFLR_OCP_TRIM_230_MA                        0x1A
 #define RFLR_OCP_TRIM_240_MA                        0x1B
 
 /*!
  * RegLna
  */
-#define RFLR_LNA_GAIN_MASK                          0x1F 
+#define RFLR_LNA_GAIN_MASK                          0x1F
 #define RFLR_LNA_GAIN_G1                            0x20 // Default
-#define RFLR_LNA_GAIN_G2                            0x40 
-#define RFLR_LNA_GAIN_G3                            0x60 
-#define RFLR_LNA_GAIN_G4                            0x80 
-#define RFLR_LNA_GAIN_G5                            0xA0 
-#define RFLR_LNA_GAIN_G6                            0xC0 
+#define RFLR_LNA_GAIN_G2                            0x40
+#define RFLR_LNA_GAIN_G3                            0x60
+#define RFLR_LNA_GAIN_G4                            0x80
+#define RFLR_LNA_GAIN_G5                            0xA0
+#define RFLR_LNA_GAIN_G6                            0xC0
 
-#define RFLR_LNA_BOOST_LF_MASK                      0xE7 
+#define RFLR_LNA_BOOST_LF_MASK                      0xE7
 #define RFLR_LNA_BOOST_LF_DEFAULT                   0x00 // Default
-#define RFLR_LNA_BOOST_LF_GAIN                      0x08 
-#define RFLR_LNA_BOOST_LF_IP3                       0x10 
-#define RFLR_LNA_BOOST_LF_BOOST                     0x18 
+#define RFLR_LNA_BOOST_LF_GAIN                      0x08
+#define RFLR_LNA_BOOST_LF_IP3                       0x10
+#define RFLR_LNA_BOOST_LF_BOOST                     0x18
 
-#define RFLR_LNA_RXBANDFORCE_MASK                   0xFB 
+#define RFLR_LNA_RXBANDFORCE_MASK                   0xFB
 #define RFLR_LNA_RXBANDFORCE_BAND_SEL               0x04
 #define RFLR_LNA_RXBANDFORCE_AUTO                   0x00 // Default
 
-#define RFLR_LNA_BOOST_HF_MASK                      0xFC 
+#define RFLR_LNA_BOOST_HF_MASK                      0xFC
 #define RFLR_LNA_BOOST_HF_OFF                       0x00 // Default
-#define RFLR_LNA_BOOST_HF_ON                        0x03 
+#define RFLR_LNA_BOOST_HF_ON                        0x03
 
 /*!
  * RegFifoAddrPtr
@@ -648,94 +648,94 @@ typedef struct sSX1276
 /*!
  * RegIrqFlagsMask
  */
-#define RFLR_IRQFLAGS_RXTIMEOUT_MASK                0x80 
-#define RFLR_IRQFLAGS_RXDONE_MASK                   0x40 
-#define RFLR_IRQFLAGS_PAYLOADCRCERROR_MASK          0x20 
-#define RFLR_IRQFLAGS_VALIDHEADER_MASK              0x10 
-#define RFLR_IRQFLAGS_TXDONE_MASK                   0x08 
-#define RFLR_IRQFLAGS_CADDONE_MASK                  0x04 
-#define RFLR_IRQFLAGS_FHSSCHANGEDCHANNEL_MASK       0x02 
-#define RFLR_IRQFLAGS_CADDETECTED_MASK              0x01 
+#define RFLR_IRQFLAGS_RXTIMEOUT_MASK                0x80
+#define RFLR_IRQFLAGS_RXDONE_MASK                   0x40
+#define RFLR_IRQFLAGS_PAYLOADCRCERROR_MASK          0x20
+#define RFLR_IRQFLAGS_VALIDHEADER_MASK              0x10
+#define RFLR_IRQFLAGS_TXDONE_MASK                   0x08
+#define RFLR_IRQFLAGS_CADDONE_MASK                  0x04
+#define RFLR_IRQFLAGS_FHSSCHANGEDCHANNEL_MASK       0x02
+#define RFLR_IRQFLAGS_CADDETECTED_MASK              0x01
 
 /*!
  * RegIrqFlags
  */
-#define RFLR_IRQFLAGS_RXTIMEOUT                     0x80 
-#define RFLR_IRQFLAGS_RXDONE                        0x40 
-#define RFLR_IRQFLAGS_PAYLOADCRCERROR               0x20 
-#define RFLR_IRQFLAGS_VALIDHEADER                   0x10 
-#define RFLR_IRQFLAGS_TXDONE                        0x08 
-#define RFLR_IRQFLAGS_CADDONE                       0x04 
-#define RFLR_IRQFLAGS_FHSSCHANGEDCHANNEL            0x02 
-#define RFLR_IRQFLAGS_CADDETECTED                   0x01 
+#define RFLR_IRQFLAGS_RXTIMEOUT                     0x80
+#define RFLR_IRQFLAGS_RXDONE                        0x40
+#define RFLR_IRQFLAGS_PAYLOADCRCERROR               0x20
+#define RFLR_IRQFLAGS_VALIDHEADER                   0x10
+#define RFLR_IRQFLAGS_TXDONE                        0x08
+#define RFLR_IRQFLAGS_CADDONE                       0x04
+#define RFLR_IRQFLAGS_FHSSCHANGEDCHANNEL            0x02
+#define RFLR_IRQFLAGS_CADDETECTED                   0x01
 
- /*!
- * RegModemStat (Read Only)    //
- */
-#define RFLR_MODEMSTAT_RX_CR_MASK                   0x1F 
-#define RFLR_MODEMSTAT_MODEM_STATUS_MASK            0xE0 
- /*!
- * RegModemConfig1
- */
-#define RFLR_MODEMCONFIG1_BW_MASK                   0x0F 
+/*!
+* RegModemStat (Read Only)    //
+*/
+#define RFLR_MODEMSTAT_RX_CR_MASK                   0x1F
+#define RFLR_MODEMSTAT_MODEM_STATUS_MASK            0xE0
+/*!
+* RegModemConfig1
+*/
+#define RFLR_MODEMCONFIG1_BW_MASK                   0x0F
 
-#define RFLR_MODEMCONFIG1_BW_7_81_KHZ               0x00 
-#define RFLR_MODEMCONFIG1_BW_10_41_KHZ              0x10 
-#define RFLR_MODEMCONFIG1_BW_15_62_KHZ              0x20 
-#define RFLR_MODEMCONFIG1_BW_20_83_KHZ              0x30 
-#define RFLR_MODEMCONFIG1_BW_31_25_KHZ              0x40 
-#define RFLR_MODEMCONFIG1_BW_41_66_KHZ              0x50 
-#define RFLR_MODEMCONFIG1_BW_62_50_KHZ              0x60 
+#define RFLR_MODEMCONFIG1_BW_7_81_KHZ               0x00
+#define RFLR_MODEMCONFIG1_BW_10_41_KHZ              0x10
+#define RFLR_MODEMCONFIG1_BW_15_62_KHZ              0x20
+#define RFLR_MODEMCONFIG1_BW_20_83_KHZ              0x30
+#define RFLR_MODEMCONFIG1_BW_31_25_KHZ              0x40
+#define RFLR_MODEMCONFIG1_BW_41_66_KHZ              0x50
+#define RFLR_MODEMCONFIG1_BW_62_50_KHZ              0x60
 #define RFLR_MODEMCONFIG1_BW_125_KHZ                0x70 // Default
-#define RFLR_MODEMCONFIG1_BW_250_KHZ                0x80 
-#define RFLR_MODEMCONFIG1_BW_500_KHZ                0x90 
-                                                    
-#define RFLR_MODEMCONFIG1_CODINGRATE_MASK           0xF1 
+#define RFLR_MODEMCONFIG1_BW_250_KHZ                0x80
+#define RFLR_MODEMCONFIG1_BW_500_KHZ                0x90
+
+#define RFLR_MODEMCONFIG1_CODINGRATE_MASK           0xF1
 #define RFLR_MODEMCONFIG1_CODINGRATE_4_5            0x02
 #define RFLR_MODEMCONFIG1_CODINGRATE_4_6            0x04 // Default
-#define RFLR_MODEMCONFIG1_CODINGRATE_4_7            0x06 
-#define RFLR_MODEMCONFIG1_CODINGRATE_4_8            0x08 
-                                                    
-#define RFLR_MODEMCONFIG1_IMPLICITHEADER_MASK       0xFE 
-#define RFLR_MODEMCONFIG1_IMPLICITHEADER_ON         0x01 
+#define RFLR_MODEMCONFIG1_CODINGRATE_4_7            0x06
+#define RFLR_MODEMCONFIG1_CODINGRATE_4_8            0x08
+
+#define RFLR_MODEMCONFIG1_IMPLICITHEADER_MASK       0xFE
+#define RFLR_MODEMCONFIG1_IMPLICITHEADER_ON         0x01
 #define RFLR_MODEMCONFIG1_IMPLICITHEADER_OFF        0x00 // Default
 
- /*!
- * RegModemConfig2
- */
-#define RFLR_MODEMCONFIG2_SF_MASK                   0x0F 
-#define RFLR_MODEMCONFIG2_SF_6                      0x60 
+/*!
+* RegModemConfig2
+*/
+#define RFLR_MODEMCONFIG2_SF_MASK                   0x0F
+#define RFLR_MODEMCONFIG2_SF_6                      0x60
 #define RFLR_MODEMCONFIG2_SF_7                      0x70 // Default
-#define RFLR_MODEMCONFIG2_SF_8                      0x80 
-#define RFLR_MODEMCONFIG2_SF_9                      0x90 
-#define RFLR_MODEMCONFIG2_SF_10                     0xA0 
-#define RFLR_MODEMCONFIG2_SF_11                     0xB0 
-#define RFLR_MODEMCONFIG2_SF_12                     0xC0 
+#define RFLR_MODEMCONFIG2_SF_8                      0x80
+#define RFLR_MODEMCONFIG2_SF_9                      0x90
+#define RFLR_MODEMCONFIG2_SF_10                     0xA0
+#define RFLR_MODEMCONFIG2_SF_11                     0xB0
+#define RFLR_MODEMCONFIG2_SF_12                     0xC0
 
-#define RFLR_MODEMCONFIG2_TXCONTINUOUSMODE_MASK     0xF7 
-#define RFLR_MODEMCONFIG2_TXCONTINUOUSMODE_ON       0x08 
-#define RFLR_MODEMCONFIG2_TXCONTINUOUSMODE_OFF      0x00 
+#define RFLR_MODEMCONFIG2_TXCONTINUOUSMODE_MASK     0xF7
+#define RFLR_MODEMCONFIG2_TXCONTINUOUSMODE_ON       0x08
+#define RFLR_MODEMCONFIG2_TXCONTINUOUSMODE_OFF      0x00
 
-#define RFLR_MODEMCONFIG2_RXPAYLOADCRC_MASK         0xFB 
-#define RFLR_MODEMCONFIG2_RXPAYLOADCRC_ON           0x04 
+#define RFLR_MODEMCONFIG2_RXPAYLOADCRC_MASK         0xFB
+#define RFLR_MODEMCONFIG2_RXPAYLOADCRC_ON           0x04
 #define RFLR_MODEMCONFIG2_RXPAYLOADCRC_OFF          0x00 // Default
- 
-#define RFLR_MODEMCONFIG2_SYMBTIMEOUTMSB_MASK       0xFC 
+
+#define RFLR_MODEMCONFIG2_SYMBTIMEOUTMSB_MASK       0xFC
 #define RFLR_MODEMCONFIG2_SYMBTIMEOUTMSB            0x00 // Default
-                                                    
-                                                    
-/*!                                                 
- * RegHopChannel (Read Only)                        
- */                                                 
-#define RFLR_HOPCHANNEL_PLL_LOCK_TIMEOUT_MASK       0x7F 
-#define RFLR_HOPCHANNEL_PLL_LOCK_FAIL               0x80 
+
+
+/*!
+ * RegHopChannel (Read Only)
+ */
+#define RFLR_HOPCHANNEL_PLL_LOCK_TIMEOUT_MASK       0x7F
+#define RFLR_HOPCHANNEL_PLL_LOCK_FAIL               0x80
 #define RFLR_HOPCHANNEL_PLL_LOCK_SUCCEED            0x00 // Default
-                                                    
+
 #define RFLR_HOPCHANNEL_PAYLOAD_CRC16_MASK          0xBF
 #define RFLR_HOPCHANNEL_PAYLOAD_CRC16_ON            0x40
 #define RFLR_HOPCHANNEL_PAYLOAD_CRC16_OFF           0x00 // Default
 
-#define RFLR_HOPCHANNEL_CHANNEL_MASK                0x3F 
+#define RFLR_HOPCHANNEL_CHANNEL_MASK                0x3F
 
 
 /*!
@@ -856,13 +856,13 @@ typedef struct sSX1276
 /*!
  * RegModemConfig3
  */
-#define RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_MASK  0xF7 
-#define RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_ON    0x08 
+#define RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_MASK  0xF7
+#define RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_ON    0x08
 #define RFLR_MODEMCONFIG3_LOWDATARATEOPTIMIZE_OFF   0x00 // Default
 
-#define RFLR_MODEMCONFIG3_AGCAUTO_MASK              0xFB 
+#define RFLR_MODEMCONFIG3_AGCAUTO_MASK              0xFB
 #define RFLR_MODEMCONFIG3_AGCAUTO_ON                0x04 // Default 
-#define RFLR_MODEMCONFIG3_AGCAUTO_OFF               0x00 
+#define RFLR_MODEMCONFIG3_AGCAUTO_OFF               0x00
 
 #define RXTX( txEnable )                            SX1276WriteRxTx( id, txEnable );
 
@@ -887,7 +887,7 @@ typedef struct sSX1276
 #define REG_OPMODE                                  0x01
 #define REG_BITRATEMSB                              0x02
 #define REG_BITRATELSB                              0x03
-#define REG_FDEVMSB                                 0x04 
+#define REG_FDEVMSB                                 0x04
 #define REG_FDEVLSB                                 0x05
 #define REG_FRFMSB                                  0x06
 #define REG_FRFMID                                  0x07
@@ -895,7 +895,7 @@ typedef struct sSX1276
 // Tx settings
 #define REG_PACONFIG                                0x09
 #define REG_PARAMP                                  0x0A
-#define REG_OCP                                     0x0B 
+#define REG_OCP                                     0x0B
 // Rx settings
 #define REG_LNA                                     0x0C
 #define REG_RXCONFIG                                0x0D
@@ -903,7 +903,7 @@ typedef struct sSX1276
 #define REG_RSSICOLLISION                           0x0F
 #define REG_RSSITHRESH                              0x10
 #define REG_RSSIVALUE                               0x11
-#define REG_RXBW                                    0x12 
+#define REG_RXBW                                    0x12
 #define REG_AFCBW                                   0x13
 #define REG_OOKPEAK                                 0x14
 #define REG_OOKFIX                                  0x15
@@ -992,7 +992,7 @@ typedef struct sSX1276
 
 #define RF_OPMODE_FREQMODE_ACCESS_MASK              0xF7
 #define RF_OPMODE_FREQMODE_ACCESS_LF                0x08  // Default
-#define RF_OPMODE_FREQMODE_ACCESS_HF                0x00 
+#define RF_OPMODE_FREQMODE_ACCESS_HF                0x00
 
 #define RF_OPMODE_MASK                              0xF8
 #define RF_OPMODE_SLEEP                             0x00
@@ -1047,13 +1047,13 @@ typedef struct sSX1276
 /*!
  * RegFdev (Hz)
  */
- 
-#define RF_FDEVMSB_BANDREG_MASK                     0x3F 
+
+#define RF_FDEVMSB_BANDREG_MASK                     0x3F
 #define RF_FDEVMSB_BANDREG_AUTO                     0x00 // Default
 #define RF_FDEVMSB_BANDREG_DIV_BY_1                 0x40
 #define RF_FDEVMSB_BANDREG_DIV_BY_2                 0x80
 #define RF_FDEVMSB_BANDREG_DIV_BY_6                 0xC0
- 
+
 #define RF_FDEVMSB_FDEV_MASK                        0xC0
 
 #define RF_FDEVMSB_2000_HZ                          0x00
@@ -1239,7 +1239,7 @@ typedef struct sSX1276
 #define RF_PACONFIG_MAX_POWER_MASK                  0x8F
 
 #define RF_PACONFIG_OUTPUTPOWER_MASK                0xF0
- 
+
 /*!
  * RegPaRamp
  */
@@ -1248,9 +1248,9 @@ typedef struct sSX1276
 #define RF_PARAMP_MODULATIONSHAPING_01              0x20
 #define RF_PARAMP_MODULATIONSHAPING_10              0x40
 #define RF_PARAMP_MODULATIONSHAPING_11              0x60
- 
-#define RF_PARAMP_TXBANDFORCE_MASK                  0xEF 
-#define RF_PARAMP_TXBANDFORCE_BAND_SEL              0x10 
+
+#define RF_PARAMP_TXBANDFORCE_MASK                  0xEF
+#define RF_PARAMP_TXBANDFORCE_BAND_SEL              0x10
 #define RF_PARAMP_TXBANDFORCE_AUTO                  0x00 // Default
 
 #define RF_PARAMP_MASK                              0xF0
@@ -1276,36 +1276,36 @@ typedef struct sSX1276
  */
 #define RF_OCP_MASK                                 0xDF
 #define RF_OCP_ON                                   0x20  // Default
-#define RF_OCP_OFF                                  0x00  
+#define RF_OCP_OFF                                  0x00
 
 #define RF_OCP_TRIM_MASK                            0xE0
 #define RF_OCP_TRIM_045_MA                          0x00
-#define RF_OCP_TRIM_050_MA                          0x01   
-#define RF_OCP_TRIM_055_MA                          0x02 
-#define RF_OCP_TRIM_060_MA                          0x03 
-#define RF_OCP_TRIM_065_MA                          0x04 
-#define RF_OCP_TRIM_070_MA                          0x05 
-#define RF_OCP_TRIM_075_MA                          0x06 
-#define RF_OCP_TRIM_080_MA                          0x07  
+#define RF_OCP_TRIM_050_MA                          0x01
+#define RF_OCP_TRIM_055_MA                          0x02
+#define RF_OCP_TRIM_060_MA                          0x03
+#define RF_OCP_TRIM_065_MA                          0x04
+#define RF_OCP_TRIM_070_MA                          0x05
+#define RF_OCP_TRIM_075_MA                          0x06
+#define RF_OCP_TRIM_080_MA                          0x07
 #define RF_OCP_TRIM_085_MA                          0x08
-#define RF_OCP_TRIM_090_MA                          0x09 
-#define RF_OCP_TRIM_095_MA                          0x0A 
+#define RF_OCP_TRIM_090_MA                          0x09
+#define RF_OCP_TRIM_095_MA                          0x0A
 #define RF_OCP_TRIM_100_MA                          0x0B  // Default
-#define RF_OCP_TRIM_105_MA                          0x0C 
-#define RF_OCP_TRIM_110_MA                          0x0D 
-#define RF_OCP_TRIM_115_MA                          0x0E 
-#define RF_OCP_TRIM_120_MA                          0x0F 
+#define RF_OCP_TRIM_105_MA                          0x0C
+#define RF_OCP_TRIM_110_MA                          0x0D
+#define RF_OCP_TRIM_115_MA                          0x0E
+#define RF_OCP_TRIM_120_MA                          0x0F
 #define RF_OCP_TRIM_130_MA                          0x10
-#define RF_OCP_TRIM_140_MA                          0x11   
-#define RF_OCP_TRIM_150_MA                          0x12 
-#define RF_OCP_TRIM_160_MA                          0x13 
-#define RF_OCP_TRIM_170_MA                          0x14 
-#define RF_OCP_TRIM_180_MA                          0x15 
-#define RF_OCP_TRIM_190_MA                          0x16 
-#define RF_OCP_TRIM_200_MA                          0x17  
+#define RF_OCP_TRIM_140_MA                          0x11
+#define RF_OCP_TRIM_150_MA                          0x12
+#define RF_OCP_TRIM_160_MA                          0x13
+#define RF_OCP_TRIM_170_MA                          0x14
+#define RF_OCP_TRIM_180_MA                          0x15
+#define RF_OCP_TRIM_190_MA                          0x16
+#define RF_OCP_TRIM_200_MA                          0x17
 #define RF_OCP_TRIM_210_MA                          0x18
-#define RF_OCP_TRIM_220_MA                          0x19 
-#define RF_OCP_TRIM_230_MA                          0x1A 
+#define RF_OCP_TRIM_220_MA                          0x19
+#define RF_OCP_TRIM_230_MA                          0x1A
 #define RF_OCP_TRIM_240_MA                          0x1B
 
 /*!
@@ -1319,19 +1319,19 @@ typedef struct sSX1276
 #define RF_LNA_GAIN_G5                              0xA0
 #define RF_LNA_GAIN_G6                              0xC0
 
-#define RF_LNA_BOOST_LF_MASK                        0xE7 
+#define RF_LNA_BOOST_LF_MASK                        0xE7
 #define RF_LNA_BOOST_LF_DEFAULT                     0x00 // Default
-#define RF_LNA_BOOST_LF_GAIN                        0x08 
-#define RF_LNA_BOOST_LF_IP3                         0x10 
-#define RF_LNA_BOOST_LF_BOOST                       0x18 
+#define RF_LNA_BOOST_LF_GAIN                        0x08
+#define RF_LNA_BOOST_LF_IP3                         0x10
+#define RF_LNA_BOOST_LF_BOOST                       0x18
 
-#define RF_LNA_RXBANDFORCE_MASK                     0xFB 
+#define RF_LNA_RXBANDFORCE_MASK                     0xFB
 #define RF_LNA_RXBANDFORCE_BAND_SEL                 0x04
 #define RF_LNA_RXBANDFORCE_AUTO                     0x00 // Default
 
-#define RF_LNA_BOOST_HF_MASK                        0xFC 
+#define RF_LNA_BOOST_HF_MASK                        0xFC
 #define RF_LNA_BOOST_HF_OFF                         0x00 // Default
-#define RF_LNA_BOOST_HF_ON                          0x03 
+#define RF_LNA_BOOST_HF_ON                          0x03
 
 /*!
  * RegRxConfig
@@ -1423,19 +1423,19 @@ typedef struct sSX1276
  * RegRxBw
  */
 #define RF_RXBW_MANT_MASK                           0xE7
-#define RF_RXBW_MANT_16                             0x00  
-#define RF_RXBW_MANT_20                             0x08  
+#define RF_RXBW_MANT_16                             0x00
+#define RF_RXBW_MANT_20                             0x08
 #define RF_RXBW_MANT_24                             0x10  // Default 
 
-#define RF_RXBW_EXP_MASK                            0xF8 
-#define RF_RXBW_EXP_0                               0x00 
-#define RF_RXBW_EXP_1                               0x01 
-#define RF_RXBW_EXP_2                               0x02 
-#define RF_RXBW_EXP_3                               0x03 
-#define RF_RXBW_EXP_4                               0x04 
+#define RF_RXBW_EXP_MASK                            0xF8
+#define RF_RXBW_EXP_0                               0x00
+#define RF_RXBW_EXP_1                               0x01
+#define RF_RXBW_EXP_2                               0x02
+#define RF_RXBW_EXP_3                               0x03
+#define RF_RXBW_EXP_4                               0x04
 #define RF_RXBW_EXP_5                               0x05  // Default
-#define RF_RXBW_EXP_6                               0x06  
-#define RF_RXBW_EXP_7                               0x07 
+#define RF_RXBW_EXP_6                               0x06
+#define RF_RXBW_EXP_7                               0x07
 
 /*!
  * RegAfcBw
@@ -1443,17 +1443,17 @@ typedef struct sSX1276
 #define RF_AFCBW_MANTAFC_MASK                       0xE7
 #define RF_AFCBW_MANTAFC_16                         0x00
 #define RF_AFCBW_MANTAFC_20                         0x08  // Default
-#define RF_AFCBW_MANTAFC_24                         0x10  
+#define RF_AFCBW_MANTAFC_24                         0x10
 
 #define RF_AFCBW_EXPAFC_MASK                        0xF8
-#define RF_AFCBW_EXPAFC_0                           0x00 
-#define RF_AFCBW_EXPAFC_1                           0x01 
-#define RF_AFCBW_EXPAFC_2                           0x02  
+#define RF_AFCBW_EXPAFC_0                           0x00
+#define RF_AFCBW_EXPAFC_1                           0x01
+#define RF_AFCBW_EXPAFC_2                           0x02
 #define RF_AFCBW_EXPAFC_3                           0x03  // Default
-#define RF_AFCBW_EXPAFC_4                           0x04 
-#define RF_AFCBW_EXPAFC_5                           0x05 
-#define RF_AFCBW_EXPAFC_6                           0x06  
-#define RF_AFCBW_EXPAFC_7                           0x07 
+#define RF_AFCBW_EXPAFC_4                           0x04
+#define RF_AFCBW_EXPAFC_5                           0x05
+#define RF_AFCBW_EXPAFC_6                           0x06
+#define RF_AFCBW_EXPAFC_7                           0x07
 
 /*!
  * RegOokPeak
@@ -1521,7 +1521,7 @@ typedef struct sSX1276
 /*!
  * RegAfcMsb (Read Only)
  */
- 
+
 /*!
  * RegAfcLsb (Read Only)
  */
@@ -1614,7 +1614,7 @@ typedef struct sSX1276
 #define RF_OSC_CLKOUT_2_MHZ                         0x04
 #define RF_OSC_CLKOUT_1_MHZ                         0x05  // Default
 #define RF_OSC_CLKOUT_RC                            0x06
-#define RF_OSC_CLKOUT_OFF                           0x07  
+#define RF_OSC_CLKOUT_OFF                           0x07
 
 /*!
  * RegPreambleMsb/RegPreambleLsb
@@ -1643,7 +1643,7 @@ typedef struct sSX1276
 #define RF_SYNCCONFIG_SYNCSIZE_MASK                 0xF8
 #define RF_SYNCCONFIG_SYNCSIZE_1                    0x00
 #define RF_SYNCCONFIG_SYNCSIZE_2                    0x01
-#define RF_SYNCCONFIG_SYNCSIZE_3                    0x02  
+#define RF_SYNCCONFIG_SYNCSIZE_3                    0x02
 #define RF_SYNCCONFIG_SYNCSIZE_4                    0x03  // Default
 #define RF_SYNCCONFIG_SYNCSIZE_5                    0x04
 #define RF_SYNCCONFIG_SYNCSIZE_6                    0x05
@@ -1694,8 +1694,8 @@ typedef struct sSX1276
 /*!
  * RegPacketConfig2
  */
- 
-#define RF_PACKETCONFIG2_WMBUS_CRC_ENABLE_MASK      0x7F 
+
+#define RF_PACKETCONFIG2_WMBUS_CRC_ENABLE_MASK      0x7F
 #define RF_PACKETCONFIG2_WMBUS_CRC_ENABLE           0x80
 #define RF_PACKETCONFIG2_WMBUS_CRC_DISABLE          0x00  // Default
 
@@ -1733,7 +1733,7 @@ typedef struct sSX1276
  */
 #define RF_FIFOTHRESH_TXSTARTCONDITION_MASK         0x7F
 #define RF_FIFOTHRESH_TXSTARTCONDITION_FIFOTHRESH   0x00  // Default
-#define RF_FIFOTHRESH_TXSTARTCONDITION_FIFONOTEMPTY 0x80  
+#define RF_FIFOTHRESH_TXSTARTCONDITION_FIFONOTEMPTY 0x80
 
 #define RF_FIFOTHRESH_FIFOTHRESHOLD_MASK            0xC0
 #define RF_FIFOTHRESH_FIFOTHRESHOLD_THRESHOLD       0x0F  // Default
@@ -2006,7 +2006,7 @@ typedef struct sSX1276
 #define NOISE_ABSOLUTE_ZERO                         -174.0
 
 #define NOISE_FIGURE_LF                                4.0
-#define NOISE_FIGURE_HF                                6.0 
+#define NOISE_FIGURE_HF                                6.0
 
 
 
@@ -2015,11 +2015,10 @@ tSX1276LR* SX1276LR;
 
 
 
-void  SX1276StartRx( SPISlaveID id );
-//void RF_Sx1276_Init(void);
+void SX1276StartRx( SPISlaveID id );
 void SX1276SetIdleState( SPISlaveID id );
 void SX1276GetRxPacket( SPISlaveID id, void *buffer, uint16_t *size );
 void SX1276SetTxPacket( SPISlaveID id, const void *buffer, uint16_t size );
 void SX1276LoRaSetRFFrequency( SPISlaveID id, uint32_t freq );
 
-#endif 
+#endif
