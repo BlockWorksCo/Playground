@@ -8,6 +8,7 @@
 #include "sx1276-PhysicalInterface.h"
 #include "sx1276-LoRa.h"
 #include "delay.h"
+#include <string.h>
 
 void ReadTemperature();
 uint8_t receiveBuffer[128]  = {0};
@@ -22,6 +23,7 @@ uint8_t loraReceivePacket( SPISlaveID id, uint8_t* buf )
 
     if ( GPIO_ReadInputDataBit( GPIOB, GPIO_Pin_10 ) != 0 )
     {
+        memset( &receiveBuffer[0], 0xff, sizeof(receiveBuffer) );
         length = RFM96_LoRaRxPacket( id, &receiveBuffer[0] );
 
         RFM96_LoRaEntryRx( id );
@@ -125,8 +127,11 @@ int main(void)
         static uint32_t count    = 0;
         count++;
         if(count > 10) {
+            static uint8_t  i   = 0;
             count   = 0;
             uint8_t     packet[32]  = {0,1,2,3,4,5};
+            packet[0]   = i;
+            i++;
             loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
         }
   }

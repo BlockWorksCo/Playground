@@ -14,20 +14,20 @@ void spiBusInit()
     GPIO_InitTypeDef  GPIO_InitStructure;
 
     //
-    // Init SlaveSelect1.
+    // Init SlaveA.
     //
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
 
     //
-    // Init SlaveSelect2.
+    // Init SlaveB.
     //
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
@@ -83,14 +83,28 @@ void spiBusInit()
     SPI_NSSInternalSoftwareConfig(SPI1, SPI_NSSInternalSoft_Set);
 }
 
-void spiBusSelectSlave( SPISlaveID slaveID )
+void spiBusSelectSlave( SPISlaveID id )
 {
-    GPIO_ResetBits(GPIOB, GPIO_Pin_1);
+    if( id == SlaveA )
+    {
+        GPIO_ResetBits(GPIOB, GPIO_Pin_0);
+    }
+    else
+    {
+        GPIO_ResetBits(GPIOB, GPIO_Pin_1);
+    }
 }
 
-void spiBusDeselectSlave( SPISlaveID slaveID )
+void spiBusDeselectSlave( SPISlaveID id )
 {
-    GPIO_SetBits(GPIOB, GPIO_Pin_1);
+    if( id == SlaveA )
+    {
+        GPIO_SetBits(GPIOB, GPIO_Pin_0);
+    }
+    else
+    {
+        GPIO_SetBits(GPIOB, GPIO_Pin_1);
+    }
 }
 
 uint8_t spiBusWriteOneByte( uint8_t byte )

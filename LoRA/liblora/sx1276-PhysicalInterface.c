@@ -259,6 +259,34 @@ void SX1276Reset( SPISlaveID id )
 
 void sx1276PhysicalInterfaceInit(SPISlaveID id )
 {
+    GPIO_InitTypeDef  GPIO_InitStructure;
+
+#if 0
+    /* Initialize LED which connected to PC13 */
+    // Enable PORTC Clock
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+    /* Configure the GPIO_LED pin */
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14|GPIO_Pin_15;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+    GPIO_ResetBits(GPIOC, GPIO_Pin_13); // Set C13 to Low level ("0")
+    GPIO_ResetBits(GPIOB, GPIO_Pin_14); // Set C13 to Low level ("0")
+    GPIO_ResetBits(GPIOB, GPIO_Pin_15); // Set C13 to Low level ("0")
+#endif
+
+    /* Initialize DIO input PB10 PB11*/
+    // Enable PORTB Clock
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+    /* Configure the GPIO_BUTTON pin */
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10|GPIO_Pin_11;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+    // B12 B13 are resets
+    // B10 B11 are DIO0 inputs.
 }
 
 
