@@ -9,24 +9,6 @@
 #include "sx1276-RF.h" // TODO: remove the need for this
 
 
-#define DIO0_IOPORT                                 GPIOA
-#define DIO0_PIN                                    GPIO_Pin_1
-
-#define DIO1_IOPORT                                 GPIOB
-#define DIO1_PIN                                    GPIO_Pin_11 
-
-#define DIO2_IOPORT                                 GPIOB
-#define DIO2_PIN                                    GPIO_Pin_10
-
-#define DIO3_IOPORT                                 GPIOB
-#define DIO3_PIN                                    GPIO_Pin_1
-
-#define DIO4_IOPORT                                 GPIOB
-#define DIO4_PIN                                    GPIO_Pin_0 
-
-#define DIO5_IOPORT                                 GPIOC
-#define DIO5_PIN                                    GPIO_Pin_5
-
 static uint8_t RFState = RF_STATE_IDLE;
 
 
@@ -264,42 +246,6 @@ void SX1276ReadFifo( SPISlaveID id, uint8_t *buffer, uint8_t size )
 {
     SX1276ReadBuffer( id,  0, buffer, size );
 }
-#if 0
-
-uint8_t SX1276ReadDio0( SPISlaveID id )
-{
-    return GPIO_ReadInputDataBit( GPIOB, GPIO_Pin_11 );
-}
-
-uint8_t SX1276ReadDio1( SPISlaveID id )
-{
-    return GPIO_ReadInputDataBit( DIO1_IOPORT, DIO1_PIN );
-}
-
-uint8_t SX1276ReadDio2( SPISlaveID id )
-{
-    return GPIO_ReadInputDataBit( DIO2_IOPORT, DIO2_PIN );
-}
-uint8_t SX1276ReadDio3( SPISlaveID id )
-{
-	  return GPIO_ReadInputDataBit( DIO3_IOPORT, DIO3_PIN );
-}
-
-uint8_t SX1276ReadDio4( SPISlaveID id )
-{
-	  return GPIO_ReadInputDataBit( DIO4_IOPORT, DIO4_PIN );
-}
-
-uint8_t SX1276ReadDio5( SPISlaveID id )
-{
-	  return GPIO_ReadInputDataBit( DIO5_IOPORT, DIO5_PIN );
-}
-
-void SX1276WriteRxTx( SPISlaveID id, uint8_t txEnable )
-{
-
-}
-#endif
 
 void SX1276Reset( SPISlaveID id )
 {
@@ -313,37 +259,6 @@ void SX1276Reset( SPISlaveID id )
 
 void sx1276PhysicalInterfaceInit(SPISlaveID id )
 {
-#if 0
-   GPIO_InitTypeDef GPIO_InitStructure;
-
-    RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC, ENABLE );
-
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-    // Configure radio DIO as inputs
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-
-    // Configure DIO0
-    GPIO_InitStructure.GPIO_Pin =  DIO0_PIN;
-    GPIO_Init( DIO0_IOPORT, &GPIO_InitStructure );
-    
-    // Configure DIO1
-    GPIO_InitStructure.GPIO_Pin =  DIO1_PIN;
-    GPIO_Init( DIO1_IOPORT, &GPIO_InitStructure );
-    
-    // Configure DIO2
-    GPIO_InitStructure.GPIO_Pin =  DIO2_PIN;
-    GPIO_Init( DIO2_IOPORT, &GPIO_InitStructure );
-    
-    // Configure DIO3 as input
-    GPIO_InitStructure.GPIO_Pin =  DIO3_PIN;
-    GPIO_Init( DIO3_IOPORT, &GPIO_InitStructure );
-    
-    // Configure DIO5 as input
-    GPIO_InitStructure.GPIO_Pin =  DIO5_PIN;
-    GPIO_Init( DIO5_IOPORT, &GPIO_InitStructure );
-#endif
 }
 
 
