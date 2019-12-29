@@ -261,7 +261,7 @@ uint8_t RFM96_LoRaRxPacket(SPISlaveID id, uint8_t *buf)
 				else
 					packet_size = RegisterRead( id, (uint8_t)(LR_RegRxNbBytes>>8));     //Number for received bytes    
 
-				SPIBurstRead(0x00, buf, packet_size);
+				SPIBurstRead(id, 0x00, buf, packet_size);
 
 				RFM96_LoRaClearIrq(id);
 				delay_us(1);
@@ -321,7 +321,7 @@ uint8_t RFM96_LoRaEntryTx(SPISlaveID id, uint8_t packet_length)
 uint8_t RFM96_LoRaTxPacket(SPISlaveID id, uint8_t *buf,uint8_t len)
 { 
          
-    BurstWrite(0x00, (uint8_t *)buf, len);  
+    BurstWrite(id, 0x00, (uint8_t *)buf, len);  
     RegisterWrite( id, LR_RegOpMode+0x03+0x08);                    //Tx Mode       
 
     uint16_t count=0;	

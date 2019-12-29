@@ -76,7 +76,7 @@ void RegisterWrite( SPISlaveID id, uint16_t WrPara)
 **          length--how many bytes for read
 **Output:   None
 **********************************************************/
-void SPIBurstRead(uint8_t adr, uint8_t *ptr, uint8_t length)
+void SPIBurstRead( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
 {
   uint8_t i;
   if(length<=1)                                            //lengt
@@ -106,7 +106,7 @@ void SPIBurstRead(uint8_t adr, uint8_t *ptr, uint8_t length)
 **          length--how many bytes for write
 **Output:   none
 **********************************************************/
-void BurstWrite(uint8_t adr, uint8_t *ptr, uint8_t length)
+void BurstWrite( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
 { 
     spiBusSelectSlave( SlaveA );
     
