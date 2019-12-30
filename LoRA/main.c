@@ -21,7 +21,7 @@ uint8_t loraReceivePacket( SPISlaveID id, uint8_t* buf )
 {
     uint8_t length = 0;
 
-    if ( GPIO_ReadInputDataBit( GPIOB, GPIO_Pin_10 ) != 0 )
+    if ( sx1276IsIRQPinAsserted(id) == true )
     {
         memset( &receiveBuffer[0], 0xff, sizeof(receiveBuffer) );
         length = RFM96_LoRaRxPacket( id, &receiveBuffer[0] );
@@ -86,8 +86,10 @@ int main(void)
 
     spiBusInit();
 
+  	GPIOB->ODR ^= GPIO_Pin_14; // Invert C13
   	GPIOB->ODR ^= GPIO_Pin_15; // Invert C13
     delay_ms(1000);
+  	GPIOB->ODR ^= GPIO_Pin_14; // Invert C13
   	GPIOB->ODR ^= GPIO_Pin_15; // Invert C13
 
     sx1276PhysicalInterfaceInit( SlaveA );
@@ -99,14 +101,12 @@ int main(void)
   while (1) {
 
     	/* Toggle LED which connected to PC13*/
-    	GPIOB->ODR ^= GPIO_Pin_14; // Invert C13
     	GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
 
     	/* delay */
         delay_ms(100);
 
     	/* Toggle LED which connected to PC13*/
-    	GPIOB->ODR ^= GPIO_Pin_14; // Invert C13
     	GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
 
         ReadTemperature();
@@ -115,24 +115,59 @@ int main(void)
         delay_ms(100);
 
         //
+        // Receive any packets on SlaveA.
         //
-        //
-        uint8_t length  = loraReceivePacket( SlaveA, &receiveBuffer[0] );
-        if(length > 0) {
-        	GPIOB->ODR |= GPIO_Pin_15; // Invert C13
-            delay_ms(100);
-        	GPIOB->ODR &= ~GPIO_Pin_15; // Invert C13
+        {
+            uint8_t length  = loraReceivePacket( SlaveA, &receiveBuffer[0] );
+            if(length > 0) {
+                GPIOB->ODR |= GPIO_Pin_14; // Invert C13
+                delay_ms(100);
+                GPIOB->ODR &= ~GPIO_Pin_14; // Invert C13
+            }
         }
 
-        static uint32_t count    = 0;
-        count++;
-        if(count > 10) {
-            static uint8_t  i   = 0;
-            count   = 0;
-            uint8_t     packet[32]  = {0,1,2,3,4,5};
-            packet[0]   = i;
-            i++;
-            loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
+        //
+        // Receive any packets on SlaveB.
+        //
+        {
+            uint8_t length  = loraReceivePacket( SlaveB, &receiveBuffer[0] );
+            if(length > 0) {
+                GPIOB->ODR |= GPIO_Pin_15; // Invert C13
+                delay_ms(100);
+                GPIOB->ODR &= ~GPIO_Pin_15; // Invert C13
+            }
+        }
+
+        //
+        // Transmit from SlaveA
+        //
+        {
+            static uint32_t count    = 0;
+            count++;
+            if(count > 5) {
+                static uint8_t  i   = 0;
+                count   = 0;
+                uint8_t     packet[16]  = {0,2,3,4,5,6};
+                packet[0]   = i;
+                i++;
+                loraTransmitPacket( SlaveA,  &packet[0], sizeof(packet) );
+            }
+        }
+
+        //
+        // Transmit from SlaveB
+        //
+        {
+            static uint32_t count    = 0;
+            count++;
+            if(count > 10) {
+                static uint8_t  i   = 0;
+                count   = 0;
+                uint8_t     packet[32]  = {0,1,2,3,4,5};
+                packet[0]   = i;
+                i++;
+                loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
+            }
         }
   }
 }
