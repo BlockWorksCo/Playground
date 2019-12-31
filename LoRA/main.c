@@ -21,13 +21,10 @@ uint8_t loraReceivePacket( SPISlaveID id, uint8_t* buf )
 {
     uint8_t length = 0;
 
-    if ( loraCheckAsyncReceiveCompletion(id) == true )
-    {
-        memset( &receiveBuffer[0], 0xff, sizeof(receiveBuffer) );
-        length = RFM96_LoRaRxPacket( id, &receiveBuffer[0] );
+    memset( &receiveBuffer[0], 0xff, sizeof(receiveBuffer) );
+    length = RFM96_LoRaRxPacket( id, &receiveBuffer[0] );
 
-        RFM96_LoRaEntryRx( id );
-    }
+    RFM96_LoRaEntryRx( id );
 
     return length;
 }
@@ -102,14 +99,15 @@ int main(void)
         /* Toggle LED which connected to PC13*/
         GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
 
-        ReadTemperature();
+        //ReadTemperature();
 
         /* delay */
-        delay_ms(100);
+        delay_ms(200);
 
         //
         // Receive any packets on SlaveA.
         //
+        if ( loraCheckAsyncReceiveCompletion(SlaveA) == true )
         {
             uint8_t length  = loraReceivePacket( SlaveA, &receiveBuffer[0] );
             if(length > 0) {
@@ -122,6 +120,7 @@ int main(void)
         //
         // Receive any packets on SlaveB.
         //
+        if ( loraCheckAsyncReceiveCompletion(SlaveB) == true )
         {
             uint8_t length  = loraReceivePacket( SlaveB, &receiveBuffer[0] );
             if(length > 0) {
