@@ -21,7 +21,7 @@ uint8_t loraReceivePacket( SPISlaveID id, uint8_t* buf )
 {
     uint8_t length = 0;
 
-    if ( sx1276IsIRQPinAsserted(id) == true )
+    if ( loraCheckAsyncReceiveCompletion(id) == true )
     {
         memset( &receiveBuffer[0], 0xff, sizeof(receiveBuffer) );
         length = RFM96_LoRaRxPacket( id, &receiveBuffer[0] );
@@ -33,17 +33,10 @@ uint8_t loraReceivePacket( SPISlaveID id, uint8_t* buf )
 }
 
 
-uint8_t loraTransmitPacket( SPISlaveID id, uint8_t* buf, uint8_t size )
+void loraTransmitPacket( SPISlaveID id, uint8_t* buf, uint8_t size )
 {
-    int ret = 0;
-
-    ret = RFM96_LoRaEntryTx(id, size);
-    ret = RFM96_LoRaTxPacket(id, buf,size);
-
-    delay_ms( 10 );
-    RFM96_LoRaEntryRx( id );
-
-    return ret;
+    RFM96_LoRaEntryTx(id, size);
+    loraTransmitPacket_Async(id, buf,size);
 }
 
 
@@ -86,11 +79,11 @@ int main(void)
 
     spiBusInit();
 
-  	GPIOB->ODR ^= GPIO_Pin_14; // Invert C13
-  	GPIOB->ODR ^= GPIO_Pin_15; // Invert C13
+    GPIOB->ODR ^= GPIO_Pin_14; // Invert C13
+    GPIOB->ODR ^= GPIO_Pin_15; // Invert C13
     delay_ms(1000);
-  	GPIOB->ODR ^= GPIO_Pin_14; // Invert C13
-  	GPIOB->ODR ^= GPIO_Pin_15; // Invert C13
+    GPIOB->ODR ^= GPIO_Pin_14; // Invert C13
+    GPIOB->ODR ^= GPIO_Pin_15; // Invert C13
 
     sx1276PhysicalInterfaceInit( SlaveA );
     sx1276PhysicalInterfaceInit( SlaveB );
@@ -141,13 +134,14 @@ int main(void)
         //
         // Transmit from SlaveA
         //
+        if(loraCheckAsyncTransmitForCompletion(SlaveA) == true)
         {
             static uint32_t count    = 0;
             count++;
-            if(count > 5) {
+            if(count > 6) {
                 static uint8_t  i   = 0;
                 count   = 0;
-                uint8_t     packet[16]  = {0,2,3,4,5,6};
+                uint8_t     packet[8]  = {0,2,3,4,5,6};
                 packet[0]   = i;
                 i++;
                 loraTransmitPacket( SlaveA,  &packet[0], sizeof(packet) );
@@ -157,13 +151,14 @@ int main(void)
         //
         // Transmit from SlaveB
         //
+        if(loraCheckAsyncTransmitForCompletion(SlaveB) == true)
         {
             static uint32_t count    = 0;
             count++;
-            if(count > 10) {
+            if(count > 20) {
                 static uint8_t  i   = 0;
                 count   = 0;
-                uint8_t     packet[32]  = {0,1,2,3,4,5};
+                uint8_t     packet[8]  = {0,1,2,3,4,5};
                 packet[0]   = i;
                 i++;
                 loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );

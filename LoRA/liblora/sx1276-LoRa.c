@@ -22,6 +22,13 @@
 #define CRC_EN   0x00  //CRC Enable
 
 
+//
+//
+//
+bool transmitInProgress_SlaveA  = false;
+bool transmitInProgress_SlaveB  = false;
+
+
 /**********************************************************
 **Parameter table define
 **********************************************************/
@@ -122,8 +129,6 @@ void RFM96_Config( SPISlaveID id, uint8_t mode)
 
     RFM96_Sleep(id);                                           //Change modem mode Must in Sleep mode
     delay_ms(1);
-
-
 
     RFM96_EntryLoRa(id);
     // RegisterWrite( id, 0x5904);   //?? Change digital regulator form 1.6V to 1.47V: see errata note
@@ -327,11 +332,11 @@ uint8_t RFM96_LoRaTxPacket(SPISlaveID id, uint8_t *buf,uint8_t len)
     uint16_t count=0;
     while( sx1276IsIRQPinAsserted(id) == false )
     {
-        if(++count>1000)
+        if(++count>10000)
         {
             break;
         }
-        delay_ms(1);
+        delay_us(1000);
     }
 
     RegisterRead( id, (uint8_t)(LR_RegIrqFlags>>8));
@@ -346,7 +351,96 @@ uint8_t RFM96_LoRaTxPacket(SPISlaveID id, uint8_t *buf,uint8_t len)
 }
 
 
+uint8_t loraTransmitPacket_Async(SPISlaveID id, uint8_t *buf,uint8_t len)
+{
+    BurstWrite(id, 0x00, (uint8_t *)buf, len);
+    RegisterWrite( id, LR_RegOpMode+0x03+0x08);                    //Tx Mode
 
+    if(id == SlaveA)
+    {
+        transmitInProgress_SlaveA   = true;
+    }
+
+    if(id == SlaveB)
+    {
+        transmitInProgress_SlaveB   = true;
+    }
+
+
+    return len;
+}
+
+
+//
+// return value is true if a transmit can be started.
+//
+bool loraCheckAsyncTransmitForCompletion(SPISlaveID id)
+{
+    if((id == SlaveA) && (transmitInProgress_SlaveA == false)) 
+    {
+        // Transmit is not in progress, so indicate that a transmit
+        // is allowed to be setup.
+        return true;
+    }
+
+    if((id == SlaveB) && (transmitInProgress_SlaveB == false)) 
+    {
+        // Transmit is not in progress, so indicate that a transmit
+        // is allowed to be setup.
+        return true;
+    }
+
+    if( sx1276IsIRQPinAsserted(id) == true ) 
+    {
+        // Previous transmit is now complete, clear the IRQ flags and
+        // move into standby mode.
+        // TODO: Shouldn't we be going to receive mode?
+        RegisterRead( id, (uint8_t)(LR_RegIrqFlags>>8));
+        RFM96_LoRaClearIrq(id);                                //Clear irq
+        RFM96_Standby(id);                                     //Entry Standby mode
+
+        delay_ms( 10 );
+        RFM96_LoRaEntryRx( id );
+
+        if(id == SlaveA) 
+        {
+            transmitInProgress_SlaveA   = false;
+        }
+        if(id == SlaveB) 
+        {
+            transmitInProgress_SlaveB   = false;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+
+
+bool loraCheckAsyncReceiveCompletion(SPISlaveID id)
+{
+    if((id == SlaveA) && (transmitInProgress_SlaveA == true)) 
+    {
+        // If a transmit is in progress, we're not receiving.
+        return false;
+    }
+
+    if((id == SlaveB) && (transmitInProgress_SlaveB == true)) 
+    {
+        // If a transmit is in progress, we're not receiving.
+        return false;
+    }
+
+    if ( sx1276IsIRQPinAsserted(id) == true )
+    {
+        // receive-complete has been signalled.
+        return true;
+    }
+
+    return false;
+}
 
 
 

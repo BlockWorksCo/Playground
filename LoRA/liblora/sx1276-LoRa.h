@@ -85,6 +85,13 @@ void RFM96_LoRaEntryRx( SPISlaveID id );
 uint8_t RFM96_LoRaRxPacket(SPISlaveID id, uint8_t *buf);
 uint8_t RFM96_LoRaEntryTx(SPISlaveID id, uint8_t packet_length);
 uint8_t RFM96_LoRaTxPacket(SPISlaveID id, uint8_t *buf,uint8_t len);
+
+
+
+uint8_t loraTransmitPacket_Async(SPISlaveID id, uint8_t *buf,uint8_t len);
+bool loraCheckAsyncTransmitForCompletion(SPISlaveID id);
+bool loraCheckAsyncReceiveCompletion(SPISlaveID id);
+
 /*!
  * SX1276 Internal registers Address
  */
