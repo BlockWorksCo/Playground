@@ -153,11 +153,11 @@ int main(void)
         //
         if(loraCheckAsyncTransmitForCompletion(SlaveB) == true)
         {
-            static uint32_t count    = 0;
+            static uint32_t count    = 2;
             count++;
-            if(count > 20) {
+            if(count > 8) {
                 static uint8_t  i   = 0;
-                count   = 0;
+                count   = 2;
                 uint8_t     packet[8]  = {0,1,2,3,4,5};
                 packet[0]   = i;
                 i++;
