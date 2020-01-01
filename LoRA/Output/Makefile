@@ -54,6 +54,7 @@ OBJS    += sx1276-LoRaMisc.o
 OBJS    += sx1276-PhysicalInterface.o
 OBJS    += SPIBus.o
 OBJS    += delay.o
+OBJS    += sysclk.o
 
 
 

@@ -8,14 +8,16 @@
 #include "sx1276-LoRa.h"
 #include "delay.h"
 #include <string.h>
+#include "sysclk.h"
+
 
 
 
 int main(void)
 {
-    static uint8_t receiveBuffer[128]  = {0};
-
-
+    //
+    // Initialise GPIOs.
+    //
     GPIO_InitTypeDef  GPIO_InitStructure;
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
@@ -33,6 +35,13 @@ int main(void)
     GPIO_ResetBits(GPIOC, GPIO_Pin_13); // Set C13 to Low level ("0")
     GPIO_ResetBits(GPIOB, GPIO_Pin_14); // Set C13 to Low level ("0")
     GPIO_ResetBits(GPIOB, GPIO_Pin_15); // Set C13 to Low level ("0")
+
+    //
+    // Initialise SysTick.
+    //
+    SetSysClockTo72();
+    SysTick_Config(SystemCoreClock/1000);
+
 
     //
     // Startup flash of both LEDs.
@@ -57,6 +66,8 @@ int main(void)
     // 
     while(true) 
     {
+        static uint8_t receiveBuffer[128]  = {0};
+
         /* Toggle LED which connected to PC13*/
         GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
 
@@ -65,8 +76,6 @@ int main(void)
 
         /* Toggle LED which connected to PC13*/
         GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
-
-        //ReadTemperature();
 
         /* delay */
         delay_ms(200);
@@ -132,3 +141,7 @@ int main(void)
         }
     }
 }
+
+
+
+
