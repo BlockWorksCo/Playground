@@ -39,8 +39,8 @@ int main(void)
     //
     // Initialise SysTick.
     //
-    SetSysClockTo72();
-    SysTick_Config(SystemCoreClock/1000);
+    //SysTick_Config(SystemCoreClock/100);
+    SysTick_Config(30000);
 
 
     //
