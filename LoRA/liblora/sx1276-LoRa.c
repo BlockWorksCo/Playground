@@ -361,7 +361,6 @@ uint8_t loraTransmitPacket_Async(SPISlaveID id, uint8_t *buf,uint8_t len)
 //
 bool loraCheckAsyncTransmitForCompletion(SPISlaveID id)
 {
-    //delay_ms(20);
     if((id == SlaveA) && (transmitInProgress_SlaveA == false)) 
     {
         // Transmit is not in progress, so indicate that a transmit
@@ -404,7 +403,6 @@ bool loraCheckAsyncTransmitForCompletion(SPISlaveID id)
 
 bool loraCheckAsyncReceiveCompletion(SPISlaveID id)
 {
-    delay_ms(70);
     if((id == SlaveA) && (transmitInProgress_SlaveA == true)) 
     {
         // If a transmit is in progress, we're not receiving.
