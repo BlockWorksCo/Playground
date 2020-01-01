@@ -40,7 +40,7 @@ int main(void)
     // Initialise SysTick.
     //
     //SysTick_Config(SystemCoreClock/100);
-    SysTick_Config(30000);
+    SysTick_Config(50000);
 
 
     //
@@ -74,11 +74,10 @@ int main(void)
         /* delay */
         delay_ms(100);
 
-        /* Toggle LED which connected to PC13*/
-        GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
+        // turn off the LEDs
+        GPIOB->ODR &= ~GPIO_Pin_14; // Invert C13
+        GPIOB->ODR &= ~GPIO_Pin_15; // Invert C13
 
-        /* delay */
-        delay_ms(200);
 
         //
         // Receive any packets on SlaveA.
@@ -88,8 +87,6 @@ int main(void)
             uint8_t length  = loraReceivePacket( SlaveA, &receiveBuffer[0], sizeof(receiveBuffer) );
             if(length > 0) {
                 GPIOB->ODR |= GPIO_Pin_14; // Invert C13
-                delay_ms(100);
-                GPIOB->ODR &= ~GPIO_Pin_14; // Invert C13
             }
         }
 
@@ -101,8 +98,6 @@ int main(void)
             uint8_t length  = loraReceivePacket( SlaveB, &receiveBuffer[0], sizeof(receiveBuffer) );
             if(length > 0) {
                 GPIOB->ODR |= GPIO_Pin_15; // Invert C13
-                delay_ms(100);
-                GPIOB->ODR &= ~GPIO_Pin_15; // Invert C13
             }
         }
 
