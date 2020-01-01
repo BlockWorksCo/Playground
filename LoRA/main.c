@@ -69,9 +69,6 @@ int main(void)
     {
         static uint8_t receiveBuffer[128]  = {0};
 
-        extern bool transmitInProgress_SlaveA;
-        extern bool transmitInProgress_SlaveB;
-
         /* Toggle LED which connected to PC13*/
         GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
 
@@ -93,14 +90,11 @@ int main(void)
         //
         if(loraCheckAsyncTransmitForCompletion(SlaveA) == true)
         {
-            if((transmitInProgress_SlaveA == false) && (transmitInProgress_SlaveB == false))
-            {
-                static uint32_t count    = 0;
-                if((sysclkGetTickCount()-count) > 5000) {
-                    count   = sysclkGetTickCount();
-                    uint8_t     packet[8]  = {0,2,3,4,5,6};
-                    loraTransmitPacket( SlaveA,  &packet[0], sizeof(packet) );
-                }
+            static uint32_t count    = 0;
+            if((sysclkGetTickCount()-count) > 5000) {
+                count   = sysclkGetTickCount();
+                uint8_t     packet[8]  = {0,2,3,4,5,6};
+                loraTransmitPacket( SlaveA,  &packet[0], sizeof(packet) );
             }
         }
 
@@ -123,17 +117,18 @@ int main(void)
         //
         if(loraCheckAsyncTransmitForCompletion(SlaveB) == true)
         {
-            if((transmitInProgress_SlaveA == false) && (transmitInProgress_SlaveB == false))
-            {
-                static uint32_t count    = 2500;
-                if((sysclkGetTickCount()-count) > 5000) {
-                    count   = sysclkGetTickCount();
-                    uint8_t     packet[8]  = {0,1,2,3,4,5};
-                    loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
-                }
+            static uint32_t count    = 2500;
+            if((sysclkGetTickCount()-count) > 5000) {
+                count   = sysclkGetTickCount();
+                uint8_t     packet[8]  = {0,1,2,3,4,5};
+                loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
             }
         }
 
+        //
+        //
+        //
+        DispatchHandlers();
 
     }
 }
