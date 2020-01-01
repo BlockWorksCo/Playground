@@ -12,6 +12,7 @@
 #include "delay.h"
 #include "SPIBus.h"
 #include <stdio.h>
+#include <string.h>
 
 
 
@@ -422,6 +423,28 @@ bool loraCheckAsyncReceiveCompletion(SPISlaveID id)
     return false;
 }
 
+
+
+
+
+uint8_t loraReceivePacket( SPISlaveID id, uint8_t* buf, size_t maxBytesToReceive )
+{
+    uint8_t length = 0;
+    
+    memset( &buf[0], 0xff, maxBytesToReceive );
+    length = RFM96_LoRaRxPacket( id, &buf[0] );
+    
+    loraContinuousReceiveMode( id );
+    
+    return length;
+}   
+
+
+void loraTransmitPacket( SPISlaveID id, uint8_t* buf, uint8_t size )
+{
+    RFM96_LoRaEntryTx(id, size);
+    loraTransmitPacket_Async(id, buf,size);
+}   
 
 
 

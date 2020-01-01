@@ -23,6 +23,7 @@
 
 
 #include "SPIBus.h"
+#include <stddef.h>
 
 /*
   #define LED_TX           PD_ODR_ODR7
@@ -91,6 +92,11 @@ uint8_t RFM96_LoRaTxPacket(SPISlaveID id, uint8_t *buf,uint8_t len);
 uint8_t loraTransmitPacket_Async(SPISlaveID id, uint8_t *buf,uint8_t len);
 bool loraCheckAsyncTransmitForCompletion(SPISlaveID id);
 bool loraCheckAsyncReceiveCompletion(SPISlaveID id);
+
+
+uint8_t loraReceivePacket( SPISlaveID id, uint8_t* buf, size_t maxBytesToReceive );
+void loraTransmitPacket( SPISlaveID id, uint8_t* buf, uint8_t size );
+
 
 /*!
  * SX1276 Internal registers Address
