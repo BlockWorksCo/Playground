@@ -248,14 +248,8 @@ uint8_t RFM96_LoRaRxWaitStable( SPISlaveID id )
 **********************************************************/
 uint8_t RFM96_LoRaRxPacket(SPISlaveID id, uint8_t *buf)
 {
-    uint8_t i;
     uint8_t addr;
     uint8_t packet_size;
-
-
-
-    for(i=0; i<32; i++) //清Buffer
-        buf[i] = 0x00;
 
     addr = RegisterRead( id, (uint8_t)(LR_RegFifoRxCurrentaddr>>8));      //last packet addr 数据包的最后地址(数据的尾地址)
     RegisterWrite( id, LR_RegFifoAddrPtr+addr);                      //RxBaseAddr -> FiFoAddrPtr
@@ -270,9 +264,8 @@ uint8_t RFM96_LoRaRxPacket(SPISlaveID id, uint8_t *buf)
 
     RFM96_LoRaClearIrq(id);
     delay_us(1);
+
     return packet_size;
-
-
 }
 
 
