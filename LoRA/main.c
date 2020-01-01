@@ -91,17 +91,6 @@ int main(void)
         }
 
         //
-        // Receive any packets on SlaveB.
-        //
-        if ( loraCheckAsyncReceiveCompletion(SlaveB) == true )
-        {
-            uint8_t length  = loraReceivePacket( SlaveB, &receiveBuffer[0], sizeof(receiveBuffer) );
-            if(length > 0) {
-                GPIOB->ODR |= GPIO_Pin_15; // Invert C13
-            }
-        }
-
-        //
         // Transmit from SlaveA
         //
         if(loraCheckAsyncTransmitForCompletion(SlaveA) == true)
@@ -115,6 +104,19 @@ int main(void)
                 packet[0]   = i;
                 i++;
                 loraTransmitPacket( SlaveA,  &packet[0], sizeof(packet) );
+            }
+        }
+
+
+
+        //
+        // Receive any packets on SlaveB.
+        //
+        if ( loraCheckAsyncReceiveCompletion(SlaveB) == true )
+        {
+            uint8_t length  = loraReceivePacket( SlaveB, &receiveBuffer[0], sizeof(receiveBuffer) );
+            if(length > 0) {
+                GPIOB->ODR |= GPIO_Pin_15; // Invert C13
             }
         }
 
@@ -134,6 +136,8 @@ int main(void)
                 loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
             }
         }
+
+
     }
 }
 
