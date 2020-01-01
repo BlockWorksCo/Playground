@@ -6,24 +6,21 @@
 //
 
 
-#ifndef __COMMON_H__
-#define __COMMON_H__
-
-#include <stdint.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdarg.h>
-#include <string.h>
 
 
-#define PRIVATE     static
 
 
-#define NUMBER_OF_ELEMENTS(a)   (sizeof(a)/sizeof(a[0]))
+#ifndef __EVENTQUEUE_H__
+#define __EVENTQUEUE_H__
+
+
+typedef void (*Handler)();
+
+
+void Call( Handler handler );
+void CallFromInterrupt( Handler handler );
+
+void DispatchHandlers();
 
 #endif
-
-
-
-
 

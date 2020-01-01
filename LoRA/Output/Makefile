@@ -38,6 +38,7 @@ VPATH   += ../cmsis
 VPATH   += ../cmsis_boot
 VPATH   += ../cmsis_boot/startup
 VPATH   += ../liblora
+VPATH   += ../EventQueue
 
 
 
@@ -55,6 +56,7 @@ OBJS    += sx1276-PhysicalInterface.o
 OBJS    += SPIBus.o
 OBJS    += delay.o
 OBJS    += sysclk.o
+OBJS    += EventQueue.o
 
 
 
@@ -63,6 +65,7 @@ INCLUDES   += -I../stm_lib/inc
 INCLUDES   += -I../cmsis
 INCLUDES   += -I../cmsis_boot
 INCLUDES   += -I../liblora
+INCLUDES   += -I../EventQueue
 
 
 all: app.elf
