@@ -99,17 +99,22 @@ int main(void)
         }
 
 
+        extern bool transmitInProgress_SlaveA;
+        extern bool transmitInProgress_SlaveB;
 
         //
         // Receive any packets on SlaveB.
         //
         if ( loraCheckAsyncReceiveCompletion(SlaveB) == true )
         {
-            uint8_t length  = loraReceivePacket( SlaveB, &receiveBuffer[0], sizeof(receiveBuffer) );
-            if(length > 0) {
-                GPIOB->ODR |= GPIO_Pin_15; // Invert C13
-                delay_ms(100);
-                GPIOB->ODR &= ~GPIO_Pin_15; // Invert C13
+            if((transmitInProgress_SlaveA == false) && (transmitInProgress_SlaveB == false))
+            {
+                uint8_t length  = loraReceivePacket( SlaveB, &receiveBuffer[0], sizeof(receiveBuffer) );
+                if(length > 0) {
+                    GPIOB->ODR |= GPIO_Pin_15; // Invert C13
+                    delay_ms(100);
+                    GPIOB->ODR &= ~GPIO_Pin_15; // Invert C13
+                }
             }
         }
 
@@ -118,11 +123,14 @@ int main(void)
         //
         if(loraCheckAsyncTransmitForCompletion(SlaveB) == true)
         {
-            static uint32_t count    = 0;
-            if((sysclkGetTickCount()-count) > 5700) {
-                count   = sysclkGetTickCount();
-                uint8_t     packet[8]  = {0,1,2,3,4,5};
-                loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
+            if((transmitInProgress_SlaveA == false) && (transmitInProgress_SlaveB == false))
+            {
+                static uint32_t count    = 0;
+                if((sysclkGetTickCount()-count) > 5700) {
+                    count   = sysclkGetTickCount();
+                    uint8_t     packet[8]  = {0,1,2,3,4,5};
+                    loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
+                }
             }
         }
 
