@@ -90,7 +90,7 @@ int main(void)
         if(loraCheckAsyncTransmitForCompletion(SlaveA) == true)
         {
             static uint32_t count    = 0;
-            if((sysclkGetTickCount()-count) > 6000) {
+            if((sysclkGetTickCount()-count) > 6300) {
                 count   = sysclkGetTickCount();
                 uint8_t     packet[8]  = {0,2,3,4,5,6};
                 loraTransmitPacket( SlaveA,  &packet[0], sizeof(packet) );
@@ -118,7 +118,7 @@ int main(void)
         if(loraCheckAsyncTransmitForCompletion(SlaveB) == true)
         {
             static uint32_t count    = 0;
-            if((sysclkGetTickCount()-count) > 5000) {
+            if((sysclkGetTickCount()-count) > 5700) {
                 count   = sysclkGetTickCount();
                 uint8_t     packet[8]  = {0,1,2,3,4,5};
                 loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
