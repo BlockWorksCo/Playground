@@ -81,7 +81,7 @@ void SX1276LoRaInit( void );
 // define MCU GPIO
 //-----------------------------------------------------------------------------
 
-void RFM96_LoRaEntryRx( SPISlaveID id );
+void loraContinuousReceiveMode( SPISlaveID id );
 uint8_t RFM96_LoRaRxPacket(SPISlaveID id, uint8_t *buf);
 uint8_t RFM96_LoRaEntryTx(SPISlaveID id, uint8_t packet_length);
 uint8_t RFM96_LoRaTxPacket(SPISlaveID id, uint8_t *buf,uint8_t len);

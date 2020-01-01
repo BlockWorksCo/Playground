@@ -69,12 +69,12 @@ const uint8_t  RFM96Data[] = {"1234567890ABCDEFGHIJK"};
 
 
 /**********************************************************
-**Name:     RFM96_Standby
+**Name:     loraStandbyMode
 **Function: Entry standby mode
 **Input:    None
 **Output:   None
 **********************************************************/
-void RFM96_Standby( SPISlaveID id )
+void loraStandbyMode( SPISlaveID id )
 {
     RegisterWrite( id, LR_RegOpMode+0x01+0x08);                              //Standby
 }
@@ -105,12 +105,12 @@ void RFM96_EntryLoRa( SPISlaveID id )
 }
 
 /**********************************************************
-**Name:     RFM96_LoRaClearIrq
+**Name:     loraClearAllIRQFlags
 **Function: Clear all irq
 **Input:    None
 **Output:   None
 **********************************************************/
-void RFM96_LoRaClearIrq( SPISlaveID id )
+void loraClearAllIRQFlags( SPISlaveID id )
 {
     RegisterWrite( id, LR_RegIrqFlags+0xFF);
 }
@@ -180,18 +180,17 @@ void RFM96_Config( SPISlaveID id, uint8_t mode)
     RegisterWrite( id, LR_RegPreambleLsb + 12);                      //RegPreambleLsb 8+4=12byte Preamble
 
     RegisterWrite( id, REG_LR_DIOMAPPING2_LONG+0x01);                     //RegDioMapping2 DIO5=00, DIO4=01
-    RFM96_Standby(id);                                         //Entry standby mode
+    loraStandbyMode(id);                                         //Entry standby mode
 
 }
 
 /**********************************************************
-**Name:     RFM96_LoRaEntryRx
+**Name:     loraContinuousReceiveMode
 **Function: Entry Rx mode
 **Input:    None
 **Output:   None
 **********************************************************/
-uint8_t version = 0x0a;
-void RFM96_LoRaEntryRx( SPISlaveID id )
+void loraContinuousReceiveMode( SPISlaveID id )
 {
     uint8_t addr;
 
@@ -202,7 +201,7 @@ void RFM96_LoRaEntryRx( SPISlaveID id )
     RegisterWrite( id, REG_LR_DIOMAPPING1_LONG+0x01);                       //DIO0=00, DIO1=00, DIO2=00, DIO3=01  DIO0=00--RXDONE
 
     RegisterWrite( id, LR_RegIrqFlagsMask+0x3F);                       //Open RxDone interrupt & Timeout
-    RFM96_LoRaClearIrq(id);
+    loraClearAllIRQFlags(id);
 
     //TODO
     RegisterWrite( id, LR_RegPayloadLength+21);                       //RegPayloadLength  21byte(this register must difine when the data long of one byte in SF is 6)
@@ -210,13 +209,6 @@ void RFM96_LoRaEntryRx( SPISlaveID id )
     addr = RegisterRead( id, (uint8_t)(LR_RegFifoRxBaseAddr>>8));           //Read RxBaseAddr
     RegisterWrite( id, LR_RegFifoAddrPtr+addr);                        //RxBaseAddr -> FiFoAddrPtr　
     RegisterWrite( id, LR_RegOpMode+0x0D);                        //Continuous Rx Mode
-
-
-    //
-    // Identifier check (version == 0x12)
-    //
-    version = RegisterRead( id, 0x42);
-    while( version != 0x12 );
 }
 
 
@@ -262,7 +254,7 @@ uint8_t RFM96_LoRaRxPacket(SPISlaveID id, uint8_t *buf)
 
     SPIBurstRead(id, 0x00, buf, packet_size);
 
-    RFM96_LoRaClearIrq(id);
+    loraClearAllIRQFlags(id);
     delay_us(1);
 
     return packet_size;
@@ -282,12 +274,12 @@ uint8_t RFM96_LoRaEntryTx(SPISlaveID id, uint8_t packet_length)
     uint8_t temp;
 
     RFM96_Config(id, 0);                                         //模块发射参数设置
-    delay_us(1000);
+    //delay_us(10);
     RegisterWrite( id, 0x4D00+0x87);                                   //发射功率 for 20dBm
     RegisterWrite( id, LR_RegHopPeriod);                               //RegHopPeriod NO FHSS
     RegisterWrite( id, REG_LR_DIOMAPPING1_LONG+0x41);                       //DIO0=01, DIO1=00, DIO2=00, DIO3=01
 
-    RFM96_LoRaClearIrq(id);
+    loraClearAllIRQFlags(id);
     RegisterWrite( id, LR_RegIrqFlagsMask+0xF7);                       //Open TxDone interrupt
     RegisterWrite( id, LR_RegPayloadLength+packet_length);                       //RegPayloadLength  21byte负载和fifo的字节数的关系是什么？？
 
@@ -329,12 +321,12 @@ uint8_t RFM96_LoRaTxPacket(SPISlaveID id, uint8_t *buf,uint8_t len)
         {
             break;
         }
-        delay_us(1000);
+        delay_us(500);
     }
 
     RegisterRead( id, (uint8_t)(LR_RegIrqFlags>>8));
-    RFM96_LoRaClearIrq(id);                                //Clear irq
-    RFM96_Standby(id);                                     //Entry Standby mode
+    loraClearAllIRQFlags(id);                                //Clear irq
+    loraStandbyMode(id);                                     //Entry Standby mode
 
     if(count>1000)
     {
@@ -358,7 +350,6 @@ uint8_t loraTransmitPacket_Async(SPISlaveID id, uint8_t *buf,uint8_t len)
     {
         transmitInProgress_SlaveB   = true;
     }
-
 
     return len;
 }
@@ -387,13 +378,9 @@ bool loraCheckAsyncTransmitForCompletion(SPISlaveID id)
     {
         // Previous transmit is now complete, clear the IRQ flags and
         // move into standby mode.
-        // TODO: Shouldn't we be going to receive mode?
         RegisterRead( id, (uint8_t)(LR_RegIrqFlags>>8));
-        RFM96_LoRaClearIrq(id);                                //Clear irq
-        RFM96_Standby(id);                                     //Entry Standby mode
-
-        delay_ms( 10 );
-        RFM96_LoRaEntryRx( id );
+        loraClearAllIRQFlags(id);                                //Clear irq
+        loraContinuousReceiveMode( id );
 
         if(id == SlaveA) 
         {

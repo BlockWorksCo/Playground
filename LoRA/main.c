@@ -24,7 +24,7 @@ uint8_t loraReceivePacket( SPISlaveID id, uint8_t* buf )
     memset( &receiveBuffer[0], 0xff, sizeof(receiveBuffer) );
     length = RFM96_LoRaRxPacket( id, &receiveBuffer[0] );
 
-    RFM96_LoRaEntryRx( id );
+    loraContinuousReceiveMode( id );
 
     return length;
 }
@@ -85,8 +85,8 @@ int main(void)
     sx1276PhysicalInterfaceInit( SlaveA );
     sx1276PhysicalInterfaceInit( SlaveB );
 
-    RFM96_LoRaEntryRx( SlaveA );
-    RFM96_LoRaEntryRx( SlaveB );
+    loraContinuousReceiveMode( SlaveA );
+    loraContinuousReceiveMode( SlaveB );
 
     while (1) {
 
