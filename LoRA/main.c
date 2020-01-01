@@ -71,14 +71,6 @@ int main(void)
         /* Toggle LED which connected to PC13*/
         GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
 
-        /* delay */
-        delay_ms(100);
-
-        // turn off the LEDs
-        GPIOB->ODR &= ~GPIO_Pin_14; // Invert C13
-        GPIOB->ODR &= ~GPIO_Pin_15; // Invert C13
-
-
         //
         // Receive any packets on SlaveA.
         //
@@ -87,6 +79,8 @@ int main(void)
             uint8_t length  = loraReceivePacket( SlaveA, &receiveBuffer[0], sizeof(receiveBuffer) );
             if(length > 0) {
                 GPIOB->ODR |= GPIO_Pin_14; // Invert C13
+                delay_ms(100);
+                GPIOB->ODR &= ~GPIO_Pin_14; // Invert C13
             }
         }
 
@@ -96,13 +90,9 @@ int main(void)
         if(loraCheckAsyncTransmitForCompletion(SlaveA) == true)
         {
             static uint32_t count    = 0;
-            count++;
-            if(count > 6) {
-                static uint8_t  i   = 0;
-                count   = 0;
+            if((sysclkGetTickCount()-count) > 6000) {
+                count   = sysclkGetTickCount();
                 uint8_t     packet[8]  = {0,2,3,4,5,6};
-                packet[0]   = i;
-                i++;
                 loraTransmitPacket( SlaveA,  &packet[0], sizeof(packet) );
             }
         }
@@ -117,6 +107,8 @@ int main(void)
             uint8_t length  = loraReceivePacket( SlaveB, &receiveBuffer[0], sizeof(receiveBuffer) );
             if(length > 0) {
                 GPIOB->ODR |= GPIO_Pin_15; // Invert C13
+                delay_ms(100);
+                GPIOB->ODR &= ~GPIO_Pin_15; // Invert C13
             }
         }
 
@@ -125,14 +117,10 @@ int main(void)
         //
         if(loraCheckAsyncTransmitForCompletion(SlaveB) == true)
         {
-            static uint32_t count    = 2;
-            count++;
-            if(count > 8) {
-                static uint8_t  i   = 0;
-                count   = 2;
+            static uint32_t count    = 0;
+            if((sysclkGetTickCount()-count) > 5000) {
+                count   = sysclkGetTickCount();
                 uint8_t     packet[8]  = {0,1,2,3,4,5};
-                packet[0]   = i;
-                i++;
                 loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
             }
         }
