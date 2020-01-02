@@ -43,28 +43,16 @@ const uint16_t RFM96PowerTbl[4] =
     0x09F6,                   //11dbm
 };
 
-/*
-const uint8_t RFM96SpreadFactorTbl[7] =
-{
- 6,7,8,9,10,11,12
-
-}; */
-
 const uint8_t RFM96SpreadFactorTbl[6] =
 {
     7,8,9,10,11,12
-};//由于6扩频因子档位只能是固定数据包长所以去掉6扩频因子档位
+};
 
 const uint8_t RFM96LoRaBwTbl[10] =
 {   // 0        1     2       3      4       5         6      7       8      9
 //7.8KHz,10.4KHz,15.6KHz,20.8KHz,31.2KHz,41.7KHz,62.5KHz,125KHz,250KHz,500KHz
     0,1,2,3,4,5,6,7,8,9
 };
-
-const uint8_t  RFM96Data[] = {"1234567890ABCDEFGHIJK"};
-
-
-
 
 
 
@@ -81,12 +69,12 @@ void loraStandbyMode( SPISlaveID id )
 }
 
 /**********************************************************
-**Name:     RFM96_Sleep
+**Name:     loraSleepMode
 **Function: Entry sleep mode
 **Input:    None
 **Output:   None
 **********************************************************/
-void RFM96_Sleep( SPISlaveID id )
+void loraSleepMode( SPISlaveID id )
 {
     sx1276RegisterWrite( id, LR_RegOpMode+0x00+0x08);                              //Sleep
 }
@@ -95,12 +83,12 @@ void RFM96_Sleep( SPISlaveID id )
 //LoRa mode
 /*********************************************************/
 /**********************************************************
-**Name:     RFM96_EntryLoRa
+**Name:     loraLoraMode
 **Function: Set RFM69 entry LoRa(LongRange) mode
 **Input:    None
 **Output:   None
 **********************************************************/
-void RFM96_EntryLoRa( SPISlaveID id )
+void loraLoraMode( SPISlaveID id )
 {
     sx1276RegisterWrite( id, LR_RegOpMode+0x80+0x08);
 }
@@ -117,32 +105,20 @@ void loraClearAllIRQFlags( SPISlaveID id )
 }
 
 /**********************************************************
-**Name:     RFM96_Config
+**Name:     loraBasicConfiguration
 **Function: RFM96 base config
 **Input:    mode
 **Output:   None
 **********************************************************/
-void RFM96_Config( SPISlaveID id, uint8_t mode)
+void loraBasicConfiguration( SPISlaveID id, uint8_t mode)
 {
     uint8_t i;
 
     sx1276Reset(id);
-
-    RFM96_Sleep(id);                                           //Change modem mode Must in Sleep mode
+    loraSleepMode(id);                                           //Change modem mode Must in Sleep mode
     delay_ms(1);
+    loraLoraMode(id);
 
-    RFM96_EntryLoRa(id);
-    // sx1276RegisterWrite( id, 0x5904);   //?? Change digital regulator form 1.6V to 1.47V: see errata note
-
-
-    {
-        //volatile uint8_t	Sx1276VerNO = sx1276RegisterRead( id, (uint8_t)(REG_LR_VERSION_LONG>>8)); //获取SX1276 版本号 是0X11(V1A版本 工程版） 或者是 0X12（V1B 正式版）
-//		 printf("sx1278(V12) v:%02X",Sx1276VerNO);
-        //	 sx1276RegisterWrite( id, RFM96FreqTbl[0]);
-        //	 Sx1276VerNO=sx1276RegisterRead( id, (uint8_t)(RFM96FreqTbl[0]>>8));
-        //   printf("RFM96FreqTbl[0](0X06_6C) R:0x%02X",Sx1276VerNO);
-
-    }
     for(i=0; i<3; i++)                                     //setting frequency parameter
     {
         sx1276RegisterWrite( id, RFM96FreqTbl[i]);
@@ -170,11 +146,6 @@ void RFM96_Config( SPISlaveID id, uint8_t mode)
         sx1276RegisterWrite( id, LR_RegModemConfig2+(RFM96SpreadFactorTbl[gb_SF]<<4)+(CRC_EN<<2)+0x03);  //SFactor &  LNA gain set by the internal AGC loop
     }
 
-
-//	sx1276RegisterWrite( id, LR_RegModemConfig1+0x36); //BW=3 20.8KHz , CR=3 4/7, explit
-//	sx1276RegisterWrite( id, LR_RegModemConfig2+0x77); //SF=6, CRC on
-
-
     sx1276RegisterWrite( id, LR_RegSymbTimeoutLsb+0xFF);                   //RegSymbTimeoutLsb Timeout = 0x3FF(Max)
 
     sx1276RegisterWrite( id, LR_RegPreambleMsb + 0);                       //RegPreambleMsb
@@ -182,7 +153,6 @@ void RFM96_Config( SPISlaveID id, uint8_t mode)
 
     sx1276RegisterWrite( id, REG_LR_DIOMAPPING2_LONG+0x01);                     //RegDioMapping2 DIO5=00, DIO4=01
     loraStandbyMode(id);                                         //Entry standby mode
-
 }
 
 /**********************************************************
@@ -195,7 +165,7 @@ void loraContinuousReceiveMode( SPISlaveID id )
 {
     uint8_t addr;
 
-    RFM96_Config(id,0);                                         //setting base parameter
+    loraBasicConfiguration(id,0);                                         //setting base parameter
 
     sx1276RegisterWrite( id, 0x4D00+0x84);                                   //Normal and Rx
     sx1276RegisterWrite( id, LR_RegHopPeriod+0xFF);                          //RegHopPeriod NO FHSS
@@ -213,24 +183,6 @@ void loraContinuousReceiveMode( SPISlaveID id )
 }
 
 
-uint8_t temperature = 0xaa;
-void ReadTemperature( SPISlaveID id )
-{
-    temperature = sx1276RegisterRead( id, 0x03);
-}
-
-/**********************************************************
-**Name:     RFM96_LoRaRxWaitStable
-**Function: Determine whether the state of stable Rx 查询RX 状态
-**Input:    none
-**Output:   none
-**********************************************************/
-uint8_t RFM96_LoRaRxWaitStable( SPISlaveID id )
-{
-    uint8_t tmp;
-    tmp=sx1276RegisterRead( id, (uint8_t)(LR_RegModemStat>>8));
-    return tmp;
-}
 
 /**********************************************************
 **Name:     RFM96_LoRaRxPacket
@@ -261,75 +213,6 @@ uint8_t RFM96_LoRaRxPacket(SPISlaveID id, uint8_t *buf)
     return packet_size;
 }
 
-
-/**********************************************************
-**Name:     RFM96_LoRaEntryTx
-**Function: Entry Tx mode
-**Input:    None
-**Output:   None
-**********************************************************/
-uint8_t RFM96_LoRaEntryTx(SPISlaveID id, uint8_t packet_length)
-{
-    uint8_t addr;
-    uint8_t temp;
-
-    RFM96_Config(id, 0);                                         //模块发射参数设置
-    //delay_us(10);
-    sx1276RegisterWrite( id, 0x4D00+0x87);                                   //发射功率 for 20dBm
-    sx1276RegisterWrite( id, LR_RegHopPeriod);                               //RegHopPeriod NO FHSS
-    sx1276RegisterWrite( id, REG_LR_DIOMAPPING1_LONG+0x41);                       //DIO0=01, DIO1=00, DIO2=00, DIO3=01
-
-    loraClearAllIRQFlags(id);
-    sx1276RegisterWrite( id, LR_RegIrqFlagsMask+0xF7);                       //Open TxDone interrupt
-    sx1276RegisterWrite( id, LR_RegPayloadLength+packet_length);                       //RegPayloadLength  21byte负载和fifo的字节数的关系是什么？？
-
-    addr = sx1276RegisterRead( id, (uint8_t)(LR_RegFifoTxBaseAddr>>8));           //RegFiFoTxBaseAddr
-    sx1276RegisterWrite( id, LR_RegFifoAddrPtr+addr);                        //RegFifoAddrPtr
-
-    while(1)
-    {
-        temp=sx1276RegisterRead( id, (uint8_t)(LR_RegPayloadLength>>8) );
-        if(temp==packet_length)
-        {
-            break;
-        }
-    }
-
-    return 	packet_length;
-}
-
-/**********************************************************
-**Name:     RFM96_LoRaTxPacket
-**Function: Send data in LoRa mode
-**Input:    None
-**Output:   1- Send over
-**********************************************************/
-uint8_t RFM96_LoRaTxPacket(SPISlaveID id, uint8_t *buf,uint8_t len)
-{
-
-    sx1276BlockWrite(id, 0x00, (uint8_t *)buf, len);
-    sx1276RegisterWrite( id, LR_RegOpMode+0x03+0x08);                    //Tx Mode
-
-    uint16_t count=0;
-    while( sx1276IsIRQPinAsserted(id) == false )
-    {
-        if(++count>10000)
-        {
-            break;
-        }
-        delay_us(500);
-    }
-
-    sx1276RegisterRead( id, (uint8_t)(LR_RegIrqFlags>>8));
-    loraClearAllIRQFlags(id);                                //Clear irq
-    loraStandbyMode(id);                                     //Entry Standby mode
-
-    if(count>1000)
-    {
-        return 0;
-    }
-    return len;
-}
 
 
 uint8_t loraTransmitPacket_Async(SPISlaveID id, uint8_t *buf,uint8_t len)
@@ -439,7 +322,30 @@ uint8_t loraReceivePacket( SPISlaveID id, uint8_t* buf, size_t maxBytesToReceive
 
 void loraTransmitPacket( SPISlaveID id, uint8_t* buf, uint8_t size )
 {
-    RFM96_LoRaEntryTx(id, size);
+    uint8_t addr;
+    uint8_t temp;
+
+    loraBasicConfiguration(id, 0);                                         //模块发射参数设置
+    sx1276RegisterWrite( id, 0x4D00+0x87);                                   //发射功率 for 20dBm
+    sx1276RegisterWrite( id, LR_RegHopPeriod);                               //RegHopPeriod NO FHSS
+    sx1276RegisterWrite( id, REG_LR_DIOMAPPING1_LONG+0x41);                       //DIO0=01, DIO1=00, DIO2=00, DIO3=01
+
+    loraClearAllIRQFlags(id);
+    sx1276RegisterWrite( id, LR_RegIrqFlagsMask+0xF7);                       //Open TxDone interrupt
+    sx1276RegisterWrite( id, LR_RegPayloadLength+size);                       //RegPayloadLength  21byte负载和fifo的字节数的关系是什么？？
+
+    addr = sx1276RegisterRead( id, (uint8_t)(LR_RegFifoTxBaseAddr>>8));           //RegFiFoTxBaseAddr
+    sx1276RegisterWrite( id, LR_RegFifoAddrPtr+addr);                        //RegFifoAddrPtr
+
+    while(1)
+    {
+        temp=sx1276RegisterRead( id, (uint8_t)(LR_RegPayloadLength>>8) );
+        if(temp == size)
+        {
+            break;
+        }
+    }
+
     loraTransmitPacket_Async(id, buf,size);
 }   
 
