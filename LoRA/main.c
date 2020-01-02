@@ -13,17 +13,49 @@
 #include "TimedEvents.h"
 
 
+//
+//
+//
 void tick()
 {
     GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
 }
 
 
+//
+// Transmit from SlaveA
+//
 void SlaveATransmit()
 {
+    if(loraCheckAsyncTransmitForCompletion(SlaveA) == true)
+    {
+        uint8_t     packet[8]  = {0,2,3,4,5,6};
+        loraTransmitPacket( SlaveA,  &packet[0], sizeof(packet) );
+    }
 }
 
 
+//
+// Transmit from SlaveB
+//
+void SlaveBTransmit()
+{
+    if(loraCheckAsyncTransmitForCompletion(SlaveB) == true)
+    {
+        uint8_t     packet[8]  = {0,2,3,4,5,6};
+        loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
+    }
+}
+
+void StartSlaveB()
+{
+    CallEvery_ms( SlaveBTransmit, 5000 );
+}
+
+
+//
+//
+//
 int main(void)
 {
     BoardSupportInitialise();
@@ -71,7 +103,8 @@ int main(void)
     //
     //
     CallEvery_ms( tick, 1000 );
-    CallEvery_ms( SlaveATransmit, 5000 );
+    //CallEvery_ms( SlaveATransmit, 5000 );
+    CallAfter_ms( StartSlaveB, 2500 );
 
     //
     // Forever...
@@ -94,20 +127,6 @@ int main(void)
         }
 
         //
-        // Transmit from SlaveA
-        //
-        if(loraCheckAsyncTransmitForCompletion(SlaveA) == true)
-        {
-            static uint32_t count    = 0;
-            if((CurrentTimestamp_ms()-count) > 5000) {
-                count   = CurrentTimestamp_ms();
-                uint8_t     packet[8]  = {0,2,3,4,5,6};
-                loraTransmitPacket( SlaveA,  &packet[0], sizeof(packet) );
-            }
-        }
-
-
-        //
         // Receive any packets on SlaveB.
         //
         if ( loraCheckAsyncReceiveCompletion(SlaveB) == true )
@@ -121,24 +140,10 @@ int main(void)
         }
 
         //
-        // Transmit from SlaveB
-        //
-        if(loraCheckAsyncTransmitForCompletion(SlaveB) == true)
-        {
-            static uint32_t count    = 2500;
-            if((CurrentTimestamp_ms()-count) > 5000) {
-                count   = CurrentTimestamp_ms();
-                uint8_t     packet[8]  = {0,1,2,3,4,5};
-                loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
-            }
-        }
-
-        //
         //
         //
         CheckTimedEventHandlers();
         DispatchHandlers();
-
     }
 }
 

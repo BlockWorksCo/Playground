@@ -11,27 +11,16 @@ RM      = rm
 
 
 
-
-VPATH   += ../
-VPATH   += ../liblora
-
-
-
-OBJS    += main.o
-OBJS    += sx1276-LoRa.o
-OBJS    += sx1276-PhysicalInterface.o
-
-
-
-INCLUDES   += -I../
-INCLUDES   += -I../liblora
-
+include ../Build.mk
+include ../liblora/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/BluePillBoardSupport/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/ErrorHandling/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/EventQueue/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/NullDebugText/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/BluePillSPIMaster/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/TimedEvents/Build.mk
+
+
 
 all: app.elf
 
@@ -50,12 +39,12 @@ app.elf: $(OBJS)
 
 
 .c.o:
-	@$(ECHO) Compiling $^
+	@$(ECHO) Compiling $(notdir $^)
 	@$(CC) $(CFLAGS) $(INCLUDES) -o $@ -c $^
 
 
 .s.o:
-	@$(ECHO) Assembling $^
+	@$(ECHO) Assembling $(notdir $^)
 	@$(AS) $(AFLAGS) -o $@ -c $<
 
 
