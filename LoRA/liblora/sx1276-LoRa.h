@@ -68,32 +68,14 @@
 
 
 
-
-
-//-----------------------------------------------------------------------------
-// ×Ó³ÌÐòÉùÃ÷
-//-----------------------------------------------------------------------------
-void RF_GpioInt(void);
-void SpiWriteAddressData(unsigned char address, unsigned char data1);
-unsigned char SpiReadAddressData(unsigned char uint8_tAddr);
-void SX1276LoRaInit( void );
-
 //-----------------------------------------------------------------------------
 // define MCU GPIO
 //-----------------------------------------------------------------------------
 
 void loraContinuousReceiveMode( SPISlaveID id );
-uint8_t RFM96_LoRaRxPacket(SPISlaveID id, uint8_t *buf);
-uint8_t RFM96_LoRaEntryTx(SPISlaveID id, uint8_t packet_length);
-uint8_t RFM96_LoRaTxPacket(SPISlaveID id, uint8_t *buf,uint8_t len);
-
-
-
 uint8_t loraTransmitPacket_Async(SPISlaveID id, uint8_t *buf,uint8_t len);
 bool loraCheckAsyncTransmitForCompletion(SPISlaveID id);
 bool loraCheckAsyncReceiveCompletion(SPISlaveID id);
-
-
 uint8_t loraReceivePacket( SPISlaveID id, uint8_t* buf, size_t maxBytesToReceive );
 void loraTransmitPacket( SPISlaveID id, uint8_t* buf, uint8_t size );
 

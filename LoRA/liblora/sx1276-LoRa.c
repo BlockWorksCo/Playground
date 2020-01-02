@@ -201,9 +201,13 @@ uint8_t RFM96_LoRaRxPacket(SPISlaveID id, uint8_t *buf)
     delay_us(1);
 
     if(RFM96SpreadFactorTbl[gb_SF]==6)           //When SpreadFactor is six，will used Implicit Header mode(Excluding internal packet length)
+    {
         packet_size=21;
+    }
     else
+    {
         packet_size = sx1276RegisterRead( id, (uint8_t)(LR_RegRxNbBytes>>8));     //Number for received bytes
+    }
 
     sx1276BlockRead(id, 0x00, buf, packet_size);
 
@@ -299,7 +303,6 @@ bool loraCheckAsyncReceiveCompletion(SPISlaveID id)
         return true;
     }
 
-
     return false;
 }
 
@@ -323,7 +326,7 @@ uint8_t loraReceivePacket( SPISlaveID id, uint8_t* buf, size_t maxBytesToReceive
 void loraTransmitPacket( SPISlaveID id, uint8_t* buf, uint8_t size )
 {
     uint8_t addr;
-    uint8_t temp;
+    uint8_t temp    = 0;
 
     loraBasicConfiguration(id, 0);                                         //模块发射参数设置
     sx1276RegisterWrite( id, 0x4D00+0x87);                                   //发射功率 for 20dBm
@@ -337,13 +340,9 @@ void loraTransmitPacket( SPISlaveID id, uint8_t* buf, uint8_t size )
     addr = sx1276RegisterRead( id, (uint8_t)(LR_RegFifoTxBaseAddr>>8));           //RegFiFoTxBaseAddr
     sx1276RegisterWrite( id, LR_RegFifoAddrPtr+addr);                        //RegFifoAddrPtr
 
-    while(1)
+    while(temp != size)
     {
-        temp=sx1276RegisterRead( id, (uint8_t)(LR_RegPayloadLength>>8) );
-        if(temp == size)
-        {
-            break;
-        }
+        temp = sx1276RegisterRead( id, (uint8_t)(LR_RegPayloadLength>>8) );
     }
 
     loraTransmitPacket_Async(id, buf,size);
