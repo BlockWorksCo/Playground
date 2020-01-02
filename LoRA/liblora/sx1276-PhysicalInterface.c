@@ -128,71 +128,60 @@ bool sx1276IsIRQPinAsserted(SPISlaveID id)
 
 
 
-void SX1276SetReset( SPISlaveID id, uint8_t state )
+void sx1276Reset( SPISlaveID id )
 {
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    if( id == SlaveA ) {
-        if( state == RADIO_RESET_ON )
-        {
-            // Set RESET pin to 0
-            GPIO_WriteBit( GPIOB, GPIO_Pin_12, Bit_RESET );
-            // Configure RESET as output
-            GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
-            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-            GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
-            GPIO_Init( GPIOB, &GPIO_InitStructure );
+    if( id == SlaveA ) 
+    {
+        // Set RESET pin to 0
+        GPIO_WriteBit( GPIOB, GPIO_Pin_12, Bit_RESET );
+        // Configure RESET as output
+        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
+        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+        GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
+        GPIO_Init( GPIOB, &GPIO_InitStructure );
 
-            GPIOB->ODR &= ~GPIO_Pin_12;
-        }
-        else
-        {
-            // Configure RESET as input
-            GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-            GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12;
-            GPIO_Init( GPIOB, &GPIO_InitStructure );
+        GPIOB->ODR &= ~GPIO_Pin_12;
+    
+        delay_ms(1);
 
-            GPIOB->ODR |= GPIO_Pin_12;
-        }
+        // Configure RESET as input
+        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+        GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12;
+        GPIO_Init( GPIOB, &GPIO_InitStructure );
+
+        GPIOB->ODR |= GPIO_Pin_12;
     }
 
-    if( id == SlaveB ) {
-        if( state == RADIO_RESET_ON )
-        {
-            // Set RESET pin to 0
-            GPIO_WriteBit( GPIOB, GPIO_Pin_13, Bit_RESET );
-            // Configure RESET as output
-            GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
-            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-            GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
-            GPIO_Init( GPIOB, &GPIO_InitStructure );
+    if( id == SlaveB ) 
+    {
+        // Set RESET pin to 0
+        GPIO_WriteBit( GPIOB, GPIO_Pin_13, Bit_RESET );
+        // Configure RESET as output
+        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
+        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+        GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
+        GPIO_Init( GPIOB, &GPIO_InitStructure );
 
-            GPIOB->ODR &= ~GPIO_Pin_13;
-        }
-        else
-        {
-            // Configure RESET as input
-            GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-            GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_13;
-            GPIO_Init( GPIOB, &GPIO_InitStructure );
+        GPIOB->ODR &= ~GPIO_Pin_13;
 
-            GPIOB->ODR |= GPIO_Pin_13;
-        }
+        delay_ms(1);
+
+        // Configure RESET as input
+        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+        GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_13;
+        GPIO_Init( GPIOB, &GPIO_InitStructure );
+
+        GPIOB->ODR |= GPIO_Pin_13;
     }
 
-
-}
-
-
-void sx1276Reset( SPISlaveID id )
-{
-    SX1276SetReset( id, RADIO_RESET_ON );
-    delay_ms(1);
-    SX1276SetReset( id, RADIO_RESET_OFF );
     delay_ms(10);
 }
+
+
 
 
 
