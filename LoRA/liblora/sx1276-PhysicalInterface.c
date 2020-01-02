@@ -10,8 +10,6 @@
 #include "sx1276-RF.h" // TODO: remove the need for this
 
 
-static uint8_t RFState = RF_STATE_IDLE;
-
 
 
 /**********************************************************
@@ -103,33 +101,6 @@ void sx1276BlockWrite( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
     spiBusDeselectSlave( id );
 }
 
-void SX1276WriteBuffer( SPISlaveID id, uint8_t addr, uint8_t *buffer, uint8_t size )
-{
-    sx1276BlockWrite(id, addr, buffer, size);
-}
-
-void SX1276ReadBuffer( SPISlaveID id, uint8_t addr, uint8_t *buffer, uint8_t size )
-{
-    sx1276BlockRead( id, addr, buffer, size);
-}
-
-void SX1276Write( SPISlaveID id, uint8_t addr, uint8_t data )
-{
-    sx1276BlockWrite( id, addr, &data, 1);
-}
-
-void SX1276Read( SPISlaveID id, uint8_t addr, uint8_t *data )
-{
-    sx1276BlockRead( id, addr, data, 1);
-}
-
-
-
-void sx1276Reset(SPISlaveID id)
-{
-    SX1276Reset(id);
-}
-
 
 bool sx1276IsIRQPinAsserted(SPISlaveID id)
 {
@@ -214,22 +185,8 @@ void SX1276SetReset( SPISlaveID id, uint8_t state )
 
 }
 
-void SX1276SetIdleState(SPISlaveID id)
-{
-    RFState=RF_STATE_IDLE;
-}
 
-void SX1276WriteFifo( SPISlaveID id, uint8_t *buffer, uint8_t size )
-{
-    SX1276WriteBuffer( id,  0, buffer, size );
-}
-
-void SX1276ReadFifo( SPISlaveID id, uint8_t *buffer, uint8_t size )
-{
-    SX1276ReadBuffer( id,  0, buffer, size );
-}
-
-void SX1276Reset( SPISlaveID id )
+void sx1276Reset( SPISlaveID id )
 {
     SX1276SetReset( id, RADIO_RESET_ON );
     delay_ms(1);
