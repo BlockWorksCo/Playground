@@ -10,8 +10,13 @@
 #include <string.h>
 #include "BoardSupport.h"
 #include "EventQueue.h"
+#include "TimedEvents.h"
 
 
+void tick()
+{
+    GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
+}
 
 
 int main(void)
@@ -58,6 +63,11 @@ int main(void)
     loraContinuousReceiveMode( SlaveB );
 
     //
+    //
+    //
+    CallEvery_ms( tick, 1000 );
+
+    //
     // Forever...
     // 
     while(true) 
@@ -65,7 +75,7 @@ int main(void)
         static uint8_t receiveBuffer[128]  = {0};
 
         /* Toggle LED which connected to PC13*/
-        GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
+        //GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
 
         //
         // Receive any packets on SlaveA.
@@ -123,6 +133,7 @@ int main(void)
         //
         //
         //
+        CheckTimedEventHandlers();
         DispatchHandlers();
 
     }
