@@ -131,6 +131,16 @@ void StartSlaveB()
 
 
 
+//
+// Check whether the LoRa modules have completed transmission
+// and if so, move them back into receive mode.
+//
+void PollForTransmitCompletion()
+{
+    loraCheckAsyncTransmitForCompletion(SlaveA);
+    loraCheckAsyncTransmitForCompletion(SlaveB);
+}
+
 
 //
 //
@@ -181,18 +191,13 @@ int main(void)
     //
     CallEvery_ms( SlaveATransmit, 5000 );
     CallAfter_ms( StartSlaveB, 2000 );
+    CallEvery_ms( PollForTransmitCompletion, 100 );
 
     //
     // Forever...
     // 
     while(true) 
     {
-        loraCheckAsyncTransmitForCompletion(SlaveA);
-        loraCheckAsyncTransmitForCompletion(SlaveB);
-
-        //
-        //
-        //
         CheckTimedEventHandlers();
         DispatchHandlers();
     }
