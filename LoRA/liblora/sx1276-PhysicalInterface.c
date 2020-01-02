@@ -53,14 +53,14 @@ void sx1276RegisterWrite( SPISlaveID id, uint16_t WrPara)
 
 
 /**********************************************************
-**Name:     SPIBurstRead
+**Name:     sx1276BlockRead
 **Function: SPI burst read mode
 **Input:    adr-----address for read
 **          ptr-----data buffer point for read
 **          length--how many bytes for read
 **Output:   None
 **********************************************************/
-void SPIBurstRead( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
+void sx1276BlockRead( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
 {
     uint8_t i;
     if(length<=1)                                            //lengt
@@ -83,14 +83,14 @@ void SPIBurstRead( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
 
 
 /**********************************************************
-**Name:     SPIBurstWrite
+**Name:     SPIsx1276BlockWrite
 **Function: SPI burst write mode
 **Input:    adr-----address for write
 **          ptr-----data buffer point for write
 **          length--how many bytes for write
 **Output:   none
 **********************************************************/
-void BurstWrite( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
+void sx1276BlockWrite( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
 {
     spiBusSelectSlave( id );
 
@@ -105,22 +105,22 @@ void BurstWrite( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
 
 void SX1276WriteBuffer( SPISlaveID id, uint8_t addr, uint8_t *buffer, uint8_t size )
 {
-    BurstWrite(id, addr, buffer, size);
+    sx1276BlockWrite(id, addr, buffer, size);
 }
 
 void SX1276ReadBuffer( SPISlaveID id, uint8_t addr, uint8_t *buffer, uint8_t size )
 {
-    SPIBurstRead( id, addr, buffer, size);
+    sx1276BlockRead( id, addr, buffer, size);
 }
 
 void SX1276Write( SPISlaveID id, uint8_t addr, uint8_t data )
 {
-    BurstWrite( id, addr, &data, 1);
+    sx1276BlockWrite( id, addr, &data, 1);
 }
 
 void SX1276Read( SPISlaveID id, uint8_t addr, uint8_t *data )
 {
-    SPIBurstRead( id, addr, data, 1);
+    sx1276BlockRead( id, addr, data, 1);
 }
 
 

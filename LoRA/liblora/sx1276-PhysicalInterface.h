@@ -27,24 +27,24 @@ uint8_t sx1276RegisterRead( SPISlaveID id, uint8_t adr);
 void sx1276RegisterWrite( SPISlaveID id, uint16_t WrPara);
 
 /**********************************************************
-**Name:     SPIBurstRead
+**Name:     sx1276BlockRead
 **Function: SPI burst read mode
 **Input:    adr-----address for read
 **          ptr-----data buffer point for read
 **          length--how many bytes for read
 **Output:   None
 **********************************************************/
-void SPIBurstRead( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length);
+void sx1276BlockRead( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length);
 
 /**********************************************************
-**Name:     SPIBurstWrite
+**Name:     SPIsx1276BlockWrite
 **Function: SPI burst write mode
 **Input:    adr-----address for write
 **          ptr-----data buffer point for write
 **          length--how many bytes for write
 **Output:   none
 **********************************************************/
-void BurstWrite( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length);
+void sx1276BlockWrite( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length);
 
 void sx1276Reset( SPISlaveID id );
 

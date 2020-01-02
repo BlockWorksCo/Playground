@@ -253,7 +253,7 @@ uint8_t RFM96_LoRaRxPacket(SPISlaveID id, uint8_t *buf)
     else
         packet_size = sx1276RegisterRead( id, (uint8_t)(LR_RegRxNbBytes>>8));     //Number for received bytes
 
-    SPIBurstRead(id, 0x00, buf, packet_size);
+    sx1276BlockRead(id, 0x00, buf, packet_size);
 
     loraClearAllIRQFlags(id);
     delay_us(1);
@@ -307,7 +307,7 @@ uint8_t RFM96_LoRaEntryTx(SPISlaveID id, uint8_t packet_length)
 uint8_t RFM96_LoRaTxPacket(SPISlaveID id, uint8_t *buf,uint8_t len)
 {
 
-    BurstWrite(id, 0x00, (uint8_t *)buf, len);
+    sx1276BlockWrite(id, 0x00, (uint8_t *)buf, len);
     sx1276RegisterWrite( id, LR_RegOpMode+0x03+0x08);                    //Tx Mode
 
     uint16_t count=0;
@@ -334,7 +334,7 @@ uint8_t RFM96_LoRaTxPacket(SPISlaveID id, uint8_t *buf,uint8_t len)
 
 uint8_t loraTransmitPacket_Async(SPISlaveID id, uint8_t *buf,uint8_t len)
 {
-    BurstWrite(id, 0x00, (uint8_t *)buf, len);
+    sx1276BlockWrite(id, 0x00, (uint8_t *)buf, len);
     sx1276RegisterWrite( id, LR_RegOpMode+0x03+0x08);                    //Tx Mode
 
     if(id == SlaveA)
