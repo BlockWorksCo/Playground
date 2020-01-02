@@ -7,7 +7,6 @@
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_rcc.h"
 #include "delay.h"
-#include "sx1276-RF.h" // TODO: remove the need for this
 
 
 
