@@ -11,20 +11,20 @@
 
 
 /**********************************************************
-**Name:     RegisterRead
+**Name:     sx1276RegisterRead
 **Function: SPI Read CMD
 **Input:    adr -> address for read
 **Output:   None
 **********************************************************/
-uint8_t RegisterRead( SPISlaveID id, uint8_t adr);
+uint8_t sx1276RegisterRead( SPISlaveID id, uint8_t adr);
 
 /**********************************************************
-**Name:     RegisterWrite
+**Name:     sx1276RegisterWrite
 **Function: SPI Write CMD
 **Input:    WrPara -> address & data
 **Output:   None
 **********************************************************/
-void RegisterWrite( SPISlaveID id, uint16_t WrPara);
+void sx1276RegisterWrite( SPISlaveID id, uint16_t WrPara);
 
 /**********************************************************
 **Name:     SPIBurstRead

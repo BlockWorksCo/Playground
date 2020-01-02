@@ -77,7 +77,7 @@ const uint8_t  RFM96Data[] = {"1234567890ABCDEFGHIJK"};
 **********************************************************/
 void loraStandbyMode( SPISlaveID id )
 {
-    RegisterWrite( id, LR_RegOpMode+0x01+0x08);                              //Standby
+    sx1276RegisterWrite( id, LR_RegOpMode+0x01+0x08);                              //Standby
 }
 
 /**********************************************************
@@ -88,7 +88,7 @@ void loraStandbyMode( SPISlaveID id )
 **********************************************************/
 void RFM96_Sleep( SPISlaveID id )
 {
-    RegisterWrite( id, LR_RegOpMode+0x00+0x08);                              //Sleep
+    sx1276RegisterWrite( id, LR_RegOpMode+0x00+0x08);                              //Sleep
 }
 
 /*********************************************************/
@@ -102,7 +102,7 @@ void RFM96_Sleep( SPISlaveID id )
 **********************************************************/
 void RFM96_EntryLoRa( SPISlaveID id )
 {
-    RegisterWrite( id, LR_RegOpMode+0x80+0x08);
+    sx1276RegisterWrite( id, LR_RegOpMode+0x80+0x08);
 }
 
 /**********************************************************
@@ -113,7 +113,7 @@ void RFM96_EntryLoRa( SPISlaveID id )
 **********************************************************/
 void loraClearAllIRQFlags( SPISlaveID id )
 {
-    RegisterWrite( id, LR_RegIrqFlags+0xFF);
+    sx1276RegisterWrite( id, LR_RegIrqFlags+0xFF);
 }
 
 /**********************************************************
@@ -132,55 +132,55 @@ void RFM96_Config( SPISlaveID id, uint8_t mode)
     delay_ms(1);
 
     RFM96_EntryLoRa(id);
-    // RegisterWrite( id, 0x5904);   //?? Change digital regulator form 1.6V to 1.47V: see errata note
+    // sx1276RegisterWrite( id, 0x5904);   //?? Change digital regulator form 1.6V to 1.47V: see errata note
 
 
     {
-        //volatile uint8_t	Sx1276VerNO = RegisterRead( id, (uint8_t)(REG_LR_VERSION_LONG>>8)); //获取SX1276 版本号 是0X11(V1A版本 工程版） 或者是 0X12（V1B 正式版）
+        //volatile uint8_t	Sx1276VerNO = sx1276RegisterRead( id, (uint8_t)(REG_LR_VERSION_LONG>>8)); //获取SX1276 版本号 是0X11(V1A版本 工程版） 或者是 0X12（V1B 正式版）
 //		 printf("sx1278(V12) v:%02X",Sx1276VerNO);
-        //	 RegisterWrite( id, RFM96FreqTbl[0]);
-        //	 Sx1276VerNO=RegisterRead( id, (uint8_t)(RFM96FreqTbl[0]>>8));
+        //	 sx1276RegisterWrite( id, RFM96FreqTbl[0]);
+        //	 Sx1276VerNO=sx1276RegisterRead( id, (uint8_t)(RFM96FreqTbl[0]>>8));
         //   printf("RFM96FreqTbl[0](0X06_6C) R:0x%02X",Sx1276VerNO);
 
     }
     for(i=0; i<3; i++)                                     //setting frequency parameter
     {
-        RegisterWrite( id, RFM96FreqTbl[i]);
+        sx1276RegisterWrite( id, RFM96FreqTbl[i]);
     }
 
     //setting base parameter
-    RegisterWrite( id, RFM96PowerTbl[0]);             //Setting output power parameter
-    RegisterWrite( id, LR_RegOcp+0x0B);                              //RegOcp,Close Ocp
-    RegisterWrite( id, LR_RegLna+0x23);                              //RegLNA,High & LNA Enable
+    sx1276RegisterWrite( id, RFM96PowerTbl[0]);             //Setting output power parameter
+    sx1276RegisterWrite( id, LR_RegOcp+0x0B);                              //RegOcp,Close Ocp
+    sx1276RegisterWrite( id, LR_RegLna+0x23);                              //RegLNA,High & LNA Enable
 
     if(RFM96SpreadFactorTbl[gb_SF]==6)           //SFactor=6
     {
         uint8_t tmp;
-        RegisterWrite( id, LR_RegModemConfig1+(RFM96LoRaBwTbl[gb_BW]<<4)+(CR<<1)+0x01);//带宽设置，包结构，Implicit Enable CRC Enable(0x02) & Error Coding rate 4/5(0x01), 4/6(0x02), 4/7(0x03), 4/8(0x04)
-        RegisterWrite( id, LR_RegModemConfig2+(RFM96SpreadFactorTbl[gb_SF]<<4)+(CRC_EN<<2)+0x03);
-        tmp = RegisterRead( id, 0x31);
+        sx1276RegisterWrite( id, LR_RegModemConfig1+(RFM96LoRaBwTbl[gb_BW]<<4)+(CR<<1)+0x01);//带宽设置，包结构，Implicit Enable CRC Enable(0x02) & Error Coding rate 4/5(0x01), 4/6(0x02), 4/7(0x03), 4/8(0x04)
+        sx1276RegisterWrite( id, LR_RegModemConfig2+(RFM96SpreadFactorTbl[gb_SF]<<4)+(CRC_EN<<2)+0x03);
+        tmp = sx1276RegisterRead( id, 0x31);
         tmp &= 0xF8;
         tmp |= 0x05;
-        RegisterWrite( id, 0x3100+tmp);
-        RegisterWrite( id, 0x3700+0x0C);
+        sx1276RegisterWrite( id, 0x3100+tmp);
+        sx1276RegisterWrite( id, 0x3700+0x0C);
     }
     else
     {
-        RegisterWrite( id, LR_RegModemConfig1+(RFM96LoRaBwTbl[gb_BW]<<4)+(CR<<1)+0x00);//Explicit Enable CRC Enable(0x02) & Error Coding rate 4/5(0x01), 4/6(0x02), 4/7(0x03), 4/8(0x04)
-        RegisterWrite( id, LR_RegModemConfig2+(RFM96SpreadFactorTbl[gb_SF]<<4)+(CRC_EN<<2)+0x03);  //SFactor &  LNA gain set by the internal AGC loop
+        sx1276RegisterWrite( id, LR_RegModemConfig1+(RFM96LoRaBwTbl[gb_BW]<<4)+(CR<<1)+0x00);//Explicit Enable CRC Enable(0x02) & Error Coding rate 4/5(0x01), 4/6(0x02), 4/7(0x03), 4/8(0x04)
+        sx1276RegisterWrite( id, LR_RegModemConfig2+(RFM96SpreadFactorTbl[gb_SF]<<4)+(CRC_EN<<2)+0x03);  //SFactor &  LNA gain set by the internal AGC loop
     }
 
 
-//	RegisterWrite( id, LR_RegModemConfig1+0x36); //BW=3 20.8KHz , CR=3 4/7, explit
-//	RegisterWrite( id, LR_RegModemConfig2+0x77); //SF=6, CRC on
+//	sx1276RegisterWrite( id, LR_RegModemConfig1+0x36); //BW=3 20.8KHz , CR=3 4/7, explit
+//	sx1276RegisterWrite( id, LR_RegModemConfig2+0x77); //SF=6, CRC on
 
 
-    RegisterWrite( id, LR_RegSymbTimeoutLsb+0xFF);                   //RegSymbTimeoutLsb Timeout = 0x3FF(Max)
+    sx1276RegisterWrite( id, LR_RegSymbTimeoutLsb+0xFF);                   //RegSymbTimeoutLsb Timeout = 0x3FF(Max)
 
-    RegisterWrite( id, LR_RegPreambleMsb + 0);                       //RegPreambleMsb
-    RegisterWrite( id, LR_RegPreambleLsb + 12);                      //RegPreambleLsb 8+4=12byte Preamble
+    sx1276RegisterWrite( id, LR_RegPreambleMsb + 0);                       //RegPreambleMsb
+    sx1276RegisterWrite( id, LR_RegPreambleLsb + 12);                      //RegPreambleLsb 8+4=12byte Preamble
 
-    RegisterWrite( id, REG_LR_DIOMAPPING2_LONG+0x01);                     //RegDioMapping2 DIO5=00, DIO4=01
+    sx1276RegisterWrite( id, REG_LR_DIOMAPPING2_LONG+0x01);                     //RegDioMapping2 DIO5=00, DIO4=01
     loraStandbyMode(id);                                         //Entry standby mode
 
 }
@@ -197,26 +197,26 @@ void loraContinuousReceiveMode( SPISlaveID id )
 
     RFM96_Config(id,0);                                         //setting base parameter
 
-    RegisterWrite( id, 0x4D00+0x84);                                   //Normal and Rx
-    RegisterWrite( id, LR_RegHopPeriod+0xFF);                          //RegHopPeriod NO FHSS
-    RegisterWrite( id, REG_LR_DIOMAPPING1_LONG+0x01);                       //DIO0=00, DIO1=00, DIO2=00, DIO3=01  DIO0=00--RXDONE
+    sx1276RegisterWrite( id, 0x4D00+0x84);                                   //Normal and Rx
+    sx1276RegisterWrite( id, LR_RegHopPeriod+0xFF);                          //RegHopPeriod NO FHSS
+    sx1276RegisterWrite( id, REG_LR_DIOMAPPING1_LONG+0x01);                       //DIO0=00, DIO1=00, DIO2=00, DIO3=01  DIO0=00--RXDONE
 
-    RegisterWrite( id, LR_RegIrqFlagsMask+0x3F);                       //Open RxDone interrupt & Timeout
+    sx1276RegisterWrite( id, LR_RegIrqFlagsMask+0x3F);                       //Open RxDone interrupt & Timeout
     loraClearAllIRQFlags(id);
 
     //TODO
-    RegisterWrite( id, LR_RegPayloadLength+21);                       //RegPayloadLength  21byte(this register must difine when the data long of one byte in SF is 6)
+    sx1276RegisterWrite( id, LR_RegPayloadLength+21);                       //RegPayloadLength  21byte(this register must difine when the data long of one byte in SF is 6)
 
-    addr = RegisterRead( id, (uint8_t)(LR_RegFifoRxBaseAddr>>8));           //Read RxBaseAddr
-    RegisterWrite( id, LR_RegFifoAddrPtr+addr);                        //RxBaseAddr -> FiFoAddrPtr　
-    RegisterWrite( id, LR_RegOpMode+0x0D);                        //Continuous Rx Mode
+    addr = sx1276RegisterRead( id, (uint8_t)(LR_RegFifoRxBaseAddr>>8));           //Read RxBaseAddr
+    sx1276RegisterWrite( id, LR_RegFifoAddrPtr+addr);                        //RxBaseAddr -> FiFoAddrPtr　
+    sx1276RegisterWrite( id, LR_RegOpMode+0x0D);                        //Continuous Rx Mode
 }
 
 
 uint8_t temperature = 0xaa;
 void ReadTemperature( SPISlaveID id )
 {
-    temperature = RegisterRead( id, 0x03);
+    temperature = sx1276RegisterRead( id, 0x03);
 }
 
 /**********************************************************
@@ -228,7 +228,7 @@ void ReadTemperature( SPISlaveID id )
 uint8_t RFM96_LoRaRxWaitStable( SPISlaveID id )
 {
     uint8_t tmp;
-    tmp=RegisterRead( id, (uint8_t)(LR_RegModemStat>>8));
+    tmp=sx1276RegisterRead( id, (uint8_t)(LR_RegModemStat>>8));
     return tmp;
 }
 
@@ -244,14 +244,14 @@ uint8_t RFM96_LoRaRxPacket(SPISlaveID id, uint8_t *buf)
     uint8_t addr;
     uint8_t packet_size;
 
-    addr = RegisterRead( id, (uint8_t)(LR_RegFifoRxCurrentaddr>>8));      //last packet addr 数据包的最后地址(数据的尾地址)
-    RegisterWrite( id, LR_RegFifoAddrPtr+addr);                      //RxBaseAddr -> FiFoAddrPtr
+    addr = sx1276RegisterRead( id, (uint8_t)(LR_RegFifoRxCurrentaddr>>8));      //last packet addr 数据包的最后地址(数据的尾地址)
+    sx1276RegisterWrite( id, LR_RegFifoAddrPtr+addr);                      //RxBaseAddr -> FiFoAddrPtr
     delay_us(1);
 
     if(RFM96SpreadFactorTbl[gb_SF]==6)           //When SpreadFactor is six，will used Implicit Header mode(Excluding internal packet length)
         packet_size=21;
     else
-        packet_size = RegisterRead( id, (uint8_t)(LR_RegRxNbBytes>>8));     //Number for received bytes
+        packet_size = sx1276RegisterRead( id, (uint8_t)(LR_RegRxNbBytes>>8));     //Number for received bytes
 
     SPIBurstRead(id, 0x00, buf, packet_size);
 
@@ -271,32 +271,27 @@ uint8_t RFM96_LoRaRxPacket(SPISlaveID id, uint8_t *buf)
 uint8_t RFM96_LoRaEntryTx(SPISlaveID id, uint8_t packet_length)
 {
     uint8_t addr;
-    uint8_t SysTime = 0;
     uint8_t temp;
 
     RFM96_Config(id, 0);                                         //模块发射参数设置
     //delay_us(10);
-    RegisterWrite( id, 0x4D00+0x87);                                   //发射功率 for 20dBm
-    RegisterWrite( id, LR_RegHopPeriod);                               //RegHopPeriod NO FHSS
-    RegisterWrite( id, REG_LR_DIOMAPPING1_LONG+0x41);                       //DIO0=01, DIO1=00, DIO2=00, DIO3=01
+    sx1276RegisterWrite( id, 0x4D00+0x87);                                   //发射功率 for 20dBm
+    sx1276RegisterWrite( id, LR_RegHopPeriod);                               //RegHopPeriod NO FHSS
+    sx1276RegisterWrite( id, REG_LR_DIOMAPPING1_LONG+0x41);                       //DIO0=01, DIO1=00, DIO2=00, DIO3=01
 
     loraClearAllIRQFlags(id);
-    RegisterWrite( id, LR_RegIrqFlagsMask+0xF7);                       //Open TxDone interrupt
-    RegisterWrite( id, LR_RegPayloadLength+packet_length);                       //RegPayloadLength  21byte负载和fifo的字节数的关系是什么？？
+    sx1276RegisterWrite( id, LR_RegIrqFlagsMask+0xF7);                       //Open TxDone interrupt
+    sx1276RegisterWrite( id, LR_RegPayloadLength+packet_length);                       //RegPayloadLength  21byte负载和fifo的字节数的关系是什么？？
 
-    addr = RegisterRead( id, (uint8_t)(LR_RegFifoTxBaseAddr>>8));           //RegFiFoTxBaseAddr
-    RegisterWrite( id, LR_RegFifoAddrPtr+addr);                        //RegFifoAddrPtr
+    addr = sx1276RegisterRead( id, (uint8_t)(LR_RegFifoTxBaseAddr>>8));           //RegFiFoTxBaseAddr
+    sx1276RegisterWrite( id, LR_RegFifoAddrPtr+addr);                        //RegFifoAddrPtr
 
     while(1)
     {
-        temp=RegisterRead( id, (uint8_t)(LR_RegPayloadLength>>8) );
+        temp=sx1276RegisterRead( id, (uint8_t)(LR_RegPayloadLength>>8) );
         if(temp==packet_length)
         {
             break;
-        }
-        if(SysTime>=3)
-        {
-            return 0;
         }
     }
 
@@ -313,7 +308,7 @@ uint8_t RFM96_LoRaTxPacket(SPISlaveID id, uint8_t *buf,uint8_t len)
 {
 
     BurstWrite(id, 0x00, (uint8_t *)buf, len);
-    RegisterWrite( id, LR_RegOpMode+0x03+0x08);                    //Tx Mode
+    sx1276RegisterWrite( id, LR_RegOpMode+0x03+0x08);                    //Tx Mode
 
     uint16_t count=0;
     while( sx1276IsIRQPinAsserted(id) == false )
@@ -325,7 +320,7 @@ uint8_t RFM96_LoRaTxPacket(SPISlaveID id, uint8_t *buf,uint8_t len)
         delay_us(500);
     }
 
-    RegisterRead( id, (uint8_t)(LR_RegIrqFlags>>8));
+    sx1276RegisterRead( id, (uint8_t)(LR_RegIrqFlags>>8));
     loraClearAllIRQFlags(id);                                //Clear irq
     loraStandbyMode(id);                                     //Entry Standby mode
 
@@ -340,7 +335,7 @@ uint8_t RFM96_LoRaTxPacket(SPISlaveID id, uint8_t *buf,uint8_t len)
 uint8_t loraTransmitPacket_Async(SPISlaveID id, uint8_t *buf,uint8_t len)
 {
     BurstWrite(id, 0x00, (uint8_t *)buf, len);
-    RegisterWrite( id, LR_RegOpMode+0x03+0x08);                    //Tx Mode
+    sx1276RegisterWrite( id, LR_RegOpMode+0x03+0x08);                    //Tx Mode
 
     if(id == SlaveA)
     {
@@ -379,7 +374,7 @@ bool loraCheckAsyncTransmitForCompletion(SPISlaveID id)
     {
         // Previous transmit is now complete, clear the IRQ flags and
         // move into standby mode.
-        RegisterRead( id, (uint8_t)(LR_RegIrqFlags>>8));
+        sx1276RegisterRead( id, (uint8_t)(LR_RegIrqFlags>>8));
         loraClearAllIRQFlags(id);                                //Clear irq
         loraContinuousReceiveMode( id );
 
