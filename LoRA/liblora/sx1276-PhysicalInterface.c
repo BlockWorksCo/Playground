@@ -103,6 +103,61 @@ void BurstWrite( SPISlaveID id, uint8_t adr, uint8_t *ptr, uint8_t length)
     spiBusDeselectSlave( id );
 }
 
+void SX1276WriteBuffer( SPISlaveID id, uint8_t addr, uint8_t *buffer, uint8_t size )
+{
+#if 1
+    BurstWrite(id, addr, buffer, size);
+#else
+    uint8_t i;
+    //NSS = 0;
+    spiBusSelectSlave( id );
+    spiBusWriteOneByte( addr | 0x80 );
+    for( i = 0; i < size; i++ )
+    {
+        spiBusWriteOneByte( buffer[i] );
+    }
+    //NSS = 1;
+    spiBusDeselectSlave( id );
+#endif
+}
+
+void SX1276ReadBuffer( SPISlaveID id, uint8_t addr, uint8_t *buffer, uint8_t size )
+{
+#if 1
+    SPIBurstRead( id, addr, buffer, size);
+#else
+    uint8_t i;
+    //NSS = 0;
+    spiBusSelectSlave( id );
+
+    spiBusWriteOneByte( addr & 0x7F );
+
+    for( i = 0; i < size; i++ )
+    {
+        buffer[i] = spiBusWriteOneByte( 0 );
+    }
+    spiBusDeselectSlave( id );
+#endif
+}
+
+void SX1276Write( SPISlaveID id, uint8_t addr, uint8_t data )
+{
+#if 1
+    BurstWrite( id, addr, &data, 1);
+#else
+    SX1276WriteBuffer( id,  addr, &data, 1 );
+#endif
+}
+
+void SX1276Read( SPISlaveID id, uint8_t addr, uint8_t *data )
+{
+#if 1
+    SPIBurstRead( id, addr, data, 1);
+#else
+    SX1276ReadBuffer( id,  addr, data, 1 );
+#endif
+}
+
 
 
 void sx1276Reset(SPISlaveID id)
@@ -192,45 +247,6 @@ void SX1276SetReset( SPISlaveID id, uint8_t state )
     }
 
 
-}
-
-void SX1276WriteBuffer( SPISlaveID id, uint8_t addr, uint8_t *buffer, uint8_t size )
-{
-    uint8_t i;
-    //NSS = 0;
-    spiBusSelectSlave( id );
-    spiBusWriteOneByte( addr | 0x80 );
-    for( i = 0; i < size; i++ )
-    {
-        spiBusWriteOneByte( buffer[i] );
-    }
-    //NSS = 1;
-    spiBusDeselectSlave( id );
-}
-
-void SX1276ReadBuffer( SPISlaveID id, uint8_t addr, uint8_t *buffer, uint8_t size )
-{
-    uint8_t i;
-    //NSS = 0;
-    spiBusSelectSlave( id );
-
-    spiBusWriteOneByte( addr & 0x7F );
-
-    for( i = 0; i < size; i++ )
-    {
-        buffer[i] = spiBusWriteOneByte( 0 );
-    }
-    spiBusDeselectSlave( id );
-}
-
-void SX1276Write( SPISlaveID id, uint8_t addr, uint8_t data )
-{
-    SX1276WriteBuffer( id,  addr, &data, 1 );
-}
-
-void SX1276Read( SPISlaveID id, uint8_t addr, uint8_t *data )
-{
-    SX1276ReadBuffer( id,  addr, data, 1 );
 }
 
 void SX1276SetIdleState(SPISlaveID id)
