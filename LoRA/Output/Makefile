@@ -20,7 +20,6 @@ VPATH   += ../liblora
 OBJS    += main.o
 OBJS    += sx1276-LoRa.o
 OBJS    += sx1276-PhysicalInterface.o
-OBJS    += SPIBus.o
 OBJS    += delay.o
 OBJS    += sysclk.o
 
@@ -33,6 +32,7 @@ include $(SOURCE_LIBRARY)/Implementations/BluePillBoardSupport/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/ErrorHandling/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/EventQueue/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/NullDebugText/Build.mk
+include $(SOURCE_LIBRARY)/Implementations/BluePillSPIMaster/Build.mk
 
 all: app.elf
 

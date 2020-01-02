@@ -22,7 +22,7 @@
 #define __SX1276_LORA_H__
 
 
-#include "SPIBus.h"
+#include "SPIMaster.h"
 #include <stddef.h>
 
 /*

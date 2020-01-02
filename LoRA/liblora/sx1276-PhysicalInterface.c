@@ -3,7 +3,6 @@
 #include "Common.h"
 #include "ErrorHandling.h"
 #include "sx1276-PhysicalInterface.h"
-#include "SPIBus.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_rcc.h"
 #include "delay.h"

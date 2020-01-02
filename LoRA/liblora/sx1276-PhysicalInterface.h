@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "SPIBus.h"
+#include "SPIMaster.h"
 
 
 /**********************************************************
