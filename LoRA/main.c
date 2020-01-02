@@ -9,7 +9,7 @@
 #include "sx1276-LoRa.h"
 #include "delay.h"
 #include <string.h>
-#include "sysclk.h"
+#include "BoardSupport.h"
 #include "EventQueue.h"
 
 
@@ -17,6 +17,8 @@
 
 int main(void)
 {
+    BoardSupportInitialise();
+
     //
     // Initialise GPIOs.
     //
@@ -37,13 +39,6 @@ int main(void)
     GPIO_ResetBits(GPIOC, GPIO_Pin_13); // Set C13 to Low level ("0")
     GPIO_ResetBits(GPIOB, GPIO_Pin_14); // Set C13 to Low level ("0")
     GPIO_ResetBits(GPIOB, GPIO_Pin_15); // Set C13 to Low level ("0")
-
-    //
-    // Initialise SysTick.
-    //
-    //SysTick_Config(SystemCoreClock/100);
-    SysTick_Config(50000);
-
 
     //
     // Startup flash of both LEDs.
@@ -92,8 +87,8 @@ int main(void)
         if(loraCheckAsyncTransmitForCompletion(SlaveA) == true)
         {
             static uint32_t count    = 0;
-            if((sysclkGetTickCount()-count) > 5000) {
-                count   = sysclkGetTickCount();
+            if((GetTickCount()-count) > 5000) {
+                count   = GetTickCount();
                 uint8_t     packet[8]  = {0,2,3,4,5,6};
                 loraTransmitPacket( SlaveA,  &packet[0], sizeof(packet) );
             }
@@ -119,8 +114,8 @@ int main(void)
         if(loraCheckAsyncTransmitForCompletion(SlaveB) == true)
         {
             static uint32_t count    = 2500;
-            if((sysclkGetTickCount()-count) > 5000) {
-                count   = sysclkGetTickCount();
+            if((GetTickCount()-count) > 5000) {
+                count   = GetTickCount();
                 uint8_t     packet[8]  = {0,1,2,3,4,5};
                 loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
             }

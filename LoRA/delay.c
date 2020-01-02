@@ -3,13 +3,13 @@
 
 
 #include "delay.h"
-#include "sysclk.h"
+#include "BoardSupport.h"
 
 
 void delay_ms(uint32_t ms)
 {
-    uint32_t    start   = sysclkGetTickCount();
-    while(sysclkGetTickCount() < (start+ms) );
+    uint32_t    start   = GetTickCount();
+    while(GetTickCount() < (start+ms) );
 }
 
 

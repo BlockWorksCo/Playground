@@ -21,7 +21,6 @@ OBJS    += main.o
 OBJS    += sx1276-LoRa.o
 OBJS    += sx1276-PhysicalInterface.o
 OBJS    += delay.o
-OBJS    += sysclk.o
 
 
 
