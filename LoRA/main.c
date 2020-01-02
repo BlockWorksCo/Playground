@@ -19,6 +19,11 @@ void tick()
 }
 
 
+void SlaveATransmit()
+{
+}
+
+
 int main(void)
 {
     BoardSupportInitialise();
@@ -66,6 +71,7 @@ int main(void)
     //
     //
     CallEvery_ms( tick, 1000 );
+    CallEvery_ms( SlaveATransmit, 5000 );
 
     //
     // Forever...
@@ -73,9 +79,6 @@ int main(void)
     while(true) 
     {
         static uint8_t receiveBuffer[128]  = {0};
-
-        /* Toggle LED which connected to PC13*/
-        //GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
 
         //
         // Receive any packets on SlaveA.
