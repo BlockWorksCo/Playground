@@ -9,7 +9,7 @@
 
 #include "sx1276-LoRa.h"
 #include "sx1276-PhysicalInterface.h"
-#include "delay.h"
+#include "BoardSupport.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -115,7 +115,7 @@ void loraBasicConfiguration( SPISlaveID id, uint8_t mode)
 
     sx1276Reset(id);
     loraSleepMode(id);                                           //Change modem mode Must in Sleep mode
-    delay_ms(1);
+    Delay_ms(1);
     loraLoraMode(id);
 
     for(i=0; i<3; i++)                                     //setting frequency parameter
@@ -197,7 +197,7 @@ uint8_t RFM96_LoRaRxPacket(SPISlaveID id, uint8_t *buf)
 
     addr = sx1276RegisterRead( id, (uint8_t)(LR_RegFifoRxCurrentaddr>>8));      //last packet addr 数据包的最后地址(数据的尾地址)
     sx1276RegisterWrite( id, LR_RegFifoAddrPtr+addr);                      //RxBaseAddr -> FiFoAddrPtr
-    delay_us(1);
+    Delay_us(1);
 
     if(RFM96SpreadFactorTbl[gb_SF]==6)           //When SpreadFactor is six，will used Implicit Header mode(Excluding internal packet length)
     {
@@ -211,7 +211,7 @@ uint8_t RFM96_LoRaRxPacket(SPISlaveID id, uint8_t *buf)
     sx1276BlockRead(id, 0x00, buf, packet_size);
 
     loraClearAllIRQFlags(id);
-    delay_us(1);
+    Delay_us(1);
 
     return packet_size;
 }

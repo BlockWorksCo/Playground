@@ -2,10 +2,11 @@
 
 #include "Common.h"
 #include "ErrorHandling.h"
+#include "BoardSupport.h"
+
 #include "sx1276-PhysicalInterface.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_rcc.h"
-#include "delay.h"
 
 
 
@@ -142,7 +143,7 @@ void sx1276Reset( SPISlaveID id )
 
         GPIOB->ODR &= ~GPIO_Pin_12;
     
-        delay_ms(1);
+        Delay_ms(1);
 
         // Configure RESET as input
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
@@ -165,7 +166,7 @@ void sx1276Reset( SPISlaveID id )
 
         GPIOB->ODR &= ~GPIO_Pin_13;
 
-        delay_ms(1);
+        Delay_ms(1);
 
         // Configure RESET as input
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
@@ -176,7 +177,7 @@ void sx1276Reset( SPISlaveID id )
         GPIOB->ODR |= GPIO_Pin_13;
     }
 
-    delay_ms(10);
+    Delay_ms(10);
 }
 
 

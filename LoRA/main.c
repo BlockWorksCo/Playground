@@ -7,7 +7,6 @@
 #include "stm32f10x_spi.h"
 #include "sx1276-PhysicalInterface.h"
 #include "sx1276-LoRa.h"
-#include "delay.h"
 #include <string.h>
 #include "BoardSupport.h"
 #include "EventQueue.h"
@@ -45,7 +44,7 @@ int main(void)
     //
     GPIOB->ODR ^= GPIO_Pin_14; // Invert C13
     GPIOB->ODR ^= GPIO_Pin_15; // Invert C13
-    delay_ms(1000);
+    Delay_ms(1000);
     GPIOB->ODR ^= GPIO_Pin_14; // Invert C13
     GPIOB->ODR ^= GPIO_Pin_15; // Invert C13
 
@@ -76,7 +75,7 @@ int main(void)
             uint8_t length  = loraReceivePacket( SlaveA, &receiveBuffer[0], sizeof(receiveBuffer) );
             if(length > 0) {
                 GPIOB->ODR |= GPIO_Pin_14; // Invert C13
-                delay_ms(100);
+                Delay_ms(100);
                 GPIOB->ODR &= ~GPIO_Pin_14; // Invert C13
             }
         }
@@ -87,8 +86,8 @@ int main(void)
         if(loraCheckAsyncTransmitForCompletion(SlaveA) == true)
         {
             static uint32_t count    = 0;
-            if((GetTickCount()-count) > 5000) {
-                count   = GetTickCount();
+            if((CurrentTimestamp_ms()-count) > 5000) {
+                count   = CurrentTimestamp_ms();
                 uint8_t     packet[8]  = {0,2,3,4,5,6};
                 loraTransmitPacket( SlaveA,  &packet[0], sizeof(packet) );
             }
@@ -103,7 +102,7 @@ int main(void)
             uint8_t length  = loraReceivePacket( SlaveB, &receiveBuffer[0], sizeof(receiveBuffer) );
             if(length > 0) {
                 GPIOB->ODR |= GPIO_Pin_15; // Invert C13
-                delay_ms(100);
+                Delay_ms(100);
                 GPIOB->ODR &= ~GPIO_Pin_15; // Invert C13
             }
         }
@@ -114,8 +113,8 @@ int main(void)
         if(loraCheckAsyncTransmitForCompletion(SlaveB) == true)
         {
             static uint32_t count    = 2500;
-            if((GetTickCount()-count) > 5000) {
-                count   = GetTickCount();
+            if((CurrentTimestamp_ms()-count) > 5000) {
+                count   = CurrentTimestamp_ms();
                 uint8_t     packet[8]  = {0,1,2,3,4,5};
                 loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
             }
