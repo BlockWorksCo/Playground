@@ -259,7 +259,7 @@ bool loraCheckAsyncTransmitForCompletion(SPISlaveID id)
     if( sx1276IsIRQPinAsserted(id) == true ) 
     {
         // Previous transmit is now complete, clear the IRQ flags and
-        // move into standby mode.
+        // move into receive mode.
         sx1276RegisterRead( id, (uint8_t)(LR_RegIrqFlags>>8));
         loraClearAllIRQFlags(id);                                //Clear irq
         loraContinuousReceiveMode( id );
