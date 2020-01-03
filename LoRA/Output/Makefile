@@ -12,13 +12,13 @@ RM      = rm
 
 
 include ../Build.mk
-include ../liblora/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/BluePillBoardSupport/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/ErrorHandling/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/EventQueue/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/NullDebugText/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/BluePillSPIMaster/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/TimedEvents/Build.mk
+include $(SOURCE_LIBRARY)/Implementations/LoRa/Build.mk
 
 
 

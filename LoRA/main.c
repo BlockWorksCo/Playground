@@ -126,7 +126,7 @@ void SlaveBTransmit()
 
 void StartSlaveB()
 {
-    CallEvery_ms( SlaveBTransmit, 5000 );
+    CallEvery_ms( SlaveBTransmit, 3000 );
 }
 
 
@@ -166,10 +166,6 @@ int main(void)
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-    GPIO_ResetBits(GPIOC, GPIO_Pin_13); // Set C13 to Low level ("0")
-    GPIO_ResetBits(GPIOB, GPIO_Pin_14); // Set C13 to Low level ("0")
-    GPIO_ResetBits(GPIOB, GPIO_Pin_15); // Set C13 to Low level ("0")
-
     //
     // Startup the radio(s).
     //
@@ -189,8 +185,8 @@ int main(void)
     //
     //
     //
-    CallEvery_ms( SlaveATransmit, 5000 );
-    CallAfter_ms( StartSlaveB, 2000 );
+    CallEvery_ms( SlaveATransmit, 3000 );
+    CallAfter_ms( StartSlaveB, 1000 );
     CallEvery_ms( PollForTransmitCompletion, 100 );
 
     //
