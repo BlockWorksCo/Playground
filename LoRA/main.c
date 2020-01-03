@@ -212,7 +212,7 @@ int main(void)
     CallAfter_ms( StartSlaveB, 1000 );
     CallEvery_ms( SlaveATransmit, 3000 );
     CallEvery_ms( PollForTransmitCompletion, 100 );
-    //CallEvery_ms( PollForPacketReception, 100 );
+    CallEvery_ms( PollForPacketReception, 100 );
 
     //
     // Forever...
