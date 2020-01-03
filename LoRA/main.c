@@ -80,11 +80,10 @@ void PollForPacketReception();
 void SlaveATransmit()
 {
     PollForPacketReception();
-    if(radioAsyncTransmitCompleted(RadioA) == true)
-    {
-        uint8_t     packet[8]  = {0,2,3,4,5,6};
-        radioAsyncTransmitPacket( RadioA,  &packet[0], sizeof(packet) );
-    }
+    radioAsyncTransmitCompleted(RadioA);
+
+    uint8_t     packet[8]  = {0,2,3,4,5,6};
+    radioAsyncTransmitPacket( RadioA,  &packet[0], sizeof(packet) );
 }
 
 
@@ -94,11 +93,10 @@ void SlaveATransmit()
 void SlaveBTransmit()
 {
     PollForPacketReception();
-    if(radioAsyncTransmitCompleted(RadioB) == true)
-    {
-        uint8_t     packet[8]  = {0,2,3,4,5,6};
-        radioAsyncTransmitPacket( RadioB,  &packet[0], sizeof(packet) );
-    }
+    radioAsyncTransmitCompleted(RadioB); 
+
+    uint8_t     packet[8]  = {0,2,3,4,5,6};
+    radioAsyncTransmitPacket( RadioB,  &packet[0], sizeof(packet) );
 }
 
 void StartSlaveB()
