@@ -71,17 +71,11 @@ void FlashLED_B()
 }
 
 
-void PollForPacketReception();
-
-
 //
 // Transmit from SlaveA
 //
 void SlaveATransmit()
 {
-    PollForPacketReception();
-    radioAsyncTransmitCompleted(RadioA);
-
     uint8_t     packet[8]  = {0,2,3,4,5,6};
     radioAsyncTransmitPacket( RadioA,  &packet[0], sizeof(packet) );
 }
@@ -92,9 +86,6 @@ void SlaveATransmit()
 //
 void SlaveBTransmit()
 {
-    PollForPacketReception();
-    radioAsyncTransmitCompleted(RadioB); 
-
     uint8_t     packet[8]  = {0,2,3,4,5,6};
     radioAsyncTransmitPacket( RadioB,  &packet[0], sizeof(packet) );
 }
@@ -207,10 +198,10 @@ int main(void)
     //
     //
     //
-    CallAfter_ms( StartSlaveB, 1000 );
+    CallAfter_ms( StartSlaveB, 1500 );
     CallEvery_ms( SlaveATransmit, 3000 );
     CallEvery_ms( PollForTransmitCompletion, 100 );
-    CallEvery_ms( PollForPacketReception, 100 );
+    CallEvery_ms( PollForPacketReception, 250 );
 
     //
     // Forever...
