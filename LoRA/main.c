@@ -3,11 +3,10 @@
 #include "BoardSupport.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_rcc.h"
-#include "sx1276-PhysicalInterface.h"
-#include "sx1276-LoRa.h"
 #include "EventQueue.h"
 #include "TimedEvents.h"
 #include "Radio.h"
+#include "ErrorHandling.h"
 
 
 //
@@ -15,7 +14,7 @@
 //
 void tick()
 {
-    GPIOC->ODR ^= GPIO_Pin_13; // Invert C13
+    GPIOC->ODR ^= GPIO_Pin_13;
 }
 
 
@@ -72,6 +71,7 @@ void FlashLED_B()
 }
 
 
+void PollForPacketReception();
 
 
 //
@@ -79,23 +79,11 @@ void FlashLED_B()
 //
 void SlaveATransmit()
 {
-    //
-    // Receive any packets on SlaveA.
-    //
-    if ( radioAsyncReceiveCompleted(SlaveA) == true )
-    {
-        static uint8_t receiveBuffer[128]  = {0};
-        uint8_t length  = radioAsyncReceivePacket( SlaveA, &receiveBuffer[0], sizeof(receiveBuffer) );
-        if(length > 0) 
-        {
-            Call(FlashLED_A);
-        }
-    }
-
-    if(radioAsyncTransmitCompleted(SlaveA) == true)
+    PollForPacketReception();
+    if(radioAsyncTransmitCompleted(RadioA) == true)
     {
         uint8_t     packet[8]  = {0,2,3,4,5,6};
-        radioAsyncTransmitPacket( SlaveA,  &packet[0], sizeof(packet) );
+        radioAsyncTransmitPacket( RadioA,  &packet[0], sizeof(packet) );
     }
 }
 
@@ -105,23 +93,11 @@ void SlaveATransmit()
 //
 void SlaveBTransmit()
 {
-    //
-    // Receive any packets on SlaveB.
-    //
-    if ( radioAsyncReceiveCompleted(SlaveB) == true )
-    {
-        static uint8_t receiveBuffer[128]  = {0};
-        uint8_t length  = radioAsyncReceivePacket( SlaveB, &receiveBuffer[0], sizeof(receiveBuffer) );
-        if(length > 0) 
-        {
-            Call(FlashLED_B);
-        }
-    }
-
-    if(radioAsyncTransmitCompleted(SlaveB) == true)
+    PollForPacketReception();
+    if(radioAsyncTransmitCompleted(RadioB) == true)
     {
         uint8_t     packet[8]  = {0,2,3,4,5,6};
-        radioAsyncTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
+        radioAsyncTransmitPacket( RadioB,  &packet[0], sizeof(packet) );
     }
 }
 
@@ -146,10 +122,49 @@ void PollForTransmitCompletion()
 //
 //
 //
-int main(void)
+void PollForPacketReception()
 {
-    BoardSupportInitialise();
+    //
+    // Receive any packets on RadioB.
+    //
+    if ( radioAsyncReceiveCompleted(RadioB) == true )
+    {
+        static uint8_t receiveBuffer[128]  = {0};
+        uint8_t length  = radioAsyncReceivePacket( RadioB, &receiveBuffer[0], sizeof(receiveBuffer) );
+        if(length > 0) 
+        {
+            Call(FlashLED_B);
+        }
+        else
+        {
+            PANIC("ouch!");
+        }
+    }
 
+    //
+    // Receive any packets on RadioA.
+    //
+    if ( radioAsyncReceiveCompleted(RadioA) == true )
+    {
+        static uint8_t receiveBuffer[128]  = {0};
+        uint8_t length  = radioAsyncReceivePacket( RadioA, &receiveBuffer[0], sizeof(receiveBuffer) );
+        if(length > 0) 
+        {
+            Call(FlashLED_A);
+        }
+        else
+        {
+            PANIC("ouch!");
+        }
+    }
+}
+
+
+//
+//
+//
+void InitialiseLEDs()
+{
     //
     // Initialise GPIOs.
     //
@@ -166,6 +181,17 @@ int main(void)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
+}
+
+
+//
+//
+//
+int main(void)
+{
+    BoardSupportInitialise();
+
+    InitialiseLEDs();
 
     //
     // Startup the radio(s).
@@ -183,9 +209,10 @@ int main(void)
     //
     //
     //
-    CallEvery_ms( SlaveATransmit, 3000 );
     CallAfter_ms( StartSlaveB, 1000 );
+    CallEvery_ms( SlaveATransmit, 3000 );
     CallEvery_ms( PollForTransmitCompletion, 100 );
+    //CallEvery_ms( PollForPacketReception, 100 );
 
     //
     // Forever...
