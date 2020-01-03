@@ -20,12 +20,21 @@ def InitPopulation():
 
 
 
+def CycleSim(time, population):
+
+    for node in population:
+        print node
+
 
 if __name__ == '__main__':
 
     print('LoRaMesh sim')
 
     population  = InitPopulation()
-    print(population)
+    time        = 0
+    while True:
+        print(time)
+        CycleSim(time, population)
+        time    = time + 1
 
 
