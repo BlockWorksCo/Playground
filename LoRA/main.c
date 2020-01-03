@@ -7,6 +7,7 @@
 #include "sx1276-LoRa.h"
 #include "EventQueue.h"
 #include "TimedEvents.h"
+#include "Radio.h"
 
 
 //
@@ -81,20 +82,20 @@ void SlaveATransmit()
     //
     // Receive any packets on SlaveA.
     //
-    if ( loraCheckAsyncReceiveCompletion(SlaveA) == true )
+    if ( radioAsyncReceiveCompleted(SlaveA) == true )
     {
         static uint8_t receiveBuffer[128]  = {0};
-        uint8_t length  = loraReceivePacket( SlaveA, &receiveBuffer[0], sizeof(receiveBuffer) );
+        uint8_t length  = radioAsyncReceivePacket( SlaveA, &receiveBuffer[0], sizeof(receiveBuffer) );
         if(length > 0) 
         {
             Call(FlashLED_A);
         }
     }
 
-    if(loraCheckAsyncTransmitForCompletion(SlaveA) == true)
+    if(radioAsyncTransmitCompleted(SlaveA) == true)
     {
         uint8_t     packet[8]  = {0,2,3,4,5,6};
-        loraTransmitPacket( SlaveA,  &packet[0], sizeof(packet) );
+        radioAsyncTransmitPacket( SlaveA,  &packet[0], sizeof(packet) );
     }
 }
 
@@ -107,20 +108,20 @@ void SlaveBTransmit()
     //
     // Receive any packets on SlaveB.
     //
-    if ( loraCheckAsyncReceiveCompletion(SlaveB) == true )
+    if ( radioAsyncReceiveCompleted(SlaveB) == true )
     {
         static uint8_t receiveBuffer[128]  = {0};
-        uint8_t length  = loraReceivePacket( SlaveB, &receiveBuffer[0], sizeof(receiveBuffer) );
+        uint8_t length  = radioAsyncReceivePacket( SlaveB, &receiveBuffer[0], sizeof(receiveBuffer) );
         if(length > 0) 
         {
             Call(FlashLED_B);
         }
     }
 
-    if(loraCheckAsyncTransmitForCompletion(SlaveB) == true)
+    if(radioAsyncTransmitCompleted(SlaveB) == true)
     {
         uint8_t     packet[8]  = {0,2,3,4,5,6};
-        loraTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
+        radioAsyncTransmitPacket( SlaveB,  &packet[0], sizeof(packet) );
     }
 }
 
@@ -137,8 +138,8 @@ void StartSlaveB()
 //
 void PollForTransmitCompletion()
 {
-    loraCheckAsyncTransmitForCompletion(SlaveA);
-    loraCheckAsyncTransmitForCompletion(SlaveB);
+    radioAsyncTransmitCompleted(RadioA);
+    radioAsyncTransmitCompleted(RadioB);
 }
 
 
@@ -169,11 +170,8 @@ int main(void)
     //
     // Startup the radio(s).
     //
-    sx1276PhysicalInterfaceInit( SlaveA );
-    loraContinuousReceiveMode( SlaveA );
-
-    sx1276PhysicalInterfaceInit( SlaveB );
-    loraContinuousReceiveMode( SlaveB );
+    radioInitialise( RadioA );
+    radioInitialise( RadioB );
 
     //
     // Startup flash of both LEDs and continuous toggle of
