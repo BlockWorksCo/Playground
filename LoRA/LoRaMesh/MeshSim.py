@@ -15,7 +15,7 @@ def InitPopulation():
     random.seed()
     population  = []
     for i in range(100):
-        population.append({'x':random.random(),'y':random.random(),'receivedData':'', 'receivedPower':0.0}) 
+        population.append({'x':random.random(),'y':random.random(),'receivedData':'', 'receivedPower':0.0, 'inFlightPackets':[], 'RootNode':False}) 
 
     return population
 
@@ -26,10 +26,14 @@ def ProcessPacket(time, node):
 
     if node['receivedData'] != '':
 
-        packetAge   = time - node['receivedTime']
-        if packetAge > 10:
-            node['transmittingPacket']  = node['receivedData']
-            node['transmittingPower']   = 15
+        node['inFlightPackets'].append( node['receivedData'] )
+
+        #packetAge   = time - node['receivedTime']
+        #if packetAge > 10:
+            #node['transmittingPacket']  = node['receivedData']
+            #node['transmittingPower']   = 15
+
+    return node
 
 
 
@@ -42,7 +46,7 @@ def CycleSim(time, population):
             node['receivedPower']   = 0.0
 
     # Transmit from each node to all other nodes, taking into account
-    # threshold and otxehr packets.
+    # threshold and otehr packets.
     for fromNode in population:
         if fromNode.get('transmittingPacket') != None:
             for toNode in population:
@@ -80,6 +84,8 @@ if __name__ == '__main__':
 
     population[37]['transmittingPacket']    = 'Hello World'
     population[37]['transmittingPower']     = 15
+    
+    population[23]['RootNode']              = True
 
     while True:
         print(time)

@@ -78,6 +78,7 @@ void SlaveATransmit()
 {
     uint8_t     packet[8]  = {0,2,3,4,5,6};
     radioAsyncTransmitPacket( RadioA,  &packet[0], sizeof(packet) );
+    Call(FlashLED_B);
 }
 
 
@@ -113,6 +114,7 @@ void PollForTransmitCompletion()
 //
 void PollForPacketReception()
 {
+#if 0
     //
     // Receive any packets on RadioB.
     //
@@ -129,7 +131,7 @@ void PollForPacketReception()
             PANIC("ouch!");
         }
     }
-
+#endif
     //
     // Receive any packets on RadioA.
     //
@@ -186,7 +188,7 @@ int main(void)
     // Startup the radio(s).
     //
     radioInitialise( RadioA );
-    radioInitialise( RadioB );
+    //radioInitialise( RadioB );
 
     //
     // Startup flash of both LEDs and continuous toggle of
