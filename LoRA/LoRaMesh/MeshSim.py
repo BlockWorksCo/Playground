@@ -32,10 +32,17 @@ def ProcessPacket(time, node):
             node['transmittingPower']   = 15
 
 
+
 def CycleSim(time, population):
 
+    # Clear the received packets
+    for node in population:
+        if node.get('receivedData') != None:
+            node['receivedData']    = ''
+            node['receivedPower']   = 0.0
+
     # Transmit from each node to all other nodes, taking into account
-    # threshold and otehr packets.
+    # threshold and otxehr packets.
     for fromNode in population:
         if fromNode.get('transmittingPacket') != None:
             for toNode in population:
