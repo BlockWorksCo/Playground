@@ -21,6 +21,14 @@ def InitPopulation():
 
 
 
+
+def ProcessPacket(node):
+
+    if node['receivedData'] != '':
+        node['transmittingPacket']  = node['receivedData']
+        node['transmittingPower']   = 15
+
+
 def CycleSim(time, population):
 
     # Clear the received packets.
@@ -43,6 +51,18 @@ def CycleSim(time, population):
                         toNode['receivedPower']   = receivedPower
                         print(toNode)
 
+    # Clear the transmittedData.
+    for node in population:
+        if node.get('transmittingPacket') != None:
+            del node['transmittingPacket']
+
+    # Process the received packets.
+    for node in population:
+        node    = ProcessPacket(node)
+
+    return population
+
+
 
 if __name__ == '__main__':
 
@@ -57,7 +77,7 @@ if __name__ == '__main__':
 
     while True:
         print(time)
-        CycleSim(time, population)
+        population  = CycleSim(time, population)
         time    = time + 1
 
 
