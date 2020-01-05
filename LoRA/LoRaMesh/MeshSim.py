@@ -24,14 +24,24 @@ def InitPopulation():
 
 def ProcessPacket(time, node):
 
+    # Add new packet to in-flight packets.
     if node['receivedData'] != '':
+        node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time} )
 
-        node['inFlightPackets'].append( node['receivedData'] )
+    # Check all in-flight packets for ready-to-transmit? transmit one and remove it from
+    # the in-flight list.
+    inFlightPackets = node['inFlightPackets']
+    for index,packet in enumerate(inFlightPackets):
+        packetAge   = time - packet['time']
+        if packetAge > 10:
+            print('forwarding [%s] because age is %d...'%(packet['packet'],packetAge))
+            #print(node)
+            node['transmittingPacket']  = packet['packet']
+            node['transmittingPower']   = 15
+            node['inFlightPackets']     = inFlightPackets[0:index]+inFlightPackets[index+1:]
+            #print(node)
+            break
 
-        #packetAge   = time - node['receivedTime']
-        #if packetAge > 10:
-            #node['transmittingPacket']  = node['receivedData']
-            #node['transmittingPower']   = 15
 
     return node
 
@@ -59,7 +69,7 @@ def CycleSim(time, population):
                         toNode['receivedData']    = fromNode['transmittingPacket']
                         toNode['receivedPower']   = receivedPower
                         toNode['receivedTime']    = time
-                        print(toNode)
+                        #print(toNode)
 
     # Clear the transmittedData.
     for node in population:
@@ -88,7 +98,7 @@ if __name__ == '__main__':
     population[23]['RootNode']              = True
 
     while True:
-        print(time)
+        print('\nTime: %d\n========================'%(time))
         population  = CycleSim(time, population)
         time    = time + 1
 

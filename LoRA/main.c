@@ -200,10 +200,10 @@ int main(void)
     //
     //
     //
-    CallAfter_ms( StartSlaveB, 1500 );
+    //CallAfter_ms( StartSlaveB, 1500 );
     CallEvery_ms( SlaveATransmit, 3000 );
     CallEvery_ms( PollForTransmitCompletion, 100 );
-    CallEvery_ms( PollForPacketReception, 250 );
+    CallEvery_ms( PollForPacketReception, 50 );
 
     //
     // Forever...
