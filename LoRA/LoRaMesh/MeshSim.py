@@ -6,6 +6,7 @@
 
 import random
 import math
+import binascii
 
 
 
@@ -15,7 +16,7 @@ def InitPopulation():
     random.seed()
     population  = []
     for i in range(100):
-        population.append({'x':random.random(),'y':random.random(),'receivedData':'', 'receivedPower':0.0, 'inFlightPackets':[], 'RootNode':False}) 
+        population.append({'x':random.random(),'y':random.random(),'receivedData':'', 'receivedPower':0.0, 'inFlightPackets':[], 'RootNode':False, 'packetHistory':[]}) 
 
     return population
 
@@ -24,9 +25,13 @@ def InitPopulation():
 
 def ProcessPacket(time, node, nodeIndex):
 
-    # Add new packet to in-flight packets.
+    # Add new packet to in-flight packets. If the hash is not in the history-list
     if node['receivedData'] != '':
-        node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time} )
+        thisHash    = binascii.crc32(node['receivedData'])
+        if thisHash not in node['packetHistory']:
+            node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time} )
+        else:
+            print('node %d dropping [%s] because already seen'%(nodeIndex,node['receivedData']))
 
     # Check all in-flight packets for ready-to-transmit? transmit one and remove it from
     # the in-flight list.
@@ -35,11 +40,10 @@ def ProcessPacket(time, node, nodeIndex):
         packetAge   = time - packet['time']
         if packetAge > 10:
             print('node %d forwarding [%s] because age is %d...'%(nodeIndex,packet['packet'],packetAge))
-            #print(node)
             node['transmittingPacket']  = packet['packet']
             node['transmittingPower']   = 15
             node['inFlightPackets']     = inFlightPackets[0:index]+inFlightPackets[index+1:]
-            #print(node)
+            node['packetHistory'].append(binascii.crc32( packet['packet'] ))
             break
 
 
