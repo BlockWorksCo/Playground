@@ -22,7 +22,7 @@ def InitPopulation():
 
 
 
-def ProcessPacket(time, node):
+def ProcessPacket(time, node, nodeIndex):
 
     # Add new packet to in-flight packets.
     if node['receivedData'] != '':
@@ -34,7 +34,7 @@ def ProcessPacket(time, node):
     for index,packet in enumerate(inFlightPackets):
         packetAge   = time - packet['time']
         if packetAge > 10:
-            print('forwarding [%s] because age is %d...'%(packet['packet'],packetAge))
+            print('node %d forwarding [%s] because age is %d...'%(nodeIndex,packet['packet'],packetAge))
             #print(node)
             node['transmittingPacket']  = packet['packet']
             node['transmittingPower']   = 15
@@ -56,7 +56,7 @@ def CycleSim(time, population):
             node['receivedPower']   = 0.0
 
     # Transmit from each node to all other nodes, taking into account
-    # threshold and otehr packets.
+    # threshold and other packets.
     for fromNode in population:
         if fromNode.get('transmittingPacket') != None:
             for toNode in population:
@@ -77,8 +77,8 @@ def CycleSim(time, population):
             del node['transmittingPacket']
 
     # Process the received packets.
-    for node in population:
-        node    = ProcessPacket(time, node)
+    for index,node in enumerate(population):
+        node    = ProcessPacket(time, node, index)
 
     return population
 
