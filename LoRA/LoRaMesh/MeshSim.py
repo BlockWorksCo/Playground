@@ -9,8 +9,8 @@ import math
 import binascii
 
 
-xScale  = 8.0
-yScale  = 8.0
+xScale  = 9.0
+yScale  = 9.0
 ageBeforeForwarding    = 10
 
 
@@ -41,7 +41,12 @@ def ProcessPacket(time, node, nodeIndex):
                 if binascii.crc32(packet['packet']) == ackHash:
                     print('node %d found ACKed-packet in in-flight packets, marking it as ACKed.'%(nodeIndex))
                     packet['ackSeenAtTime']     = time
-                    break
+
+                    # This is an ACK to a packet we forwarded (and not already ACK-forwarded), so forward the ACK also.
+                    if packet.get('ackSeenAtTime') == None:
+                        node['transmittingPacket']  = node['receivedData']
+                        node['transmittingPower']   = 15
+                        break
 
         else:
             # *NOT* and ACK packet.
@@ -65,7 +70,7 @@ def ProcessPacket(time, node, nodeIndex):
                     node['transmittingPacket']  = 'ACK:'+str(binascii.crc32(node['receivedData']))
                     node['transmittingPower']   = 15
                 else:
-                    print('node %d storing packet for deduplication [%s]'%(nodeIndex,node['receivedData']))
+                    print('node %d storing packet for deduplication during transmission [%s]'%(nodeIndex,node['receivedData']))
                     node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time,'forwarded':False} )
 
             else:
@@ -109,12 +114,16 @@ def CycleSim(time, population):
                     dx  = fromNode['x'] - toNode['x']
                     dy  = fromNode['y'] - toNode['y']
                     distanceBetweenNodes    = math.sqrt((dx*dx)+(dy*dy))
-                    receivedPower           = fromNode['transmittingPower'] / 10*(distanceBetweenNodes*distanceBetweenNodes)
-                    if receivedPower > 0.9 and receivedPower > toNode['receivedPower']:
+                    receivedPower           = fromNode['transmittingPower'] / (distanceBetweenNodes*distanceBetweenNodes)
+                    if receivedPower > 10.9 and receivedPower > toNode['receivedPower']:
                         toNode['receivedData']    = fromNode['transmittingPacket']
                         toNode['receivedPower']   = receivedPower
                         toNode['receivedTime']    = time
                         #print(toNode)
+
+            # Mark this packet as having been forwarded (transmitted).
+            node['inFlightPackets'].append( {'packet':fromNode['transmittingPacket'],'time':time,'forwarded':True} )
+            
 
     # Clear the transmittedData.
     for node in population:
