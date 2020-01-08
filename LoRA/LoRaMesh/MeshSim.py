@@ -51,6 +51,7 @@ def ProcessPacket(time, node, nodeIndex):
 
             ackForIndex = -1
             for index,packet in enumerate(node['inFlightPackets']):
+
                 if binascii.crc32(packet['packet']) == ackHash:
                     ackForIndex = index
                     #print('node %d found ACKed-packet in in-flight packets, marking it as ACKed.'%(nodeIndex))
@@ -93,7 +94,9 @@ def ProcessPacket(time, node, nodeIndex):
                     node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time,'forwarded':False} )
                     print('node %d generating ACK for [%s]'%(nodeIndex,node['receivedData']))
                     node['outputQueue'].append( 'ACK:%d:%s:'%(0,str(binascii.crc32(node['receivedData']))) );
+
                 else:
+
                     #print('node %d storing packet for deduplication during transmission [%s]'%(nodeIndex,node['receivedData']))
                     node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time,'forwarded':False} )
 
@@ -110,10 +113,10 @@ def ProcessPacket(time, node, nodeIndex):
 
         # The delay before forwarding should be related to the hopCount of the forwarding node so farther-out nodes
         # are less likely to forward.
-        ageBeforeForwarding = node['hopCount']+3+(random.random()*5)
+        ageBeforeForwarding = node['hopCount']+2+(random.random()*2)
 
         if packetAge > ageBeforeForwarding and packet.get('ackSeenAtTime') == None and packet['forwarded'] == False:
-            #print('node %d forwarding [%s] because age is >%d and no ACK seen for it...'%(nodeIndex,packet['packet'],packetAge))
+            print('node %d forwarding [%s] because age is >%d and no ACK seen for it...'%(nodeIndex,packet['packet'],packetAge))
             node['outputQueue'].append( packet['packet'] );
 
             packet['forwarded']  = True
