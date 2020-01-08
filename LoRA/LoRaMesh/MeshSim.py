@@ -8,6 +8,7 @@ import random
 import math
 import binascii
 import collections
+import sys
 
 
 xScale                  = 9.0
@@ -35,6 +36,46 @@ def InitPopulation():
     return population
 
 
+header  = \
+"""
+<svg width="110%%" height="auto" viewBox="0 0 %d %d" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .timeLabel { font: italic 0.3pt sans-serif; fill: black }
+    .nodeId { font: italic 0.1pt sans-serif; fill: red }
+    .txPacket { font: italic 0.1pt sans-serif; fill: blue }
+  </style>
+
+    <xxrect x="0" y="0" width="10" height="10" style="stroke: #000000; fill:none;"/>
+"""%(xScale,yScale)
+
+footer  = \
+"""
+</svg>
+"""
+
+outFile = open('run.svg', "wt+")
+
+def ShowHeader():
+    outFile.write(header)
+
+
+def ShowFooter():
+    outFile.write(footer)
+
+
+def ShowFrame(population, time):
+    """
+    """
+    outFile.write('\n<svg>\n')
+    outFile.write('<text x="0.5" y="0.5" class="timeLabel">Time:%d</text>\n'%(time))
+    for index,node in enumerate(population):
+        outFile.write('<circle cx="%f" cy="%f" r="0.1"/>\n'%(node['x']+0.1,node['y']-0.1))
+        outFile.write('<text x="%f" y="%f" class="nodeId">%d</text>\n'%(node['x']+0.1,node['y']+0.1,index))
+        if node.get('transmittingPacket') != None:
+            outFile.write('<text x="%f" y="%f" class="txPacket">%s</text>\n'%(node['x'],node['y'],node['transmittingPacket']))
+
+    outFile.write('<animate id="frame%d" attributeName="visibility" begin="%ds;" from="hidden" to="visible" dur="1s"/>'%(time,time))
+    outFile.write('\n</svg>\n')
 
 
 def ProcessPacket(time, node, nodeIndex):
@@ -171,6 +212,9 @@ def CycleSim(time, population):
     for index,node in enumerate(population):
         node    = ProcessPacket(time, node, index)
 
+    # Produce the pretty pics.
+    ShowFrame(population, time)
+
     return population
 
 
@@ -189,9 +233,18 @@ if __name__ == '__main__':
     
     population[23]['RootNode']              = True
 
-    while True:
-        print('\nTime: %d\n========================'%(time))
-        population  = CycleSim(time, population)
-        time    = time + 1
+    ShowHeader()
+    try:
+        while True:
+            print('\nTime: %d\n========================'%(time))
+            population  = CycleSim(time, population)
+            time    = time + 1
+            if time>200:
+                ShowFooter()
+                break
+    except KeyboardInterrupt:
+        print "Bye"
+        ShowFooter()
+        sys.exit()
 
 
