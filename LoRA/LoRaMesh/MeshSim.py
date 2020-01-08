@@ -12,9 +12,8 @@ import collections
 
 xScale                  = 9.0
 yScale                  = 9.0
-ageBeforeForwarding     = 10
 receiverSensitivity     = 9
-maxHopCount             = 100
+maxHopCount             = 10
 
 
 
@@ -46,8 +45,9 @@ def ProcessPacket(time, node, nodeIndex):
         # If this is an ACK-packet, mark the packet as ACKed.
         if node['receivedData'][:4] == 'ACK:':
 
-            ackHash = int(node['receivedData'][4:])
-            print('node %d received ACK for %d'%(nodeIndex,ackHash))
+            hopCount = int(node['receivedData'].split(':')[1])
+            ackHash = int(node['receivedData'].split(':')[2])
+            print('node %d received ACK for %d with hopCount %d'%(nodeIndex,ackHash,hopCount))
 
             ackForIndex = -1
             for index,packet in enumerate(node['inFlightPackets']):
@@ -56,9 +56,10 @@ def ProcessPacket(time, node, nodeIndex):
                     #print('node %d found ACKed-packet in in-flight packets, marking it as ACKed.'%(nodeIndex))
 
                     # This is an ACK to a packet we forwarded (and not already ACK-forwarded), so forward the ACK also.
+                    # Make sure we increment the hopCount for this packet to inform all other nodes of their position.
                     if packet.get('ackSeenAtTime') == None:
                         print('node %d forwarding ACK [%s]'%(nodeIndex,node['receivedData']))
-                        node['outputQueue'].append(node['receivedData']);
+                        node['outputQueue'].append( 'ACK:%d:%s:'%(hopCount+1,str(binascii.crc32(node['receivedData']))) );
 
                         packet['ackSeenAtTime']     = time
                 break
@@ -91,7 +92,7 @@ def ProcessPacket(time, node, nodeIndex):
 
                     node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time,'forwarded':False} )
                     print('node %d generating ACK for [%s]'%(nodeIndex,node['receivedData']))
-                    node['outputQueue'].append( 'ACK:%d:%s:'(0,str(binascii.crc32(node['receivedData']))) );
+                    node['outputQueue'].append( 'ACK:%d:%s:'%(0,str(binascii.crc32(node['receivedData']))) );
                 else:
                     #print('node %d storing packet for deduplication during transmission [%s]'%(nodeIndex,node['receivedData']))
                     node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time,'forwarded':False} )
@@ -104,7 +105,13 @@ def ProcessPacket(time, node, nodeIndex):
     # the in-flight list.
     inFlightPackets = node['inFlightPackets']
     for index,packet in enumerate(inFlightPackets):
+    
         packetAge   = time - packet['time']
+
+        # The delay before forwarding should be related to the hopCount of the forwarding node so farther-out nodes
+        # are less likely to forward.
+        ageBeforeForwarding = node['hopCount']+3+(random.random()*5)
+
         if packetAge > ageBeforeForwarding and packet.get('ackSeenAtTime') == None and packet['forwarded'] == False:
             #print('node %d forwarding [%s] because age is >%d and no ACK seen for it...'%(nodeIndex,packet['packet'],packetAge))
             node['outputQueue'].append( packet['packet'] );
