@@ -64,6 +64,11 @@ def ProcessPacket(time, node, nodeIndex):
             if ackForIndex == -1:   
                 print("node %d: ACK received but no originating message [%s]"%(nodeIndex, node['receivedData']))
 
+            if node.get('messageWaitingForACK') != None:
+                if ackHash == node['messageWaitingForACK']:
+                    print('node %d: packet received Ok! [%d]'%(nodeIndex, ackHash))
+                    del node['messageWaitingForACK']
+
         else:
             # *NOT* and ACK packet.
 
@@ -167,6 +172,7 @@ if __name__ == '__main__':
 
     population[37]['transmittingPacket']    = 'Hello World'
     population[37]['transmittingPower']     = 15
+    population[37]['messageWaitingForACK']  = binascii.crc32( population[37]['transmittingPacket'] )
     
     population[23]['RootNode']              = True
 
