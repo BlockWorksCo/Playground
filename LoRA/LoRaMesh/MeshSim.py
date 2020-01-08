@@ -14,6 +14,7 @@ xScale                  = 9.0
 yScale                  = 9.0
 ageBeforeForwarding     = 10
 receiverSensitivity     = 9
+maxHopCount             = 100
 
 
 
@@ -28,7 +29,8 @@ def InitPopulation():
                             'receivedPower':0.0, 
                             'inFlightPackets':[], 
                             'RootNode':False,
-                            'outputQueue':collections.deque()
+                            'outputQueue':collections.deque(),
+                            'hopCount':maxHopCount,
                           }) 
 
     return population
@@ -64,6 +66,7 @@ def ProcessPacket(time, node, nodeIndex):
             if ackForIndex == -1:   
                 print("node %d: ACK received but no originating message [%s]"%(nodeIndex, node['receivedData']))
 
+            # Have we received the ACK we've been waiting for?
             if node.get('messageWaitingForACK') != None:
                 if ackHash == node['messageWaitingForACK']:
                     print('node %d: packet received Ok! [%d]'%(nodeIndex, ackHash))
@@ -88,7 +91,7 @@ def ProcessPacket(time, node, nodeIndex):
 
                     node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time,'forwarded':False} )
                     print('node %d generating ACK for [%s]'%(nodeIndex,node['receivedData']))
-                    node['outputQueue'].append( 'ACK:'+str(binascii.crc32(node['receivedData'])) );
+                    node['outputQueue'].append( 'ACK:%d:%s:'(0,str(binascii.crc32(node['receivedData']))) );
                 else:
                     #print('node %d storing packet for deduplication during transmission [%s]'%(nodeIndex,node['receivedData']))
                     node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time,'forwarded':False} )
@@ -103,7 +106,7 @@ def ProcessPacket(time, node, nodeIndex):
     for index,packet in enumerate(inFlightPackets):
         packetAge   = time - packet['time']
         if packetAge > ageBeforeForwarding and packet.get('ackSeenAtTime') == None and packet['forwarded'] == False:
-            print('node %d forwarding [%s] because age is >%d and no ACK seen for it...'%(nodeIndex,packet['packet'],packetAge))
+            #print('node %d forwarding [%s] because age is >%d and no ACK seen for it...'%(nodeIndex,packet['packet'],packetAge))
             node['outputQueue'].append( packet['packet'] );
 
             packet['forwarded']  = True
