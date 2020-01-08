@@ -7,11 +7,13 @@
 import random
 import math
 import binascii
+import collections
 
 
-xScale  = 9.0
-yScale  = 9.0
-ageBeforeForwarding    = 10
+xScale                  = 9.0
+yScale                  = 9.0
+ageBeforeForwarding     = 10
+receiverSensitivity     = 9
 
 
 
@@ -19,7 +21,15 @@ def InitPopulation():
     random.seed()
     population  = []
     for i in range(100):
-        population.append({'x':random.random()*xScale,'y':random.random()*yScale,'receivedData':'', 'receivedPower':0.0, 'inFlightPackets':[], 'RootNode':False}) 
+        population.append({
+                            'x':random.random()*xScale,
+                            'y':random.random()*yScale,
+                            'receivedData':'', 
+                            'receivedPower':0.0, 
+                            'inFlightPackets':[], 
+                            'RootNode':False,
+                            'outputQueue':collections.deque()
+                          }) 
 
     return population
 
@@ -37,16 +47,22 @@ def ProcessPacket(time, node, nodeIndex):
             ackHash = int(node['receivedData'][4:])
             print('node %d received ACK for %d'%(nodeIndex,ackHash))
 
+            ackForIndex = -1
             for index,packet in enumerate(node['inFlightPackets']):
                 if binascii.crc32(packet['packet']) == ackHash:
+                    ackForIndex = index
                     print('node %d found ACKed-packet in in-flight packets, marking it as ACKed.'%(nodeIndex))
-                    packet['ackSeenAtTime']     = time
 
                     # This is an ACK to a packet we forwarded (and not already ACK-forwarded), so forward the ACK also.
                     if packet.get('ackSeenAtTime') == None:
-                        node['transmittingPacket']  = node['receivedData']
-                        node['transmittingPower']   = 15
-                        break
+                        print('node %d forwarding ACK [%s]'%(nodeIndex,node['receivedData']))
+                        node['outputQueue'].append(node['receivedData']);
+
+                        packet['ackSeenAtTime']     = time
+                break
+
+            if ackForIndex == -1:   
+                print("node %d: ACK received but no originating message [%s]"%(nodeIndex, node['receivedData']))
 
         else:
             # *NOT* and ACK packet.
@@ -67,8 +83,7 @@ def ProcessPacket(time, node, nodeIndex):
 
                     node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time,'forwarded':False} )
                     print('node %d generating ACK for [%s]'%(nodeIndex,node['receivedData']))
-                    node['transmittingPacket']  = 'ACK:'+str(binascii.crc32(node['receivedData']))
-                    node['transmittingPower']   = 15
+                    node['outputQueue'].append( 'ACK:'+str(binascii.crc32(node['receivedData'])) );
                 else:
                     print('node %d storing packet for deduplication during transmission [%s]'%(nodeIndex,node['receivedData']))
                     node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time,'forwarded':False} )
@@ -84,12 +99,16 @@ def ProcessPacket(time, node, nodeIndex):
         packetAge   = time - packet['time']
         if packetAge > ageBeforeForwarding and packet.get('ackSeenAtTime') == None and packet['forwarded'] == False:
             print('node %d forwarding [%s] because age is %d and no ACK seen for it...'%(nodeIndex,packet['packet'],packetAge))
-            node['transmittingPacket']  = packet['packet']
-            node['transmittingPower']   = 15
+            node['outputQueue'].append( packet['packet'] );
 
             packet['forwarded']  = True
-            #node['inFlightPackets']     = inFlightPackets[0:index]+inFlightPackets[index+1:]
             break
+
+
+    # If there are packets in the output-queue, transmit them...
+    if len(node['outputQueue']) > 0:
+        node['transmittingPacket']  = node['outputQueue'].pop()
+        node['transmittingPower']   = 15
 
 
     return node
@@ -115,7 +134,7 @@ def CycleSim(time, population):
                     dy  = fromNode['y'] - toNode['y']
                     distanceBetweenNodes    = math.sqrt((dx*dx)+(dy*dy))
                     receivedPower           = fromNode['transmittingPower'] / (distanceBetweenNodes*distanceBetweenNodes)
-                    if receivedPower > 10.9 and receivedPower > toNode['receivedPower']:
+                    if receivedPower > receiverSensitivity and receivedPower > toNode['receivedPower']:
                         toNode['receivedData']    = fromNode['transmittingPacket']
                         toNode['receivedPower']   = receivedPower
                         toNode['receivedTime']    = time
