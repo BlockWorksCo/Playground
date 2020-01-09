@@ -11,6 +11,7 @@ import collections
 import sys
 
 
+populationSize          = 100
 xScale                  = 9.0
 yScale                  = 9.0
 receiverSensitivity     = 9
@@ -21,7 +22,7 @@ maxHopCount             = 10
 def InitPopulation():
     random.seed()
     population  = []
-    for i in range(100):
+    for i in range(populationSize):
         population.append({
                             'x':random.random()*xScale,
                             'y':random.random()*yScale,
@@ -40,6 +41,8 @@ header  = \
 """
 <svg width="110%%" height="auto" viewBox="0 0 %d %d" xmlns="http://www.w3.org/2000/svg">
   <style>
+    .loliteNode { fill: black }
+    .hiliteNode { fill: red }
     .timeLabel { font: italic 0.3pt sans-serif; fill: black }
     .nodeId { font: italic 0.1pt sans-serif; fill: red }
     .txPacket { font: italic 0.1pt sans-serif; fill: blue }
@@ -69,13 +72,16 @@ def ShowFrame(population, time):
     outFile.write('\n<svg>\n')
     outFile.write('<text x="0.5" y="0.5" class="timeLabel">Time:%d</text>\n'%(time))
     for index,node in enumerate(population):
-        outFile.write('<circle cx="%f" cy="%f" r="0.1"/>\n'%(node['x']+0.1,node['y']-0.1))
+        if index==37 or index == 23:
+            outFile.write('<circle class="hiliteNode" cx="%f" cy="%f" r="0.1"/>\n'%(node['x']+0.1,node['y']-0.1))
+        else:
+            outFile.write('<circle class="loliteNode" cx="%f" cy="%f" r="0.1"/>\n'%(node['x']+0.1,node['y']-0.1))
         outFile.write('<text x="%f" y="%f" class="nodeId">%d</text>\n'%(node['x']+0.1,node['y']+0.1,index))
         if node.get('transmittingPacket') != None:
             outFile.write('<text x="%f" y="%f" class="txPacket">%s</text>\n'%(node['x'],node['y'],node['transmittingPacket']))
 
-    outFile.write('<animate id="frame%d" attributeName="visibility" begin="%ds;" from="hidden" to="visible" dur="1s"/>'%(time,time))
-    outFile.write('\n</svg>\n')
+    outFile.write('<animate id="frame%d" attributeName="visibility" begin="%ds" from="hidden" to="visible" dur="1s" fill="freeze"/>'%(time,time))
+    outFile.write('</svg>\n')
 
 
 def ProcessPacket(time, node, nodeIndex):
@@ -239,7 +245,7 @@ if __name__ == '__main__':
             print('\nTime: %d\n========================'%(time))
             population  = CycleSim(time, population)
             time    = time + 1
-            if time>200:
+            if time>20:
                 ShowFooter()
                 break
     except KeyboardInterrupt:
