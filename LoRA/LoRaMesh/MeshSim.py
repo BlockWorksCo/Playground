@@ -15,7 +15,8 @@ populationSize          = 100
 xScale                  = 9.0
 yScale                  = 9.0
 receiverSensitivity     = 9
-maxHopCount             = 10
+maxHopCount             = 20
+illuminatorPeriod       = 50
 
 
 
@@ -32,6 +33,7 @@ def InitPopulation():
                             'RootNode':False,
                             'outputQueue':collections.deque(),
                             'hopCount':maxHopCount,
+                            'lastIlluminatorTime':-illuminatorPeriod,
                           }) 
 
     return population
@@ -44,8 +46,9 @@ header  = \
     .loliteNode { fill: black }
     .hiliteNode { fill: red }
     .timeLabel { font: italic 0.3pt sans-serif; fill: black }
-    .nodeId { font: italic 0.1pt sans-serif; fill: red }
-    .txPacket { font: italic 0.1pt sans-serif; fill: blue }
+    .nodeId { font: italic 0.2pt sans-serif; fill: red }
+    .hopCount{ font: italic 0.2pt sans-serif; fill: green }
+    .txPacket { font: italic 0.2pt sans-serif; fill: blue }
   </style>
 
     <xxrect x="0" y="0" width="10" height="10" style="stroke: #000000; fill:none;"/>
@@ -72,13 +75,19 @@ def ShowFrame(population, time):
     outFile.write('\n<svg>\n')
     outFile.write('<text x="0.5" y="0.5" class="timeLabel">Time:%d</text>\n'%(time))
     for index,node in enumerate(population):
+
         if index==37 or index == 23:
-            outFile.write('<circle class="hiliteNode" cx="%f" cy="%f" r="0.1"/>\n'%(node['x']+0.1,node['y']-0.1))
+            outFile.write('<circle class="hiliteNode" cx="%f" cy="%f" r="0.2"/>\n'%(node['x'],node['y']))
         else:
-            outFile.write('<circle class="loliteNode" cx="%f" cy="%f" r="0.1"/>\n'%(node['x']+0.1,node['y']-0.1))
-        outFile.write('<text x="%f" y="%f" class="nodeId">%d</text>\n'%(node['x']+0.1,node['y']+0.1,index))
+            outFile.write('<circle class="loliteNode" cx="%f" cy="%f" r="0.1"/>\n'%(node['x'],node['y']))
+
+        outFile.write('<text x="%f" y="%f" class="nodeId">%d</text>\n'%(node['x']-0.3,node['y']-0.1,index))
+
+        if node['hopCount'] < maxHopCount:
+            outFile.write('<text x="%f" y="%f" class="hopCount">%d</text>\n'%(node['x']+0.1,node['y']-0.1,node['hopCount']))
+
         if node.get('transmittingPacket') != None:
-            outFile.write('<text x="%f" y="%f" class="txPacket">%s</text>\n'%(node['x'],node['y'],node['transmittingPacket']))
+            outFile.write('<text x="%f" y="%f" class="txPacket">%s</text>\n'%(node['x']-0.4,node['y']+0.2,node['transmittingPacket']))
 
     outFile.write('<set id="start" attributeName="opacity" begin="0s" to="0" />')
     outFile.write('<set attributeName="opacity" begin="%ds" to="1" />'%(time+1))
@@ -124,8 +133,19 @@ def ProcessPacket(time, node, nodeIndex):
                     print('node %d: packet received Ok! [%d]'%(nodeIndex, ackHash))
                     del node['messageWaitingForACK']
 
+        # If this is an illuminator packet and its been a while since we had one, note our new hopCount and pass it on.
+        elif node['receivedData'][:6] == 'ILLUM:':
+
+            hopCount = int(node['receivedData'].split(':')[1])
+            if time-node['lastIlluminatorTime'] > illuminatorPeriod:
+                node['hopCount']            = hopCount
+                node['lastIlluminatorTime'] = time
+
+                node['outputQueue'].append( 'ILLUM:%d'%(hopCount+1) );
+                print("node %d: Illuminator received for hopCount [%s] last time was %d"%(nodeIndex, node['receivedData'], node['lastIlluminatorTime']))
+
         else:
-            # *NOT* and ACK packet.
+            # *NOT* and ACK or illuminator packet.
 
             # If this packet has not been seen before, add it to the in-flight packets
             thisHash        = binascii.crc32(node['receivedData'])
@@ -153,6 +173,13 @@ def ProcessPacket(time, node, nodeIndex):
             #else:
                 #print('node %d dropping [%s] because already seen'%(nodeIndex,node['receivedData']))
             
+
+    # General network maintainance
+    if ((time%illuminatorPeriod) == 0) and (node['RootNode'] == True):
+
+        # This node is a root-node and its time to transmit an illuminator packet.
+        node['outputQueue'].append( 'ILLUM:%d'%(0) );
+        
 
     # Check all in-flight packets for ready-to-transmit? transmit one and remove it from
     # the in-flight list.
