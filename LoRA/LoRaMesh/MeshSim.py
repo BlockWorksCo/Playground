@@ -215,13 +215,14 @@ def CycleSim(time, population):
             del node['transmittingPacket']
 
     # Process the received packets.
+    newPopulation   = []
     for index,node in enumerate(population):
-        node    = ProcessPacket(time, node, index)
+        newPopulation.append( ProcessPacket(time, node, index) )
 
     # Produce the pretty pics.
-    ShowFrame(population, time)
+    ShowFrame(newPopulation, time)
 
-    return population
+    return newPopulation
 
 
 
@@ -245,7 +246,7 @@ if __name__ == '__main__':
             print('\nTime: %d\n========================'%(time))
             population  = CycleSim(time, population)
             time    = time + 1
-            if time>20:
+            if time>200:
                 ShowFooter()
                 break
     except KeyboardInterrupt:
