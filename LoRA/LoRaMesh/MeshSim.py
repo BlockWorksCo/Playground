@@ -80,7 +80,10 @@ def ShowFrame(population, time):
         if node.get('transmittingPacket') != None:
             outFile.write('<text x="%f" y="%f" class="txPacket">%s</text>\n'%(node['x'],node['y'],node['transmittingPacket']))
 
-    outFile.write('<animate id="frame%d" attributeName="visibility" begin="%ds" from="hidden" to="visible" dur="1s" fill="freeze"/>'%(time,time))
+    outFile.write('<set id="start" attributeName="opacity" begin="0s" to="0" />')
+    outFile.write('<set attributeName="opacity" begin="%ds" to="1" />'%(time+1))
+    outFile.write('<set attributeName="opacity" begin="%ds" to="0" />'%(time+2))
+
     outFile.write('</svg>\n')
 
 
