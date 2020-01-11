@@ -16,7 +16,7 @@ xScale                  = 9.0
 yScale                  = 9.0
 receiverSensitivity     = 9
 maxHopCount             = 20
-illuminatorPeriod       = 50
+illuminatorPeriod       = 100
 
 
 
@@ -119,7 +119,7 @@ def ProcessPacket(time, node, nodeIndex):
                     # Make sure we increment the hopCount for this packet to inform all other nodes of their position.
                     if packet.get('ackSeenAtTime') == None:
                         print('node %d forwarding ACK [%s]'%(nodeIndex,node['receivedData']))
-                        node['outputQueue'].append( 'ACK:%d:%s:'%(hopCount+1,str(binascii.crc32(node['receivedData']))) );
+                        node['outputQueue'].append( 'ACK:%d:%s:'%(hopCount+1,ackHash) );
 
                         packet['ackSeenAtTime']     = time
                 break
@@ -137,7 +137,7 @@ def ProcessPacket(time, node, nodeIndex):
         elif node['receivedData'][:6] == 'ILLUM:':
 
             hopCount = int(node['receivedData'].split(':')[1])
-            if time-node['lastIlluminatorTime'] > illuminatorPeriod:
+            if time-node['lastIlluminatorTime'] >= illuminatorPeriod:
                 node['hopCount']            = hopCount
                 node['lastIlluminatorTime'] = time
 
