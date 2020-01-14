@@ -196,7 +196,8 @@ def ProcessPacket(time, node, nodeIndex):
 
         # The delay before forwarding should be related to the hopCount of the forwarding node so farther-out nodes
         # are less likely to forward.
-        ageBeforeForwarding = node['hopCount']+(random.random()*node['hopCount'])
+        # Also, packets with greater 'seenCount's should be send later..
+        ageBeforeForwarding = node['hopCount']+(packet['seenCount']*2)+(random.random()*node['hopCount'])
 
         if packetAge > ageBeforeForwarding and packet.get('ackSeenAtTime') == None and packet['forwarded'] == False:
             print('node %d forwarding [%s] because age is >%d and no ACK seen for it...'%(nodeIndex,packet['packet'],packetAge))
