@@ -149,29 +149,35 @@ def ProcessPacket(time, node, nodeIndex):
 
             # If this packet has not been seen before, add it to the in-flight packets
             thisHash        = binascii.crc32(node['receivedData'])
-            duplicatePacket = False
+            duplicatePacket = None
             for index,packet in enumerate(node['inFlightPackets']):
                 if binascii.crc32(packet['packet']) == thisHash:
-                    duplicatePacket = True
+                    duplicatePacket = packet
+                    break
 
-            if duplicatePacket == False:
+
+            if duplicatePacket == None:
             
                 # This packet has not been seen before, add it to the in-flight packets as non-ACKed.
 
                 # If this node is a root, generate an ACK packet for the received packet and mark it as ACKed.
                 if node['RootNode'] == True:
 
-                    node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time,'forwarded':False} )
+                    node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time,'forwarded':False, 'seenCount':1} )
+
                     print('node %d generating ACK for [%s]'%(nodeIndex,node['receivedData']))
                     node['outputQueue'].append( 'ACK:%d:%s:'%(0,str(binascii.crc32(node['receivedData']))) );
 
                 else:
 
-                    #print('node %d storing packet for deduplication during transmission [%s]'%(nodeIndex,node['receivedData']))
-                    node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time,'forwarded':False} )
+                    print('node %d storing packet for deduplication during transmission [%s]'%(nodeIndex,node['receivedData']))
+                    node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time,'forwarded':False, 'seenCount':1} )
 
-            #else:
-                #print('node %d dropping [%s] because already seen'%(nodeIndex,node['receivedData']))
+            else:
+
+                # Mark the fact we've seen this packet again.
+                duplicatePacket['seenCount'] = duplicatePacket['seenCount'] + 1
+                print('node %d dropping [%s] because already seen, seenCount=%d'%(nodeIndex,node['receivedData'], duplicatePacket['seenCount']))
             
 
     # General network maintainance
@@ -190,7 +196,7 @@ def ProcessPacket(time, node, nodeIndex):
 
         # The delay before forwarding should be related to the hopCount of the forwarding node so farther-out nodes
         # are less likely to forward.
-        ageBeforeForwarding = node['hopCount']+2+(random.random()*2)
+        ageBeforeForwarding = node['hopCount']+(random.random()*node['hopCount'])
 
         if packetAge > ageBeforeForwarding and packet.get('ackSeenAtTime') == None and packet['forwarded'] == False:
             print('node %d forwarding [%s] because age is >%d and no ACK seen for it...'%(nodeIndex,packet['packet'],packetAge))
@@ -236,7 +242,7 @@ def CycleSim(time, population):
                         #print(toNode)
 
             # Mark this packet as having been forwarded (transmitted).
-            node['inFlightPackets'].append( {'packet':fromNode['transmittingPacket'],'time':time,'forwarded':True} )
+            node['inFlightPackets'].append( {'packet':fromNode['transmittingPacket'],'time':time,'forwarded':True, 'seenCount':0} )
             
 
     # Clear the transmittedData.
