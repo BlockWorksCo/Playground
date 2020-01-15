@@ -51,7 +51,13 @@ header  = \
     .txPacket { font: italic 0.2pt sans-serif; fill: blue }
   </style>
 
-    <xxrect x="0" y="0" width="10" height="10" style="stroke: #000000; fill:none;"/>
+  <defs>
+    <marker id="arrow" markerWidth="3" markerHeight="3" refX="0" refY="1" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,2 L3,1 z" />
+    </marker>
+  </defs>
+
+
 """%(xScale,yScale)
 
 footer  = \
@@ -94,6 +100,45 @@ def ShowFrame(population, time):
     outFile.write('<set attributeName="opacity" begin="%ds" to="0" />'%(time+2))
 
     outFile.write('</svg>\n')
+
+
+
+def ShowTrace(population,trace):
+
+    outFile = open('trace.svg', "wt+")
+    outFile.write(header)
+
+    colours = ['#bbb','#aaa','#999','#888','#777','#666','#555','#444','#333','#222','#1111','#d00','#c00','#b00','#a00']
+
+    traceCount  = 0
+    for payload,traceData in trace.items():
+        print(traceData)
+        for fromNode,toNode in traceData:
+            x1  = population[fromNode]['x']
+            y1  = population[fromNode]['y']
+            x2  = population[toNode]['x']
+            y2  = population[toNode]['y']
+            outFile.write('<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:%s;stroke-width:0.1" marker-end="url(#arrow)" />\n'%(x1,y1,x2,y2,colours[traceCount]) )
+
+        traceCount  = traceCount + 1
+
+    for index,node in enumerate(population):
+
+        if index==37 or index == 23:
+            outFile.write('<circle class="hiliteNode" cx="%f" cy="%f" r="0.2"/>\n'%(node['x'],node['y']))
+        else:
+            outFile.write('<circle class="loliteNode" cx="%f" cy="%f" r="0.1"/>\n'%(node['x'],node['y']))
+
+        outFile.write('<text x="%f" y="%f" class="nodeId">%d</text>\n'%(node['x']-0.3,node['y']-0.1,index))
+
+        if node['hopCount'] < maxHopCount:
+            outFile.write('<text x="%f" y="%f" class="hopCount">%d</text>\n'%(node['x']+0.1,node['y']-0.1,node['hopCount']))
+
+        if node.get('transmittingPacket') != None:
+            outFile.write('<text x="%f" y="%f" class="txPacket">%s</text>\n'%(node['x']-0.4,node['y']+0.2,node['transmittingPacket']))
+
+    outFile.write(footer)
+    
 
 
 def ProcessPacket(time, node, nodeIndex):
@@ -217,7 +262,7 @@ def ProcessPacket(time, node, nodeIndex):
 
 
 
-def CycleSim(time, population):
+def CycleSim(time, population, trace):
 
     # Clear the received packets
     for node in population:
@@ -225,12 +270,13 @@ def CycleSim(time, population):
             node['receivedData']    = ''
             node['receivedPower']   = 0.0
 
+
     # Transmit from each node to all other nodes, taking into account
     # threshold and other packets.
-    for index,fromNode in enumerate(population):
+    for fromIndex,fromNode in enumerate(population):
         if fromNode.get('transmittingPacket') != None:
-            print('node %d transmitting [%s]'%(index, fromNode['transmittingPacket']))
-            for toNode in population:
+            print('node %d transmitting [%s]'%(fromIndex, fromNode['transmittingPacket']))
+            for toIndex,toNode in enumerate(population):
                 if toNode != fromNode:
                     dx  = fromNode['x'] - toNode['x']
                     dy  = fromNode['y'] - toNode['y']
@@ -240,12 +286,17 @@ def CycleSim(time, population):
                         toNode['receivedData']    = fromNode['transmittingPacket']
                         toNode['receivedPower']   = receivedPower
                         toNode['receivedTime']    = time
-                        #print(toNode)
+
+                        # Maintain the trace of the path packets are taking.
+                        if fromNode['transmittingPacket'].split(':')[0] != 'ILLUM':
+                            if trace.get(fromNode['transmittingPacket']) == None:
+                                trace[fromNode['transmittingPacket']]   = []
+
+                            trace[fromNode['transmittingPacket']].append( (fromIndex,toIndex) )
 
             # Mark this packet as having been forwarded (transmitted).
             node['inFlightPackets'].append( {'packet':fromNode['transmittingPacket'],'time':time,'forwarded':True, 'seenCount':0} )
             
-
     # Clear the transmittedData.
     for node in population:
         if node.get('transmittingPacket') != None:
@@ -259,7 +310,7 @@ def CycleSim(time, population):
     # Produce the pretty pics.
     ShowFrame(newPopulation, time)
 
-    return newPopulation
+    return newPopulation,trace
 
 
 
@@ -277,18 +328,16 @@ if __name__ == '__main__':
     
     population[23]['RootNode']              = True
 
+    trace   = {}
     ShowHeader()
-    try:
-        while True:
-            print('\nTime: %d\n========================'%(time))
-            population  = CycleSim(time, population)
-            time    = time + 1
-            if time>200:
-                ShowFooter()
-                break
-    except KeyboardInterrupt:
-        print "Bye"
-        ShowFooter()
-        sys.exit()
+    while True:
+        print('\nTime: %d\n========================'%(time))
+        population,trace  = CycleSim(time, population, trace)
+        time    = time + 1
+        if time>200:
+            ShowFooter()
+            break
+
+    ShowTrace(population,trace)
 
 
