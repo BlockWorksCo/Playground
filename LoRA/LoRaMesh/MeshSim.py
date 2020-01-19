@@ -108,7 +108,7 @@ def ShowTrace(population,trace):
     outFile = open('trace.svg', "wt+")
     outFile.write(header)
 
-    colours = ['#bbb','#aaa','#999','#888','#777','#666','#555','#444','#333','#222','#1111','#d00','#c00','#b00','#a00']
+    colours = ['#bbb','#aaa','#999','#888','#777','#666','#555','#444','#333','#222','#1111','#d00','#c00','#b00','#a00','#222','#333','#666','#555','#444']
 
     traceCount  = 0
     for payload,traceData in trace.items():
@@ -164,7 +164,7 @@ def ProcessPacket(time, node, nodeIndex):
                     # Make sure we increment the hopCount for this packet to inform all other nodes of their position.
                     if packet.get('ackSeenAtTime') == None:
                         print('node %d forwarding ACK [%s]'%(nodeIndex,node['receivedData']))
-                        node['outputQueue'].append( 'ACK:%d:%s:'%(hopCount+1,ackHash) );
+                        node['outputQueue'].append( {'payload':'ACK:%d:%s:'%(hopCount+1,ackHash)} );
 
                         packet['ackSeenAtTime']     = time
                 break
@@ -186,14 +186,16 @@ def ProcessPacket(time, node, nodeIndex):
                 node['hopCount']            = hopCount
                 node['lastIlluminatorTime'] = time
 
-                node['outputQueue'].append( 'ILLUM:%d'%(hopCount+1) );
+                node['outputQueue'].append( {'payload':'ILLUM:%d'%(hopCount+1)} );
                 print("node %d: Illuminator received for hopCount [%s] last time was %d"%(nodeIndex, node['receivedData'], node['lastIlluminatorTime']))
 
         else:
             # *NOT* and ACK or illuminator packet.
 
             # If this packet has not been seen before, add it to the in-flight packets
-            thisHash        = binascii.crc32(node['receivedData'])
+            hopDirectionAndCount = int(node['receivedData'].split(':')[0])
+            payload = node['receivedData'].split(':')[1]
+            thisHash        = binascii.crc32(payload)
             duplicatePacket = None
             for index,packet in enumerate(node['inFlightPackets']):
                 if binascii.crc32(packet['packet']) == thisHash:
@@ -208,28 +210,42 @@ def ProcessPacket(time, node, nodeIndex):
                 # If this node is a root, generate an ACK packet for the received packet and mark it as ACKed.
                 if node['RootNode'] == True:
 
-                    node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time,'forwarded':False, 'seenCount':1} )
+                    node['inFlightPackets'].append( {'packet':payload,'time':time,'forwarded':False, 'seenCount':1,'packetDirection':1} )
 
-                    print('node %d generating ACK for [%s]'%(nodeIndex,node['receivedData']))
-                    node['outputQueue'].append( 'ACK:%d:%s:'%(0,str(binascii.crc32(node['receivedData']))) );
+                    print('node %d generating ACK for [%s]'%(nodeIndex,payload))
+                    node['outputQueue'].append( {'payload':'ACK:%d:%s:'%(0,str(binascii.crc32(payload)))} );
 
                 else:
 
-                    print('node %d storing packet for deduplication during transmission [%s]'%(nodeIndex,node['receivedData']))
-                    node['inFlightPackets'].append( {'packet':node['receivedData'],'time':time,'forwarded':False, 'seenCount':1} )
+                    # Check if the packet is moving in the desired direction
+                    packetHopCount  = abs(hopDirectionAndCount)
+                    if ((hopDirectionAndCount < 0) and (node['hopCount'] < packetHopCount)) \
+                        or ((hopDirectionAndCount > 0) and (node['hopCount'] > packetHopCount)) \
+                        or hopDirectionAndCount >= maxHopCount:
+
+                        print('node %d: packet moving in correct direction (%d, %d,%d)'%(nodeIndex,hopDirectionAndCount,packetHopCount,node['hopCount']))
+                        # We're not generating an ACK for this packet, so put it in inFlightPackets for later 
+                        # forwarding.
+                        if True:
+                            print('node %d storing packet for deduplication during transmission [%s]'%(nodeIndex,payload))
+                            node['inFlightPackets'].append( {'packet':payload,'time':time,'forwarded':False, 'seenCount':1, 'packetDirection':math.copysign(1,hopDirectionAndCount)} )
+
+                    else:
+                        print('node %d: packet *not* moving in correct direction (%d, %d,%d), ignoring it'%(nodeIndex,hopDirectionAndCount,packetHopCount,node['hopCount']))
+
 
             else:
 
                 # Mark the fact we've seen this packet again.
                 duplicatePacket['seenCount'] = duplicatePacket['seenCount'] + 1
-                print('node %d dropping [%s] because already seen, seenCount=%d'%(nodeIndex,node['receivedData'], duplicatePacket['seenCount']))
+                print('node %d dropping [%s] because already seen, seenCount=%d'%(nodeIndex,payload, duplicatePacket['seenCount']))
             
 
     # General network maintainance
     if ((time%illuminatorPeriod) == 0) and (node['RootNode'] == True):
 
         # This node is a root-node and its time to transmit an illuminator packet.
-        node['outputQueue'].append( 'ILLUM:%d'%(0) );
+        node['outputQueue'].append( {'payload':'ILLUM:%d'%(0)} );
         
 
     # Check all in-flight packets for ready-to-transmit? transmit one and remove it from
@@ -242,11 +258,11 @@ def ProcessPacket(time, node, nodeIndex):
         # The delay before forwarding should be related to the hopCount of the forwarding node so farther-out nodes
         # are less likely to forward.
         # Also, packets with greater 'seenCount's should be send later..
-        ageBeforeForwarding = node['hopCount']+(packet['seenCount']*2)+(random.random()*node['hopCount'])
+        ageBeforeForwarding = node['hopCount']+(packet['seenCount'])+(random.random()*node['hopCount'])
 
         if packetAge > ageBeforeForwarding and packet.get('ackSeenAtTime') == None and packet['forwarded'] == False:
             print('node %d forwarding [%s] because age is >%d and no ACK seen for it...'%(nodeIndex,packet['packet'],packetAge))
-            node['outputQueue'].append( packet['packet'] );
+            node['outputQueue'].append( {'payload':packet['packet'],'direction':packet['packetDirection']} );
 
             packet['forwarded']  = True
             break
@@ -254,7 +270,13 @@ def ProcessPacket(time, node, nodeIndex):
 
     # If there are packets in the output-queue, transmit them...
     if len(node['outputQueue']) > 0:
-        node['transmittingPacket']  = node['outputQueue'].pop()
+        packet  = node['outputQueue'].pop()
+        if packet.get('direction') != None:
+            # this hopcount has lost the sign to indicate direction!
+            print(packet)
+            node['transmittingPacket']  = '%d:%s'%(packet['direction']*node['hopCount'], packet['payload'])
+        else:
+            node['transmittingPacket']  = packet['payload']
         node['transmittingPower']   = 15
 
 
@@ -270,11 +292,11 @@ def CycleSim(time, population, trace):
             node['receivedData']    = ''
             node['receivedPower']   = 0.0
 
-
     # Transmit from each node to all other nodes, taking into account
     # threshold and other packets.
     for fromIndex,fromNode in enumerate(population):
         if fromNode.get('transmittingPacket') != None:
+
             print('node %d transmitting [%s]'%(fromIndex, fromNode['transmittingPacket']))
             for toIndex,toNode in enumerate(population):
                 if toNode != fromNode:
@@ -296,11 +318,9 @@ def CycleSim(time, population, trace):
 
             # Mark this packet as having been forwarded (transmitted).
             node['inFlightPackets'].append( {'packet':fromNode['transmittingPacket'],'time':time,'forwarded':True, 'seenCount':0} )
-            
-    # Clear the transmittedData.
-    for node in population:
-        if node.get('transmittingPacket') != None:
-            del node['transmittingPacket']
+        
+            # Clear the transmittedData.
+            del fromNode['transmittingPacket']
 
     # Process the received packets.
     newPopulation   = []
@@ -322,10 +342,6 @@ if __name__ == '__main__':
     time        = 0
 
 
-    population[37]['transmittingPacket']    = 'Hello World'
-    population[37]['transmittingPower']     = 15
-    population[37]['messageWaitingForACK']  = binascii.crc32( population[37]['transmittingPacket'] )
-    
     population[23]['RootNode']              = True
 
     trace   = {}
@@ -337,6 +353,12 @@ if __name__ == '__main__':
         if time>200:
             ShowFooter()
             break
+
+        if time == 25:
+            population[37]['transmittingPacket']    = '%d:Hello World'%(-population[37]['hopCount'])
+            population[37]['transmittingPower']     = 15
+            population[37]['messageWaitingForACK']  = binascii.crc32( population[37]['transmittingPacket'] )
+    
 
     ShowTrace(population,trace)
 
