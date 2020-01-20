@@ -262,8 +262,8 @@ def ProcessPacket(time, node, nodeIndex):
         # Also, packets with greater 'seenCount's should be send later..
         ageBeforeForwarding = node['hopCount']+(packet['seenCount'])+(random.random()*node['hopCount'])
 
-        if packetAge > ageBeforeForwarding and packet.get('ackSeenAtTime') == None and packet['forwarded'] == False:
-            print('node %d forwarding [%s] because age is >%d and no ACK seen for it...'%(nodeIndex,packet['packet'],packetAge))
+        if packetAge > ageBeforeForwarding and packet.get('ackSeenAtTime') == None and packet['forwarded'] == False and packet['seenCount'] <= 1:
+            print('node %d forwarding [%s] because age is >%d and no ACK seen for it and no duplicates...'%(nodeIndex,packet['packet'],packetAge))
             node['outputQueue'].append( {'payload':packet['packet'],'direction':packet['packetDirection']} );
 
             packet['forwarded']  = True
