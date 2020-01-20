@@ -177,6 +177,8 @@ def ProcessPacket(time, node, nodeIndex):
                 if ackHash == node['messageWaitingForACK']:
                     print('node %d: packet received Ok! [%d]'%(nodeIndex, ackHash))
                     del node['messageWaitingForACK']
+                else:
+                    print('node %d: got ACK for message I wasnt waiting for %d != %d.'%(nodeIndex,ackHash,node['messageWaitingForACK']))
 
         # If this is an illuminator packet and its been a while since we had one, note our new hopCount and pass it on.
         elif node['receivedData'][:6] == 'ILLUM:':
@@ -357,7 +359,7 @@ if __name__ == '__main__':
         if time == 25:
             population[37]['transmittingPacket']    = '%d:Hello World'%(-population[37]['hopCount'])
             population[37]['transmittingPower']     = 15
-            population[37]['messageWaitingForACK']  = binascii.crc32( population[37]['transmittingPacket'] )
+            population[37]['messageWaitingForACK']  = binascii.crc32( population[37]['transmittingPacket'].split(':')[1] )
     
 
     ShowTrace(population,trace)
