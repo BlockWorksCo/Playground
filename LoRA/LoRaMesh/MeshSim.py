@@ -108,7 +108,7 @@ def ShowTrace(population,trace):
     outFile = open('trace.svg', "wt+")
     outFile.write(header)
 
-    colours = ['#bbb','#aaa','#999','#888','#777','#666','#555','#444','#333','#222','#1111','#d00','#c00','#b00','#a00','#222','#333','#666','#555','#444']
+    colours = ['#bbb','#aaa','#999','#888','#777','#666','#555','#444','#333','#222','#1111','#d00','#c00','#b00','#a00','#222','#333','#666','#555','#444','#555','#666','#666','#666','#666']
 
     traceCount  = 0
     for payload,traceData in trace.items():
@@ -189,7 +189,7 @@ def ProcessPacket(time, node, nodeIndex):
                 node['lastIlluminatorTime'] = time
 
                 node['outputQueue'].append( {'payload':'ILLUM:%d'%(hopCount+1)} );
-                print("node %d: Illuminator received for hopCount [%s] last time was %d"%(nodeIndex, node['receivedData'], node['lastIlluminatorTime']))
+                #print("node %d: Illuminator received for hopCount [%s] last time was %d"%(nodeIndex, node['receivedData'], node['lastIlluminatorTime']))
 
         else:
             # *NOT* and ACK or illuminator packet.
@@ -212,10 +212,13 @@ def ProcessPacket(time, node, nodeIndex):
                 # If this node is a root, generate an ACK packet for the received packet and mark it as ACKed.
                 if node['RootNode'] == True:
 
-                    node['inFlightPackets'].append( {'packet':payload,'time':time,'forwarded':False, 'seenCount':1,'packetDirection':1} )
+                    # Mark this as forwarded even tho we ACKed it... basically, we dealt with it.
+                    # Mark this packet as having seen an ACK.
+                    node['inFlightPackets'].append( {'packet':payload,'time':time,'forwarded':True, 'seenCount':1,'packetDirection':1, 'ackSeenAtTime':time} )
 
                     print('node %d generating ACK for [%s]'%(nodeIndex,payload))
                     node['outputQueue'].append( {'payload':'ACK:%d:%s:'%(0,str(binascii.crc32(payload)))} );
+
 
                 else:
 
