@@ -193,6 +193,7 @@ def ProcessPacket(time, node, nodeIndex):
 
         else:
             # *NOT* and ACK or illuminator packet.
+            rssi    = node['receivedPower']
 
             # If this packet has not been seen before, add it to the in-flight packets
             hopDirectionAndCount = int(node['receivedData'].split(':')[0])
@@ -214,7 +215,7 @@ def ProcessPacket(time, node, nodeIndex):
 
                     # Mark this as forwarded even tho we ACKed it... basically, we dealt with it.
                     # Mark this packet as having seen an ACK.
-                    node['inFlightPackets'].append( {'packet':payload,'time':time,'forwarded':True, 'seenCount':1,'packetDirection':1, 'ackSeenAtTime':time} )
+                    node['inFlightPackets'].append( {'packet':payload,'time':time,'forwarded':True, 'seenCount':1,'packetDirection':1, 'ackSeenAtTime':time,'rssi':rssi} )
 
                     print('node %d generating ACK for [%s]'%(nodeIndex,payload))
                     node['outputQueue'].append( {'payload':'ACK:%d:%s:'%(0,str(binascii.crc32(payload)))} );
@@ -228,12 +229,12 @@ def ProcessPacket(time, node, nodeIndex):
                         or ((hopDirectionAndCount > 0) and (node['hopCount'] > packetHopCount)) \
                         or hopDirectionAndCount >= maxHopCount:
 
-                        print('node %d: packet moving in correct direction (%d, %d,%d)'%(nodeIndex,hopDirectionAndCount,packetHopCount,node['hopCount']))
+                        print('node %d: packet moving in correct direction (%d, %d,%d) with power %f'%(nodeIndex,hopDirectionAndCount,packetHopCount,node['hopCount'],rssi))
                         # We're not generating an ACK for this packet, so put it in inFlightPackets for later 
                         # forwarding.
                         if True:
                             print('node %d storing packet for deduplication during transmission [%s]'%(nodeIndex,payload))
-                            node['inFlightPackets'].append( {'packet':payload,'time':time,'forwarded':False, 'seenCount':1, 'packetDirection':math.copysign(1,hopDirectionAndCount)} )
+                            node['inFlightPackets'].append( {'packet':payload,'time':time,'forwarded':False, 'seenCount':1, 'packetDirection':math.copysign(1,hopDirectionAndCount),'rssi':rssi} )
 
                     else:
                         print('node %d: packet *not* moving in correct direction (%d, %d,%d), ignoring it'%(nodeIndex,hopDirectionAndCount,packetHopCount,node['hopCount']))
@@ -263,7 +264,8 @@ def ProcessPacket(time, node, nodeIndex):
         # The delay before forwarding should be related to the hopCount of the forwarding node so farther-out nodes
         # are less likely to forward.
         # Also, packets with greater 'seenCount's should be send later..
-        ageBeforeForwarding = node['hopCount']+(packet['seenCount'])+(random.random()*node['hopCount'])
+        # Also, packets received with a lower RSSI indicate a longer travel distance which is desirable.
+        ageBeforeForwarding = node['hopCount']+((packet['rssi']/2)+packet['seenCount'])+(random.random()*node['hopCount'])
 
         if packetAge > ageBeforeForwarding and packet.get('ackSeenAtTime') == None and packet['forwarded'] == False and packet['seenCount'] <= 1:
             print('node %d forwarding [%s] because age is >%d and no ACK seen for it and no duplicates...'%(nodeIndex,packet['packet'],packetAge))
@@ -322,7 +324,7 @@ def CycleSim(time, population, trace):
                             trace[fromNode['transmittingPacket']].append( (fromIndex,toIndex) )
 
             # Mark this packet as having been forwarded (transmitted).
-            node['inFlightPackets'].append( {'packet':fromNode['transmittingPacket'],'time':time,'forwarded':True, 'seenCount':0} )
+            node['inFlightPackets'].append( {'packet':fromNode['transmittingPacket'],'time':time,'forwarded':True, 'seenCount':0,'rssi':0} )
         
             # Clear the transmittedData.
             del fromNode['transmittingPacket']
