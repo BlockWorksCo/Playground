@@ -18,6 +18,8 @@ include $(SOURCE_LIBRARY)/Implementations/EventQueue/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/NullDebugText/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/BluePillSPIMaster/Build.mk
 include $(SOURCE_LIBRARY)/Implementations/TimedEvents/Build.mk
+include $(SOURCE_LIBRARY)/Implementations/FatalAssertions/Build.mk
+include ../ENC28J60/Build.mk
 
 
 

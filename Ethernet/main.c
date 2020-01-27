@@ -6,6 +6,7 @@
 #include "EventQueue.h"
 #include "TimedEvents.h"
 #include "ErrorHandling.h"
+#include "Ethernet.h"
 
 
 //
@@ -118,6 +119,9 @@ int main(void)
     //
     Call( FlashAllLEDs );
     CallEvery_ms( tick, 200 );
+
+    //
+    ethernetInit( SlaveA );
 
     //
     //
