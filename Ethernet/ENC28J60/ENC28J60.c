@@ -45,8 +45,8 @@ void enc28j60ReadOperation( EthernetID id, OpCode opCode, uint8_t argument, uint
     // Output to the device.
     spiBusSelectSlave( id );
 
-    spiBusWriteOneByte(byte0);
-    for(uint32_t i=0; i<numberOfBytes; i++) {
+    data[0] = spiBusWriteOneByte(byte0);
+    for(uint32_t i=1; i<numberOfBytes; i++) {
         data[i] = spiBusReadOneByte();
     }
 
@@ -140,6 +140,7 @@ uint16_t enc28j60ReadPHYRegister( EthernetID id, uint8_t registerId )
 
 void ethernetInit( EthernetID id )
 {
+#if 0
     //
     GPIO_InitTypeDef GPIO_InitStructure;
 
@@ -189,7 +190,14 @@ void ethernetInit( EthernetID id )
         GPIOB->ODR |= GPIO_Pin_13;
     }
 
+#endif
+    spiBusInit();
+
     Delay_ms(10);
+
+    uint8_t econ2   = 0x00;
+    enc28j60ReadOperation( id, ReadControlRegister, 0x1e, &econ2, 1 );
+    AssertThat( econ2 == 0x80, "econ2" );
 
     //
     uint16_t    phid1   = enc28j60ReadPHYRegister( id, 0x02 );
