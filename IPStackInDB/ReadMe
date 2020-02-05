@@ -28,3 +28,17 @@ Capturing on 'tun1'
 0030  73 64 66 73 64 66 0a                              sdfsdf.
 
 
+
+frame[0]& 0xe0 == 0x60 for IPv6
+payload at frame[40]
+srcIID at frame[8]
+dstIID at frame[24]
+
+8-byte UDP header @ frame[40] "e4 f2 00 50 00 0f d8 4a"
+UDP src port @ frame[40],16 bit == "e4 f2"
+UDP dst port @ frame[42],16 bit == "00 50"
+UDP len port @ frame[44],16 bit == "00 0f"
+UDP chksum port @ frame[46],16 bit == "d8 4a"
+payload @ frame[48] = "73 64 66 73 64 66 0a"
+
+

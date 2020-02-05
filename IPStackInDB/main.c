@@ -15,6 +15,7 @@
 #include <sys/time.h>
 #include <errno.h>
 #include <stdarg.h>
+#include <string.h>
 
 /* buffer for reading from tun/tap interface, must be >= 1500 */
 #define BUFSIZE 2000
@@ -167,6 +168,41 @@ void usage(void)
     exit(1);
 }
 
+
+typedef uint8_t IPv6Address[16];
+
+void decodeFrame( uint8_t* frame, size_t numberOfBytes )
+{
+    printf("Decoding frame [%zd]\n",numberOfBytes);
+
+    uint8_t frameType   = frame[0] & 0xe0;
+    if(frameType == 0x60) {
+        printf("IPv6\n");
+    }
+    if(frameType == 0x40) {
+        printf("IPv4\n");
+    }
+
+    uint16_t*       ipv6PacketLength = (uint16_t*)&frame[4];
+    IPv6Address*    src = (IPv6Address*)&frame[8];
+    IPv6Address*    dst = (IPv6Address*)&frame[24];
+
+    uint16_t*       srcPort = (uint16_t*)&frame[40];
+    uint16_t*       dstPort = (uint16_t*)&frame[42];
+    uint16_t*       udpPacketLength = (uint16_t*)&frame[44];
+    uint16_t*       udpCheckSum = (uint16_t*)&frame[46];
+    
+    uint8_t*        udpPayload  = &frame[48];
+
+    printf("srcPort=%d dstPort=%d udpLength=%d udpChecksum=%04x\n", *srcPort, *dstPort, *udpPacketLength, *udpCheckSum);
+
+    uint8_t string[128] = {0};
+    memcpy( &string[0], udpPayload, (*udpPacketLength)-8 );
+    printf("[%s]\n", string);
+}
+
+
+
 int main(int argc, char* argv[])
 {
     int tap_fd, option;
@@ -308,6 +344,11 @@ int main(int argc, char* argv[])
             //nwrite = cwrite(net_fd, (char*)&plength, sizeof(plength));
             //nwrite = cwrite(net_fd, buffer, nread);
             do_debug("TAP2NET %lu: Written %d bytes to the network\n", tap2net, nwrite);
+
+            //
+            // Decode an ethernet frame.
+            //
+            decodeFrame( buffer, nread );
         }
 
 #if 0
