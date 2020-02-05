@@ -2,7 +2,29 @@
 
 
 sudo tunctl -t tun1
-sudo ifconfig tun1 10.0.1.254 up
-route add -host 10.0.1.1 dev tun1
+#sudo ifconfig tun1 10.0.1.254 up
+
+#route add -host 10.0.1.1 dev tun1
+#sudo ip add add fd00::1 dev tun1
+
+# Add a route to the fd00:: network via tun1
+sudo ip -6 route add fd00::1/64 dev tun1
+
+# send packets to fd00::2 which will be routed through tun1
+ping6 fd00::2
+
+
+shark -i tun1 -x
+Running as user "root" and group "root". This could be dangerous.
+Capturing on 'tun1'
+0000  60 05 b9 b2 00 0e 11 40 fd 00 00 00 00 00 00 00   `......@........
+0010  00 00 00 00 00 00 00 01 fd 00 00 00 00 00 00 00   ................
+0020  00 00 00 00 00 00 00 02 e4 f2 00 50 00 0e d3 b5   ...........P....
+0030  73 66 73 64 66 0a                                 sfsdf.
+
+0000  60 05 b9 b2 00 0f 11 40 fd 00 00 00 00 00 00 00   `......@........
+0010  00 00 00 00 00 00 00 01 fd 00 00 00 00 00 00 00   ................
+0020  00 00 00 00 00 00 00 02 e4 f2 00 50 00 0f d8 4a   ...........P...J
+0030  73 64 66 73 64 66 0a                              sdfsdf.
 
 
