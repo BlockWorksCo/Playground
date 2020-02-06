@@ -194,11 +194,14 @@ void decodeFrame( uint8_t* frame, size_t numberOfBytes )
     
     uint8_t*        udpPayload  = &frame[48];
 
-    printf("srcPort=%d dstPort=%d udpLength=%d udpChecksum=%04x\n", *srcPort, *dstPort, *udpPacketLength, *udpCheckSum);
+    printf("srcPort=%d dstPort=%d udpLength=%d udpChecksum=%04x\n", ntohs(*srcPort), ntohs(*dstPort), ntohs(*udpPacketLength), ntohs(*udpCheckSum) );
 
-    uint8_t string[128] = {0};
-    memcpy( &string[0], udpPayload, (*udpPacketLength)-8 );
-    printf("[%s]\n", string);
+    //
+    if(ntohs(*dstPort) == 80) {
+        uint8_t string[128] = {0};
+        memcpy( &string[0], udpPayload, ntohs(*udpPacketLength)-8 );
+        printf("[%s]\n", string);
+    }
 }
 
 
@@ -348,7 +351,7 @@ int main(int argc, char* argv[])
             //
             // Decode an ethernet frame.
             //
-            decodeFrame( buffer, nread );
+            decodeFrame( &buffer[0], nread );
         }
 
 #if 0
