@@ -185,6 +185,16 @@ typedef struct
     uint16_t    checksum;
 } UDPPsuedoHeader;
 
+
+
+uint16_t udpChecksum( IPv6Address src, IPv6Address dst, uint16_t srcPort, uint16_t dstPort, uint16_t length, uint8_t* payload )
+{
+    return 0;
+}
+
+
+
+
 void decodeFrame( uint8_t* frame, size_t numberOfBytes )
 {
     printf("Decoding frame [%zd]\n",numberOfBytes);
@@ -205,7 +215,7 @@ void decodeFrame( uint8_t* frame, size_t numberOfBytes )
     uint16_t*       srcPort = (uint16_t*)&frame[40];
     uint16_t*       dstPort = (uint16_t*)&frame[42];
     uint16_t*       udpPacketLength = (uint16_t*)&frame[44];
-    uint16_t*       udpCheckSum = (uint16_t*)&frame[46];
+    uint16_t*       udpCheckSum = (uint16_t*)&frame[46];    // assume its zero/unused.
     
     uint8_t*        udpPayload  = &frame[48];
 
@@ -227,10 +237,13 @@ void decodeFrame( uint8_t* frame, size_t numberOfBytes )
         IPv6Address*    newDst      = (IPv6Address*)&packet[24];
         uint16_t*       newSrcPort  = (uint16_t*)&packet[40];
         uint16_t*       newDstPort  = (uint16_t*)&packet[42];
+        uint16_t*       newUDPCheckSum = (uint16_t*)&packet[46];
+
         memcpy( newSrc, dst, sizeof(IPv6Address) );
         memcpy( newDst, src, sizeof(IPv6Address) );
         *newSrcPort     = *dstPort; 
         *newDstPort     = *srcPort; 
+        *newUDPCheckSum = udpChecksum( *newSrc, *newDst, *srcPort, *dstPort, numberOfBytes, &packet[0] );
 
         // transmit the packet.
         uint16_t nwrite = cwrite(tap_fd, &packet[0], numberOfBytes);

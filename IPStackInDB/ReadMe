@@ -42,3 +42,16 @@ UDP chksum port @ frame[46],16 bit == "d8 4a"
 payload @ frame[48] = "73 64 66 73 64 66 0a"
 
 
+
+#setup with:
+sudo ip add add fd00::1 dev tun1
+sudo ifconfig tun1 up
+sudo ip -6 route add fd00::1/64 dev tun1
+
+
+
+# test with
+nc -6 -u fd00::2 80
+
+
+
