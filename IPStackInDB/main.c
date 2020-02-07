@@ -172,6 +172,19 @@ void usage(void)
 typedef uint8_t IPv6Address[16];
 int tap_fd;
 
+typedef struct
+{
+    IPv6Address src;
+    IPv6Address dst;
+    uint32_t    headerAndDataLength;
+    uint8_t     zeroes[3];
+    uint8_t     nextHeader;
+    uint16_t    srcPort;
+    uint16_t    dstPort;
+    uint16_t    length;
+    uint16_t    checksum;
+} UDPPsuedoHeader;
+
 void decodeFrame( uint8_t* frame, size_t numberOfBytes )
 {
     printf("Decoding frame [%zd]\n",numberOfBytes);
