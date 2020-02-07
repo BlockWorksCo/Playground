@@ -170,6 +170,7 @@ void usage(void)
 
 
 typedef uint8_t IPv6Address[16];
+int tap_fd;
 
 void decodeFrame( uint8_t* frame, size_t numberOfBytes )
 {
@@ -202,6 +203,25 @@ void decodeFrame( uint8_t* frame, size_t numberOfBytes )
         uint8_t string[128] = {0};
         memcpy( &string[0], udpPayload, ntohs(*udpPacketLength)-8 );
         printf("[%s]\n", string);
+
+        //
+        // echo the packet back.
+        //
+        uint8_t         packet[128];
+
+        memcpy( &packet[0], frame, numberOfBytes );
+        IPv6Address*    newSrc      = (IPv6Address*)&packet[8];
+        IPv6Address*    newDst      = (IPv6Address*)&packet[24];
+        uint16_t*       newSrcPort  = (uint16_t*)&packet[40];
+        uint16_t*       newDstPort  = (uint16_t*)&packet[42];
+        memcpy( newSrc, dst, sizeof(IPv6Address) );
+        memcpy( newDst, src, sizeof(IPv6Address) );
+        *newSrcPort     = *dstPort; 
+        *newDstPort     = *srcPort; 
+
+        // transmit the packet.
+        uint16_t nwrite = cwrite(tap_fd, &packet[0], numberOfBytes);
+        printf("replied...\n");
     }
 }
 
@@ -209,7 +229,7 @@ void decodeFrame( uint8_t* frame, size_t numberOfBytes )
 
 int main(int argc, char* argv[])
 {
-    int tap_fd, option;
+    int option;
     int flags = IFF_TUN;
     char if_name[IFNAMSIZ] = "";
     int header_len = IP_HDR_LEN;
