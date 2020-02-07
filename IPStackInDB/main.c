@@ -197,8 +197,8 @@ void decodeFrame( uint8_t* frame, size_t numberOfBytes )
 
     printf("nextHeader=%02x srcPort=%d dstPort=%d udpLength=%d udpChecksum=%04x\n", *nextHeader, ntohs(*srcPort), ntohs(*dstPort), ntohs(*udpPacketLength), ntohs(*udpCheckSum) );
 
-    //
-    if(ntohs(*dstPort) == 80) {
+    // UDP packets sent to port 80.
+    if((ntohs(*dstPort) == 80) && (*nextHeader == 0x11)) {
         uint8_t string[128] = {0};
         memcpy( &string[0], udpPayload, ntohs(*udpPacketLength)-8 );
         printf("[%s]\n", string);
