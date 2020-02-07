@@ -184,6 +184,7 @@ void decodeFrame( uint8_t* frame, size_t numberOfBytes )
     }
 
     uint16_t*       ipv6PacketLength = (uint16_t*)&frame[4];
+    uint8_t*        nextHeader          = (uint8_t*)&frame[6];
     IPv6Address*    src = (IPv6Address*)&frame[8];
     IPv6Address*    dst = (IPv6Address*)&frame[24];
 
@@ -194,7 +195,7 @@ void decodeFrame( uint8_t* frame, size_t numberOfBytes )
     
     uint8_t*        udpPayload  = &frame[48];
 
-    printf("srcPort=%d dstPort=%d udpLength=%d udpChecksum=%04x\n", ntohs(*srcPort), ntohs(*dstPort), ntohs(*udpPacketLength), ntohs(*udpCheckSum) );
+    printf("nextHeader=%02x srcPort=%d dstPort=%d udpLength=%d udpChecksum=%04x\n", *nextHeader, ntohs(*srcPort), ntohs(*dstPort), ntohs(*udpPacketLength), ntohs(*udpCheckSum) );
 
     //
     if(ntohs(*dstPort) == 80) {
