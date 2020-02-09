@@ -382,7 +382,8 @@ void decodeFrame( uint8_t* frame, size_t numberOfBytes )
             *newUDPCheckSum = 0x0000;
             memcpy( newUDPPayload, udpPayload, numberOfBytes-8 );
 
-            *newUDPCheckSum = udpChecksum( *newSrc, *newDst, dstPort, srcPort, numberOfBytes, &packet[0] );
+            //uint16_t checkValue = udpChecksum( *src, *dst, srcPort, dstPort, udpPacketLength-8, udpPayload );
+            *newUDPCheckSum = udpChecksum( *newSrc, *newDst, dstPort, srcPort, numberOfBytes-8, &packet[0] );
 
             printf("outgoing frame:");
             dumpHex( packet, numberOfBytes );
