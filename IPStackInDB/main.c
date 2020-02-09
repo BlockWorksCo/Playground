@@ -286,7 +286,7 @@ uint16_t udpChecksum( IPv6Address src, IPv6Address dst, uint16_t srcPort, uint16
 
   // Pad to the next 16-bit boundary
   for (i=0; i<payloadLen%2; i++) {
-    buf[i]  = 0x00;
+    buf[chksumlen]  = 0x00;
     chksumlen++;
   }
 
@@ -300,7 +300,7 @@ uint16_t udpChecksum( IPv6Address src, IPv6Address dst, uint16_t srcPort, uint16
   uint16_t checksumValue =  checksum((uint16_t *) buf, chksumlen);
   printf("checksumValue = %04x\n\n",htons(checksumValue));
 
-    return checksumValue;
+    return htons(checksumValue);
 }
 
 
@@ -336,13 +336,14 @@ void decodeFrame( uint8_t* frame, size_t numberOfBytes )
     printf("nextHeader=%02x srcPort=%d dstPort=%d udpLength=%d udpChecksum=%04x\n", *nextHeader, ntohs(*srcPort), ntohs(*dstPort), ntohs(*udpPacketLength), ntohs(*udpCheckSum) );
 
     // UDP packets sent to port 80.
-    if((ntohs(*dstPort) == 9874) && (*nextHeader == 0x11)) {
+    if((ntohs(*dstPort) == 80) && (*nextHeader == 0x11)) {
 
         printf("incoming frame:");
         dumpHex( frame, numberOfBytes );
 
         // Integrity check.
         uint16_t checkValue = udpChecksum( *src, *dst, *srcPort, *dstPort, ntohs(*udpPacketLength)-8, udpPayload );
+        printf("\n[%04x == %04x]\n", ntohs(*udpCheckSum),checkValue);
 
         // Process payload
         uint8_t string[128] = {0};
@@ -395,10 +396,10 @@ int main(int argc, char* argv[])
     progname = argv[0];
 
 
-
+/*
     uint8_t test0[]    = {0x60, 0x00, 0x00, 0x00, 0x00, 0x34, 0x11, 0x01, 0x21, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xAB, 0xCD, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xFD, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x60, 0x26, 0x92, 0x26, 0x92, 0x00, 0x0C, 0x7E, 0xD5, 0x12, 0x34, 0x56, 0x78};
     decodeFrame( &test0[0], sizeof(test0) );
-
+*/
 
     /* Check command line options */
     while((option = getopt(argc, argv, "i:sc:p:uahd")) > 0)
