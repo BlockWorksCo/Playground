@@ -321,56 +321,65 @@ void decodeFrame( uint8_t* frame, size_t numberOfBytes )
         printf("IPv4\n");
     }
 
-    uint16_t*       ipv6PacketLength = (uint16_t*)&frame[4];
-    uint8_t*        nextHeader          = (uint8_t*)&frame[6];
+    uint16_t        ipv6PacketLength = ntohs(*(uint16_t*)&frame[4]);
+    uint8_t         nextHeader          = *(uint8_t*)&frame[6];
     IPv6Address*    src = (IPv6Address*)&frame[8];
     IPv6Address*    dst = (IPv6Address*)&frame[24];
 
-    uint16_t*       srcPort = (uint16_t*)&frame[40];
-    uint16_t*       dstPort = (uint16_t*)&frame[42];
-    uint16_t*       udpPacketLength = (uint16_t*)&frame[44];
-    uint16_t*       udpCheckSum = (uint16_t*)&frame[46];    // assume its zero/unused.
+    if( nextHeader == 0x3a ) {
+        // ICMP
+        printf("[ICMP packet]\n");
+    }
 
-    uint8_t*        udpPayload  = &frame[48];
+    if( nextHeader == 0x11 ) {
+        // UDP
 
-    printf("nextHeader=%02x srcPort=%d dstPort=%d udpLength=%d udpChecksum=%04x\n", *nextHeader, ntohs(*srcPort), ntohs(*dstPort), ntohs(*udpPacketLength), ntohs(*udpCheckSum) );
+        uint16_t*       srcPort = (uint16_t*)&frame[40];
+        uint16_t*       dstPort = (uint16_t*)&frame[42];
+        uint16_t*       udpPacketLength = (uint16_t*)&frame[44];
+        uint16_t*       udpCheckSum = (uint16_t*)&frame[46];    // assume its zero/unused.
 
-    // UDP packets sent to port 80.
-    if((ntohs(*dstPort) == 80) && (*nextHeader == 0x11)) {
+        uint8_t*        udpPayload  = &frame[48];
 
-        printf("incoming frame:");
-        dumpHex( frame, numberOfBytes );
+        printf("UDP: nextHeader=%02x srcPort=%d dstPort=%d udpLength=%d udpChecksum=%04x\n", nextHeader, ntohs(*srcPort), ntohs(*dstPort), ntohs(*udpPacketLength), ntohs(*udpCheckSum) );
 
-        // Integrity check.
-        uint16_t checkValue = udpChecksum( *src, *dst, *srcPort, *dstPort, ntohs(*udpPacketLength)-8, udpPayload );
-        printf("\n[%04x == %04x]\n", ntohs(*udpCheckSum),checkValue);
+        // UDP packets sent to port 80.
+        if(ntohs(*dstPort) == 80) {
 
-        // Process payload
-        uint8_t string[128] = {0};
-        memcpy( &string[0], udpPayload, ntohs(*udpPacketLength)-8 );
-        printf("%02x [%s]\n", checkValue,string);
+            printf("incoming frame:");
+            dumpHex( frame, numberOfBytes );
 
-        //
-        // echo the packet back.
-        //
-        uint8_t         packet[128];
+            // Integrity check.
+            uint16_t checkValue = udpChecksum( *src, *dst, *srcPort, *dstPort, ntohs(*udpPacketLength)-8, udpPayload );
+            printf("\n[%04x == %04x]\n", ntohs(*udpCheckSum),checkValue);
 
-        memcpy( &packet[0], frame, numberOfBytes );
-        IPv6Address*    newSrc      = (IPv6Address*)&packet[8];
-        IPv6Address*    newDst      = (IPv6Address*)&packet[24];
-        uint16_t*       newSrcPort  = (uint16_t*)&packet[40];
-        uint16_t*       newDstPort  = (uint16_t*)&packet[42];
-        uint16_t*       newUDPCheckSum = (uint16_t*)&packet[46];
+            // Process payload
+            uint8_t string[128] = {0};
+            memcpy( &string[0], udpPayload, ntohs(*udpPacketLength)-8 );
+            printf("%02x [%s]\n", checkValue,string);
 
-        memcpy( newSrc, dst, sizeof(IPv6Address) );
-        memcpy( newDst, src, sizeof(IPv6Address) );
-        *newSrcPort     = *dstPort; 
-        *newDstPort     = *srcPort; 
-        *newUDPCheckSum = udpChecksum( *newSrc, *newDst, *newSrcPort, *newDstPort, numberOfBytes, &packet[0] );
+            //
+            // echo the packet back.
+            //
+            uint8_t         packet[128];
 
-        // transmit the packet.
-        uint16_t nwrite = cwrite(tap_fd, &packet[0], numberOfBytes);
-        printf("replied...\n");
+            memcpy( &packet[0], frame, numberOfBytes );
+            IPv6Address*    newSrc      = (IPv6Address*)&packet[8];
+            IPv6Address*    newDst      = (IPv6Address*)&packet[24];
+            uint16_t*       newSrcPort  = (uint16_t*)&packet[40];
+            uint16_t*       newDstPort  = (uint16_t*)&packet[42];
+            uint16_t*       newUDPCheckSum = (uint16_t*)&packet[46];
+
+            memcpy( newSrc, dst, sizeof(IPv6Address) );
+            memcpy( newDst, src, sizeof(IPv6Address) );
+            *newSrcPort     = *dstPort; 
+            *newDstPort     = *srcPort; 
+            *newUDPCheckSum = udpChecksum( *newSrc, *newDst, *newSrcPort, *newDstPort, numberOfBytes, &packet[0] );
+
+            // transmit the packet.
+            uint16_t nwrite = cwrite(tap_fd, &packet[0], numberOfBytes);
+            printf("replied...\n");
+        }
     }
 }
 
