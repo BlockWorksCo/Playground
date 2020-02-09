@@ -174,15 +174,19 @@ int tap_fd;
 
 typedef struct
 {
+    // pseudo header
     IPv6Address src;
     IPv6Address dst;
-    uint32_t    headerAndDataLength;
-    uint8_t     zeroes[3];
-    uint8_t     nextHeader;
+    uint16_t    headerAndDataLength;
+    uint16_t    nextHeader; // extended to 16-bit for calculation
+
+    // UDP header
     uint16_t    srcPort;
     uint16_t    dstPort;
     uint16_t    length;
     uint16_t    checksum;
+
+    // payload
     uint8_t     payload[1];
 
 } __attribute__((__packed__)) UDPPsuedoHeader;
@@ -236,6 +240,8 @@ uint16_t udpChecksum( IPv6Address src, IPv6Address dst, uint16_t srcPort, uint16
   int chksumlen = 0;
   int i;
 
+    // Pseudo header
+
   // Copy source IP address into buf (128 bits)
   memcpy( &header->src, src, sizeof(IPv6Address) );
   chksumlen += sizeof (IPv6Address);
@@ -245,18 +251,15 @@ uint16_t udpChecksum( IPv6Address src, IPv6Address dst, uint16_t srcPort, uint16
   chksumlen += sizeof (IPv6Address);
 
   // Copy UDP length into buf (32 bits)
-  header->headerAndDataLength   = 8 + payloadLen;
+  header->headerAndDataLength   = htons(8 + payloadLen);
   chksumlen += sizeof (uint32_t);
 
-  // Copy zero field to buf (24 bits)
-  header->zeroes[0]  = 0;
-  header->zeroes[1]  = 0;
-  header->zeroes[2]  = 0;
-  chksumlen += 3;
+  // Copy next header field to buf (extended to 16 bits)
+  header->nextHeader    = htons(0x0011);
+  chksumlen += sizeof (uint16_t);
 
-  // Copy next header field to buf (8 bits)
-  header->nextHeader    = 0x11;
-  chksumlen += sizeof (uint8_t);
+
+    // UDP header.
 
   // Copy UDP source port to buf (16 bits)
   header->srcPort   = srcPort;
@@ -267,7 +270,7 @@ uint16_t udpChecksum( IPv6Address src, IPv6Address dst, uint16_t srcPort, uint16
   chksumlen += sizeof (uint16_t);
 
   // Copy UDP length again to buf (16 bits)
-  header->length   = payloadLen;
+  header->length   = htons(8 + payloadLen);
   chksumlen += sizeof (uint16_t);
 
   // Copy UDP checksum to buf (16 bits)
@@ -275,12 +278,15 @@ uint16_t udpChecksum( IPv6Address src, IPv6Address dst, uint16_t srcPort, uint16
   header->checksum  = 0;
   chksumlen += sizeof (uint16_t);
 
+    // payload.
+
   // Copy payload to buf
   memcpy( &header->payload[0], payload, payloadLen );
   chksumlen += payloadLen;
 
   // Pad to the next 16-bit boundary
   for (i=0; i<payloadLen%2; i++) {
+    buf[i]  = 0x00;
     chksumlen++;
   }
 
@@ -292,7 +298,7 @@ uint16_t udpChecksum( IPv6Address src, IPv6Address dst, uint16_t srcPort, uint16
   dumpHex( (uint8_t*)buf, chksumlen );
 
   uint16_t checksumValue =  checksum((uint16_t *) buf, chksumlen);
-  printf("checksumValue = %04x\n\n",checksumValue);
+  printf("checksumValue = %04x\n\n",htons(checksumValue));
 
     return checksumValue;
 }
