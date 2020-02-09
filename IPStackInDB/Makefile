@@ -1,8 +1,20 @@
 
 
+OBJS    += main.o
+OBJS    += tun.o
+OBJS    += ipv6.o
+OBJS    += layer1.o
 
 
+all: main
 
-all: main.c
-	gcc -o main main.c
+main: $(OBJS)
+	gcc -o $@ $^
+
+clean:
+	-rm $(OBJS)
+	-rm main
+
+%.o: %.c
+	@ gcc $(CFLAGS) $(DEFINES) $(INCLUDES) -c $< -o $@ -MMD -MP -MF $(notdir $(patsubst %.o,%.d,$@) )
 

@@ -17,6 +17,10 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include "layer1.h"
+#include "tun.h"
+#include "ipv6.h"
+
 /* buffer for reading from tun/tap interface, must be >= 1500 */
 #define BUFSIZE 2000
 #define CLIENT 0
@@ -66,65 +70,6 @@ int tun_alloc(char* dev, int flags)
 }
 
 /**************************************************************************
- * cread: read routine that checks for errors and exits if an error is    *
- *        returned.                                                       *
- **************************************************************************/
-int cread(int fd, char* buf, int n)
-{
-    int nread;
-
-    if((nread = read(fd, buf, n)) < 0)
-    {
-        perror("Reading data");
-        exit(1);
-    }
-
-    return nread;
-}
-
-/**************************************************************************
- * cwrite: write routine that checks for errors and exits if an error is  *
- *         returned.                                                      *
- **************************************************************************/
-int cwrite(int fd, char* buf, int n)
-{
-    int nwrite;
-
-    if((nwrite = write(fd, buf, n)) < 0)
-    {
-        perror("Writing data");
-        exit(1);
-    }
-
-    return nwrite;
-}
-
-/**************************************************************************
- * read_n: ensures we read exactly n bytes, and puts those into "buf".    *
- *         (unless EOF, of course)                                        *
- **************************************************************************/
-int read_n(int fd, char* buf, int n)
-{
-    int nread, left = n;
-
-    while(left > 0)
-    {
-        if ((nread = cread(fd, buf, left)) == 0)
-        {
-            return 0 ;
-        }
-
-        else
-        {
-            left -= nread;
-            buf += nread;
-        }
-    }
-
-    return n;
-}
-
-/**************************************************************************
  * do_debug: prints debugging stuff (doh!)                                *
  **************************************************************************/
 void do_debug(char* msg, ...)
@@ -167,235 +112,6 @@ void usage(void)
     fprintf(stderr, "-h: prints this help text\n");
     exit(1);
 }
-
-
-typedef uint8_t IPv6Address[16];
-int tap_fd;
-
-typedef struct
-{
-    // pseudo header
-    IPv6Address src;
-    IPv6Address dst;
-    uint16_t    headerAndDataLength;
-    uint16_t    nextHeader; // extended to 16-bit for calculation
-
-    // UDP header
-    uint16_t    srcPort;
-    uint16_t    dstPort;
-    uint16_t    length;
-    uint16_t    checksum;
-
-    // payload
-    uint8_t     payload[1];
-
-} __attribute__((__packed__)) UDPPsuedoHeader;
-
-
-void dumpHex( uint8_t* bytes, size_t numberOfBytes )
-{
-    for(uint32_t i = 0; i < numberOfBytes; i++)
-    {
-        printf("%02x ", bytes[i]);
-    }
-
-    printf("\n");
-}
-
-
-// Computing the internet checksum (RFC 1071).
-// Note that the internet checksum does not preclude collisions.
-uint16_t checksum (uint16_t* addr, int len)
-{
-    int count = len;
-    register uint32_t sum = 0;
-    uint16_t answer = 0;
-
-    // Sum up 2-byte values until none or only one byte left.
-    while (count > 1)
-    {
-        sum += *(addr++);
-        count -= 2;
-    }
-
-    // Add left-over byte, if any.
-    if (count > 0)
-    {
-        sum += *(uint8_t*) addr;
-    }
-
-    // Fold 32-bit sum into 16 bits; we lose information by doing this,
-    // increasing the chances of a collision.
-    // sum = (lower 16 bits) + (upper 16 bits shifted right 16 bits)
-    while (sum >> 16)
-    {
-        sum = (sum & 0xffff) + (sum >> 16);
-    }
-
-    // Checksum is one's compliment of sum.
-    answer = ~sum;
-    return (answer);
-}
-
-uint16_t udpChecksum( IPv6Address src, IPv6Address dst, uint16_t srcPort, uint16_t dstPort, uint16_t payloadLen, uint8_t* payload )
-{
-    char buf[2048]    = {0};
-    UDPPsuedoHeader*  header  = (UDPPsuedoHeader*)&buf[0];
-    int chksumlen = 0;
-    int i;
-
-    // Pseudo header
-    printf("payloadLen=%d\n", payloadLen);
-    // Copy source IP address into buf (128 bits)
-    memcpy( &header->src, src, sizeof(IPv6Address) );
-    chksumlen += sizeof (IPv6Address);
-    // Copy destination IP address into buf (128 bits)
-    memcpy( &header->dst, dst, sizeof(IPv6Address) );
-    chksumlen += sizeof (IPv6Address);
-    // Copy UDP length into buf (32 bits)
-    header->headerAndDataLength   = htons(8 + payloadLen);
-    chksumlen += sizeof (uint32_t);
-    // Copy next header field to buf (extended to 16 bits)
-    header->nextHeader    = htons(0x0011);
-    chksumlen += sizeof (uint16_t);
-
-    // UDP header.
-    // Copy UDP source port to buf (16 bits)
-    header->srcPort   = htons(srcPort);
-    chksumlen += sizeof (uint16_t);
-    // Copy UDP destination port to buf (16 bits)
-    header->dstPort   = htons(dstPort);
-    chksumlen += sizeof (uint16_t);
-    // Copy UDP length again to buf (16 bits)
-    header->length   = htons(8 + payloadLen);
-    chksumlen += sizeof (uint16_t);
-    // Copy UDP checksum to buf (16 bits)
-    // Zero, since we don't know it yet
-    header->checksum  = 0;
-    chksumlen += sizeof (uint16_t);
-
-    // payload.
-    // Copy payload to buf
-    memcpy( &header->payload[0], payload, payloadLen );
-    chksumlen += payloadLen;
-
-    // Pad to the next 16-bit boundary
-    for (i = 0; i < payloadLen % 2; i++)
-    {
-        buf[chksumlen]  = 0x00;
-        chksumlen++;
-    }
-
-    printf("src:");
-    dumpHex( (uint8_t*)src, sizeof(IPv6Address) );
-    printf("dst:");
-    dumpHex( (uint8_t*)dst, sizeof(IPv6Address) );
-    printf("checked frame:");
-    dumpHex( (uint8_t*)buf, chksumlen );
-    uint16_t checksumValue =  checksum((uint16_t*) buf, chksumlen);
-    printf("checksumValue = %04x\n\n", htons(checksumValue));
-    return htons(checksumValue);
-}
-
-
-
-
-
-void encodeUDPFrame( IPv6Address* src, IPv6Address* dst, uint16_t srcPort, uint16_t dstPort, uint8_t* payload, size_t payloadSize )
-{
-    uint8_t         packet[128] = {0};
-    uint32_t   ipv6PacketLength    = 40 + 8 + payloadSize;
-    printf("[ipv6PacketLength=%d]\n", ipv6PacketLength);
-    packet[0]       = 0x60;
-    packet[1]       = 0x0f;
-    packet[2]       = 0x17;
-    packet[3]       = 0xee;
-    IPv6Address*    newSrc      = (IPv6Address*)&packet[8];
-    IPv6Address*    newDst      = (IPv6Address*)&packet[24];
-    uint16_t*       newIPv6PacketLength = (uint16_t*)&packet[4];
-    uint8_t*        newNextHeader     = (uint8_t*)&packet[6];
-    uint16_t*       newSrcPort  = (uint16_t*)&packet[40];
-    uint16_t*       newDstPort  = (uint16_t*)&packet[42];
-    uint16_t*       newUDPPacketLength = (uint16_t*)&packet[44];
-    uint16_t*       newUDPCheckSum = (uint16_t*)&packet[46];
-    uint8_t*        newUDPPayload  = &packet[48];
-    memcpy( newSrc, dst, sizeof(IPv6Address) );
-    memcpy( newDst, src, sizeof(IPv6Address) );
-    *newIPv6PacketLength    = htons(payloadSize + 8);
-    *newNextHeader  = 0x11;
-    *newSrcPort     = htons(dstPort);
-    *newDstPort     = htons(srcPort);
-    *newUDPPacketLength = htons(payloadSize + 8);
-    *newUDPCheckSum = 0x0000;
-    memcpy( newUDPPayload, payload, payloadSize );
-    *newUDPCheckSum = htons(udpChecksum( *newSrc, *newDst, ntohs(*newSrcPort), ntohs(*newDstPort), payloadSize, newUDPPayload ));
-    printf("outgoing frame:");
-    dumpHex( packet, ipv6PacketLength );
-    // transmit the packet.
-    uint16_t nwrite = cwrite(tap_fd, &packet[0], ipv6PacketLength);
-    printf("replied...\n");
-}
-
-
-void decodeFrame( uint8_t* frame, size_t numberOfBytes )
-{
-    printf("Decoding frame [%zd]\n", numberOfBytes);
-    uint8_t frameType   = frame[0] & 0xe0;
-
-    if(frameType == 0x60)
-    {
-        printf("IPv6\n");
-    }
-
-    if(frameType == 0x40)
-    {
-        printf("IPv4\n");
-    }
-
-    uint16_t        ipv6PacketLength = ntohs(*(uint16_t*)&frame[4]);
-    uint8_t         nextHeader          = *(uint8_t*)&frame[6];
-    IPv6Address*    src = (IPv6Address*)&frame[8];
-    IPv6Address*    dst = (IPv6Address*)&frame[24];
-
-    if( nextHeader == 0x3a )
-    {
-        // ICMP
-        printf("[ICMP packet]\n");
-    }
-
-    if( nextHeader == 0x11 )
-    {
-        // UDP
-        uint16_t        srcPort         = ntohs(*(uint16_t*)&frame[40]);
-        uint16_t        dstPort         = ntohs(*(uint16_t*)&frame[42]);
-        uint16_t        udpPacketLength = ntohs(*(uint16_t*)&frame[44]);
-        uint16_t        udpCheckSum     = ntohs(*(uint16_t*)&frame[46]);    // assume its zero/unused.
-        uint8_t*        udpPayload  = &frame[48];
-        printf("UDP: nextHeader=%02x srcPort=%d dstPort=%d udpLength=%d udpChecksum=%04x\n", nextHeader, srcPort, dstPort, udpPacketLength, udpCheckSum );
-
-        // UDP packets sent to port 80.
-        if(dstPort == 80)
-        {
-            printf("incoming frame:");
-            dumpHex( frame, numberOfBytes );
-            // Integrity check.
-            uint16_t checkValue = udpChecksum( *src, *dst, srcPort, dstPort, udpPacketLength - 8, udpPayload );
-            printf("\n[%04x == %04x]\n", udpCheckSum, checkValue);
-            // Process payload
-            uint8_t string[128] = {0};
-            memcpy( &string[0], udpPayload, udpPacketLength - 8 );
-            printf("%02x [%s]\n", checkValue, string);
-
-            //
-            // echo the packet back.
-            //
-            uint8_t     response[128]   = {0};
-            sprintf(response,"[%s]",string);
-            encodeUDPFrame( src, dst, srcPort, dstPort, response, strlen(response) );
-        }
-    }
-}
-
 
 
 int main(int argc, char* argv[])
@@ -495,7 +211,7 @@ int main(int argc, char* argv[])
     }
 
     /* initialize tun/tap interface */
-    if ( (tap_fd = tun_alloc(if_name, flags | IFF_NO_PI)) < 0 )
+    if ( (tun_fd = tun_alloc(if_name, flags | IFF_NO_PI)) < 0 )
     {
         my_err("Error connecting to tun/tap interface %s!\n", if_name);
         exit(1);
@@ -510,7 +226,7 @@ int main(int argc, char* argv[])
     }
 
     /* use select() to handle two descriptors at once */
-    maxfd = tap_fd;
+    maxfd = tun_fd;
     printf("Entering main loop.\n");
 
     while(1)
@@ -518,7 +234,7 @@ int main(int argc, char* argv[])
         int ret;
         fd_set rd_set;
         FD_ZERO(&rd_set);
-        FD_SET(tap_fd, &rd_set);
+        FD_SET(tun_fd, &rd_set);
         ret = select(maxfd + 1, &rd_set, NULL, NULL, NULL);
 
         if (ret < 0 && errno == EINTR)
@@ -532,10 +248,10 @@ int main(int argc, char* argv[])
             exit(1);
         }
 
-        if(FD_ISSET(tap_fd, &rd_set))
+        if(FD_ISSET(tun_fd, &rd_set))
         {
             /* data from tun/tap: just read it and write it to the network */
-            nread = cread(tap_fd, buffer, BUFSIZE);
+            nread = cread(tun_fd, buffer, BUFSIZE);
             tap2net++;
             do_debug("TAP2NET %lu: Read %d bytes from the tap interface\n", tap2net, nread);
             /* write length + packet */
@@ -548,32 +264,6 @@ int main(int argc, char* argv[])
             //
             decodeFrame( &buffer[0], nread );
         }
-
-#if 0
-
-        if(FD_ISSET(net_fd, &rd_set))
-        {
-            /* data from the network: read it, and write it to the tun/tap interface.
-             * We need to read the length first, and then the packet */
-            /* Read length */
-            nread = read_n(net_fd, (char*)&plength, sizeof(plength));
-
-            if(nread == 0)
-            {
-                /* ctrl-c at the other end */
-                break;
-            }
-
-            net2tap++;
-            /* read packet */
-            nread = read_n(net_fd, buffer, ntohs(plength));
-            do_debug("NET2TAP %lu: Read %d bytes from the network\n", net2tap, nread);
-            /* now buffer[] contains a full packet or frame, write it into the tun/tap interface */
-            nwrite = cwrite(tap_fd, buffer, nread);
-            do_debug("NET2TAP %lu: Written %d bytes to the tap interface\n", net2tap, nwrite);
-        }
-
-#endif
     }
 
     return(0);
