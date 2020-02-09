@@ -6,6 +6,7 @@
 
 extern int tun_fd;
 
+int tun_alloc(char* dev, int flags);
 
 #endif
 
