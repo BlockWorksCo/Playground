@@ -363,19 +363,29 @@ void decodeFrame( uint8_t* frame, size_t numberOfBytes )
             //
             uint8_t         packet[128];
 
-            memcpy( &packet[0], frame, numberOfBytes );
+            memcpy( &packet[0], frame, ipv6PacketLength );
             IPv6Address*    newSrc      = (IPv6Address*)&packet[8];
             IPv6Address*    newDst      = (IPv6Address*)&packet[24];
+            uint8_t*        newNextHeader     = (uint8_t*)&packet[6];
             uint16_t*       newSrcPort  = (uint16_t*)&packet[40];
             uint16_t*       newDstPort  = (uint16_t*)&packet[42];
+            uint16_t*       newUDPPacketLength = (uint16_t*)&packet[44];
             uint16_t*       newUDPCheckSum = (uint16_t*)&packet[46];
+            uint8_t*        newUDPPayload  = &packet[48];
 
             memcpy( newSrc, dst, sizeof(IPv6Address) );
             memcpy( newDst, src, sizeof(IPv6Address) );
-            *newSrcPort     = dstPort; 
-            *newDstPort     = srcPort; 
+            *newNextHeader  = 0x11;
+            *newSrcPort     = htons(dstPort); 
+            *newDstPort     = htons(srcPort); 
+            *newUDPPacketLength = htons(udpPacketLength);
+            *newUDPCheckSum = 0x0000;
+            memcpy( newUDPPayload, udpPayload, numberOfBytes-8 );
 
             *newUDPCheckSum = udpChecksum( *newSrc, *newDst, dstPort, srcPort, numberOfBytes, &packet[0] );
+
+            printf("outgoing frame:");
+            dumpHex( packet, numberOfBytes );
 
             // transmit the packet.
             uint16_t nwrite = cwrite(tap_fd, &packet[0], numberOfBytes);
