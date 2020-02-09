@@ -11,7 +11,7 @@ OBJS    += session.o
 all: main
 
 main: $(OBJS)
-	gcc -o $@ $^
+	gcc -o $@ $^ -lwolfssl
 
 clean:
 	@-rm $(OBJS)

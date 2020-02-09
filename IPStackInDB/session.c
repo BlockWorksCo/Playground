@@ -8,8 +8,22 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "wolfssl_config.h"
+#include "wolfssl/ssl.h"
+#include "wolfssl/error-ssl.h"
+#include "wolfssl/wolfcrypt/asn.h"
+#include "wolfssl/wolfcrypt/logging.h"
 
 
+static struct WOLFSSL_CTX* s_ctx;
+
+bool sessionExists  = false;
+
+
+void setupSession()
+{
+    struct WOLFSSL* ssl = wolfSSL_new(s_ctx);
+}
 
 
 
@@ -21,9 +35,19 @@ void sessionProcessUDPPacket(IPv6Address* src, IPv6Address* dst, uint16_t srcPor
     printf("[%s]\n", string);
 
     //
+    if(sessionExists == false) {
+        setupSession();
+        sessionExists   = true;
+    }
+
+    //
     // echo the packet back.
     //
     uint8_t     response[128]   = {0};
     sprintf(response,"[%s]",string);
     encodeUDPFrame( src, dst, srcPort, dstPort, response, strlen(response) );
 }
+
+
+
+
