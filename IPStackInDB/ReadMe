@@ -54,4 +54,5 @@ sudo ip -6 route add fd00::1/64 dev tun1
 nc -6 -u fd00::2 80
 
 
+sudo tshark -i tun1 -V  -o udp.check_checksum:TRUE
 
