@@ -12,7 +12,7 @@ OBJS    += udpQueue.o
 all: main
 
 main: $(OBJS)
-	gcc -o $@ $^ -lwolfssl
+	gcc -o $@ $^ -lwolfssl -lpthread
 
 clean:
 	@-rm $(OBJS)

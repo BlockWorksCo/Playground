@@ -4,6 +4,9 @@
 
 #include "session.h"
 #include "udp.h"
+#include "udpQueue.h"
+#include <unistd.h>
+#include <pthread.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -26,19 +29,21 @@ void setupSession()
 }
 
 
-
 void sessionProcessUDPPacket(IPv6Address* src, IPv6Address* dst, uint16_t srcPort, uint16_t dstPort, uint8_t* packet, size_t numberOfBytes )
 {
-    // Process payload
-    uint8_t string[128] = {0};
-    memcpy( &string[0], packet, numberOfBytes );
-    printf("[%s]\n", string);
-
     //
     if(sessionExists == false) {
         setupSession();
         sessionExists   = true;
     }
+
+    // Push the packet into the queue.
+    udpQueuePut( 0, src, packet, numberOfBytes );
+
+    // Process payload
+    uint8_t string[128] = {0};
+    memcpy( &string[0], packet, numberOfBytes );
+    printf("[%s]\n", string);
 
     //
     // echo the packet back.
@@ -50,4 +55,7 @@ void sessionProcessUDPPacket(IPv6Address* src, IPv6Address* dst, uint16_t srcPor
 
 
 
+void sessionInit()
+{
+}
 

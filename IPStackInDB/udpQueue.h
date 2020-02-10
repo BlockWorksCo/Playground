@@ -16,11 +16,11 @@
 
 
 
-void udpQueueGet( uint8_t* packet, size_t* maxNumberOfBytes );
+void udpQueueGet( uint32_t streamId, uint8_t* packet, size_t* maxNumberOfBytes );
 
-void udpQueuePut( IPv6Address* src, uint8_t* packet, size_t numberOfBytes );
+void udpQueuePut( uint32_t streamId, IPv6Address* src, uint8_t* packet, size_t numberOfBytes );
 
-void udpQueueInit();
+void udpQueueInit(uint32_t streamId);
 
 
 #endif

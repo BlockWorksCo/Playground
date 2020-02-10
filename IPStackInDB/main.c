@@ -34,6 +34,8 @@
 #define ARP_PKT_LEN 28
 
 
+
+
 int main(int argc, char* argv[])
 {
     int option;
@@ -44,7 +46,8 @@ int main(int argc, char* argv[])
     char buffer[BUFSIZE];
 
     //
-    udpQueueInit();
+    udpQueueInit(0);
+    udpQueueInit(1);
 
     /* initialize tun/tap interface */
     if ( (tun_fd = tun_alloc(if_name, flags | IFF_NO_PI)) < 0 )
@@ -59,6 +62,7 @@ int main(int argc, char* argv[])
     maxfd = tun_fd;
     printf("Entering main loop.\n");
 
+    //
     while(1)
     {
         int ret;

@@ -7,10 +7,12 @@
 #include <unistd.h>
 #include <sys/fcntl.h>
 #include <stdio.h>
+#include <pthread.h>
 
 
+#define MAX_STREAMS     (2)
 
-int     fd      = -1;
+int     fd[MAX_STREAMS]      = {0};
 
 
 // Only address needs to be hashed because the packets still contain the 
@@ -19,10 +21,11 @@ int     fd      = -1;
 // address and limit the address-range we can serve.
 uint32_t ipAddressHash( IPv6Address* address )
 {
-    uint32_t    addressComponent    = (((uint32_t)address[14])<<8) | (uint32_t)address[15];
+    uint32_t    addressComponent    = (((uint32_t)((uint8_t*)address)[14])<<8) | (uint32_t)((uint8_t*)address)[15];
     if(addressComponent > MAX_UDPQUEUE_ADDRESS_RANGE) {
         // this address is out of our representible range.
-        printf("\naddress out of range.\n");
+        dumpHex((uint8_t*)address,16);
+        printf("\naddress out of range (%04x).\n",addressComponent);
         exit(-1);
     }
 
@@ -33,35 +36,52 @@ uint32_t ipAddressHash( IPv6Address* address )
 
 
 
-void udpQueueGet( uint8_t* packet, size_t* maxNumberOfBytes )
+void udpQueueGet( uint32_t streamId, uint8_t* packet, size_t* maxNumberOfBytes )
 {
 }
 
 
-void udpQueuePut( IPv6Address* src,  uint8_t* packet, size_t numberOfBytes )
+void udpQueuePut( uint32_t streamId, IPv6Address* src,  uint8_t* packet, size_t numberOfBytes )
 {
     uint32_t    hash        = ipAddressHash(src);
 
     off_t       position    = hash * MAX_UDPQUEUE_ELEMENT_SIZE;
-    lseek( fd, position, SEEK_SET );
-    write( fd, packet, MAX_UDPQUEUE_ELEMENT_SIZE );
+    lseek( fd[streamId], position, SEEK_SET );
+    write( fd[streamId], packet, MAX_UDPQUEUE_ELEMENT_SIZE );
 }
 
 
-
-void udpQueueInit()
+void *packetProcessorThread(void* param)
 {
-    fd  = creat("/tmp/udpQueue.bin", O_RDWR);
-    if( fd == -1 ) {
+    while(true) {
+        usleep(100);
+    }
+}
+
+
+void udpQueueInit(uint32_t streamId)
+{
+    char    name[64]    = {0};
+
+    sprintf(name,"/tmp/udpQueue%d.bin",streamId);
+    fd[streamId]  = creat(name, O_RDWR);
+    if( fd[streamId] == -1 ) {
         printf("\nCant open updQueue.\n");
         exit(-1);
     }
 
     // Initialise it.
     off_t    fileSize    = MAX_UDPQUEUE_ADDRESS_RANGE * MAX_UDPQUEUE_ELEMENT_SIZE;
-    lseek( fd, fileSize, SEEK_SET );
+    lseek( fd[streamId], fileSize, SEEK_SET );
     uint8_t buf[MAX_UDPQUEUE_ELEMENT_SIZE]  = {0};
-    write( fd, buf, sizeof(buf) );
+    write( fd[streamId], buf, sizeof(buf) );
+
+    //
+    pthread_t   threadId;
+    if(pthread_create( &threadId, NULL, packetProcessorThread, NULL)) {
+        fprintf(stderr, "Error creating thread\n");
+        exit(-1);
+    }   
 }
 
 
