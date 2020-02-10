@@ -20,6 +20,7 @@
 #include "layer1.h"
 #include "tun.h"
 #include "ipv6.h"
+#include "udpQueue.h"
 
 /* buffer for reading from tun/tap interface, must be >= 1500 */
 #define BUFSIZE 2000
@@ -41,6 +42,9 @@ int main(int argc, char* argv[])
     int maxfd;
     uint16_t nread, nwrite, plength;
     char buffer[BUFSIZE];
+
+    //
+    udpQueueInit();
 
     /* initialize tun/tap interface */
     if ( (tun_fd = tun_alloc(if_name, flags | IFF_NO_PI)) < 0 )
