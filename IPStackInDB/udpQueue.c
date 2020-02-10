@@ -1,6 +1,7 @@
 
 
 
+#include "udp.h"
 #include "udpQueue.h"
 #include "ipv6.h"
 
@@ -11,6 +12,17 @@
 
 
 #define MAX_STREAMS     (2)
+#define QUEUE_DEPTH     (8)
+
+
+typedef struct
+{
+    uint32_t    sequenceNumber;
+    UDPHeader   udpHeader;
+
+} ElementHeader;
+
+
 
 int     fd[MAX_STREAMS]      = {0};
 
@@ -71,7 +83,7 @@ void udpQueueInit(uint32_t streamId)
     }
 
     // Initialise it.
-    off_t    fileSize    = MAX_UDPQUEUE_ADDRESS_RANGE * MAX_UDPQUEUE_ELEMENT_SIZE;
+    off_t    fileSize    = QUEUE_DEPTH * MAX_UDPQUEUE_ELEMENT_SIZE;
     lseek( fd[streamId], fileSize, SEEK_SET );
     uint8_t buf[MAX_UDPQUEUE_ELEMENT_SIZE]  = {0};
     write( fd[streamId], buf, sizeof(buf) );
