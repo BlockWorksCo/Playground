@@ -8,6 +8,8 @@ OBJS    += udp.o
 OBJS    += session.o
 OBJS    += udpQueue.o
 
+CFLAGS  += -g
+
 
 all: main
 
