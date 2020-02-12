@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <string.h>
 
 
 #define MAX_STREAMS     (2)
@@ -35,31 +36,6 @@ void readElement( uint32_t streamId, uint32_t elementId, uint8_t* element );
 
 
 
-// Only address needs to be hashed because the packets still contain the 
-// header which contains srcPort and dstPort.
-// To ensure that there are no hash-collisions, we use 16-bits from the
-// address and limit the address-range we can serve.
-uint32_t ipAddressHash( IPv6Address* address )
-{
-#if 0
-    uint32_t    addressComponent    = (((uint32_t)((uint8_t*)address)[14])<<8) | (uint32_t)((uint8_t*)address)[15];
-    if(addressComponent > MAX_UDPQUEUE_ADDRESS_RANGE) {
-        // this address is out of our representible range.
-        dumpHex((uint8_t*)address,16);
-        printf("\naddress out of range (%04x).\n",addressComponent);
-        exit(-1);
-    }
-
-    uint32_t    hash    = (addressComponent<<16) | 0x50 | 0x11;
-#endif
-    uint32_t    addressComponent    = ((uint8_t*)address)[15];
-    uint32_t    hash    = addressComponent & 0x01;
-
-    return hash;
-}
-
-
-
 void udpQueueGet( uint32_t streamId, uint8_t* packet, size_t* maxNumberOfBytes )
 {
 }
@@ -67,10 +43,7 @@ void udpQueueGet( uint32_t streamId, uint8_t* packet, size_t* maxNumberOfBytes )
 
 void udpQueuePut( uint32_t streamId, IPv6Address* src,  uint8_t* packet, size_t numberOfBytes )
 {
-    uint32_t    hash        = ipAddressHash(src);
-
-    off_t       position    = hash * MAX_UDPQUEUE_ELEMENT_SIZE;
-    lseek( fd[streamId], position, SEEK_SET );
+    lseek( fd[streamId], MAX_UDPQUEUE_ELEMENT_SIZE*firstEmptyElement[streamId], SEEK_SET );
 
     ElementHeader   header  = 
     {
@@ -80,7 +53,14 @@ void udpQueuePut( uint32_t streamId, IPv6Address* src,  uint8_t* packet, size_t 
     write( fd[streamId], &header, sizeof(ElementHeader) );
     write( fd[streamId], packet, MAX_UDPQUEUE_ELEMENT_SIZE );
 
+    firstEmptyElement[streamId]  = (firstEmptyElement[streamId]+1) % QUEUE_DEPTH;
     sem_post( &dataAvailableSemaphore[streamId] );
+}
+
+
+void processElement( uint32_t streamId, uint8_t* element )
+{
+    printf("processing packet...\n");
 }
 
 
@@ -93,10 +73,18 @@ void *packetProcessorThread(void* param)
         printf("\n****[data available]****\n");
 
         // Read all available packets.
-        while( firstFullElement[streamId] |= firstEmptyElement[streamId] ) {
+        while( firstFullElement[streamId] != firstEmptyElement[streamId] ) {
             uint8_t element[MAX_UDPQUEUE_ELEMENT_SIZE];
             ElementHeader*  header  = (ElementHeader*)element;
             readElement( streamId, firstFullElement[streamId], &element[0] );
+
+            // process it...
+            processElement( streamId, &element[0]);
+
+            // mark it as bad.
+            memset( element, 0xff, 16 );
+            lseek( fd[streamId], MAX_UDPQUEUE_ELEMENT_SIZE*firstFullElement[streamId], SEEK_SET );
+            write( fd[streamId], element, MAX_UDPQUEUE_ELEMENT_SIZE );
 
             firstFullElement[streamId]  = (firstFullElement[streamId]+1) % QUEUE_DEPTH;
         }
@@ -171,7 +159,7 @@ void udpQueueInit(uint32_t streamId)
     firstFullElement[streamId] = minSequencePosition;
 
     //
-    sem_init( &dataAvailableSemaphore[streamId], 0, 1 );
+    sem_init( &dataAvailableSemaphore[streamId], 0, 0 );
 
     // Start a reader thread.
     pthread_t   threadId;
