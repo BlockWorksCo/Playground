@@ -51,7 +51,7 @@ void udpQueuePut( uint32_t streamId, IPv6Address* src,  uint8_t* packet, size_t 
         .checksum       = checksumOf(packet),
     };
     write( fd[streamId], &header, sizeof(ElementHeader) );
-    write( fd[streamId], packet, MAX_UDPQUEUE_ELEMENT_SIZE );
+    write( fd[streamId], packet, MAX_UDPQUEUE_ELEMENT_SIZE-sizeof(ElementHeader) );
 
     firstEmptyElement[streamId]  = (firstEmptyElement[streamId]+1) % QUEUE_DEPTH;
     sem_post( &dataAvailableSemaphore[streamId] );
@@ -74,12 +74,20 @@ void *packetProcessorThread(void* param)
 
         // Read all available packets.
         while( firstFullElement[streamId] != firstEmptyElement[streamId] ) {
+
             uint8_t element[MAX_UDPQUEUE_ELEMENT_SIZE];
             ElementHeader*  header  = (ElementHeader*)element;
-            readElement( streamId, firstFullElement[streamId], &element[0] );
+
+            lseek( fd[streamId], MAX_UDPQUEUE_ELEMENT_SIZE*firstFullElement[streamId], SEEK_SET );
+            read( fd[streamId], &element[0], MAX_UDPQUEUE_ELEMENT_SIZE );
 
             // process it...
-            processElement( streamId, &element[0]);
+            if(checksumOf(&element[sizeof(ElementHeader)]) == header->checksum) {
+                processElement( streamId, &element[sizeof(ElementHeader)]);
+            }
+            else {
+                printf("\n!! bad checksum on packet !!\n");
+            }
 
             // mark it as bad.
             memset( element, 0xff, 16 );
@@ -116,7 +124,7 @@ void udpQueueInit(uint32_t streamId)
     char    name[64]    = {0};
 
     sprintf(name,"/tmp/udpQueue%d.bin",streamId);
-    fd[streamId]  = creat(name, O_RDWR);
+    fd[streamId]  = open(name, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU | S_IRWXG);
     if( fd[streamId] == -1 ) {
         printf("\nCant open updQueue.\n");
         exit(-1);
@@ -135,6 +143,7 @@ void udpQueueInit(uint32_t streamId)
     int32_t     minSequenceNumber   = -1;
     uint32_t    minSequencePosition = -1;
     for(uint32_t i=0; i<QUEUE_DEPTH; i++) {
+
         uint8_t element[MAX_UDPQUEUE_ELEMENT_SIZE];
         ElementHeader*  header  = (ElementHeader*)element;
         readElement( streamId, i, &buf[0] );
@@ -152,11 +161,17 @@ void udpQueueInit(uint32_t streamId)
         }
     }
 
-    // ...then store the first empty slot index.
-    firstEmptyElement[streamId] = (maxSequencePosition+1)%QUEUE_DEPTH;
+    if(maxSequenceNumber == -1) {
+        firstEmptyElement[streamId] = 0;
+        firstFullElement[streamId]  = 0;
+    }
+    else {
+        // ...then store the first empty slot index.
+        firstEmptyElement[streamId] = (maxSequencePosition+1)%QUEUE_DEPTH;
 
-    // ...and the first full slot index.
-    firstFullElement[streamId] = minSequencePosition;
+        // ...and the first full slot index.
+        firstFullElement[streamId] = minSequencePosition;
+    }
 
     //
     sem_init( &dataAvailableSemaphore[streamId], 0, 0 );
