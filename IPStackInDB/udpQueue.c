@@ -32,13 +32,7 @@ uint32_t    firstFullElement[MAX_STREAMS]       = {0};
 sem_t       dataAvailableSemaphore[MAX_STREAMS] = {0};
 
 uint32_t checksumOf( uint8_t* element );
-void readElement( uint32_t streamId, uint32_t elementId, uint8_t* element );
 
-
-
-void udpQueueGet( uint32_t streamId, uint8_t* packet, size_t* maxNumberOfBytes )
-{
-}
 
 
 void udpQueuePut( uint32_t streamId, IPv6Address* src,  uint8_t* packet, size_t numberOfBytes )
@@ -100,12 +94,6 @@ void *packetProcessorThread(void* param)
 }
 
 
-void readElement( uint32_t streamId, uint32_t elementId, uint8_t* element )
-{
-    lseek( fd[streamId], MAX_UDPQUEUE_ELEMENT_SIZE*elementId, SEEK_SET );
-    read( fd[streamId], element, MAX_UDPQUEUE_ELEMENT_SIZE );
-}
-
 
 uint32_t checksumOf( uint8_t* element )
 {
@@ -146,7 +134,8 @@ void udpQueueInit(uint32_t streamId)
 
         uint8_t element[MAX_UDPQUEUE_ELEMENT_SIZE];
         ElementHeader*  header  = (ElementHeader*)element;
-        readElement( streamId, i, &buf[0] );
+        lseek( fd[streamId], MAX_UDPQUEUE_ELEMENT_SIZE*i, SEEK_SET );
+        read( fd[streamId], &buf[0], MAX_UDPQUEUE_ELEMENT_SIZE );
 
         if((header->sequenceNumber >= maxSequenceNumber) && 
            (checksumOf(&buf[sizeof(ElementHeader)]) == header->checksum)) {
