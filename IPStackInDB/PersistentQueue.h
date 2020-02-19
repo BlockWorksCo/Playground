@@ -11,16 +11,13 @@
 #include "ipv6.h"
 
 
-#define MAX_UDPQUEUE_ADDRESS_RANGE      (1024)
-#define MAX_UDPQUEUE_ELEMENT_SIZE       (1024*2)
 
 
+void pqGet( uint32_t pqId, uint8_t* packet, size_t* maxNumberOfBytes );
 
-void udpQueueGet( uint32_t streamId, uint8_t* packet, size_t* maxNumberOfBytes );
+void pqPut( uint32_t pqId, uint8_t* packet, size_t numberOfBytes );
 
-void udpQueuePut( uint32_t streamId, IPv6Address* src, uint8_t* packet, size_t numberOfBytes );
-
-void udpQueueInit(uint32_t streamId);
+void pqInit( uint32_t pqId, size_t elementSize, size_t numberOfElements, void (*cb)(uint8_t*,size_t) );
 
 
 #endif

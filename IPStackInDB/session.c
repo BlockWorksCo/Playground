@@ -4,7 +4,7 @@
 
 #include "session.h"
 #include "udp.h"
-#include "udpQueue.h"
+#include "PersistentQueue.h"
 #include <unistd.h>
 #include <pthread.h>
 
@@ -38,7 +38,7 @@ void sessionProcessUDPPacket(IPv6Address* src, IPv6Address* dst, uint16_t srcPor
     }
 
     // Push the packet into the queue.
-    udpQueuePut( 0, src, packet, numberOfBytes );
+    //pqPut( 0, src, packet, numberOfBytes );
 
     // Process payload
     uint8_t string[128] = {0};

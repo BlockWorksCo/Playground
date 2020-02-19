@@ -1,16 +1,15 @@
 
 
 
-#include "udp.h"
-#include "udpQueue.h"
-#include "ipv6.h"
-
 #include <unistd.h>
 #include <sys/fcntl.h>
 #include <stdio.h>
 #include <pthread.h>
 #include <semaphore.h>
 #include <string.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
 
 #define MAX_PQ      (128)
@@ -24,6 +23,7 @@ struct PQContext
     uint32_t    firstEmptyElement;
     uint32_t    firstFullElement;
     sem_t       dataAvailableSemaphore;
+    void        (*process)(uint8_t*, size_t);
 
 } pqContext[MAX_PQ];
 
@@ -38,34 +38,28 @@ typedef struct
 
 
 
-uint32_t checksumOf( uint8_t* element );
+static uint32_t checksumOf( uint8_t* element, size_t numberOfBytes );
 
 
 
-void udpQueuePut( uint32_t pqId, IPv6Address* src,  uint8_t* packet, size_t numberOfBytes )
+void pqPut( uint32_t pqId, uint8_t* packet, size_t numberOfBytes )
 {
-    lseek( pqContext[pqId].fd, MAX_UDPQUEUE_ELEMENT_SIZE*pqContext[pqId].firstEmptyElement, SEEK_SET );
+    lseek( pqContext[pqId].fd, pqContext[pqId].elementSize*pqContext[pqId].firstEmptyElement, SEEK_SET );
 
     ElementHeader   header  = 
     {
         .sequenceNumber = 0,
-        .checksum       = checksumOf(packet),
+        .checksum       = checksumOf(packet,pqContext[pqId].elementSize),
     };
     write( pqContext[pqId].fd, &header, sizeof(ElementHeader) );
-    write( pqContext[pqId].fd, packet, MAX_UDPQUEUE_ELEMENT_SIZE-sizeof(ElementHeader) );
+    write( pqContext[pqId].fd, packet, pqContext[pqId].elementSize-sizeof(ElementHeader) );
 
     pqContext[pqId].firstEmptyElement  = (pqContext[pqId].firstEmptyElement+1) % pqContext[pqId].numberOfElements;
     sem_post( &pqContext[pqId].dataAvailableSemaphore );
 }
 
 
-void processElement( uint8_t* element )
-{
-    printf("processing packet...\n");
-}
-
-
-void *packetProcessorThread(void* param)
+static void *packetProcessorThread(void* param)
 {
     struct PQContext*   context = (struct PQContext*)param;
 
@@ -83,8 +77,8 @@ void *packetProcessorThread(void* param)
             read( context->fd, &element[0], context->elementSize );
 
             // process it...
-            if(checksumOf(&element[sizeof(ElementHeader)]) == header->checksum) {
-                processElement( &element[sizeof(ElementHeader)] );
+            if(checksumOf(&element[sizeof(ElementHeader)], context->elementSize) == header->checksum) {
+                context->process( (uint8_t*)&element[sizeof(ElementHeader)], context->elementSize );
             }
             else {
                 printf("\n!! bad checksum on packet !!\n");
@@ -102,10 +96,10 @@ void *packetProcessorThread(void* param)
 
 
 
-uint32_t checksumOf( uint8_t* element )
+static uint32_t checksumOf( uint8_t* element, size_t numberOfBytes )
 {
     uint32_t    sum = 0;
-    for(uint32_t i=0; i<MAX_UDPQUEUE_ELEMENT_SIZE-sizeof(ElementHeader); i++) {
+    for(uint32_t i=0; i<numberOfBytes; i++) {
         sum += (uint32_t)element[i];
     }
 
@@ -114,7 +108,7 @@ uint32_t checksumOf( uint8_t* element )
 
 
 
-void pqQueueInit( uint32_t pqId, size_t elementSize, size_t numberOfElements )
+void pqInit( uint32_t pqId, size_t elementSize, size_t numberOfElements, void (*cb)(uint8_t*,size_t) )
 {
     // Determine the name of the backing store for this q and open
     // the file for it.
@@ -130,6 +124,7 @@ void pqQueueInit( uint32_t pqId, size_t elementSize, size_t numberOfElements )
     // Initialise the context.
     pqContext[pqId].elementSize         = elementSize;
     pqContext[pqId].numberOfElements    = numberOfElements;
+    pqContext[pqId].process             = cb;
 
     // Initialise the backing store by writing a byte 1 byte past
     // the calculated end.
@@ -156,14 +151,14 @@ void pqQueueInit( uint32_t pqId, size_t elementSize, size_t numberOfElements )
 
         // check if its good and if so, then is its sequence number increasing?
         if((header->sequenceNumber >= maxSequenceNumber) && 
-           (checksumOf(&buf[sizeof(ElementHeader)]) == header->checksum)) {
+           (checksumOf(&buf[sizeof(ElementHeader)],elementSize) == header->checksum)) {
             maxSequenceNumber   = header->sequenceNumber;
             maxSequencePosition = i;
         }
 
         // check if its good and if so, then is its sequence number decreasing?
         if((header->sequenceNumber <= minSequenceNumber) && 
-           (checksumOf(&buf[sizeof(ElementHeader)]) == header->checksum)) {
+           (checksumOf(&buf[sizeof(ElementHeader)],elementSize) == header->checksum)) {
             minSequenceNumber   = header->sequenceNumber;
             minSequencePosition = i;
         }

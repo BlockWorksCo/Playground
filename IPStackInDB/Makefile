@@ -6,8 +6,7 @@ OBJS    += ipv6.o
 OBJS    += layer1.o
 OBJS    += udp.o
 OBJS    += session.o
-OBJS    += udpQueue.o
-OBJS    += worker.o
+OBJS    += PersistentQueue.o
 
 CFLAGS  += -g
 

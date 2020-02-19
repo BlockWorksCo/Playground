@@ -20,7 +20,7 @@
 #include "layer1.h"
 #include "tun.h"
 #include "ipv6.h"
-#include "udpQueue.h"
+#include "PersistentQueue.h"
 
 /* buffer for reading from tun/tap interface, must be >= 1500 */
 #define BUFSIZE 2000
@@ -35,6 +35,14 @@
 
 
 
+void processIPv6Packet( uint8_t* data, size_t numberOfBytes )
+{
+    //
+    // Decode an ipv6 frame.
+    //
+    decodeFrame( data, numberOfBytes );
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -46,8 +54,7 @@ int main(int argc, char* argv[])
     char buffer[BUFSIZE];
 
     //
-    udpQueueInit(0);
-    udpQueueInit(1);
+    pqInit(0, BUFSIZE, 16, processIPv6Packet);
 
     /* initialize tun/tap interface */
     if ( (tun_fd = tun_alloc(if_name, flags | IFF_NO_PI)) < 0 )
@@ -87,13 +94,13 @@ int main(int argc, char* argv[])
             /* data from tun/tap: just read it and write it to the network */
             nread = cread(tun_fd, buffer, BUFSIZE);
             printf("Read %d bytes from the tap interface\n", nread);
+
             /* write length + packet */
             plength = htons(nread);
             printf("Written %d bytes to the network\n", nwrite);
+
             //
-            // Decode an ethernet frame.
-            //
-            decodeFrame( &buffer[0], nread );
+            pqPut( 0, &buffer[0], nread );
         }
     }
 
