@@ -16,7 +16,7 @@
 #define MAX_PQ      (128)
 
 
-struct 
+struct PQContext
 {
     int         fd;
     size_t      elementSize;
@@ -44,22 +44,22 @@ uint32_t checksumOf( uint8_t* element );
 
 void udpQueuePut( uint32_t pqId, IPv6Address* src,  uint8_t* packet, size_t numberOfBytes )
 {
-    lseek( pqCcontext[pqId].fd, MAX_UDPQUEUE_ELEMENT_SIZE*firstEmptyElement[pqId], SEEK_SET );
+    lseek( pqContext[pqId].fd, MAX_UDPQUEUE_ELEMENT_SIZE*pqContext[pqId].firstEmptyElement, SEEK_SET );
 
     ElementHeader   header  = 
     {
         .sequenceNumber = 0,
         .checksum       = checksumOf(packet),
     };
-    write( pqCcontext[pqId].fd, &header, sizeof(ElementHeader) );
-    write( pqCcontext[pqId].fd, packet, MAX_UDPQUEUE_ELEMENT_SIZE-sizeof(ElementHeader) );
+    write( pqContext[pqId].fd, &header, sizeof(ElementHeader) );
+    write( pqContext[pqId].fd, packet, MAX_UDPQUEUE_ELEMENT_SIZE-sizeof(ElementHeader) );
 
-    firstEmptyElement[pqId]  = (firstEmptyElement[pqId]+1) % QUEUE_DEPTH;
-    sem_post( &dataAvailableSemaphore[pqId] );
+    pqContext[pqId].firstEmptyElement  = (pqContext[pqId].firstEmptyElement+1) % pqContext[pqId].numberOfElements;
+    sem_post( &pqContext[pqId].dataAvailableSemaphore );
 }
 
 
-void processElement( uint32_t pqId, uint8_t* element )
+void processElement( uint8_t* element )
 {
     printf("processing packet...\n");
 }
@@ -67,24 +67,24 @@ void processElement( uint32_t pqId, uint8_t* element )
 
 void *packetProcessorThread(void* param)
 {
-    uint32_t    pqId    = (uint32_t)param;
+    struct PQContext*   context = (struct PQContext*)param;
 
     while(true) {
-        sem_wait( &dataAvailableSemaphore[pqId] );
+        sem_wait( &context->dataAvailableSemaphore );
         printf("\n****[data available]****\n");
 
         // Read all available packets.
-        while( firstFullElement[pqId] != firstEmptyElement[pqId] ) {
+        while( context->firstFullElement != context->firstEmptyElement ) {
 
-            uint8_t element[MAX_UDPQUEUE_ELEMENT_SIZE];
+            uint8_t element[context->elementSize];
             ElementHeader*  header  = (ElementHeader*)element;
 
-            lseek( pqCcontext[pqId].fd, MAX_UDPQUEUE_ELEMENT_SIZE*firstFullElement[pqId], SEEK_SET );
-            read( pqCcontext[pqId].fd, &element[0], MAX_UDPQUEUE_ELEMENT_SIZE );
+            lseek( context->fd, context->elementSize*context->firstFullElement, SEEK_SET );
+            read( context->fd, &element[0], context->elementSize );
 
             // process it...
             if(checksumOf(&element[sizeof(ElementHeader)]) == header->checksum) {
-                processElement( pqId, &element[sizeof(ElementHeader)]);
+                processElement( &element[sizeof(ElementHeader)] );
             }
             else {
                 printf("\n!! bad checksum on packet !!\n");
@@ -92,10 +92,10 @@ void *packetProcessorThread(void* param)
 
             // mark it as bad.
             memset( element, 0xff, 16 );
-            lseek( pqCcontext[pqId].fd, MAX_UDPQUEUE_ELEMENT_SIZE*firstFullElement[pqId], SEEK_SET );
-            write( pqCcontext[pqId].fd, element, MAX_UDPQUEUE_ELEMENT_SIZE );
+            lseek( context->fd, context->elementSize*context->firstFullElement, SEEK_SET );
+            write( context->fd, element, context->elementSize );
 
-            firstFullElement[pqId]  = (firstFullElement[pqId]+1) % QUEUE_DEPTH;
+            context->firstFullElement  = (context->firstFullElement+1) % context->numberOfElements;
         }
     }
 }
@@ -122,18 +122,18 @@ void pqQueueInit( uint32_t pqId, size_t elementSize, size_t numberOfElements )
 
     sprintf(name,"/tmp/pq%d.bin",pqId);
     pqContext[pqId].fd  = open(name, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU | S_IRWXG);
-    if( pqCcontext[pqId].fd == -1 ) {
+    if( pqContext[pqId].fd == -1 ) {
         printf("\nCant open pq.\n");
         exit(-1);
     }
 
     // Initialise the context.
     pqContext[pqId].elementSize         = elementSize;
-    pqContext[pqId].numberOfElements    = numberOfelements;
+    pqContext[pqId].numberOfElements    = numberOfElements;
 
     // Initialise the backing store by writing a byte 1 byte past
     // the calculated end.
-    off_t    fileSize    = QUEUE_DEPTH * MAX_UDPQUEUE_ELEMENT_SIZE;
+    off_t    fileSize    = pqContext[pqId].elementSize * pqContext[pqId].numberOfElements;
     lseek( pqContext[pqId].fd, fileSize+1, SEEK_SET );
     uint8_t temp    = 0;
     write( pqContext[pqId].fd, &temp, 1 );
@@ -144,20 +144,24 @@ void pqQueueInit( uint32_t pqId, size_t elementSize, size_t numberOfElements )
     uint32_t    maxSequencePosition = -1;
     int32_t     minSequenceNumber   = -1;
     uint32_t    minSequencePosition = -1;
-    uint8_t     buf[MAX_UDPQUEUE_ELEMENT_SIZE]  = {0};
-    for(uint32_t i=0; i<QUEUE_DEPTH; i++) {
+    uint8_t     buf[pqContext[pqId].elementSize];
 
-        uint8_t element[MAX_UDPQUEUE_ELEMENT_SIZE];
-        ElementHeader*  header  = (ElementHeader*)element;
-        lseek( pqCcontext[pqId].fd, MAX_UDPQUEUE_ELEMENT_SIZE*i, SEEK_SET );
-        read( pqCcontext[pqId].fd, &buf[0], MAX_UDPQUEUE_ELEMENT_SIZE );
+    // For each element...
+    for(uint32_t i=0; i<pqContext[pqId].numberOfElements; i++) {
 
+        // read in the element.
+        ElementHeader*  header  = (ElementHeader*)&buf[0];
+        lseek( pqContext[pqId].fd, pqContext[pqId].elementSize*i, SEEK_SET );
+        read( pqContext[pqId].fd, &buf[0], pqContext[pqId].elementSize );
+
+        // check if its good and if so, then is its sequence number increasing?
         if((header->sequenceNumber >= maxSequenceNumber) && 
            (checksumOf(&buf[sizeof(ElementHeader)]) == header->checksum)) {
             maxSequenceNumber   = header->sequenceNumber;
             maxSequencePosition = i;
         }
 
+        // check if its good and if so, then is its sequence number decreasing?
         if((header->sequenceNumber <= minSequenceNumber) && 
            (checksumOf(&buf[sizeof(ElementHeader)]) == header->checksum)) {
             minSequenceNumber   = header->sequenceNumber;
@@ -165,24 +169,24 @@ void pqQueueInit( uint32_t pqId, size_t elementSize, size_t numberOfElements )
         }
     }
 
+    // Check if we found a good element or not...
     if(maxSequenceNumber == -1) {
-        firstEmptyElement[pqId] = 0;
-        firstFullElement[pqId]  = 0;
+        // No good elements, so set everything to init position.
+        pqContext[pqId].firstEmptyElement = 0;
+        pqContext[pqId].firstFullElement  = 0;
     }
     else {
-        // ...then store the first empty slot index.
-        firstEmptyElement[pqId] = (maxSequencePosition+1)%QUEUE_DEPTH;
-
-        // ...and the first full slot index.
-        firstFullElement[pqId] = minSequencePosition;
+        // We have good elements already, so init the pointers.
+        pqContext[pqId].firstEmptyElement = (maxSequencePosition+1)%pqContext[pqId].numberOfElements;;
+        pqContext[pqId].firstFullElement = minSequencePosition;
     }
 
-    //
-    sem_init( &dataAvailableSemaphore[pqId], 0, 0 );
+    // Create a semaphore for triggering the reader.
+    sem_init( &pqContext[pqId].dataAvailableSemaphore, 0, 0 );
 
     // Start a reader thread.
     pthread_t   threadId;
-    if(pthread_create( &threadId, NULL, packetProcessorThread, (void*)pqId)) {
+    if(pthread_create( &threadId, NULL, packetProcessorThread, (void*)&pqContext[pqId])) {
         fprintf(stderr, "Error creating thread\n");
         exit(-1);
     }   
