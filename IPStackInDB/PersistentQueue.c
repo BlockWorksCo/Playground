@@ -49,7 +49,7 @@ void pqPut( uint32_t pqId, uint8_t* packet, size_t numberOfBytes )
     ElementHeader   header  = 
     {
         .sequenceNumber = 0,
-        .checksum       = checksumOf(packet,pqContext[pqId].elementSize),
+        .checksum       = checksumOf(packet,pqContext[pqId].elementSize-sizeof(ElementHeader)),
     };
     write( pqContext[pqId].fd, &header, sizeof(ElementHeader) );
     write( pqContext[pqId].fd, packet, pqContext[pqId].elementSize-sizeof(ElementHeader) );
@@ -77,7 +77,7 @@ static void *packetProcessorThread(void* param)
             read( context->fd, &element[0], context->elementSize );
 
             // process it...
-            if(checksumOf(&element[sizeof(ElementHeader)], context->elementSize) == header->checksum) {
+            if(checksumOf(&element[sizeof(ElementHeader)], context->elementSize-sizeof(ElementHeader)) == header->checksum) {
                 context->process( (uint8_t*)&element[sizeof(ElementHeader)], context->elementSize );
             }
             else {
@@ -110,6 +110,9 @@ static uint32_t checksumOf( uint8_t* element, size_t numberOfBytes )
 
 void pqInit( uint32_t pqId, size_t elementSize, size_t numberOfElements, void (*cb)(uint8_t*,size_t) )
 {
+    // Adjust for header size.
+    elementSize += sizeof(ElementHeader);
+
     // Determine the name of the backing store for this q and open
     // the file for it.
     char    name[64]    = {0};
