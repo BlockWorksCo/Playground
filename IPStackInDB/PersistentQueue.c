@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 
 #define MAX_PQ      (128)
@@ -24,6 +25,7 @@ struct PQContext
     uint32_t    firstFullElement;
     sem_t       dataAvailableSemaphore;
     void        (*process)(uint8_t*, size_t);
+    uint32_t    nextSequenceElementToWrite;
 
 } pqContext[MAX_PQ];
 
@@ -33,7 +35,7 @@ typedef struct
     uint32_t    sequenceNumber;
     uint32_t    checksum;
 
-} ElementHeader;
+} __attribute__((packed)) ElementHeader;
 
 
 
@@ -44,17 +46,19 @@ static uint32_t checksumOf( uint8_t* element, size_t numberOfBytes );
 
 void pqPut( uint32_t pqId, uint8_t* packet, size_t numberOfBytes )
 {
-    lseek( pqContext[pqId].fd, pqContext[pqId].elementSize*pqContext[pqId].firstEmptyElement, SEEK_SET );
 
     ElementHeader   header  = 
     {
-        .sequenceNumber = 0,
+        .sequenceNumber = pqContext[pqId].nextSequenceElementToWrite,
         .checksum       = checksumOf(packet,pqContext[pqId].elementSize-sizeof(ElementHeader)),
     };
+    lseek( pqContext[pqId].fd, pqContext[pqId].elementSize*pqContext[pqId].firstEmptyElement, SEEK_SET );
     write( pqContext[pqId].fd, &header, sizeof(ElementHeader) );
     write( pqContext[pqId].fd, packet, pqContext[pqId].elementSize-sizeof(ElementHeader) );
 
     pqContext[pqId].firstEmptyElement  = (pqContext[pqId].firstEmptyElement+1) % pqContext[pqId].numberOfElements;
+    pqContext[pqId].nextSequenceElementToWrite  = pqContext[pqId].nextSequenceElementToWrite+1;
+
     sem_post( &pqContext[pqId].dataAvailableSemaphore );
 }
 
@@ -65,7 +69,6 @@ static void *packetProcessorThread(void* param)
 
     while(true) {
         sem_wait( &context->dataAvailableSemaphore );
-        printf("\n****[data available]****\n");
 
         // Read all available packets.
         while( context->firstFullElement != context->firstEmptyElement ) {
@@ -74,18 +77,19 @@ static void *packetProcessorThread(void* param)
             ElementHeader*  header  = (ElementHeader*)element;
 
             lseek( context->fd, context->elementSize*context->firstFullElement, SEEK_SET );
-            read( context->fd, &element[0], context->elementSize );
+            read( context->fd, &element[0], sizeof(element) );
 
             // process it...
             if(checksumOf(&element[sizeof(ElementHeader)], context->elementSize-sizeof(ElementHeader)) == header->checksum) {
-                context->process( (uint8_t*)&element[sizeof(ElementHeader)], context->elementSize );
+                printf("\n****[data available %"PRIu32"]****\n",header->sequenceNumber);
+                context->process( (uint8_t*)&element[sizeof(ElementHeader)], context->elementSize-sizeof(ElementHeader) );
             }
             else {
-                printf("\n!! bad checksum on packet !!\n");
+                printf("\n!! bad checksum on packet in slot %"PRIu32" !!\n", context->firstFullElement);
             }
 
             // mark it as bad.
-            memset( element, 0xff, 16 );
+            memset( element, 0xff, sizeof(ElementHeader) );
             lseek( context->fd, context->elementSize*context->firstFullElement, SEEK_SET );
             write( context->fd, element, context->elementSize );
 
@@ -140,7 +144,7 @@ void pqInit( uint32_t pqId, size_t elementSize, size_t numberOfElements, void (*
     // a good checksum)...
     int32_t     maxSequenceNumber   = -1;
     uint32_t    maxSequencePosition = -1;
-    int32_t     minSequenceNumber   = -1;
+    int32_t     minSequenceNumber   = INT32_MAX;
     uint32_t    minSequencePosition = -1;
     uint8_t     buf[pqContext[pqId].elementSize];
 
@@ -172,12 +176,18 @@ void pqInit( uint32_t pqId, size_t elementSize, size_t numberOfElements, void (*
         // No good elements, so set everything to init position.
         pqContext[pqId].firstEmptyElement = 0;
         pqContext[pqId].firstFullElement  = 0;
+        pqContext[pqId].nextSequenceElementToWrite  = 0;
     }
     else {
         // We have good elements already, so init the pointers.
         pqContext[pqId].firstEmptyElement = (maxSequencePosition+1)%pqContext[pqId].numberOfElements;;
         pqContext[pqId].firstFullElement = minSequencePosition;
+        pqContext[pqId].nextSequenceElementToWrite  = maxSequenceNumber+1;
     }
+
+    printf("1st empty=%"PRIu32"\n",pqContext[pqId].firstEmptyElement);
+    printf("1st full=%"PRIu32"\n",pqContext[pqId].firstFullElement);
+    printf("nextSeqNum=%"PRIu32"\n",pqContext[pqId].nextSequenceElementToWrite);
 
     // Create a semaphore for triggering the reader.
     sem_init( &pqContext[pqId].dataAvailableSemaphore, 0, 0 );

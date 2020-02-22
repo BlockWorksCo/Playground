@@ -20,7 +20,7 @@
 
 #include "PersistentQueue.h"
 
-#define BUFSIZE 2000
+#define BUFSIZE 120
 
 
 void processIPv6Packet( uint8_t* data, size_t numberOfBytes )
@@ -28,7 +28,7 @@ void processIPv6Packet( uint8_t* data, size_t numberOfBytes )
     //
     // Decode an ipv6 frame.
     //
-    char    buffer[BUFSIZE] = {0};
+    char    buffer[numberOfBytes];
     memcpy( &buffer[0], data, numberOfBytes);
     printf("%zdB [%s]\n", numberOfBytes, buffer);
 }
@@ -37,17 +37,17 @@ void processIPv6Packet( uint8_t* data, size_t numberOfBytes )
 int main(int argc, char* argv[])
 {
     //
-    pqInit(0, BUFSIZE, 16, processIPv6Packet);
+    pqInit(0, BUFSIZE, 4, processIPv6Packet);
 
     //
     pqPut( 0, "Hello World1", 13 );
     pqPut( 0, "Hello World2", 13 );
-    pqPut( 0, "Hello World3", 13 );
-    pqPut( 0, "Hello World4", 13 );
-    pqPut( 0, "Hello World5", 13 );
-    pqPut( 0, "Hello World6", 13 );
-    pqPut( 0, "Hello World7", 13 );
-    pqPut( 0, "Hello World8", 13 );
+    //pqPut( 0, "Hello World3", 13 );
+    //pqPut( 0, "Hello World4", 13 );
+    //pqPut( 0, "Hello World5", 13 );
+    //pqPut( 0, "Hello World6", 13 );
+    //pqPut( 0, "Hello World7", 13 );
+    //pqPut( 0, "Hello World8", 13 );
 
     sleep(1);
 
