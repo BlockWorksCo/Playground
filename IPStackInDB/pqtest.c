@@ -20,7 +20,7 @@
 
 #include "PersistentQueue.h"
 
-#define BUFSIZE 120
+#define BUFSIZE 56
 
 
 void processIPv6Packet( uint8_t* data, size_t numberOfBytes )
@@ -42,12 +42,12 @@ int main(int argc, char* argv[])
     //
     pqPut( 0, "Hello World1", 13 );
     pqPut( 0, "Hello World2", 13 );
-    //pqPut( 0, "Hello World3", 13 );
-    //pqPut( 0, "Hello World4", 13 );
-    //pqPut( 0, "Hello World5", 13 );
-    //pqPut( 0, "Hello World6", 13 );
-    //pqPut( 0, "Hello World7", 13 );
-    //pqPut( 0, "Hello World8", 13 );
+    pqPut( 0, "Hello World3", 13 );
+    pqPut( 0, "Hello World4", 13 );
+    pqPut( 0, "Hello World5", 13 );
+    pqPut( 0, "Hello World6", 13 );
+    pqPut( 0, "Hello World7", 13 );
+    pqPut( 0, "Hello World8", 13 );
 
     sleep(1);
 
