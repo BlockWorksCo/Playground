@@ -34,6 +34,11 @@
 #define ARP_PKT_LEN 28
 
 
+void transmitIPv6Packet( uint8_t* data, size_t numberOfBytes )
+{
+    printf("<writing %zd bytes to tun>\n", numberOfBytes);
+    cwrite(tun_fd, data, numberOfBytes);
+}
 
 void processIPv6Packet( uint8_t* data, size_t numberOfBytes )
 {
@@ -55,6 +60,7 @@ int main(int argc, char* argv[])
 
     //
     pqInit(0, BUFSIZE, 16, processIPv6Packet);
+    pqInit(1, BUFSIZE, 16, transmitIPv6Packet);
 
     /* initialize tun/tap interface */
     if ( (tun_fd = tun_alloc(if_name, flags | IFF_NO_PI)) < 0 )

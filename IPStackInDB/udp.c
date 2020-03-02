@@ -17,6 +17,7 @@
 #include "tun.h"
 #include "udp.h"
 #include "session.h"
+#include "PersistentQueue.h"
 
 
 typedef struct
@@ -169,7 +170,8 @@ void encodeUDPFrame( IPv6Address* src, IPv6Address* dst, uint16_t srcPort, uint1
     printf("outgoing frame:");
     dumpHex( packet, ipv6PacketLength );
     // transmit the packet.
-    uint16_t nwrite = cwrite(tun_fd, &packet[0], ipv6PacketLength);
+    pqPut( 1, &packet[0], ipv6PacketLength );
+    //uint16_t nwrite = cwrite(tun_fd, &packet[0], ipv6PacketLength);
     printf("replied...\n");
 }
 
