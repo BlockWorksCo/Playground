@@ -64,3 +64,9 @@ void decodeFrame( uint8_t* frame, size_t numberOfBytes )
 
 
 
+void encodeFrame( uint8_t* frame, size_t numberOfBytes )
+{
+}
+
+
+
