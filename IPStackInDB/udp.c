@@ -196,10 +196,15 @@ void decodeUDPFrame( IPv6Address* src, IPv6Address* dst, uint8_t* frame, size_t 
         uint16_t checkValue = udpChecksum( *src, *dst, srcPort, dstPort, udpPacketLength - 8, udpPayload );
         printf("\n[%04x == %04x]\n", udpCheckSum, checkValue);
 
-        //
+        // Pass it up the layer stack.
         sessionProcessUDPPacket( src, dst, srcPort, dstPort, udpPayload, udpPacketLength-8 );
     }
 }
 
 
+
+void udpInit()
+{
+    sessionInit();
+}
 

@@ -70,3 +70,7 @@ void encodeFrame( uint8_t* frame, size_t numberOfBytes )
 
 
 
+void ipv6Init()
+{
+    udpInit();
+}

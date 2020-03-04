@@ -11,35 +11,92 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "wolfssl_config.h"
-#include "wolfssl/ssl.h"
-#include "wolfssl/error-ssl.h"
-#include "wolfssl/wolfcrypt/asn.h"
-#include "wolfssl/wolfcrypt/logging.h"
+#include <wolfssl/ssl.h>
 
 
-static struct WOLFSSL_CTX* s_ctx;
+// TODO: Place these in a session-context.
+static struct WOLFSSL_CTX*  ctx         = NULL;
+WOLFSSL*                    ssl         = NULL;
 
-bool sessionExists  = false;
+IPv6Address*    lastRxPacketSrc         = NULL;
+IPv6Address*    lastRxPacketDst         = NULL;
+uint16_t        lastRxPacketSrcPort     = 0;
+uint16_t        lastRxPacketDstPort     = 0;
+
+size_t          numberOfBytesInCurrentPacket    = 0;
+size_t          currentPacketReadOffset         = 0;
+uint8_t*        currentPacket                   = NULL;
 
 
-void setupSession()
+
+int myCBIORecv(WOLFSSL *ssl, char *buf, int sz, void *ctx)
 {
-    struct WOLFSSL* ssl = wolfSSL_new(s_ctx);
+    // Read up to the specified amount from the current packet or
+    // whatever we have.
+    int numBytesToRead = numberOfBytesInCurrentPacket;
+    if (numBytesToRead > sz) {
+        numBytesToRead = sz;
+    }
+
+    // Read data from the currentPacket or let the callee know we
+    // haven't got any data.
+    if (numBytesToRead > 0) {
+       
+        // Take the bytes from the currentPacket...
+        memcpy( buf, &currentPacket[currentPacketReadOffset], numBytesToRead );
+
+        // ...then move the pointers onwards.
+        numberOfBytesInCurrentPacket    -= numBytesToRead;
+        currentPacketReadOffset         += numBytesToRead;
+
+        // Discard packet if we've read it all
+        if( numberOfBytesInCurrentPacket <= 0 ) {
+
+            // clear it all down.
+            free(currentPacket);
+            numberOfBytesInCurrentPacket    = 0;
+            currentPacketReadOffset         = 0;
+            currentPacket                   = NULL;
+        }
+    }
+    else {
+
+        // Need more data.
+        return WOLFSSL_CBIO_ERR_WANT_READ;
+    }
+
+    return numBytesToRead;
 }
+
+int myCBIOSend(WOLFSSL *ssl, char *buf, int sz, void *ctx)
+{
+    // send the packet back to the originator.
+    encodeUDPFrame( lastRxPacketDst, lastRxPacketSrc, lastRxPacketDstPort, lastRxPacketSrcPort, buf, sz );
+
+    return sz;
+}
+
+
 
 
 void sessionProcessUDPPacket(IPv6Address* src, IPv6Address* dst, uint16_t srcPort, uint16_t dstPort, uint8_t* packet, size_t numberOfBytes )
 {
-    //
-    if(sessionExists == false) {
-        setupSession();
-        sessionExists   = true;
-    }
+    printf("<enter %s>\n",__func__);
 
-    // Push the packet into the queue.
-    //pqPut( 0, src, packet, numberOfBytes );
+    // TODO: Put this in a session context.
+    lastRxPacketSrc     = src;
+    lastRxPacketDst     = dst;
+    lastRxPacketSrcPort = srcPort;
+    lastRxPacketDstPort = dstPort;
+    
+    // Take a copy of the packet.
+    currentPacket   = (uint8_t*)malloc(numberOfBytes);
+    numberOfBytesInCurrentPacket    = numberOfBytes;
+    currentPacketReadOffset         = 0;
 
+    // Let WolfSSL process the packet via the I/O callbacks.
+
+#ifdef CONFIG_ECHO_SERVER
     // Process payload
     uint8_t string[128] = {0};
     memcpy( &string[0], packet, numberOfBytes );
@@ -51,11 +108,77 @@ void sessionProcessUDPPacket(IPv6Address* src, IPv6Address* dst, uint16_t srcPor
     uint8_t     response[128]   = {0};
     sprintf(response,"[%s]",string);
     encodeUDPFrame( src, dst, srcPort, dstPort, response, strlen(response) );
+#endif
+
+    printf("<exit %s>\n",__func__);
 }
 
 
 
 void sessionInit()
 {
+    //
+    wolfSSL_Init();
+
+    /* Set ctx to DTLS 1.2 */
+    if ((ctx = wolfSSL_CTX_new(wolfDTLSv1_2_server_method())) == NULL) {
+        printf("wolfSSL_CTX_new error.\n");
+    }
+
+    char        caCertLoc[] = "ca-cert.pem";
+    char        servCertLoc[] = "server-cert.pem";
+    char        servKeyLoc[] = "server-key.pem";
+
+    /* Load CA certificates */
+    if (wolfSSL_CTX_load_verify_locations(ctx,caCertLoc,0) !=
+            SSL_SUCCESS) {
+        printf("Error loading %s, please check the file.\n", caCertLoc);
+    }
+
+    /* Load server certificates */
+    if (wolfSSL_CTX_use_certificate_file(ctx, servCertLoc, SSL_FILETYPE_PEM) != SSL_SUCCESS) {
+        printf("Error loading %s, please check the file.\n", servCertLoc);
+    }
+
+    /* Load server Keys */
+    if (wolfSSL_CTX_use_PrivateKey_file(ctx, servKeyLoc,
+                SSL_FILETYPE_PEM) != SSL_SUCCESS) {
+        printf("Error loading %s, please check the file.\n", servKeyLoc);
+    }
+
+    /* Create the WOLFSSL Object */
+    int         cont = 0;
+    static int cleanup = 0;
+    if ((ssl = wolfSSL_new(ctx)) == NULL) {
+        printf("wolfSSL_new error.\n");
+        cleanup = 1;
+        cont = 1;
+    }
+
+    //
+    wolfSSL_SetIORecv(ctx, myCBIORecv);
+    wolfSSL_SetIOSend(ctx, myCBIOSend);
+
+    wolfSSL_SetIOReadCtx(ssl, NULL);
+    wolfSSL_SetIOWriteCtx(ssl, NULL);
+    wolfSSL_set_using_nonblock(ssl, 1);
+
+    // turn on EC support
+    wolfSSL_CTX_UseSupportedCurve(ctx, WOLFSSL_ECC_SECP256R1);
+    // turn on trusted_ca_keys extension support
+    //wolfSSL_CTX_UseTrustedCaKeys(ctx);
+
+    // limit the list of supported suites
+    wolfSSL_CTX_set_cipher_list(ctx, "ECDHE-ECDSA-AES128-CCM-8");
+
+    //
+    wolfSSL_set_verify(ssl, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
+
+    //
+    int res = wolfSSL_negotiate(ssl);
+
+    if( wolfSSL_is_init_finished(ssl) != 0 ) {
+        printf("DTLS session negotiated.\n");
+    }
 }
 
