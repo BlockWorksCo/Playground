@@ -9,6 +9,8 @@ OBJS    += session.o
 OBJS    += PersistentQueue.o
 
 CFLAGS  += -g
+CFLAGS  += -DWOLFSSL_DTLS
+CFLAGS  += -DHAVE_SUPPORTED_CURVES
 
 
 all: main
