@@ -31,6 +31,8 @@ uint8_t*        currentPacket                   = NULL;
 
 int myCBIORecv(WOLFSSL *ssl, char *buf, int sz, void *ctx)
 {
+    printf("<enter %s>\n",__func__);
+
     // Read up to the specified amount from the current packet or
     // whatever we have.
     int numBytesToRead = numberOfBytesInCurrentPacket;
@@ -65,13 +67,19 @@ int myCBIORecv(WOLFSSL *ssl, char *buf, int sz, void *ctx)
         return WOLFSSL_CBIO_ERR_WANT_READ;
     }
 
+    printf("<exit %s>\n",__func__);
+
     return numBytesToRead;
 }
 
 int myCBIOSend(WOLFSSL *ssl, char *buf, int sz, void *ctx)
 {
+    printf("<enter %s>\n",__func__);
+
     // send the packet back to the originator.
     encodeUDPFrame( lastRxPacketDst, lastRxPacketSrc, lastRxPacketDstPort, lastRxPacketSrcPort, buf, sz );
+
+    printf("<exit %s>\n",__func__);
 
     return sz;
 }
@@ -89,12 +97,22 @@ void sessionProcessUDPPacket(IPv6Address* src, IPv6Address* dst, uint16_t srcPor
     lastRxPacketSrcPort = srcPort;
     lastRxPacketDstPort = dstPort;
     
-    // Take a copy of the packet.
-    currentPacket   = (uint8_t*)malloc(numberOfBytes);
-    numberOfBytesInCurrentPacket    = numberOfBytes;
-    currentPacketReadOffset         = 0;
+    if( currentPacket != NULL) {
+        printf("got packet too quickly, dropping it.\n");
+    }
+    else {
+
+        // Take a copy of the packet.
+        currentPacket   = (uint8_t*)malloc(numberOfBytes);
+        numberOfBytesInCurrentPacket    = numberOfBytes;
+        currentPacketReadOffset         = 0;
+    }
 
     // Let WolfSSL process the packet via the I/O callbacks.
+    int res = wolfSSL_read( ssl, packet, numberOfBytes );
+
+    //
+    //res = wolfSSL_write( ssl, packet, numberOfBytes);
 
 #ifdef CONFIG_ECHO_SERVER
     // Process payload
@@ -155,13 +173,14 @@ void sessionInit()
         cont = 1;
     }
 
-    //
+    // setup IO plumbing
     wolfSSL_SetIORecv(ctx, myCBIORecv);
     wolfSSL_SetIOSend(ctx, myCBIOSend);
+    wolfSSL_set_using_nonblock(ssl, 1);
 
+    // Setup current context.
     wolfSSL_SetIOReadCtx(ssl, NULL);
     wolfSSL_SetIOWriteCtx(ssl, NULL);
-    wolfSSL_set_using_nonblock(ssl, 1);
 
     // turn on EC support
     wolfSSL_CTX_UseSupportedCurve(ctx, WOLFSSL_ECC_SECP256R1);
