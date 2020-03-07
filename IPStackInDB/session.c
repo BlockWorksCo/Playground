@@ -12,6 +12,7 @@
 #include <stdio.h>
 
 #include <wolfssl/ssl.h>
+#include <wolfssl/wolfio.h>
 
 
 // TODO: Place these in a session-context.
@@ -63,11 +64,12 @@ int myCBIORecv(WOLFSSL *ssl, char *buf, int sz, void *ctx)
     }
     else {
 
+        printf("need more data!\n");
         // Need more data.
         return WOLFSSL_CBIO_ERR_WANT_READ;
     }
 
-    printf("<exit %s>\n",__func__);
+    printf("<exit %s numBytesToRead=%d>\n",__func__,numBytesToRead);
 
     return numBytesToRead;
 }
@@ -106,6 +108,7 @@ void sessionProcessUDPPacket(IPv6Address* src, IPv6Address* dst, uint16_t srcPor
         currentPacket   = (uint8_t*)malloc(numberOfBytes);
         numberOfBytesInCurrentPacket    = numberOfBytes;
         currentPacketReadOffset         = 0;
+        memcpy( &currentPacket[0], packet, numberOfBytes );
     }
 
     // Let WolfSSL process the packet via the I/O callbacks.
@@ -138,6 +141,9 @@ void sessionInit()
     //
     wolfSSL_Init();
 
+    //
+    wolfSSL_Debugging_ON();
+
     /* Set ctx to DTLS 1.2 */
     if ((ctx = wolfSSL_CTX_new(wolfDTLSv1_2_server_method())) == NULL) {
         printf("wolfSSL_CTX_new error.\n");
@@ -147,22 +153,30 @@ void sessionInit()
     char        servCertLoc[] = "server-cert.pem";
     char        servKeyLoc[] = "server-key.pem";
 
-    /* Load CA certificates */
-    if (wolfSSL_CTX_load_verify_locations(ctx,caCertLoc,0) !=
-            SSL_SUCCESS) {
-        printf("Error loading %s, please check the file.\n", caCertLoc);
-    }
+     /* Set ctx to DTLS 1.2 */
+     if ((ctx = wolfSSL_CTX_new(wolfDTLSv1_2_server_method())) == NULL) {
+         printf("wolfSSL_CTX_new error.\n");
+         return;
+     }
+     /* Load CA certificates */
+     if (wolfSSL_CTX_load_verify_locations(ctx,caCertLoc,0) !=
+             SSL_SUCCESS) {
+         printf("Error loading %s, please check the file.\n", caCertLoc);
+         return;
+     }
+     /* Load server certificates */
+     if (wolfSSL_CTX_use_certificate_file(ctx, servCertLoc, SSL_FILETYPE_PEM) !=
+             SSL_SUCCESS) {
+         printf("Error loading %s, please check the file.\n", servCertLoc);
+         return;
+     }
+     /* Load server Keys */
+     if (wolfSSL_CTX_use_PrivateKey_file(ctx, servKeyLoc,
+                 SSL_FILETYPE_PEM) != SSL_SUCCESS) {
+         printf("Error loading %s, please check the file.\n", servKeyLoc);
+         return;
+     }
 
-    /* Load server certificates */
-    if (wolfSSL_CTX_use_certificate_file(ctx, servCertLoc, SSL_FILETYPE_PEM) != SSL_SUCCESS) {
-        printf("Error loading %s, please check the file.\n", servCertLoc);
-    }
-
-    /* Load server Keys */
-    if (wolfSSL_CTX_use_PrivateKey_file(ctx, servKeyLoc,
-                SSL_FILETYPE_PEM) != SSL_SUCCESS) {
-        printf("Error loading %s, please check the file.\n", servKeyLoc);
-    }
 
     /* Create the WOLFSSL Object */
     int         cont = 0;
@@ -174,8 +188,8 @@ void sessionInit()
     }
 
     // setup IO plumbing
-    wolfSSL_SetIORecv(ctx, myCBIORecv);
-    wolfSSL_SetIOSend(ctx, myCBIOSend);
+    wolfSSL_SSLSetIORecv(ssl, myCBIORecv);
+    wolfSSL_SSLSetIOSend(ssl, myCBIOSend);
     wolfSSL_set_using_nonblock(ssl, 1);
 
     // Setup current context.
@@ -189,12 +203,13 @@ void sessionInit()
 
     // limit the list of supported suites
     wolfSSL_CTX_set_cipher_list(ctx, "ECDHE-ECDSA-AES128-CCM-8");
+    wolfSSL_CTX_set_cipher_list(ctx, "ECDHE-ECDSA-AES128-CBC-SHA");
 
     //
     wolfSSL_set_verify(ssl, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
 
     //
-    int res = wolfSSL_negotiate(ssl);
+    //int res = wolfSSL_negotiate(ssl);
 
     if( wolfSSL_is_init_finished(ssl) != 0 ) {
         printf("DTLS session negotiated.\n");

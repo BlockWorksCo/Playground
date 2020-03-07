@@ -73,6 +73,9 @@ int main(int argc, char* argv[])
 
     printf("Successfully connected to interface %s\n", if_name);
 
+    //
+    ipv6Init();
+
     /* use select() to handle two descriptors at once */
     maxfd = tun_fd;
     printf("Entering main loop.\n");

@@ -195,6 +195,12 @@ void decodeUDPFrame( IPv6Address* src, IPv6Address* dst, uint8_t* frame, size_t 
         // Integrity check.
         uint16_t checkValue = udpChecksum( *src, *dst, srcPort, dstPort, udpPacketLength - 8, udpPayload );
         printf("\n[%04x == %04x]\n", udpCheckSum, checkValue);
+    }
+
+    // DTLS packets sent to port 11111.
+    if(dstPort == 11111) {
+
+        printf("<DTLS packet received>\n");
 
         // Pass it up the layer stack.
         sessionProcessUDPPacket( src, dst, srcPort, dstPort, udpPayload, udpPacketLength-8 );

@@ -54,5 +54,9 @@ sudo ip -6 route add fd00::1/64 dev tun1
 nc -6 -u fd00::2 80
 
 
-sudo tshark -i tun1 -V  -o udp.check_checksum:TRUE
+sudo tshark -i tun1 -pV  -o udp.check_checksum:TRUE
+
+configure WolfSSL with ome/steve/Projects/wolfssl'
+steve@steveslaptop:~/Projects/wolfssl$ ./configure --enable-debug --enable-dtls --enable-static
+
 
