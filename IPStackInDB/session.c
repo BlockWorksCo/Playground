@@ -12,6 +12,7 @@
 #include <stdio.h>
 
 #include <wolfssl/ssl.h>
+#include <wolfssl/wolfio.h>
 
 
 // TODO: Place these in a session-context.
@@ -174,8 +175,8 @@ void sessionInit()
     }
 
     // setup IO plumbing
-    wolfSSL_SetIORecv(ctx, myCBIORecv);
-    wolfSSL_SetIOSend(ctx, myCBIOSend);
+    wolfSSL_SSLSetIORecv(ssl, myCBIORecv);
+    wolfSSL_SSLSetIOSend(ssl, myCBIOSend);
     wolfSSL_set_using_nonblock(ssl, 1);
 
     // Setup current context.
