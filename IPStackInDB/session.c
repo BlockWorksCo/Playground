@@ -94,10 +94,10 @@ void sessionProcessUDPPacket(IPv6Address* src, IPv6Address* dst, uint16_t srcPor
     printf("<enter %s>\n",__func__);
 
     // TODO: Put this in a session context.
-    lastRxPacketSrc     = src;
-    lastRxPacketDst     = dst;
-    lastRxPacketSrcPort = srcPort;
-    lastRxPacketDstPort = dstPort;
+    lastRxPacketSrc     = dst;
+    lastRxPacketDst     = src;
+    lastRxPacketSrcPort = dstPort;
+    lastRxPacketDstPort = srcPort;
     
     if( currentPacket != NULL) {
         printf("got packet too quickly, dropping it.\n");

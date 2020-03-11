@@ -141,7 +141,7 @@ uint16_t udpChecksum( IPv6Address src, IPv6Address dst, uint16_t srcPort, uint16
 
 void encodeUDPFrame( IPv6Address* src, IPv6Address* dst, uint16_t srcPort, uint16_t dstPort, uint8_t* payload, size_t payloadSize )
 {
-    uint8_t         packet[128] = {0};
+    uint8_t         packet[2048] = {0};
     uint32_t   ipv6PacketLength    = 40 + 8 + payloadSize;
     printf("[ipv6PacketLength=%d]\n", ipv6PacketLength);
     packet[0]       = 0x60;
