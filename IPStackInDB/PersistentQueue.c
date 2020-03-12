@@ -37,6 +37,7 @@ typedef struct
 {
     uint32_t    sequenceNumber;
     uint32_t    checksum;
+    uint32_t    bytesUsed;
 
 } __attribute__((packed)) ElementHeader;
 
@@ -54,6 +55,7 @@ void pqPut( uint32_t pqId, uint8_t* packet, size_t numberOfBytes )
     {
         .sequenceNumber = pqContext[pqId].nextSequenceElementToWrite,
         .checksum       = checksumOf(packet,pqContext[pqId].payloadSize),
+        .bytesUsed      = numberOfBytes,
     };
 
     pthread_mutex_lock(&pqContext[pqId].lock);
@@ -95,7 +97,7 @@ static void *packetProcessorThread(void* param)
             // process it...
             if(checksumOf(payload, context->payloadSize) == header->checksum) {
                 //printf("\n****[data available %"PRIu32"]****\n",header->sequenceNumber);
-                context->process( payload, context->payloadSize );
+                context->process( payload, header->bytesUsed );
             }
             else {
                 printf("\n!! bad checksum on packet in slot %"PRIu32" !!\n", context->firstFullElement);

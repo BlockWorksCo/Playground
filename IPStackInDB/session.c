@@ -38,6 +38,7 @@ int myCBIORecv(WOLFSSL *ssl, char *buf, int sz, void *ctx)
     // whatever we have.
     int numBytesToRead = numberOfBytesInCurrentPacket;
     if (numBytesToRead > sz) {
+        printf("got %d bytes but limited to returning %d bytes\n",numberOfBytesInCurrentPacket,sz);
         numBytesToRead = sz;
     }
 
@@ -60,6 +61,9 @@ int myCBIORecv(WOLFSSL *ssl, char *buf, int sz, void *ctx)
             numberOfBytesInCurrentPacket    = 0;
             currentPacketReadOffset         = 0;
             currentPacket                   = NULL;
+        }
+        else {
+            printf("leaving %;d leftover bytes\n",numberOfBytesInCurrentPacket);
         }
     }
     else {
@@ -91,25 +95,22 @@ int myCBIOSend(WOLFSSL *ssl, char *buf, int sz, void *ctx)
 
 void sessionProcessUDPPacket(IPv6Address* src, IPv6Address* dst, uint16_t srcPort, uint16_t dstPort, uint8_t* packet, size_t numberOfBytes )
 {
-    printf("<enter %s>\n",__func__);
-
     // TODO: Put this in a session context.
     lastRxPacketSrc     = dst;
     lastRxPacketDst     = src;
     lastRxPacketSrcPort = dstPort;
     lastRxPacketDstPort = srcPort;
     
-    if( currentPacket != NULL) {
+    while( currentPacket != NULL) {
         printf("got packet too quickly, dropping it.\n");
+        sleep(1);
     }
-    else {
 
-        // Take a copy of the packet.
-        currentPacket   = (uint8_t*)malloc(numberOfBytes);
-        numberOfBytesInCurrentPacket    = numberOfBytes;
-        currentPacketReadOffset         = 0;
-        memcpy( &currentPacket[0], packet, numberOfBytes );
-    }
+    // Take a copy of the packet.
+    currentPacket   = (uint8_t*)malloc(numberOfBytes);
+    numberOfBytesInCurrentPacket    = numberOfBytes;
+    currentPacketReadOffset         = 0;
+    memcpy( &currentPacket[0], packet, numberOfBytes );
 
     // Let WolfSSL process the packet via the I/O callbacks.
     int res = wolfSSL_read( ssl, packet, numberOfBytes );
@@ -117,21 +118,9 @@ void sessionProcessUDPPacket(IPv6Address* src, IPv6Address* dst, uint16_t srcPor
     //
     //res = wolfSSL_write( ssl, packet, numberOfBytes);
 
-#ifdef CONFIG_ECHO_SERVER
-    // Process payload
-    uint8_t string[128] = {0};
-    memcpy( &string[0], packet, numberOfBytes );
-    printf("[%s]\n", string);
-
-    //
-    // echo the packet back.
-    //
-    uint8_t     response[128]   = {0};
-    sprintf(response,"[%s]",string);
-    encodeUDPFrame( src, dst, srcPort, dstPort, response, strlen(response) );
-#endif
-
-    printf("<exit %s>\n",__func__);
+    if( wolfSSL_is_init_finished(ssl) != 0 ) {
+        printf("DTLS session negotiated.\n");
+    }
 }
 
 
@@ -202,17 +191,14 @@ void sessionInit()
     //wolfSSL_CTX_UseTrustedCaKeys(ctx);
 
     // limit the list of supported suites
-    wolfSSL_CTX_set_cipher_list(ctx, "ECDHE-ECDSA-AES128-CCM-8");
-    wolfSSL_CTX_set_cipher_list(ctx, "ECDHE-ECDSA-AES128-CBC-SHA");
+    //wolfSSL_CTX_set_cipher_list(ctx, "ECDHE-ECDSA-AES128-CCM-8");
+    //wolfSSL_CTX_set_cipher_list(ctx, "ECDHE-ECDSA-AES128-CBC-SHA");
+    // TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8
 
     //
-    wolfSSL_set_verify(ssl, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
+    //wolfSSL_set_verify(ssl, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
 
     //
     //int res = wolfSSL_negotiate(ssl);
-
-    if( wolfSSL_is_init_finished(ssl) != 0 ) {
-        printf("DTLS session negotiated.\n");
-    }
 }
 
