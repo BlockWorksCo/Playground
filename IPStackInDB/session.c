@@ -196,7 +196,7 @@ void sessionInit()
     // TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8
 
     //
-    //wolfSSL_set_verify(ssl, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
+    wolfSSL_set_verify(ssl, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
 
     //
     //int res = wolfSSL_negotiate(ssl);
