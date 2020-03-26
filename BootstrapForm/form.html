@@ -9,7 +9,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>Signin Template for Bootstrap</title>
+    <title>CyanConnode Meter Configurator</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -36,17 +36,51 @@
     <div class="container">
 
       <form class="form-signin">
-        <h2 class="form-signin-heading">Please sign in</h2>
+        <h2 class="form-signin-heading">Meter Configurator</h2>
         <label for="inputEmail" class="sr-only">Email address</label>
-        <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
-        <label for="inputPassword" class="sr-only">Password</label>
-        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" value="remember-me"> Remember me
-          </label>
-        </div>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <input type="text" id="meterIdList" class="form-control" placeholder="MeterId1, MeterId2, etc" required autofocus>
+
+<h3 class="form-signin-heading">Job Type</h2>
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
+  <label class="form-check-label" for="exampleRadios1">
+    Load Curtailment
+  </label>
+</div>
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
+  <label class="form-check-label" for="exampleRadios2">
+    Capture period
+  </label>
+</div>
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3" value="option3" disabled>
+  <label class="form-check-label" for="exampleRadios3">
+    Self destruct
+  </label>
+</div>
+
+<h3 class="form-signin-heading">Capture Period</h2>
+    <input type="number" id="capturePeriod" class="form-control" placeholder="15" required>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="remember-me"> Remember me
+      </label>
+    </div>
+
+<h3 class="form-signin-heading">Meter Upgrade</h2>
+  <div class="form-group">
+    <label for="exampleFormControlFile1">Meter upgrade file</label>
+    <input type="file" class="form-control-file" id="exampleFormControlFile1">
+  </div>
+
+<h3 class="form-signin-heading">Node Upgrade</h2>
+  <div class="form-group">
+    <label for="exampleFormControlFile1">Node upgrade file</label>
+    <input type="file" class="form-control-file" id="exampleFormControlFile1">
+  </div>
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Create Job</button>
       </form>
 
     </div> <!-- /container -->
