@@ -1,16 +1,8 @@
 <template>
-  <v-app clipped-left=true>
+  <v-app>
 
-   <v-navigation-drawer clipped-left=false>
-     <DocList/>
-    </v-navigation-drawer>
+    <v-app-bar app clipped-left color="primary" dark flat class="deep-purple accent-4" >
 
-    <v-app-bar
-      app
-      color="primary"
-      dark
-      flat
-    >
       <div class="d-flex align-center">
         <v-img
           alt="Engrafica Logo"
@@ -43,13 +35,20 @@
       </v-btn>
     </v-app-bar>
 
-    <v-content>
+    <v-navigation-drawer app v-model="drawer" clipped class="deep-purple accent-3">
+        <DocList/>
+    </v-navigation-drawer>
+
+    <v-content app>
       <DocView/>
     </v-content>
+
   </v-app>
 </template>
 
+
 <script>
+
 import DocList from './components/DocList';
 import DocView from './components/DocView';
 
@@ -63,6 +62,7 @@ export default {
 
   data: () => ({
     //
+    drawer: true,
   }),
 };
 </script>
