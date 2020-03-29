@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from flask import Flask, request, send_from_directory
 
 # set the project root directory as the static folder, you can set others.
@@ -8,6 +10,6 @@ def send_js(path):
     return send_from_directory('static', path)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host='0.0.0.0',port=8080, ssl_context=('cert.pem', 'key.pem'))
 
 
