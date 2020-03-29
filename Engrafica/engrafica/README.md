@@ -1,5 +1,11 @@
 # engrafica
 
+
+##
+npm install -g @vue/cli
+npm install -g @vue/cli-service-global
+vue add vuetify
+
 ## Project setup
 ```
 npm install
