@@ -86,6 +86,16 @@
             {{ eco.text }}
           </a>
         </v-row>
+
+    <div>
+		{{currentPage}} / {{pageCount}}
+		<pdf
+			src="../assets/MAX7400-MAX7407.pdf "
+			@num-pages="pageCount = $event"
+			@page-loaded="currentPage = $event"
+		></pdf>
+	</div>
+
         <v-row>
             <p>one two three dourwerw erwe r we rw e r </p>
             <p>one two three dourwerw erwe r we rw e r </p>
@@ -139,10 +149,19 @@
 </template>
 
 <script>
+ 
+ import pdf from 'vue-pdf'
+
   export default {
     name: 'DocView',
 
+    components: {
+		pdf
+	},
+
     data: () => ({
+      currentPage: 0,
+      pageCount: 0,
       ecosystem: [
         {
           text: 'vuetify-loader',
