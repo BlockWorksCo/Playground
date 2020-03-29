@@ -1,6 +1,17 @@
 <template>
      <v-list dense>
 
+        <v-list-item>
+          <v-list dense>
+            <v-list-item>
+              <v-title>Search</v-title>
+            </v-list-item>
+            <v-list-item>
+              <v-text-field shaped outlined clearable dense filled rounded> Documents </v-text-field>
+            </v-list-item>
+          </v-list>
+        </v-list-item>
+
         <DocListItem/>
         <DocListItem/>
         <DocListItem/>

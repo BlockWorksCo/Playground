@@ -2,10 +2,10 @@
 
        <v-list-item two-line>
          <v-list-item-content>
-           <v-list-item-title>Two-line item</v-list-item-title>
+           <v-list-item-title>FileName.pdf</v-list-item-title>
            <v-list-item-subtitle>
-             <v-chip class="ma-2" color="green" text-color="white" > Green Chip </v-chip>
-             <v-chip class="ma-2" color="blue" text-color="white" > Blue Chip </v-chip>
+             <v-chip small close class="ma-2"> One </v-chip>
+             <v-chip small close class="ma-2"> Two </v-chip>
            </v-list-item-subtitle>
          </v-list-item-content>
        </v-list-item>
