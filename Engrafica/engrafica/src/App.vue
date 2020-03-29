@@ -1,16 +1,22 @@
 <template>
-  <v-app>
+  <v-app clipped-left=true>
+
+   <v-navigation-drawer clipped-left=false>
+     <DocList/>
+    </v-navigation-drawer>
+
     <v-app-bar
       app
       color="primary"
       dark
+      flat
     >
       <div class="d-flex align-center">
         <v-img
-          alt="Vuetify Logo"
+          alt="Engrafica Logo"
           class="shrink mr-2"
           contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
+          src="./assets/logo.png"
           transition="scale-transition"
           width="40"
         />
@@ -20,7 +26,7 @@
           class="shrink mt-1 hidden-sm-and-down"
           contain
           min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
+          src="./assets/EngraficaName.png"
           width="100"
         />
       </div>
@@ -38,19 +44,21 @@
     </v-app-bar>
 
     <v-content>
-      <HelloWorld/>
+      <DocView/>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+import DocList from './components/DocList';
+import DocView from './components/DocView';
 
 export default {
   name: 'App',
 
   components: {
-    HelloWorld,
+    DocView,
+    DocList,
   },
 
   data: () => ({
