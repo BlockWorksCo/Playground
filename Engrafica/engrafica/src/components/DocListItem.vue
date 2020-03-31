@@ -2,7 +2,7 @@
 
        <v-list-item two-line>
          <v-list-item-content>
-           <v-list-item-title>FileName.pdf</v-list-item-title>
+           <v-list-item-title dark >FileName.pdf</v-list-item-title>
            <v-list-item-subtitle>
              <v-chip small close class="ma-2"> One </v-chip>
              <v-chip small close class="ma-2"> Two </v-chip>

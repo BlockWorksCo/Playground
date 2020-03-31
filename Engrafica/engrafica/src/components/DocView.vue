@@ -87,14 +87,12 @@
           </a>
         </v-row>
 
-    <div>
-		{{currentPage}} / {{pageCount}}
-		<pdf
-			src="../assets/MAX7400-MAX7407.pdf "
-			@num-pages="pageCount = $event"
-			@page-loaded="currentPage = $event"
-		></pdf>
-	</div>
+
+<pdf src="./public/sn74hc595.pdf" :page="1">
+    <template slot="loading">
+      loading content here...
+    </template>
+  </pdf>
 
         <v-row>
             <p>one two three dourwerw erwe r we rw e r </p>
@@ -150,7 +148,7 @@
 
 <script>
  
- import pdf from 'vue-pdf'
+ import pdf from 'pdfvuer'
 
   export default {
     name: 'DocView',

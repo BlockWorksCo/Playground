@@ -1,7 +1,7 @@
 <template>
   <v-app>
 
-    <v-app-bar app clipped-left hide-on-scroll color="primary" dark flat class="deep-purple accent-4" >
+    <v-app-bar app clipped-left hide-on-scroll color="primary" dark flat class="primary" >
 
 
       <div class="d-flex align-center">
@@ -15,7 +15,7 @@
         <v-icon>mdi-open-in-new</v-icon>
     </v-app-bar>
 
-    <v-navigation-drawer app v-model="drawer" clipped class="deep-purple accent-4">
+    <v-navigation-drawer app v-model="drawer" clipped class="primary">
         <DocList/>
     </v-navigation-drawer>
 
