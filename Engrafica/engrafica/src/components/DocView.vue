@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <pdf src="https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf" :page="1">
+    <pdf src="https://0.0.0.0:8081/MAX7400-MAX7407.pdf" :page="1">
     <template slot="loading">
       loading content here...
     </template>
