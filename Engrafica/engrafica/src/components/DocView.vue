@@ -29,7 +29,7 @@
       </a>
     </div>
 
-    <pdf src="https://0.0.0.0:8081/MAX7400-MAX7407.pdf" v-for="i in numPages" :key="i" :id="i" :page="i"
+    <pdf :src="pdfdata" v-for="i in numPages" :key="i" :id="i" :page="i"
       :scale.sync="scale" style="width:100%;margin:20px auto;">
     <template slot="loading">
       loading content here...
@@ -41,12 +41,13 @@
 
 <script>
 
- // https://github.com/arkokoley/pdfvuer
+  // https://github.com/arkokoley/pdfvuer
  
- import pdfvuer from 'pdfvuer'
- import $ from 'jquery'
+  import pdfvuer from 'pdfvuer'
+  import $ from 'jquery'
 
   export default {
+
     //
     name: 'DocView',
 
@@ -58,48 +59,47 @@
     //
     data: () => ({
       page: 1,
-      numPages: 3,
+      numPages: 0,
       scale: 'page-width',
-
 
     }),
 
     //
-  computed: {
-    formattedZoom () {
+    computed: {
+      formattedZoom () {
         return Number.parseInt(this.scale * 100);
-    },
-  },
-
-    //
-  mounted () {
-    this.getPdf()
-  },
-
-    //
-  watch: {
-    show: function (s) {
-      if(s) {
-        this.getPdf();
-      }
+      },
     },
 
     //
-    page: function (p) {
-      if( window.pageYOffset <= this.findPos(document.getElementById(p)) || ( document.getElementById(p+1) && window.pageYOffset >= this.findPos(document.getElementById(p+1)) )) {
-        // window.scrollTo(0,this.findPos(document.getElementById(p)));
-        document.getElementById(p).scrollIntoView();
-      }
-    }
-  },
-
+    mounted () {
+      this.getPdf()
+    },
 
     //
-    methods: {
+    watch: {
+      show: function (s) {
+        if(s) {
+          this.getPdf();
+        }
+      },
 
-        getPdf () {
-          var self = this;
-          self.pdfdata = pdfvuer.createLoadingTask('./static/relativity.pdf');
+     //
+     page: function (p) {
+       if( window.pageYOffset <= this.findPos(document.getElementById(p)) || ( document.getElementById(p+1) && window.pageYOffset >= this.findPos(document.getElementById(p+1)) )) {
+         // window.scrollTo(0,this.findPos(document.getElementById(p)));
+         document.getElementById(p).scrollIntoView();
+       }
+     }
+   },
+
+
+     //
+     methods: {
+
+       getPdf () {
+         var self = this;
+          self.pdfdata = pdfvuer.createLoadingTask('https://0.0.0.0:8081/MAX7400-MAX7407.pdf');
           self.pdfdata.then(pdf => {
             self.numPages = pdf.numPages;
             window.onscroll = function() { 
