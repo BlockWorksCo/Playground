@@ -1,13 +1,16 @@
 <template>
   <v-app>
 
-    <v-navigation-drawer app v-model="drawer" clipped class="primary" temporary>
-        <DocList/>
+    <v-navigation-drawer app v-model="drawer" clipped class="primary" temporary >
+        <div @mouseleave="hide($event)">
+            <DocList/>
+        </div>
     </v-navigation-drawer>
 
     <v-content app>
-        <v-btn z-index=999 color="rgb(255, 0, 0, 0.0)" flat fixed dark @mouseover="show()" @mouseleave="hide()" @click.stop="drawer = !drawer" >toggle</v-btn>
-      <DocView/>
+      <div @mouseover="move($event)" @mouseenter="enter($event)" >
+        <DocView/>
+      </div>
     </v-content>
 
   </v-app>
@@ -43,8 +46,24 @@ export default {
 
         //
         hide: function() {
-            this.drawer=true;
-        }
+            this.drawer=false;
+        },
+
+        //
+        move: function(event) {
+            //console.log(event.clientX);
+            if(event.clientX < 100) {
+                this.show();
+            }
+        },
+
+        //
+        enter: function(event) {
+            console.log(event.clientX);
+            if(event.clientX < 100) {
+                this.show();
+            }
+        },
     }
 
 };

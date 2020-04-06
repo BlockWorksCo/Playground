@@ -29,7 +29,7 @@
       </a>
     </div>
 
-    <pdf :src="pdfdata" v-for="i in numPages" :key="i" :id="i" :page="i"
+    <pdf :src="pdfdata" @mouseenter="move($event)" v-for="i in numPages" :key="i" :id="i" :page="i"
       :scale.sync="scale" style="width:100%;margin:20px auto;">
     <template slot="loading">
       loading content here...
