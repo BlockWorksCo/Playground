@@ -29,47 +29,26 @@
       </a>
     </div>
 
-    <pdf :src="pdfdata" @mouseenter="move($event)" v-for="i in numPages" :key="i" :id="i" :page="i"
-      :scale.sync="scale" style="width:100%;margin:20px auto;">
-    <template slot="loading">
-      loading content here...
-    </template>
-  </pdf>
+    <pdf :src="pdfdata" @mouseenter="move($event)" v-for="i in numPages" :key="i" :id="i" :page="i" :scale.sync="scale" style="width:100%;margin:20px auto;">
+      <template slot="loading">
+        loading content here...
+      </template>
+    </pdf>
 
-<v-speed-dial fab top right open-on-hover fixed direction="left" >
+    <v-speed-dial fab top right open-on-hover fixed direction="left" >
       <template v-slot:activator>
-        <v-btn
-          v-model="fab"
-          color="blue darken-2"
-          dark
-          fab
-        >
+        <v-btn v-model="fab" color="blue darken-2" dark fab >
           <v-icon v-if="fab">mdi-close</v-icon>
           <v-icon v-else>mdi-account-circle</v-icon>
         </v-btn>
       </template>
-      <v-btn
-        fab
-        dark
-        small
-        color="green"
-      >
+      <v-btn fab dark small color="green" >
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
-      <v-btn
-        fab
-        dark
-        small
-        color="indigo"
-      >
+      <v-btn fab dark small color="indigo" >
         <v-icon>mdi-plus</v-icon>
       </v-btn>
-      <v-btn
-        fab
-        dark
-        small
-        color="red"
-      >
+      <v-btn fab dark small color="red" >
         <v-icon>mdi-delete</v-icon>
       </v-btn>
     </v-speed-dial>
@@ -83,7 +62,7 @@
   // https://github.com/arkokoley/pdfvuer
  
   import pdfvuer from 'pdfvuer'
-  import $ from 'jquery'
+  //import $ from 'jquery'
 
   export default {
 
@@ -153,6 +132,7 @@
          document.getElementById(p).scrollIntoView();
        }
      }
+
    },
 
 
@@ -165,10 +145,11 @@
           self.pdfdata.then(pdf => {
             self.numPages = pdf.numPages;
             window.onscroll = function() { 
-              changePage() 
-              stickyNav()  
+              //changePage() 
+              //stickyNav()  
             }
 
+/*
             // Get the offset position of the navbar
             var sticky = $('#buttons')[0].offsetTop
 
@@ -194,6 +175,8 @@
                 self.page = i
               }
             }
+*/
+
           });
         },
 
