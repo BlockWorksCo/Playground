@@ -9,7 +9,7 @@
 
     <v-content app>
       <div @mouseover="move($event)" @mouseenter="enter($event)" >
-        <DocView/>
+        <PDFView :filename="filename" :src="src" />
       </div>
     </v-content>
 
@@ -20,20 +20,27 @@
 <script>
 
 import DocList from './components/DocList';
-import DocView from './components/DocView';
+//import DocView from './components/DocView';
+import PDFView from './views/PDFView';
 
 export default {
   name: 'App',
 
   components: {
-    DocView,
+    //DocView,
     DocList,
+    PDFView,
   },
 
   data: () => ({
     //
     drawer: true,
 
+    //
+    filename: "https://0.0.0.0:8081/MAX7400-MAX7407.pdf",
+
+    //
+    src: "https://0.0.0.0:8081/MAX7400-MAX7407.pdf",
   }),
 
     //
