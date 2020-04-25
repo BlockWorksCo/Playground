@@ -14,7 +14,7 @@ CORS(app)
 
 @app.route('/<path:path>')
 def staticFiles(path):
-    return send_from_directory('static', path)
+    return send_from_directory('static', path, conditional=True)
 
 @app.route('/Step1Submit', methods=['POST'])
 def Step1Submit():
