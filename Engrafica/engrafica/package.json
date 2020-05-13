@@ -19,7 +19,8 @@
     "vue": "^2.6.11",
     "vue-pdf": "^4.0.8",
     "vue-router": "^3.1.5",
-    "vuetify": "^2.2.11"
+    "vuetify": "^2.2.11",
+    "web-streams-polyfill": "^2.1.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.2.0",

@@ -8,8 +8,8 @@
     </v-navigation-drawer>
 
     <v-content app>
-      <div @mouseover="move($event)" @mouseenter="enter($event)" >
-        <PDFView :filename="filename" :src="src" />
+      <div id="appSidebar" @mouseover="move($event)" @mouseenter="enter($event)" >
+        <PDFView :filename="filename" :src="src" @mouseover="move($event)" @mouseenter="enter($event)" />
       </div>
     </v-content>
 
@@ -75,3 +75,13 @@ export default {
 
 };
 </script>
+
+
+<style>
+
+
+    #appSidebar {
+        height: 100%;
+    }
+
+</style>
