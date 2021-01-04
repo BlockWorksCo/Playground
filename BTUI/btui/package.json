@@ -4,7 +4,7 @@
   "description": "bluetooth UI",
   "main": "index.html",
   "dependencies": {
-    "axios": "^0.17.1",
+    "axios": "^0.21.1",
     "vue": "^2.5.13",
     "vuetify": "^0.17.6"
   },
